@@ -1,0 +1,9 @@
+#DO NOT PUSH YOUR BLOODY API KEY
+*.env
+
+#VIM
+*.swp
+*.swo
+*tags
+
+
