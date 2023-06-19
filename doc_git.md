@@ -75,7 +75,7 @@ Add the last commit (the one you wish to keep) on top of the commit message and 
 >   
 > ADD THIS WILL STAY:  
 
-If you had already pushed the commits you've just squashed, you will to force the next push  
+If you had already pushed the commits you've just squashed, you will have to force the next push  
 	`git push --force`  
 
 #### GIT ADD -P:
@@ -84,6 +84,7 @@ You may want to add some lines of your file instead of all of it (you want to co
 	`git add -p filename` 
 will interactively highlight block of lines which had undergone a change since the last commit.
 - if you want to keep those lines as they are, type "y" and you will be shown the following ones.
-- if you do not, type "e" and the editor will give you the possiblity to single out each line out of the block and decide whether you want to add them.
+- if you do not, type "e" and the editor will give you the possiblity to single out each line from the block and decide whether you want to add them.  
+- you can also type "?" to see an overview of the options available to you
 
 When you reach the end of the file, commit as usual.  
