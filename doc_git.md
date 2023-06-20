@@ -6,18 +6,18 @@ We always work on our own branch, which will be named in the same fashion : "[in
 To create such a branch  
 	`git checkout -b [initials]/[branch name]`
 
-/!\ No one is allowed to code on this branch, except its owner. If you need to test it or you need some of the code, you **must** create a new branch using the above command.  
+/!\ No one is allowed to code on this branch, except its owner. If you need to test it or you need some of the code, you **MUST** create a new branch using the above command.  
 
 #### Branch rebase to apply changes after a Pull Request(PR):
 
 Make sure you are on master with:  
-	`git checkout master`  
+	`git checkout master`  or `git switch master`  
   
 Apply the changes to your local master branch:  
 	`git pull`  
   
 Now you need to update your local [in]/[branch]:  
-	`git checkout [in]/[branch]`  
+	`git checkout [in]/[branch]`  or `git switch [in]/[branch]  
 	`git rebase master`  
   
 You may have conflicts to deal with. While they seem daunting at first, take a deep breath and carefully deal with them one by one.  
@@ -25,7 +25,7 @@ If several commits are to be applied to your branch, you might have to deal with
 Fix the files, add them, then check the message on the terminal and type:  
 	`git rebase --continue`  
 when prompted  
-/!\ At this stage, you **must** test your code to ensure that the conflicts were properly resolved and everything runs as smoothly as expected.  
+/!\ At this stage, you **MUST** test your code to ensure that the conflicts were properly resolved and everything runs as smoothly as expected.  
 
 #### WIP-free working tree:
 
