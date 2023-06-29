@@ -99,6 +99,16 @@ class Ball
 				}
 			}
 		}
+		this.degrees_to_radians = (degrees) =>
+		{
+			let pi = Math.PI;
+			return (degrees * (pi/180));
+		};
+		this.radians_to_degrees = (radians) =>
+		{
+		  let pi = Math.PI;
+		  return (radians * (180/pi));
+		};
 		// this.leftPlayerBounceAngle = () =>
 		// {
 		// 	let relativeIntersectY = (this.game.player_one.pos.y + (this.game.player_one.racket.dim.height / 2)) - this.pos.y;
