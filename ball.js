@@ -11,24 +11,32 @@ class Ball
 		this.game = undefined;
 		this.speed = 0;
 		this.angle = 0;
-		this.bounce = 0;
+		// this.bounce = 0;
 		this.moveDirection = undefined;
 		this.firstSetDirection = 1;
-		this.maxbounceAngle = 0;
+		// this.maxbounceAngle = 0;
+		this.maxAngle = 0;
+		this.maxSpeed = 0;
 		this.init = () =>
 		{
 			this.pos.x = this.game.board.dim.width / 2;
 			this.pos.y = this.game.board.dim.height / 2;
 			this.radius = this.game.board.dim.width * 0.012;
 			this.speed = (this.radius / 2) * 0.5;
-			this.maxbounceAngle = (5 * Math.PI) / 12;
+			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{
 				let direction = Math.floor(Math.random() * 10);	
 				if (direction % 2 == 0)
+				{
 					this.moveDirection = "left";
+					this.angle = this.degrees_to_radians(180);
+				}
 				else
+				{
 					this.moveDirection = "right";
+					this.angle = this.radians_to_degrees(0);
+				}
 			}
 			this.firstSetDirection = 0;
 		}
@@ -48,8 +56,14 @@ class Ball
 		{
 			if (this.moveDirection == "left")
 				this.moveLeft();
-			if (this.moveDirection == "right")
+			// if (this.moveDirection == "right")
+			else
 				this.moveRight();
+			// if (this.angle > this.degrees_to_radians(90)
+			// 	&& this.angle <= this.degrees_to_radians(270))
+			// 	this.moveLeft();
+			// else
+			// 	this.moveRight();
 		}
 		this.moveLeft = () =>
 		{
@@ -59,15 +73,10 @@ class Ball
 				if (this.game.player_one.isLeftPlayer(newPos, this.pos.y) == true)
 				{
 					this.moveDirection = "right";
-					// this.leftPlayerBounceAngle();
 				}
 				else
 				{
 					this.pos.x = this.pos.x - this.speed;
-					// if (this.pos.y - this.radius < 0 
-					// 	|| this.pos.y + this.radius > this.game.board.dim.height)
-					// 	this.bounce *= -1;
-					// this.pos.y += this.bounce;
 				}
 				if (this.pos.x <= 0)
 				{
@@ -87,9 +96,6 @@ class Ball
 				else
 				{
 					this.pos.x = this.pos.x + this.speed;
-					// if (this.pos.y - this.radius < 0
-					// 	|| this.pos.y + this.radius > this.game.board.height)
-					// 	this.bounce *= -1;
 				}
 				if (this.pos.x >= this.game.board.dim.width)
 				{
