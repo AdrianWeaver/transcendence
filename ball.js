@@ -1,3 +1,5 @@
+//https://maththebeautiful.com/ball-bounce/
+
 class Ball
 {
 	constructor()
