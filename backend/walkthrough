@@ -1,0 +1,222 @@
+
+
+    
+   
+Walkthrought For dev
+
+    So we are inside the back-end folder with nestjs 
+    We start to create the image with the docker compose
+    
+    First one : 
+    "docker build -t dev ."
+    Can take time, -t is for the name of the image
+    Flag -g is designed to install globally and not in the project 
+    
+    here we are, we've got the image ready to the project
+    we can put the next line, but change for dev, we dont need to suppress 
+    after the exit of the container.
+    docker run -ti --rm -v $(pwd)/app:/app -p 3000:3000 dev
+    
+    So "docker run -ti -v $(pwd)/app:/app -p 3000:3000 dev"
+    We say we want to run in interactive tty mode (-ti) and we want to 
+    Bind the volume on the current folder/app to /app inside the container
+    
+    we bind the port 3000 o0n each side. 
+    Finaly we select "dev" images
+    
+    Folder app is already created.
+    
+    /app/transcendance is the root of the project nestjs
+    
+    ./dist is the build of the project, already done,
+    
+    ./package.json is defined to set-up and install the project.
+    
+    So here we go. I've already configure the project.
+    
+    we need to type npm install. 
+    
+    Previous error is generated because the installer of npm doesn't find package.json
+    
+    Vulnerability we'll be fixed soon,
+    
+    Now a folder node_modules is created, and a package-lock.json
+    We need to avoid to push it on the git.
+    In fact it lock the configuration, so you can't install if file is
+    available.
+    
+    So here we are. if we see this, it is all done for set up project. 
+    
+    We've got script into package.json
+    
+    Build will create the build of the app into dist, let's try it.
+    Some script doesn't require run keyword. 
+    
+    
+    build : npm run build 
+    all right !
+    
+    
+    Considering we are in dev mode .
+    So we can do "npm run start:dev" 
+        it will watch file change.
+        
+    pm2 script will come soon. But for dev now it take no importance. 
+    
+    If we want to check the norme of the code (the quality of the code)
+    npm run lint
+    
+    we can see everithing is okay. except type script version but anyway
+    if we've got problem, we'll see something like that.
+    
+    right XD
+    All norme will be threated as error. We ckan discuss about
+    it if consistance is not good.
+    
+    DONT FIX IT MANNUALY, or maybe but no warranty about that.
+    
+    You've got a plugin in vscode called eslint, I choose this one,
+    You've got directly correct code style
+    
+    
+    Allright for the code style. 
+    
+    Let's run in dev mode our app . 
+    
+    Our app is correctly launch 
+    To test our app we go to the first module created by the nest/cli
+    
+    
+    listen on 3000
+    
+    AppModule have a controller, and a service. 
+    
+    controller is for the methods, GET, POST etc... 
+    
+    services is designed to handle the data.
+    
+    import is designed to add new modules. We skip it for now. 
+    
+    It crash because I've got auto-save. 
+    
+    re-launch dev mode 
+    
+    Common Case, for now we need to close the process, we can't reuse the port 
+    
+    Installing htop and added to the dockerfile.
+        killing with k and press enter to select SIGTERM 
+        
+        
+    Okay, 
+    Service is the data handler. 
+    
+    We see the controller has the decorator @Get from nestjs feature
+    It is more simple than express :) 
+    
+    The decorator @Controller is design to handle the route
+    
+    for exemple: 
+    @Controller() refer to the root of the server 
+        in eg : "localhost:3000/"
+        
+    We can also do: 
+    @Controller("products") refer to "localhost:3000/products/"
+    
+    The decorator @Get(":id") can have a string. :id is for params of 
+        the request. Dynamic :)
+    
+    but can also be a static 
+            For example : @Controller("products") and @Get("promo")
+            will refer to "localhost:3000/products/promo"
+            
+    Finaly it is really easy to create module.
+    This module is the default module. 
+    Next video will explain how to create a CRUD oparation. 
+    
+    
+    For testing manually the module we can use POSTMAN, it is really easy 
+    To dev without jest or else. 
+    Be carefull to make documentation. :)
+    
+    So try the route "/"
+    
+    We can try something else
+    
+    That's all for now :)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
