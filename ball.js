@@ -68,7 +68,9 @@ class Ball
 				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
 				if (this.game.player_one.isLeftPlayer(newPosX, newPosY) == true)
 				{
-					this.angle = this.radians_to_degrees(0);
+     				this.angle = Math.PI - this.angle;
+					this.angle = this.degrees_to_radians(0);
+					this.angle -= this.degrees_to_radians(this.getBounceAngle());
 				}
 				else
 				{
@@ -80,7 +82,7 @@ class Ball
 				if (this.pos.x <= 0)
 				{
 					this.game.player_two.score += 1;
-					this.degrees_to_radians(180);
+					this.angle = this.degrees_to_radians(180);
 					this.init();
 				}
 			}
@@ -93,7 +95,9 @@ class Ball
 				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
 				if (this.game.player_two.isRightPlayer(newPosX, newPosY) == true) 
 				{
-					this.angle = this.degrees_to_radians(180);
+					this.pos.x = this.game.board.dim.width - this.radius;
+     				this.angle = Math.PI - this.angle;
+					this.angle += this.degrees_to_radians(this.getBounceAngle());
 				}
 				else
 				{
@@ -136,13 +140,19 @@ class Ball
 			let pi = Math.PI;
 			return (radians * (180/pi));
 		};
-		// this.leftPlayerBounceAngle = () =>
-		// {
-		// 	let relativeIntersectY = (this.game.player_one.pos.y + (this.game.player_one.racket.dim.height / 2)) - this.pos.y;
-		// 	//ball's interception relative to the middle of the paddle
-		// 	let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_one.racket.dim.height / 2);
-		// 	let bounceAngle = normalizedRelativeIntersectionY * this.maxBounceAngle;
-		// 	this.bounce = bounceAngle;
-		// }
+		this.getBounceAngle = () =>
+		{
+			let relativeIntersectY = 0;
+			if (this.pos.x > this.game.board.dim.width / 2)
+			{
+				relativeIntersectY = (this.game.player_two.pos.y + (this.game.player_two.racket.dim.height / 2)) - this.pos.y;
+			}
+			else
+				relativeIntersectY = (this.game.player_one.pos.y + (this.game.player_two.racket.dim.height / 2)) - this.pos.y;
+			//ball's interception relative to the middle of the paddle
+			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
+			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees(this.maxAngle);
+			return (bounceAngle);
+		}
 	}
 }
