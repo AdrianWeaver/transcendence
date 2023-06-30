@@ -54,34 +54,35 @@ class Ball
 		}
 		this.move = () =>
 		{
-			if (this.moveDirection == "left")
-				this.moveLeft();
-			// if (this.moveDirection == "right")
-			else
-				this.moveRight();
-			// if (this.angle > this.degrees_to_radians(90)
-			// 	&& this.angle <= this.degrees_to_radians(270))
+			// if (this.moveDirection == "left")
 			// 	this.moveLeft();
 			// else
 			// 	this.moveRight();
+			if (this.angle > this.degrees_to_radians(90)
+				&& this.angle <= this.degrees_to_radians(270))
+				this.moveLeft();
+			else
+				this.moveRight();
 		}
 		this.moveLeft = () =>
 		{
 			if (this.game.continueAnimating == true)
 			{
-				let newPos = this.pos.x - this.speed;
-				if (this.game.player_one.isLeftPlayer(newPos, this.pos.y) == true)
+				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speed;
+				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
+				if (this.game.player_one.isLeftPlayer(newPosX, newPosY) == true)
 				{
-					this.moveDirection = "right";
+					this.angle = this.radians_to_degrees(0);
 				}
 				else
 				{
-					this.pos.x = this.pos.x - this.speed;
+					this.pos.x += Math.cos ( this.angle ) * this.speed;
+					this.pos.y += Math.sin ( this.angle ) * this.speed;
 				}
 				if (this.pos.x <= 0)
 				{
 					this.game.player_two.score += 1;
-					this.moveDirection = "left";
+					this.degrees_to_radians(180);
 					this.init();
 				}
 			}
@@ -90,17 +91,21 @@ class Ball
 		{
 			if (this.game.continueAnimating == true)
 			{
-				let newPos = this.pos.x + this.speed;
-				if (this.game.player_two.isRightPlayer(newPos, this.pos.y) == true)
-					this.moveDirection = "left";
+				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speed;
+				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
+				if (this.game.player_two.isRightPlayer(newPosX, newPosY) == true) 
+				{
+					this.angle = this.degrees_to_radians(180);
+				}
 				else
 				{
-					this.pos.x = this.pos.x + this.speed;
+					this.pos.x += Math.cos ( this.angle ) * this.speed;
+					this.pos.y += Math.sin ( this.angle ) * this.speed;
 				}
 				if (this.pos.x >= this.game.board.dim.width)
 				{
 					this.game.player_one.score += 1;
-					this.moveDirection = "right";
+					this.angle = this.degrees_to_radians(0);
 					this.init();
 				}
 			}
@@ -112,8 +117,8 @@ class Ball
 		};
 		this.radians_to_degrees = (radians) =>
 		{
-		  let pi = Math.PI;
-		  return (radians * (180/pi));
+			let pi = Math.PI;
+			return (radians * (180/pi));
 		};
 		// this.leftPlayerBounceAngle = () =>
 		// {
