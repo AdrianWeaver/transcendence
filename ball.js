@@ -54,10 +54,6 @@ class Ball
 		}
 		this.move = () =>
 		{
-			// if (this.moveDirection == "left")
-			// 	this.moveLeft();
-			// else
-			// 	this.moveRight();
 			if (this.angle > this.degrees_to_radians(90)
 				&& this.angle <= this.degrees_to_radians(270))
 				this.moveLeft();
@@ -76,9 +72,11 @@ class Ball
 				}
 				else
 				{
-					this.pos.x += Math.cos ( this.angle ) * this.speed;
-					this.pos.y += Math.sin ( this.angle ) * this.speed;
+					this.pos.x += Math.cos (this.angle) * this.speed;
+					this.pos.y += Math.sin (this.angle) * this.speed;
 				}
+				this.wasTopWallHit();
+				this.wasBottomWallHit();
 				if (this.pos.x <= 0)
 				{
 					this.game.player_two.score += 1;
@@ -102,12 +100,30 @@ class Ball
 					this.pos.x += Math.cos ( this.angle ) * this.speed;
 					this.pos.y += Math.sin ( this.angle ) * this.speed;
 				}
+				this.wasTopWallHit();
+				this.wasBottomWallHit();
 				if (this.pos.x >= this.game.board.dim.width)
 				{
 					this.game.player_one.score += 1;
 					this.angle = this.degrees_to_radians(0);
 					this.init();
 				}
+			}
+		}
+		this.wasTopWallHit = () =>
+		{
+			if ( this.pos.y < this.radius ) 
+			{
+				this.pos.y = this.radius;
+				this.angle = ( Math.PI * 2 ) - this.angle;
+			}
+		}
+		this.wasBottomWallHit = () =>
+		{
+			if ( this.pos.y + this.radius > this.game.board.dim.height )
+			{
+				this.pos.y = this.game.board.dim.height - this.radius;
+				this.angle = ( Math.PI * 2 ) - this.angle;
 			}
 		}
 		this.degrees_to_radians = (degrees) =>
