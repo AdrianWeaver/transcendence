@@ -4,6 +4,17 @@ class	Racket
 	{
 		this.dim = new Dimension();
 		this.game = undefined;
+		this.pos = new Position();
+		this.update = () =>
+		{
+			if (game === undefined)
+				console.error("Game is undefined in Racket obj");
+			console.log("Racket updated");
+		};
+		this.render = () =>
+		{
+			
+		};
 		this.defineRacketSize = () =>
 		{
 			const	ratioHeight = 0.1276595745;

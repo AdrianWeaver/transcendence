@@ -81,7 +81,7 @@ class Ball
 				this.wasBottomWallHit();
 				if (this.pos.x <= 0)
 				{
-					this.game.player_two.score += 1;
+					this.game.player_two.score.value += 1;
 					this.angle = this.degrees_to_radians(180);
 					this.init();
 				}
@@ -108,7 +108,7 @@ class Ball
 				this.wasBottomWallHit();
 				if (this.pos.x >= this.game.board.dim.width)
 				{
-					this.game.player_one.score += 1;
+					this.game.player_one.score.value += 1;
 					this.angle = this.degrees_to_radians(0);
 					this.init();
 				}

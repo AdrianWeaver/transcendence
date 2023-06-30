@@ -6,24 +6,29 @@ const	clear = () =>
 
 const	update = () =>
 {
-	game.player_one.updatePlayerPosition();
-	game.player_two.updatePlayerPosition();
+	game.player_one.update();
+	game.player_two.update();
 	game.ball.update();
 }
 
 const	render = () =>
 {
 	clear();
-	update();
 	
 	game.player_one.render();
 	game.player_two.render();
-	game.player_one.renderScore();
-	game.player_two.renderScore();
 	game.ball.render();
 	game.net.render();
-	window.requestAnimationFrame(render);
 }
+
+const gameEngine = () =>
+{
+	update();
+	render();
+	window.requestAnimationFrame(gameEngine);
+};
+
+window.requestAnimationFrame(gameEngine);
 
 const	keyHookDown = (e) =>
 {
@@ -62,6 +67,11 @@ game.ball.game = game;
 game.net.game = game;
 
 game.board.init();
+game.player_one.init();
+game.player_two.init();
+game.player_one.score.gameRef = game;
+game.player_two.score.gameRef = game;
+console.log(game.player_one.score);
 
 addEventListener("keydown", keyHookDown);
 addEventListener("keyup", keyHookReleased);
@@ -72,4 +82,4 @@ document.getElementById('keepAnimating').addEventListener('click',function(){
 	game.continueAnimating=true;
 	// window.requestAnimationFrame(render);
 });
-window.requestAnimationFrame(render);
+
