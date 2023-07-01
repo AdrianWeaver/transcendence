@@ -121,12 +121,12 @@ class	Player
 			// FIX
 			this.bindPlayerToRacketPos();
 		};
-		this.update = () =>
-		{
-			if ((this.updateSide === undefined)
-				&&!(this.updateSide instanceof Function))
-				return (console.error("Error : no updateSide function provided, please fix with init()"));
-		};
+		// this.update = () =>
+		// {
+		// 	if ((this.updateSide === undefined)
+		// 		&&!(this.updateSide instanceof Function))
+		// 		return (console.error("Error : no updateSide function provided, please fix with init()"));
+		// };
 
 		this.updatePlayerPosition = () =>
 		{
@@ -176,6 +176,7 @@ class	Player
 		this.bindPlayerToRacketPos = () =>
 		{
 			this.racket.pos = this.pos;
+			this.racket.update();
 		}
 		this.isLeftPlayer = (p_pos_x, p_pos_y) =>
 		{

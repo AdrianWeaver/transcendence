@@ -8,6 +8,8 @@ const	update = () =>
 {
 	game.player_one.update();
 	game.player_two.update();
+	game.player_one.updatePlayerPosition();
+	game.player_two.updatePlayerPosition();
 	game.ball.update();
 }
 
@@ -71,7 +73,15 @@ game.player_one.init();
 game.player_two.init();
 game.player_one.score.gameRef = game;
 game.player_two.score.gameRef = game;
-console.log(game.player_one.score);
+game.player_one.racket.angleSelector.gameRef = game;
+game.player_two.racket.angleSelector.gameRef = game;
+game.player_one.racket.gameRef = game;
+game.player_two.racket.gameRef = game;
+
+game.player_one.racket.angleSelector.setActive("left");
+game.player_two.racket.angleSelector.setActive("right");
+
+// game.player_two.racket.angleSelector.isActive = false;
 
 addEventListener("keydown", keyHookDown);
 addEventListener("keyup", keyHookReleased);

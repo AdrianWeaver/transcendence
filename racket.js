@@ -3,17 +3,22 @@ class	Racket
 	constructor()
 	{
 		this.dim = new Dimension();
-		this.game = undefined;
+		this.gameRef = undefined;
 		this.pos = new Position();
+		this.angleSelector = new SelectorAngle();
 		this.update = () =>
 		{
-			if (game === undefined)
-				console.error("Game is undefined in Racket obj");
-			console.log("Racket updated");
+			
+			this.angleSelector.origin =
+			{
+				x: this.pos.x,
+				y: this.pos.y
+			};
+			this.angleSelector.update();
 		};
 		this.render = () =>
 		{
-			
+			this.angleSelector.render();
 		};
 		this.defineRacketSize = () =>
 		{

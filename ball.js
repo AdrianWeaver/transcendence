@@ -26,7 +26,7 @@ class Ball
 			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{
-				let direction = Math.floor(Math.random() * 10);	
+				let direction = Math.floor(Math.random() * 10);
 				if (direction % 2 == 0)
 				{
 					this.moveDirection = "left";
@@ -40,8 +40,8 @@ class Ball
 			}
 			this.firstSetDirection = 0;
 		}
-        this.update = () =>
-        {
+		this.update = () =>
+		{
 			this.radius = this.game.board.dim.width * 0.012;
 		}
 		this.render = () =>
