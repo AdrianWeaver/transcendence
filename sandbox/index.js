@@ -29,9 +29,6 @@ connectedToServer = false;
 connectionAttempt = 0;
 redirectTimer = 3;
 
-/**
- * Need to create the error page or route.
- */
 const	redirectToErrorPage = () =>
 {
 	if (redirectTimer <= 0)
@@ -51,6 +48,22 @@ const	redirectToErrorPage = () =>
 	
 };
 
+const	hideLoader = () =>
+{
+	document.getElementsByClassName("loader")[0].style.visibility = "hidden";
+}
+
+const	hideMatchmaking = () =>
+{
+	document.getElementsByClassName("matchmaking")[0].style.visibility = "hidden";
+}
+
+const	showMatchmakking = () =>
+{
+	document.getElementsByClassName("matchmaking")[0].style.visibility = "visible";
+	console.log (document.getElementsByClassName("matchmaking")[0])
+}
+
 const	connectWebSocket = () =>
 {
 	connectionStatus.innerText = "Server is alive" ;
@@ -65,6 +78,12 @@ const	connectWebSocket = () =>
 		connectionStatus.innerText += "\nYou'll be redirected in "
 			+ redirectTimer + " seconds";
 		setTimeout(redirectToErrorPage, 1000);
+	});
+
+	socket.on("connect", () =>
+	{
+		connectionStatus.innerText = "Loading Success !";
+		setTimeout(hideLoader, 1000);
 	});
 };
 
@@ -96,5 +115,7 @@ const	checkServerAvailability = () =>
 		setTimeout(checkServerAvailability, 1000);
 	});
 };
+
+hideMatchmaking();
 connectionStatus.innerText = "Checking Server...\n " ;
 setTimeout(checkServerAvailability, 1000);
