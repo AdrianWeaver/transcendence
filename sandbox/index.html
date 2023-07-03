@@ -3,9 +3,15 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Transmit data from backend</title>
+		<title>Transmit data from backend - Example</title>
+		<link rel="stylesheet" type="text/css" href="./index.css">
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	</head>
 	<body>
+		<div class="loader center">
+			<p id="connection-status">Loading</p>
+			<div class="bar"></div>
+		</div>
 		<canvas id="game-board">
 			Your browser does not support Javascript.
 		</canvas>
