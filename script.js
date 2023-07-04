@@ -27,7 +27,6 @@ const	render = () =>
 
 const	keyHookDown = (e) =>
 {
-	//console.log(e.keyCode);
 	switch (e.keyCode)
 	{
 		case 38: // fleche up
@@ -49,7 +48,6 @@ const	keyHookDown = (e) =>
 
 const	keyHookReleased = (e) =>
 {
-	//console.log(e.keyCode);
 	actionKeyPress = -1;
 }
 

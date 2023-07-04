@@ -12,7 +12,8 @@ class Ball
 		this.speedX = 0;
 		this.speedY = 0;
 		this.angle = 0;
-		// this.bounce = 0;
+		this.failedAudio = new Audio();
+		this.failedAudio.src = "sounds/fail.mp3";
 		this.moveDirection = undefined;
 		this.firstSetDirection = 1;
 		// this.maxbounceAngle = 0;
@@ -25,6 +26,7 @@ class Ball
 			this.radius = this.game.board.dim.width * 0.012;
 			this.speedX = (this.radius / 2) * 0.5;
 			// this.speedY = (this.radius / 2) * 0.5;
+			// this.failedAudio = new Audio('sounds/failed.mp3');
 			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{
@@ -50,7 +52,6 @@ class Ball
 		}
 		this.move = () =>
 		{
-			console.log(this.speedX);
 			if (this.game.continueAnimating == true)
 			{
 				let newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
@@ -77,17 +78,18 @@ class Ball
 				if (this.pos.x <= 0)
 				{
 					this.game.player_two.score += 1;
+					this.failedAudio.play();
 					this.angle = this.degrees_to_radians(180);
 					this.init();
 				}
 				if (this.pos.x >= this.game.board.dim.width)
 				{
 					this.game.player_one.score += 1;
+					this.failedAudio.play();
 					this.angle = this.degrees_to_radians(0);
 					this.init();
 				}
 			}
-			// console.log(this.speedX);
 		}
 		this.wasTopWallHit = () =>
 		{
@@ -127,12 +129,16 @@ class Ball
 			//ball's interception relative to the middle of the paddle
 			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
 			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees((Math.PI / 4));
-			if (normalizedRelativeIntersectionY <= 0.15 || normalizedRelativeIntersectionY <= -0.15)
+			if (normalizedRelativeIntersectionY <= 0.15
+				|| (normalizedRelativeIntersectionY < 0 &&normalizedRelativeIntersectionY >= -0.15))
 				this.speedX = (this.radius / 2) * 0.5;
-			else if (normalizedRelativeIntersectionY <= 0.4 || normalizedRelativeIntersectionY <= -0.4)
+			else if (normalizedRelativeIntersectionY <= 0.4 || normalizedRelativeIntersectionY >= -0.4)
 				this.speedX = ((this.radius / 2) * 0.5) * 1.5;
-			else if (normalizedRelativeIntersectionY <= 0.7 || normalizedRelativeIntersectionY <= -0.7)
+			else if (normalizedRelativeIntersectionY <= 0.7 || normalizedRelativeIntersectionY >= -0.7)
+			{
 				this.speedX = ((this.radius / 2) * 0.5) * 2;
+				console.log("YES");
+			}
 			else
 				this.speedX = ((this.radius / 2) * 0.5) * 2.5;
 			let direction = this.pos.x + this.radius < this.game.board.dim.width / 2 ? 1 : -1;
