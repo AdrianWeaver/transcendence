@@ -12,8 +12,7 @@ class Ball
 		this.speedX = 0;
 		this.speedY = 0;
 		this.angle = 0;
-		this.failedAudio = new Audio();
-		this.failedAudio.src = "sounds/fail.mp3";
+		this.failedAudio = document.querySelector('#audio')
 		this.moveDirection = undefined;
 		this.firstSetDirection = 1;
 		// this.maxbounceAngle = 0;
@@ -26,7 +25,6 @@ class Ball
 			this.radius = this.game.board.dim.width * 0.012;
 			this.speedX = (this.radius / 2) * 0.5;
 			// this.speedY = (this.radius / 2) * 0.5;
-			// this.failedAudio = new Audio('sounds/failed.mp3');
 			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{

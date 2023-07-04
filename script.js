@@ -63,6 +63,9 @@ game.board.init();
 
 addEventListener("keydown", keyHookDown);
 addEventListener("keyup", keyHookReleased);
+document.getElementById('start').addEventListener('click',function(){
+	game.continueAnimating=true;
+});
 document.getElementById('stopAnimating').addEventListener('click',function(){
 	game.continueAnimating=false;
 });

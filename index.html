@@ -2,20 +2,24 @@
 <html lang="fr">
 	<head>
 		<title>
-			Premiere page web
+			FT_TRANSCENDANCE
 		</title>
 		<meta charset="utf-8">
 	</head>
 	<body>
 		<div style="text-align:center;" class="alignement">
-			<input type="button" value="PAUSE" id=stopAnimating>
-  			<br>
-			<input type="button" value="RESUME" id=keepAnimating>
+			<input type="button" value="START" id=start>
 			<br>
 			<canvas id="board">
 				Javascript not supported.
 			</canvas>
+			<br>
+			<input type="button" value="PAUSE" id=stopAnimating>
+  			<!-- <br> -->
+			<input type="button" value="RESUME" id=keepAnimating>
+			<br>
 		</div>
+		<audio id="audio" src="sounds/fail.mp3"></audio>
 		<link rel="stylesheet" href="styles.css">
 		<script src="./game.js"></script>
 		<script src=./board.js></script>

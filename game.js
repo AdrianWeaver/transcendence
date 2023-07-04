@@ -15,7 +15,7 @@ class Game
             window.mozRequestAnimationFrame || 
             window.webkitRequestAnimationFrame || 
             window.msRequestAnimationFrame;
-        this.continueAnimating = true;
+        this.continueAnimating = false;
         // camera
         this.initPlayers = () =>
         {
