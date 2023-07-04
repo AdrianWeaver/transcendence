@@ -9,7 +9,8 @@ class Ball
 		this.startAngle = 0;
 		this.endAngle = 2 * Math.PI;
 		this.game = undefined;
-		this.speed = 0;
+		this.speedX = 0;
+		this.speedY = 0;
 		this.angle = 0;
 		// this.bounce = 0;
 		this.moveDirection = undefined;
@@ -22,21 +23,16 @@ class Ball
 			this.pos.x = this.game.board.dim.width / 2;
 			this.pos.y = this.game.board.dim.height / 2;
 			this.radius = this.game.board.dim.width * 0.012;
-			this.speed = (this.radius / 2) * 0.5;
+			this.speedX = (this.radius / 2) * 0.5;
+			this.speedY = 1;
 			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{
 				let direction = Math.floor(Math.random() * 10);	
 				if (direction % 2 == 0)
-				{
-					this.moveDirection = "left";
 					this.angle = this.degrees_to_radians(180);
-				}
 				else
-				{
-					this.moveDirection = "right";
 					this.angle = this.radians_to_degrees(0);
-				}
 			}
 			this.firstSetDirection = 0;
 		}
@@ -54,28 +50,26 @@ class Ball
 		}
 		this.move = () =>
 		{
-			if (this.angle > this.degrees_to_radians(90)
-				&& this.angle <= this.degrees_to_radians(270))
-				this.moveLeft();
-			else
-				this.moveRight();
-		}
-		this.moveLeft = () =>
-		{
 			if (this.game.continueAnimating == true)
 			{
-				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speed;
-				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
+				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speedX;
+				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speedY;
 				if (this.game.player_one.isLeftPlayer(newPosX, newPosY) == true)
 				{
      				this.angle = Math.PI - this.angle;
 					this.angle = this.degrees_to_radians(0);
 					this.angle -= this.degrees_to_radians(this.getBounceAngle());
 				}
+				else if (this.game.player_two.isRightPlayer(newPosX, newPosY) == true) 
+				{
+					this.pos.x = this.game.player_two.pos.x - this.radius;
+     				this.angle = Math.PI - this.angle;
+					this.angle += this.degrees_to_radians(this.getBounceAngle());
+				}
 				else
 				{
-					this.pos.x += Math.cos (this.angle) * this.speed;
-					this.pos.y += Math.sin (this.angle) * this.speed;
+					this.pos.x += Math.cos (this.angle) * this.speedX;
+					this.pos.y += Math.sin (this.angle) * this.speedY;
 				}
 				this.wasTopWallHit();
 				this.wasBottomWallHit();
@@ -85,27 +79,6 @@ class Ball
 					this.angle = this.degrees_to_radians(180);
 					this.init();
 				}
-			}
-		}
-		this.moveRight = () =>
-		{
-			if (this.game.continueAnimating == true)
-			{
-				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speed;
-				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speed;
-				if (this.game.player_two.isRightPlayer(newPosX, newPosY) == true) 
-				{
-					this.pos.x = this.game.board.dim.width - this.radius;
-     				this.angle = Math.PI - this.angle;
-					this.angle += this.degrees_to_radians(this.getBounceAngle());
-				}
-				else
-				{
-					this.pos.x += Math.cos ( this.angle ) * this.speed;
-					this.pos.y += Math.sin ( this.angle ) * this.speed;
-				}
-				this.wasTopWallHit();
-				this.wasBottomWallHit();
 				if (this.pos.x >= this.game.board.dim.width)
 				{
 					this.game.player_one.score += 1;
@@ -152,6 +125,8 @@ class Ball
 			//ball's interception relative to the middle of the paddle
 			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
 			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees(this.maxAngle);
+			// this.speedX = ((this.radius / 2) * 0.5) * Math.cos(bounceAngle);
+			// this.speedY = ((this.radius / 2) * 0.5) * -Math.sin(bounceAngle);
 			return (bounceAngle);
 		}
 	}
