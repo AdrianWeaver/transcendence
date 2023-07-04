@@ -24,7 +24,7 @@ class Ball
 			this.pos.y = this.game.board.dim.height / 2;
 			this.radius = this.game.board.dim.width * 0.012;
 			this.speedX = (this.radius / 2) * 0.5;
-			this.speedY = 1;
+			// this.speedY = (this.radius / 2) * 0.5;
 			this.maxAngle = this.degrees_to_radians(75);
 			if (this.firstSetDirection == 1)
 			{
@@ -50,10 +50,11 @@ class Ball
 		}
 		this.move = () =>
 		{
+			console.log(this.speedX);
 			if (this.game.continueAnimating == true)
 			{
-				let newPosX = this.pos.x + Math.cos ( this.angle ) * this.speedX;
-				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speedY;
+				let newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
+				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speedX;
 				if (this.game.player_one.isLeftPlayer(newPosX, newPosY) == true)
 				{
      				this.angle = Math.PI - this.angle;
@@ -69,7 +70,7 @@ class Ball
 				else
 				{
 					this.pos.x += Math.cos (this.angle) * this.speedX;
-					this.pos.y += Math.sin (this.angle) * this.speedY;
+					this.pos.y += Math.sin (this.angle) * this.speedX;
 				}
 				this.wasTopWallHit();
 				this.wasBottomWallHit();
@@ -86,6 +87,7 @@ class Ball
 					this.init();
 				}
 			}
+			// console.log(this.speedX);
 		}
 		this.wasTopWallHit = () =>
 		{
@@ -124,9 +126,16 @@ class Ball
 				relativeIntersectY = (this.game.player_one.pos.y + (this.game.player_two.racket.dim.height / 2)) - this.pos.y;
 			//ball's interception relative to the middle of the paddle
 			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
-			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees(this.maxAngle);
-			// this.speedX = ((this.radius / 2) * 0.5) * Math.cos(bounceAngle);
-			// this.speedY = ((this.radius / 2) * 0.5) * -Math.sin(bounceAngle);
+			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees((Math.PI / 4));
+			if (normalizedRelativeIntersectionY <= 0.15 || normalizedRelativeIntersectionY <= -0.15)
+				this.speedX = (this.radius / 2) * 0.5;
+			else if (normalizedRelativeIntersectionY <= 0.4 || normalizedRelativeIntersectionY <= -0.4)
+				this.speedX = ((this.radius / 2) * 0.5) * 1.5;
+			else if (normalizedRelativeIntersectionY <= 0.7 || normalizedRelativeIntersectionY <= -0.7)
+				this.speedX = ((this.radius / 2) * 0.5) * 2;
+			else
+				this.speedX = ((this.radius / 2) * 0.5) * 2.5;
+			let direction = this.pos.x + this.radius < this.game.board.dim.width / 2 ? 1 : -1;
 			return (bounceAngle);
 		}
 	}
