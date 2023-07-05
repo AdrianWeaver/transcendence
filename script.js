@@ -20,6 +20,8 @@ const	render = () =>
 	game.player_two.render();
 	game.player_one.renderScore();
 	game.player_two.renderScore();
+	if (game.startDisplayed == true)
+		game.displayStartMessage();
 	game.ball.render();
 	game.net.render();
 	window.requestAnimationFrame(render);
@@ -64,13 +66,14 @@ game.board.init();
 addEventListener("keydown", keyHookDown);
 addEventListener("keyup", keyHookReleased);
 document.getElementById('start').addEventListener('click',function(){
-	game.continueAnimating=true;
+	game.continueAnimating = true;
+	game.startDisplayed = false;
 });
 document.getElementById('stopAnimating').addEventListener('click',function(){
-	game.continueAnimating=false;
+	game.continueAnimating = false;
 });
 document.getElementById('keepAnimating').addEventListener('click',function(){
-	game.continueAnimating=true;
+	game.continueAnimating = true;
 	// window.requestAnimationFrame(render);
 });
 window.requestAnimationFrame(render);
