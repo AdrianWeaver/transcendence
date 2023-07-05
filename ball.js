@@ -12,7 +12,8 @@ class Ball
 		this.speedX = 0;
 		this.speedY = 0;
 		this.angle = 0;
-		this.failedAudio = document.querySelector('#audio')
+		this.failedAudio = document.querySelector('#fail');
+		this.touchAudio = document.querySelector('#touch');
 		this.moveDirection = undefined;
 		this.firstSetDirection = 1;
 		// this.maxbounceAngle = 0;
@@ -93,6 +94,7 @@ class Ball
 		{
 			if ( this.pos.y < this.radius ) 
 			{
+				this.touchAudio.play();
 				this.pos.y = this.radius;
 				this.angle = ( Math.PI * 2 ) - this.angle;
 			}
@@ -101,6 +103,7 @@ class Ball
 		{
 			if ( this.pos.y + this.radius > this.game.board.dim.height )
 			{
+				this.touchAudio.play();
 				this.pos.y = this.game.board.dim.height - this.radius;
 				this.angle = ( Math.PI * 2 ) - this.angle;
 			}

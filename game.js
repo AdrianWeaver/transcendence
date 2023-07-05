@@ -22,7 +22,7 @@ class Game
             this.player_one.game = game;
             this.player_two.game = game;
             this.player_one.racket.game = game;
-            this.player_one.side = "left";
+            this.player_one.side = "left"; // keep it for the moment or the score will not be in the right place
             this.player_two.racket.game = game;
             this.player_two.side = "right";
 
