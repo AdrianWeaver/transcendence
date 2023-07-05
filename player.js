@@ -41,9 +41,10 @@ class	Player
 					case 83:
 						if (this.side === "left")
 						{
-							if (this.pos.y + this.racket.dim.height > this.game.board.dim.height)
+							if (this.pos.y + this.racket.dim.height >= this.game.board.dim.height)
 								this.pos.y = this.game.board.dim.height - this.racket.dim.height;
-							this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
+							else
+								this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
 						}
 						break;
 					case 38:
@@ -57,9 +58,10 @@ class	Player
 						case 40:
 							if (this.side === "right")
 							{
-								if (this.pos.y + this.racket.dim.height > this.game.board.dim.height)
+								if (this.pos.y + this.racket.dim.height >= this.game.board.dim.height)
 									this.pos.y = this.game.board.dim.height - this.racket.dim.height;
-								this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
+								else
+									this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
 							}
 							break;
 					default:

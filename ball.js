@@ -138,7 +138,6 @@ class Ball
 			else if (normalizedRelativeIntersectionY <= 0.7 || normalizedRelativeIntersectionY >= -0.7)
 			{
 				this.speedX = ((this.radius / 2) * 0.5) * 2;
-				console.log("YES");
 			}
 			else
 				this.speedX = ((this.radius / 2) * 0.5) * 2.5;
