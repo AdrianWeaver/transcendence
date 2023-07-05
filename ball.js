@@ -130,15 +130,14 @@ class Ball
 			//ball's interception relative to the middle of the paddle
 			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
 			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees((Math.PI / 4));
-			if (normalizedRelativeIntersectionY <= 0.15
-				|| (normalizedRelativeIntersectionY < 0 &&normalizedRelativeIntersectionY >= -0.15))
+			if (normalizedRelativeIntersectionY < 0)
+				normalizedRelativeIntersectionY *= -1;
+			if (normalizedRelativeIntersectionY <= 0.15)
 				this.speedX = (this.radius / 2) * 0.5;
-			else if (normalizedRelativeIntersectionY <= 0.4 || normalizedRelativeIntersectionY >= -0.4)
+			else if (normalizedRelativeIntersectionY <= 0.4)
 				this.speedX = ((this.radius / 2) * 0.5) * 1.5;
-			else if (normalizedRelativeIntersectionY <= 0.7 || normalizedRelativeIntersectionY >= -0.7)
-			{
+			else if (normalizedRelativeIntersectionY <= 0.7)
 				this.speedX = ((this.radius / 2) * 0.5) * 2;
-			}
 			else
 				this.speedX = ((this.radius / 2) * 0.5) * 2.5;
 			let direction = this.pos.x + this.radius < this.game.board.dim.width / 2 ? 1 : -1;
