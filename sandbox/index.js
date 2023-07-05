@@ -50,17 +50,18 @@ const	redirectToErrorPage = () =>
 
 const	hideLoader = () =>
 {
-	document.getElementsByClassName("loader")[0].style.visibility = "hidden";
+	document.getElementsByClassName("loader")[0].style.display = "none";
+	showMatchmakking();
 }
 
 const	hideMatchmaking = () =>
 {
-	document.getElementsByClassName("matchmaking")[0].style.visibility = "hidden";
+	document.getElementsByClassName("matchmaking")[0].style.display = "none";
 }
 
 const	showMatchmakking = () =>
 {
-	document.getElementsByClassName("matchmaking")[0].style.visibility = "visible";
+	document.getElementsByClassName("matchmaking")[0].style.display = "block";
 	console.log (document.getElementsByClassName("matchmaking")[0])
 }
 
