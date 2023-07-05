@@ -66,6 +66,8 @@ game.board.init();
 addEventListener("keydown", keyHookDown);
 addEventListener("keyup", keyHookReleased);
 document.getElementById('start').addEventListener('click',function(){
+	let startAudio = document.querySelector('#startSound');
+	startAudio.play();
 	game.continueAnimating = true;
 	game.startDisplayed = false;
 });
