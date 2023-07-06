@@ -1,2 +1,0 @@
-
-export const CONTROLLER_SET_VIEW = "CONTROLLER_SET_VIEW";

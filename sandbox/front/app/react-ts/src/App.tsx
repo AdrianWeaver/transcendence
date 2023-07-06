@@ -1,19 +1,10 @@
+import ReduxViewTest from "./components/ReduxViewTest";
 
-import React, { Component} from "react";
-import ViewHandler from "./views/ViewHandler";
-
-
-export default class App extends Component
+const App = () =>
 {
-	constructor(props: object)
-	{
-		super(props);
-	}
+	return (
+		<ReduxViewTest></ReduxViewTest>
+	);
+};
 
-	render(): React.ReactNode
-	{
-		return (
-			<ViewHandler></ViewHandler>
-		);
-	}
-}
+export default App;
