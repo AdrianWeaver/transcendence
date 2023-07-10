@@ -1,5 +1,6 @@
 
 export interface ControllerModel
 {
-	"activeView": string
+	"activeView": string,
+	"themeMode": string
 }
