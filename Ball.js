@@ -40,11 +40,11 @@ class Ball
         this.update = () =>
         {
 			this.radius = this.game.board.dim.width * 0.012;
+			this.move();
 		}
 		this.render = () =>
 		{
 			this.radius = this.game.board.dim.width * 0.012;
-			this.move();
 			this.game.board.ctx.beginPath();
 			this.game.board.ctx.arc(this.pos.x, this.pos.y, this.radius, this.startAngle, this.endAngle);
 			this.game.board.ctx.fill();
