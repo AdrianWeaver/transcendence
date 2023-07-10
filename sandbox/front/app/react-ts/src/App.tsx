@@ -9,6 +9,9 @@ import { useAppSelector } from "./hooks/redux-hooks";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import ReduxViewTest from "./components/ReduxViewTest";
+import Signup from "./views/Signup";
+import Signin from "./views/Signin";
+import Logout from "./views/Logout";
 
 const	darkTheme = createTheme(
 {
@@ -26,6 +29,21 @@ const	lightTheme = createTheme(
 	}
 });
 
+const	CustomRouter = () =>
+{
+	return (
+		<BrowserRouter >
+			<Routes>
+				<Route path="/" element={<h1>Home</h1>} />
+				<Route path="/redux-test-view" element={<ReduxViewTest/>} />
+				<Route path="/signup" element={<Signup />} />
+				<Route path="/signin" element={<Signin />} />
+				<Route path="/logout" element={<Logout/>} />
+				<Route path="*" element={<h1>Error 404</h1>} />
+			</Routes>
+		</BrowserRouter>
+	);
+};
 
 const App = () =>
 {
@@ -42,13 +60,7 @@ const App = () =>
 	return (
 		<ThemeProvider theme={usedTheme}>
 			<CssBaseline />
-			<BrowserRouter >
-				<Routes>
-					<Route path="/" element={<h1>Home</h1>} />
-					<Route path="/redux-test-view" element={<ReduxViewTest/>} />
-					<Route path="*" element={<h1>Error 404</h1>} />
-				</Routes>
-			</BrowserRouter>
+			<CustomRouter />
 		</ThemeProvider>
 	);
 };
