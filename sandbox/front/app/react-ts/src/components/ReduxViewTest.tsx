@@ -11,6 +11,8 @@ import
 	setThemeModeToLight
 } from "../store/controllerAction";
 
+import MenuBar from "./MenuBar";
+
 const ReduxViewTest = () =>
 {
 	const	dispatch = useAppDispatch();
@@ -38,6 +40,7 @@ const ReduxViewTest = () =>
 
 	return (
 		<>
+			<MenuBar></MenuBar>
 			<div>
 				<h1>ReduxViewTest : {controllerState.activeView}</h1>
 				<Button
