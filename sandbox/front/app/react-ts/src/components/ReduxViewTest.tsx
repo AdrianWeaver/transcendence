@@ -11,7 +11,7 @@ import
 	setThemeModeToLight
 } from "../store/controllerAction";
 
-import MenuBar from "./MenuBar";
+import MenuBar from "./MenuBar/MenuBar";
 
 const ReduxViewTest = () =>
 {
