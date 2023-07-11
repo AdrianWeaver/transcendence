@@ -50,11 +50,17 @@ const	boxStyleSmall = {
 	display: displayStyle.mediumHidden,
 };
 
-const	pages
-= [
+const	pages = [
 	"Home",
 	"Launch Game",
-	"LeaderBoad"
+	"LeaderBoard"
+];
+
+const settings = [
+	"Profile",
+	"Account",
+	"Dashboard",
+	"Logout"
 ];
 
 type	DisplayProps = {
@@ -104,8 +110,10 @@ const	IconTitle = (props: DisplayProps) =>
 
 const	AvatarMenu = () =>
 {
-	const [anchorElUser, setAnchorElUser]
-		= React.useState<null | HTMLElement>(null);
+	const [
+		anchorElUser,
+		setAnchorElUser
+	] = React.useState<null | HTMLElement>(null);
 
 	const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
@@ -130,14 +138,50 @@ const	AvatarMenu = () =>
 					/>
 				</IconButton>
 			</Tooltip>
+			<Menu
+				sx={{ mt: "45px" }}
+				id="menu-appbar"
+				anchorEl={anchorElUser}
+				anchorOrigin={
+				{
+					vertical: "top",
+					horizontal: "right",
+				}}
+				keepMounted
+				transformOrigin={
+				{
+					vertical: "top",
+					horizontal: "right",
+				}}
+				open={Boolean(anchorElUser)}
+				onClose={handleCloseUserMenu}
+			>
+			{
+				settings.map((setting) =>
+				{
+					return (
+						<MenuItem
+							key={setting}
+							onClick={handleCloseUserMenu}
+						>
+							<Typography textAlign="center">
+								{setting}
+							</Typography>
+						</MenuItem>
+					);
+				})
+			}
+			</Menu>
 		</Box>
 	);
 };
 
 const	HamburgerMenu = () =>
 {
-	const	[anchorElNav, setAnchorElNav]
-		= React.useState<null | HTMLElement>(null);
+	const	[
+		anchorElNav,
+		setAnchorElNav
+	] = React.useState<null | HTMLElement>(null);
 
 	const handleCloseNavMenu = () =>
 	{
@@ -175,13 +219,7 @@ const	HamburgerMenu = () =>
 				}}
 				open={Boolean(anchorElNav)}
 				onClose={handleCloseNavMenu}
-				sx={{
-					display:
-					{
-						xs: "block",
-						md: "none",
-					}
-				}}
+				sx= {{ display: displayStyle.mediumHidden}}
 			>
 			{
 				pages.map((page) =>
