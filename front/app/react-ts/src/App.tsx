@@ -74,45 +74,25 @@
 import React, {useState} from 'react'
 
 function App() {
-
-  const [list, setList] = useState([]);
-  const [input, setInput] = useState("");
-
-  const addTodo = (todo) =>
-  {
-    const newTodo =
-    { 
-      id: Math.random(),
-      todo: todo
-    }
-    // add the todo to the list
-    // the three dots indicate the existing element
-    setList([...list, newTodo]);
-
-    //clear input box = setting the input to an empty string 
-    setInput("");
-  }
-
-  const deleteTodo = (id) => {
-    //filter out todo with the id
-    const newList = list.filter((todo) => todo.id !== id)
-    setList(newList);
-  }
-  // <button>&times;</button> = the X button the remove an item
   return (
-    <div>
-      <h1>Todo List</h1>
-      <input type="text" value={input} onChange={(e) => setInput(e.target.value)} />
-      <button onClick={() => addTodo(input)}>Add</button>
-      <ul>
-        {list.map((todo) => (
-            <li key={todo.id}>
-              {todo.todo}
-              <button onClick={() => deleteTodo(todo.id)}>&times;</button>
-            </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <title>FT_TRANSCENDANCE</title>
+      <meta charSet="utf-8" />
+      <div style={{ textAlign: "center" }} className="alignement">
+        <input type="button" defaultValue="START" id="start" />
+        <br />
+        <canvas id="board">Javascript not supported.</canvas>
+        <br />
+        <input type="button" defaultValue="PAUSE" id="stopAnimating" />
+        {/* <br> */}
+        <input type="button" defaultValue="RESUME" id="keepAnimating" />
+        <br />
+      </div>
+      <audio id="fail" src="sounds/fail.mp3" />
+      <audio id="touch" src="sounds/touch.wav" />
+      <audio id="startSound" src="sounds/start.wav" />
+      <link rel="stylesheet" href="styles.css" />
+    </>
   );
 }
 
