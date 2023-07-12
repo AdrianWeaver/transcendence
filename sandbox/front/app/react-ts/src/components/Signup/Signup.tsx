@@ -1,4 +1,6 @@
 
+import Copyright from "./Copyright";
+
 const	Signup = () =>
 {
 	return (
@@ -6,6 +8,7 @@ const	Signup = () =>
 			<h1>
 				Sign Up
 			</h1>
+			<Copyright />
 		</>
 	);
 };

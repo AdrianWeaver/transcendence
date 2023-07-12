@@ -13,8 +13,6 @@ import
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useState } from "react";
-
 
 const	mainStyle = {
 	marginTop: 8,
@@ -30,24 +28,17 @@ const	avatarStyle = {
 
 const	Signin = () =>
 {
-	const
-	[
-		login,
-		setLogin
-	] = useState("Your Login");
-
-	const
-	[
-		password,
-		setPassword
-	] = useState("Your Password");
-
 	const	handleSubmit = (event: React.MouseEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
 		const	currentTarget = event.currentTarget as HTMLFormElement;
 		const	data = new FormData(currentTarget);
-		console.log(data);
+		console.log(
+		{
+			login: data.get("login"),
+			password: data.get("password"),
+			rememberMe: data.get("remember-me")
+		}, event.currentTarget);
 	};
 
 	return (
@@ -89,7 +80,8 @@ const	Signin = () =>
 				<FormControlLabel
 					control= {
 						<Checkbox
-							value="Se souvenir de moi"
+							value="remember-me"
+							name="remember-me"
 							color="primary"
 						/>
 					}

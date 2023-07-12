@@ -60,6 +60,7 @@ export const	setUserLoggedIn = ()
 			...previousState.controller,
 			user:
 			{
+				...previousState.controller.user,
 				isLoggedIn: true,
 			}
 		};
@@ -77,6 +78,7 @@ export const	logOffUser = ()
 			...previousState.controller,
 			user:
 			{
+				...previousState.controller.user,
 				isLoggedIn: false,
 			}
 		};

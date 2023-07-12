@@ -9,7 +9,7 @@ import { useAppSelector } from "./hooks/redux-hooks";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import ReduxViewTest from "./components/ReduxViewTest";
-import Signup from "./views/Signup";
+import Signup from "./components/Signup/Signup";
 import Signin from "./views/Signin";
 import Logout from "./views/Logout";
 

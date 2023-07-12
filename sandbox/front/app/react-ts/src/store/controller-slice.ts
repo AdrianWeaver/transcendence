@@ -7,7 +7,10 @@ const	initialControllerState: ControllerModel = {
 	themeMode: "dark",
 	user:
 	{
-		isLoggedIn: false
+		isLoggedIn: false,
+		username: "undefined",
+		bearerToken: "undefined",
+		rememberMe: false,
 	}
 };
 
