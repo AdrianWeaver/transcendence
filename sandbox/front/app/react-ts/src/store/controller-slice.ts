@@ -4,7 +4,11 @@ import { ControllerModel } from "../models/redux-models";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
-	themeMode: "dark"
+	themeMode: "dark",
+	user:
+	{
+		isLoggedIn: false
+	}
 };
 
 const	controllerSlice = createSlice(
@@ -24,6 +28,14 @@ const	controllerSlice = createSlice(
 		setThemeModeToDark(state, action:PayloadAction<ControllerModel>)
 		{
 			state.themeMode = action.payload.themeMode;
+		},
+		setUserLoggedIn(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+		},
+		logOffUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
 		}
 	}
 });

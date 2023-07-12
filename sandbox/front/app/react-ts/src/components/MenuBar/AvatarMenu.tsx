@@ -11,8 +11,13 @@ import	Typography from "@mui/material/Typography";
 
 import	settings from "./config/SettingsItem";
 
+import { useAppDispatch } from "../../hooks/redux-hooks";
+import { logOffUser } from "../../store/controllerAction";
+
 const	AvatarMenu = () =>
 {
+	const	dispatch = useAppDispatch();
+
 	const [
 		anchorElUser,
 		setAnchorElUser
@@ -23,8 +28,13 @@ const	AvatarMenu = () =>
 		setAnchorElUser(event.currentTarget);
 	};
 
-	const handleCloseUserMenu = () =>
+	const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
+		event.preventDefault();
+
+		const clickedElement = event.target as HTMLElement;
+		if (clickedElement.textContent === "Logout")
+			dispatch(logOffUser());
 		setAnchorElUser(null);
 	};
 
@@ -67,7 +77,9 @@ const	AvatarMenu = () =>
 							key={setting}
 							onClick={handleCloseUserMenu}
 						>
-							<Typography textAlign="center">
+							<Typography
+								textAlign="center"
+							>
 								{setting}
 							</Typography>
 						</MenuItem>

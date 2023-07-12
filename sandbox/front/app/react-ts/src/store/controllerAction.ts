@@ -49,3 +49,37 @@ export const	setThemeModeToDark = ()
 		dispatch(controllerActions.setThemeModeToDark(response));
 	});
 };
+
+export const	setUserLoggedIn = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			user:
+			{
+				isLoggedIn: true,
+			}
+		};
+		dispatch(controllerActions.setUserLoggedIn(response));
+	});
+};
+
+export const	logOffUser = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			user:
+			{
+				isLoggedIn: false,
+			}
+		};
+		dispatch(controllerActions.logOffUser(response));
+	});
+};
