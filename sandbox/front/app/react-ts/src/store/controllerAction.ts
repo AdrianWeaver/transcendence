@@ -85,3 +85,39 @@ export const	logOffUser = ()
 		dispatch(controllerActions.logOffUser(response));
 	});
 };
+
+export const	userRequestRegistration = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				startedRegister: true
+			}
+		};
+		dispatch(controllerActions.userRequestRegistration(response));
+	});
+};
+
+export const	userRegistrationStepTwo = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				step: 1,
+			}
+		};
+		dispatch(controllerActions.userRegistrationStepTwo(response));
+	});
+};

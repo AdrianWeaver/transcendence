@@ -46,22 +46,4 @@ export class SocketEvents
 		// Send event
 		this.server.emit("message", client.id, data);
 	}
-
-	@SubscribeMessage("stateWriteServ")
-	handleWriteState()
-	{
-		console.log((Date.now() - this.lastWrite > 2000));
-		if (Date.now() - this.lastWrite > 2000)
-			this.stateWrite = true;
-		else
-			this.stateWrite = false;
-		this.server.emit("stateWrite", this.stateWrite);
-	}
-
-	@SubscribeMessage("enableStateWrite")
-	handleEnableWriteState()
-	{
-		this.lastWrite = Date.now();
-		this.stateWrite = true;
-	}
 }

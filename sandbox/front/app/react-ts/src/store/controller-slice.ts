@@ -11,6 +11,14 @@ const	initialControllerState: ControllerModel = {
 		username: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
+	},
+	registration:
+	{
+		startedRegister: false,
+		step: 0,
+		codeOauthFT: "unsetted",
+		// need to purge data if abort set to 
+		abortRequested: false
 	}
 };
 
@@ -39,6 +47,15 @@ const	controllerSlice = createSlice(
 		logOffUser(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+		},
+		userRequestRegistration(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.startedRegister
+				= action.payload.registration.startedRegister;
+		},
+		userRegistrationStepTwo(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.step = action.payload.registration.step;
 		}
 	}
 });
