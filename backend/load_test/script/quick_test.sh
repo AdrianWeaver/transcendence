@@ -1,1 +1,0 @@
-artillery quick --count 20 --num 10 http://172.17.0.2:3000/

@@ -8,8 +8,3 @@ async function bootstrap()
 }
 
 bootstrap();
-
-/**
- * Usefull documentation I've found here 
- * https://www.thisdot.co/blog/introduction-to-restful-apis-with-nestjs/
- */
