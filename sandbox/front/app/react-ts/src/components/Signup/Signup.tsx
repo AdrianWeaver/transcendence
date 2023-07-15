@@ -160,7 +160,6 @@ const	SecondStepForm = () =>
 				{responseQuery.errorDescription}
 			</Alert>);
 	if (responseQuery.code)
-	{
 			alertInfo = (
 				<>
 					<Alert severity="success">
@@ -169,7 +168,6 @@ const	SecondStepForm = () =>
 					<LinearProgress />
 				</>
 			);
-	}
 	return (
 		<Card sx={{ m: 5}}>
 			<CardActionArea

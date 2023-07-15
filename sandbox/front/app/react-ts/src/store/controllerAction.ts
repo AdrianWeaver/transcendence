@@ -121,3 +121,18 @@ export const	userRegistrationStepTwo = ()
 		dispatch(controllerActions.userRegistrationStepTwo(response));
 	});
 };
+
+// For LoaderOverlay
+export const	setIsFetching = (value : boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			isFetching: value,
+		};
+		dispatch(controllerActions.setIsFetching(response));
+	});
+};

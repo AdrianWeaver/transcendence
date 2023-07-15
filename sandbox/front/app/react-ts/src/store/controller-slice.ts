@@ -1,10 +1,20 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ControllerModel } from "../models/redux-models";
+import { NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "dark",
+	server:
+	{
+		connexionEnabled: false,
+	},
+	isFetching: false,
+	anonymousUser:
+	{
+		uuid: NILUUID,
+	},
 	user:
 	{
 		isLoggedIn: false,
@@ -56,6 +66,10 @@ const	controllerSlice = createSlice(
 		userRegistrationStepTwo(state, action: PayloadAction<ControllerModel>)
 		{
 			state.registration.step = action.payload.registration.step;
+		},
+		setIsFetching(state, action: PayloadAction<ControllerModel>)
+		{
+			state.isFetching = action.payload.isFetching;
 		}
 	}
 });

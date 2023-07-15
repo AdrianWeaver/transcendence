@@ -7,6 +7,11 @@ export interface	UserModel
 	"rememberMe": boolean
 }
 
+export interface	AnonymouseUserModel
+{
+	"uuid": string,
+}
+
 export	interface	RegistrationProcessModel
 {
 	"startedRegister": boolean,
@@ -15,10 +20,18 @@ export	interface	RegistrationProcessModel
 	"abortRequested": boolean,
 }
 
+export interface	ServerModel
+{
+	"connexionEnabled" : boolean,
+}
+
 export interface	ControllerModel
 {
 	"activeView": string,
 	"themeMode": string,
-	"user": UserModel
+	"server": ServerModel,
+	"anonymousUser": AnonymouseUserModel,
+	"user": UserModel,
+	"isFetching": boolean,
 	"registration": RegistrationProcessModel
 }
