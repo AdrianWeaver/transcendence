@@ -15,7 +15,6 @@ import { Server, Socket } from "socket.io";
 		origin: "*"
 	},
 })
-
 export class SocketEvents
 {
 	@WebSocketServer()
@@ -39,7 +38,7 @@ export class SocketEvents
 		console.log("Client disconnect: ", client.id);
 	}
 
-	// Recevoir un event 
+	// receive an event 
 	@SubscribeMessage("message")
 	handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket)
 	{

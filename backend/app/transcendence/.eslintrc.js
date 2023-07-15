@@ -12,11 +12,13 @@ module.exports = {
     "overrides":
     [
         {
-            "env": {
+            "env":
+            {
                 "node": true
             },
             "files": [".eslintrc.{js,cjs}"],
-            "parserOptions": {
+            "parserOptions":
+            {
                 "sourceType": "script"
             }
         }
@@ -27,21 +29,9 @@ module.exports = {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins":
-    [
-        "@typescript-eslint"
-    ],
+    "plugins": ["@typescript-eslint"],
     "rules":
     {
-        // "indent":
-        // [
-        //     "error",
-        //     "tab"
-        // ],
-        // "linebreak-style": [
-        //     "error",
-        //     "unix"
-        // ],
         "quotes":
         [
             "error",
@@ -78,7 +68,7 @@ module.exports = {
             }
         ],
         "no-ex-assign": "error",
-        "no-fallthrough": 
+        "no-fallthrough":
         [
             "error",
             {
@@ -168,7 +158,6 @@ module.exports = {
             "error",
             4
         ],
-        // "new-cap": "error",
         "no-alert": "error",
         "no-case-declarations": "error",
         "no-inline-comments": "error",
@@ -201,7 +190,7 @@ module.exports = {
         [
             "error",
             {
-                "multiline" : true
+                "multiline": true
             }
         ],
         "arrow-parens":
@@ -305,11 +294,6 @@ module.exports = {
             "error",
             "below"
         ],
-        // "object-curly-newline":
-        // [
-        //     "error",
-        //     "always"
-        // ],
         "object-property-newline": "error",
         "operator-linebreak":
         [
@@ -324,4 +308,4 @@ module.exports = {
             }
         ],
     }
-}
+};
