@@ -1,34 +1,39 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+NC='\033[0m'
+
 check_title()
 {
 	arg_iterator=1
-	#flag=ADD|MERGE|DOC|WIP|REWORK|UPDATE
 	for var in $@
 	do
 		if [[ $arg_iterator == 1 ]]
 		then
-			if ! [[ $var =~ (ADD|MERGE|DOC|WIP|REWORK|UPDATE) ]]
+			if ! [[ $var =~ (ADD|FIX|MERGE|DOC|WIP|REWORK|UPDATE)$ ]]
 			then
-				echo "Your flag '$var' is incorrect, choose one of the following : ADD, MERGE, DOC, WIP, REWORK, UPDATE"
+				echo "Your flag '$var' is incorrect, choose one of the following : ADD, FIX, MERGE, DOC, WIP, REWORK, UPDATE"
 				return 1
 			fi
 		elif [ $arg_iterator == $# ]
 		then
-			if ! [[ $var =~ '.*:' ]]
+			if ! [[ $var =~ .*: ]]
 			then
 				echo "You are missing ':' at the end of your title"
 				return 1
 			fi
-			if ! [[ $var =~ '/([A-Z]{1,}:)|(\([A-Z]{1,}\):)/' ]]
+			if ! [[ $var =~ ([A-Z]{0,}:)|(\(?[A-Z]{0,}\)?:) ]]
 			then
 				echo "Incorrect trailing word for title or missing ':'."
+				echo "var = $var"
 				return 1
 			fi
 		else
-			if ! [[ $var =~ '/[A-Z\_\-&\s]{1,}/' ]]
+			if ! [[ $var =~ ^[A-Z\_\-\s\&]{1,}$ ]]
 			then
-				echo "\'$var\' is not authorized in the title, chars allowed [A-Z] and '_-&'"
+				echo "'$var' is not authorized in the title, chars allowed [A-Z] and '_-&'"
 				return 1
 			fi
 		fi
@@ -37,21 +42,74 @@ check_title()
 	return 0
 }
 
-
-check_commit_msg()
+check_second_line()
 {
-	check_title "$@"
-	return $?
+	if ! [[ -z $1 ]]
+	then
+		return 1
+	fi
 }
 
-echo "Successfuly called commit checker hook"
-check_commit_msg "$1"
+check_content()
+{
+	line_nb=$(cat $1 | wc -l)
+	for i in line_nb
+	do
+		line=$(cat $1 | sed -n "$(i)p")
+		if [[ line =~ From\s\w{1,}repo\s\w{1,} ]]
+		then
+			echo "${ORANGE}Please note there is no need to add this line:${NC}"
+			echo $line
+		elif [[ line =~ On\sbranch\s\w*\/?\w* ]]
+		then
+			echo "Please do not specify branch in commit message, you wrote:"
+			echo $line
+			return 1
+		fi
+	done
+}
+
+error_printer()
+{
+	echo -e "${RED}${2}${NC}"
+	cat $1 | grep -v '^\s*#'
+	echo -e "${RED}==================================================${NC}"
+	echo -e "${RED}/!\\ Your commit was aborted! /!\\ ${NC}"
+}
+
+commit_msg=$(cat $1 | grep -v '^\s*#')
+if [[ -z $commit_msg ]]
+	then
+		echo "Aborting commit due to empty commit message."
+		exit 1
+	fi
+
+echo -e "${ORANGE}Successfuly called commit checker hook${NC}"
+if [[ $(cat "$1" | sed -n '1p' | wc --chars) -gt 51 ]]
+then
+	error_printer "$1" "========== YOUR TITLE IS TOO LONG MAX50 =========="
+	exit 1
+fi
+
+if [[ -z $(cat $1 | sed -n '1p') ]]
+then
+	error_printer "$1" "==========  FIRST LINE CANNOT BE EMPTY  =========="
+	exit 1
+fi
+
+check_title $(cat $1 | sed -n '1p')
 if [[ $? == 1 ]]
 then
-	echo "=== INCORRECT COMMIT MESSAGE ==="
-		echo "$@"
-		echo "================================"
-else
-		echo "Successfully commited! Good job ;-)"
+	error_printer "$1" "===========  INCORRECT COMMIT TITLE  ============="
+	exit 1
 fi
+
+check_second_line "$(cat "$1" | sed -n '2p')"
+if [[ $? == 1 ]]
+then
+	error_printer "$1" "=========== SECOND LINE MUST BE EMPTY ============"
+	exit 1
+fi
+echo -e "${GREEN}Successfully commited! Good job ;-)${NC}"
+exit 0
 
