@@ -1,0 +1,57 @@
+#!/bin/bash
+
+check_title()
+{
+	arg_iterator=1
+	#flag=ADD|MERGE|DOC|WIP|REWORK|UPDATE
+	for var in $@
+	do
+		if [[ $arg_iterator == 1 ]]
+		then
+			if ! [[ $var =~ (ADD|MERGE|DOC|WIP|REWORK|UPDATE) ]]
+			then
+				echo "Your flag '$var' is incorrect, choose one of the following : ADD, MERGE, DOC, WIP, REWORK, UPDATE"
+				return 1
+			fi
+		elif [ $arg_iterator == $# ]
+		then
+			if ! [[ $var =~ '.*:' ]]
+			then
+				echo "You are missing ':' at the end of your title"
+				return 1
+			fi
+			if ! [[ $var =~ '/([A-Z]{1,}:)|(\([A-Z]{1,}\):)/' ]]
+			then
+				echo "Incorrect trailing word for title or missing ':'."
+				return 1
+			fi
+		else
+			if ! [[ $var =~ '/[A-Z\_\-&\s]{1,}/' ]]
+			then
+				echo "\'$var\' is not authorized in the title, chars allowed [A-Z] and '_-&'"
+				return 1
+			fi
+		fi
+	arg_iterator=$(($arg_iterator+1))
+	done
+	return 0
+}
+
+
+check_commit_msg()
+{
+	check_title "$@"
+	return $?
+}
+
+echo "Successfuly called commit checker hook"
+check_commit_msg "$1"
+if [[ $? == 1 ]]
+then
+	echo "=== INCORRECT COMMIT MESSAGE ==="
+		echo "$@"
+		echo "================================"
+else
+		echo "Successfully commited! Good job ;-)"
+fi
+
