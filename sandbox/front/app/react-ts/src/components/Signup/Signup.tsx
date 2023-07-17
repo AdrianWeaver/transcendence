@@ -135,7 +135,7 @@ const	SecondStepForm = () =>
 	const	imgSource
 	= "https://placehold.co/345x140?text=Change+me+UX+Click-here";
 
-	const	url = "https://api.intra.42.fr/oauth/a";
+	const	url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-02b8cd3d7697b316dbc57f3303fc08e7da9c40c93915e87d03e73090aed467c7&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code";
 	const	openInNewTab = () =>
 	{
 		// need to get proper url from server
