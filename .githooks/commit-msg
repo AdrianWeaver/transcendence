@@ -61,7 +61,7 @@ check_title()
 			fi
 		#MIDDLE WORDS IN TITLE
 		else
-			if [[ $var =~ \( ]]
+			if [[ "$var" =~ ^\( ]]
 			then
 				if [[ $open_parenthesis == 1 ]]
 				then
@@ -70,7 +70,7 @@ check_title()
 				fi
 				open_parenthesis=1
 			fi
-			if [[ $var =~ \) ]]
+			if [[ "$var" =~ \)$ ]]
 			then
 				closing_parenthesis=1
 				if [[ $open_parenthesis == 0 ]]
@@ -86,7 +86,7 @@ check_title()
 					open_parenthesis=0
 				fi
 			fi
-			if ! [[ $var =~ (^\($)|(^\(?[A-Z\_\-\s\&]{1,}\)?$)|(^\)) ]]
+			if ! [[ "$var" =~ (^\($)|(^\(?[A-Z\&_\-]{1,}\)?$)|(^\)) ]]
 			then
 				echo "'$var' is not authorized in the title, chars allowed [A-Z], '_' '-' '&' and '('"
 				return 1
