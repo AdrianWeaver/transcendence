@@ -34,12 +34,12 @@ check_title()
 				echo "You are missing ':' at the end of your title"
 				return 1
 			fi
-			if [[ "$var" =~ \): ]]
+			if [[ "$var" =~ \):$ ]]
 			then
 				if [[ $open_parenthesis == 1 ]]
 				then
 					return 0
-				elif ! [[ "$var" =~ \( ]]
+				elif ! [[ "$var" =~ ^\( ]]
 				then
 					echo "Closing un-opened parenthesis"
 					return 1
@@ -53,7 +53,7 @@ check_title()
 					return 1
 				fi
 			else
-				if ! [[ "$var" =~ ([A-Z]{0,}:)|(\([A-Z]{0,}\):) ]]
+				if ! [[ "$var" =~ (^[A-Z]{0,}:$)|(^\([A-Z]{0,}\):$) ]]
 				then
 					echo "Incorrect trailing word for title or missing ':'."
 					return 1
@@ -86,7 +86,7 @@ check_title()
 					open_parenthesis=0
 				fi
 			fi
-			if ! [[ "$var" =~ (^\($)|(^\(?[A-Z\&_\-]{1,}\)?$)|(^\)) ]]
+			if ! [[ "$var" =~ (^\($)|(^\(?[A-Z\&\_\-]{1,}\)?$)|(^\)) ]]
 			then
 				echo "'$var' is not authorized in the title, chars allowed [A-Z], '_' '-' '&' and '('"
 				return 1
@@ -107,10 +107,17 @@ check_second_line()
 
 check_content()
 {
+
+	echo "words in commit: $(cat $1 | sed -n '3,$p' | grep -v '^\s*#' | wc -w)"
+	if [[ $(cat $1 | grep -v '^\s*#' | sed -n '3,$p' | wc -w) -lt 2 ]]
+	then
+		echo "Please provide a more detailed description"
+		return 1
+	fi
 	line_nb=$(cat $1 | wc -l)
-	for i in line_nb
+	for i in $line_nb
 	do
-		line=$(cat $1 | sed -n "$(i)p")
+		line=$(cat $1 | sed -n "${i}p")
 		if [[ line =~ From\s\w{1,}repo\s\w{1,} ]]
 		then
 			echo "${ORANGE}Please note there is no need to add this line:${NC}"
@@ -165,6 +172,14 @@ then
 	error_printer "$1" "=========== SECOND LINE MUST BE EMPTY ============"
 	exit 1
 fi
+
+check_content "$1"
+if [[ $? == 1 ]]
+then
+	error_printer "$1" "=========== INCORRECT COMMIT CONTENT  ============"
+	exit 1
+fi
+
 echo -e "${GREEN}Successfully commited! Good job ;-)${NC}"
 exit 0
 
