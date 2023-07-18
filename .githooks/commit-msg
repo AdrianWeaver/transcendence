@@ -7,16 +7,26 @@ NC='\033[0m'
 
 check_title()
 {
+	open_parenthesis=0
+	closing_parenthesis=0
 	arg_iterator=1
 	for var in $@
 	do
+		if  [[ "$var" =~ \)\s?(\w+|\)+) ]]
+		then
+			echo "closing parenthesis must be on last position"
+			return 1
+		fi
+
+		#FIRST WORD IN TITLE
 		if [[ $arg_iterator == 1 ]]
 		then
-			if ! [[ $var =~ (ADD|FIX|MERGE|DOC|WIP|REWORK|UPDATE)$ ]]
+			if ! [[ "$var" =~ (ADD|FIX|MERGE|DOC|WIP|REWORK|UPDATE)$ ]]
 			then
 				echo "Your flag '$var' is incorrect, choose one of the following : ADD, FIX, MERGE, DOC, WIP, REWORK, UPDATE"
 				return 1
 			fi
+		#LAST WORD IN TITLE
 		elif [ $arg_iterator == $# ]
 		then
 			if ! [[ $var =~ .*: ]]
@@ -24,16 +34,61 @@ check_title()
 				echo "You are missing ':' at the end of your title"
 				return 1
 			fi
-			if ! [[ $var =~ ([A-Z]{0,}:)|(\(?[A-Z]{0,}\)?:) ]]
+			if [[ "$var" =~ \): ]]
 			then
-				echo "Incorrect trailing word for title or missing ':'."
-				echo "var = $var"
-				return 1
+				if [[ $open_parenthesis == 1 ]]
+				then
+					return 0
+				elif ! [[ "$var" =~ \( ]]
+				then
+					echo "Closing un-opened parenthesis"
+					return 1
+				fi
 			fi
-		else
-			if ! [[ $var =~ ^[A-Z\_\-\s\&]{1,}$ ]]
+			if [[ $closing_parenthesis == 1 ]]
 			then
-				echo "'$var' is not authorized in the title, chars allowed [A-Z] and '_-&'"
+				if ! [[ "$var" =~ ^:$ ]]
+				then
+					echo "Scope token must be in last position"
+					return 1
+				fi
+			else
+				if ! [[ "$var" =~ ([A-Z]{0,}:)|(\([A-Z]{0,}\):) ]]
+				then
+					echo "Incorrect trailing word for title or missing ':'."
+					return 1
+				fi
+			fi
+		#MIDDLE WORDS IN TITLE
+		else
+			if [[ $var =~ \( ]]
+			then
+				if [[ $open_parenthesis == 1 ]]
+				then
+					echo "re-opening parenthesis is not allowed in title."
+					return 1
+				fi
+				open_parenthesis=1
+			fi
+			if [[ $var =~ \) ]]
+			then
+				closing_parenthesis=1
+				if [[ $open_parenthesis == 0 ]]
+				then
+					echo "Closing un-opened parenthesis"
+					return 1
+				elif [[ $arg_iterator -lt $(($# - 1)) ]]
+				then
+					echo "Scope token must be in last position"
+					echo "arg=$arg_iterator arg_nb=$#"
+					return 1
+				else
+					open_parenthesis=0
+				fi
+			fi
+			if ! [[ $var =~ (^\($)|(^\(?[A-Z\_\-\s\&]{1,}\)?$)|(^\)) ]]
+			then
+				echo "'$var' is not authorized in the title, chars allowed [A-Z], '_' '-' '&' and '('"
 				return 1
 			fi
 		fi
