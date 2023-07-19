@@ -135,7 +135,7 @@ const	SecondStepForm = () =>
 	const	imgSource
 	= "https://placehold.co/345x140?text=Change+me+UX+Click-here";
 
-	const	url = "https://api.intra.42.fr/oauth/a";
+	const	url = "https://api.intra.42.fr";
 	const	openInNewTab = () =>
 	{
 		// need to get proper url from server

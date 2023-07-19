@@ -31,6 +31,8 @@ import {
 	LinearProgress,
 	Typography
 } from "@mui/material";
+import MenuBar from "./components/MenuBar/MenuBar";
+import TheGame from "./components/TheGame/TheGame";
 
 /**
  * This change the behaviour of link of Link and Button
@@ -90,6 +92,7 @@ const	CustomRouter = () =>
 			<Routes>
 				<Route path="/" element={<h1>Home</h1>} />
 				<Route path="/redux-test-view" element={<ReduxViewTest/>} />
+				<Route path="/the-game" element={<TheGame />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/signin" element={<Signin />} />
 				<Route path="/logout" element={<Logout/>} />
