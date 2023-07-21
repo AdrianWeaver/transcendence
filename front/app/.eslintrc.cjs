@@ -15,15 +15,6 @@ module.exports = {
   rules: 
   {
     'react-refresh/only-export-components': 'warn',
-    // "indent":
-    // [
-    //     "error",
-    //     "tab"
-    // ],
-    // "linebreak-style": [
-    //     "error",
-    //     "unix"
-    // ],
     "quotes":
     [
         "error",
@@ -197,11 +188,6 @@ module.exports = {
         "error",
         "allman"
     ],
-    // "comma-dangle":
-    // [
-    //     "error",
-    //     "always"
-    // ],
     "comma-spacing":
     [
         "error",
@@ -287,11 +273,6 @@ module.exports = {
         "error",
         "below"
     ],
-    // "object-curly-newline":
-    // [
-    //     "error",
-    //     "always"
-    // ],
     "object-property-newline": "error",
     "operator-linebreak":
     [
