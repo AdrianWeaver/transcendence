@@ -25,6 +25,12 @@ export interface	ServerModel
 	"connexionEnabled" : boolean,
 }
 
+export interface	CanvasModel
+{
+	"height": number,
+	"width": number
+}
+
 export interface	ControllerModel
 {
 	"activeView": string,
@@ -33,5 +39,6 @@ export interface	ControllerModel
 	"anonymousUser": AnonymouseUserModel,
 	"user": UserModel,
 	"isFetching": boolean,
-	"registration": RegistrationProcessModel
+	"registration": RegistrationProcessModel,
+	"canvas": CanvasModel
 }

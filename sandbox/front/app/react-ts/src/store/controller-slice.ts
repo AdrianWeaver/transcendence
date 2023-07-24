@@ -29,6 +29,11 @@ const	initialControllerState: ControllerModel = {
 		codeOauthFT: "unsetted",
 		// need to purge data if abort set to 
 		abortRequested: false
+	},
+	canvas:
+	{
+		height: window.innerHeight,
+		width: window.innerWidth
 	}
 };
 
@@ -70,6 +75,10 @@ const	controllerSlice = createSlice(
 		setIsFetching(state, action: PayloadAction<ControllerModel>)
 		{
 			state.isFetching = action.payload.isFetching;
+		},
+		setCanvasSize(state, action: PayloadAction<ControllerModel>)
+		{
+			state.canvas = action.payload.canvas;
 		}
 	}
 });

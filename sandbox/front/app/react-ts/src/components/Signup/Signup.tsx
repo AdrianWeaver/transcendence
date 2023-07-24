@@ -26,6 +26,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { userRequestRegistration } from "../../store/controllerAction";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import Canvas from "../Canvas/Canvas";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -235,6 +236,7 @@ const	Signup = () =>
 				}
 				<Copyright />
 			</Container>
+			<Canvas />
 		</>
 	);
 };

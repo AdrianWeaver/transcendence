@@ -31,7 +31,6 @@ import {
 	LinearProgress,
 	Typography
 } from "@mui/material";
-import MenuBar from "./components/MenuBar/MenuBar";
 import TheGame from "./components/TheGame/TheGame";
 
 /**
@@ -55,7 +54,7 @@ const	behaviourLinkOption = {
 			defaultProps:
 			{
 				component: LinkBehaviour
-			} as LinkProps,
+			} as unknown as LinkProps,
 		},
 		MuiButtonBase:
 		{

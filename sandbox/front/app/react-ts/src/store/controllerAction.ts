@@ -4,7 +4,7 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { ControllerModel } from "../models/redux-models";
+import { CanvasModel, ControllerModel } from "../models/redux-models";
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -134,5 +134,19 @@ export const	setIsFetching = (value : boolean)
 			isFetching: value,
 		};
 		dispatch(controllerActions.setIsFetching(response));
+	});
+};
+
+export const	setCanvasSize = (size: CanvasModel)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			canvas: size
+		};
+		dispatch(controllerActions.setCanvasSize(response));
 	});
 };
