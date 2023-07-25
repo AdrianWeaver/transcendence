@@ -12,6 +12,7 @@ import
 	REGISTER
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import serverSlice from "./server-slice";
 
 const	persistConfig = {
 	key: "root",
@@ -26,7 +27,8 @@ export const	store = configureStore(
 {
 	reducer:
 	{
-		controller: persistedControllerReducer
+		controller: persistedControllerReducer,
+		server: serverSlice.reducer
 	},
 	middleware: (getDefaultMiddleware) =>
 	{

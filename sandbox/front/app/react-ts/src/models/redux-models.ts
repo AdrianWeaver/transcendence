@@ -22,7 +22,11 @@ export	interface	RegistrationProcessModel
 
 export interface	ServerModel
 {
-	"connexionEnabled" : boolean,
+	"isFetching": boolean,
+	"connexionEnabled": boolean,
+	"connexionAttempt": number,
+	"error": boolean,
+	"message": string
 }
 
 export interface	CanvasModel
@@ -35,10 +39,8 @@ export interface	ControllerModel
 {
 	"activeView": string,
 	"themeMode": string,
-	"server": ServerModel,
 	"anonymousUser": AnonymouseUserModel,
 	"user": UserModel,
-	"isFetching": boolean,
 	"registration": RegistrationProcessModel,
 	"canvas": CanvasModel
 }
