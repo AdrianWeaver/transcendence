@@ -1,4 +1,2 @@
 #!/bin/bash
-docker build -t dev .
-
-
+docker build -t dev_back .

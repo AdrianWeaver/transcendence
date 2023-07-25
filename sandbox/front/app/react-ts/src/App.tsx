@@ -5,125 +5,19 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useAppDispatch, useAppSelector } from "./hooks/redux-hooks";
+import MainRouter from "./Router";
 
-import {
-	BrowserRouter,
-	Route,
-	Routes,
-	// https://mui.com/material-ui/guides/routing/
-	Link as RouterLink,
-	LinkProps as RouterLinkProp
-
-} from "react-router-dom";
-
-import ReduxViewTest from "./components/ReduxViewTest";
-import Signup from "./components/Signup/Signup";
-import Signin from "./views/Signin";
-import Logout from "./views/Logout";
-import { LinkProps } from "@mui/material/Link";
-import React from "react";
 import {
 	Alert,
 	Backdrop,
 	LinearProgress,
 	Typography
 } from "@mui/material";
-import TheGame from "./components/TheGame/TheGame";
+import Theme from "./Theme";
 
-/**
- * This change the behaviour of link of Link and Button
- */
-const	LinkBehaviour = React.forwardRef<
-	HTMLAnchorElement,
-	Omit<RouterLinkProp, "to"> & {href : RouterLinkProp["to"]}
->((props, ref) =>
-{
-	const	{ href, ...other} = props;
-	// Map href (Material UI) -> to (react-router)
-	return <RouterLink ref={ref} to={href} {...other} />;
-});
-
-const	behaviourLinkOption = {
-	components:
-	{
-		MuiLink:
-		{
-			defaultProps:
-			{
-				component: LinkBehaviour
-			} as unknown as LinkProps,
-		},
-		MuiButtonBase:
-		{
-			defaultProps:
-			{
-				LinkComponent: LinkBehaviour
-			},
-		},
-	}
-};
-
-const	darkTheme = createTheme(
-{
-	palette:
-	{
-		mode: "dark",
-	},
-	components: behaviourLinkOption.components
-});
-
-const	lightTheme = createTheme(
-{
-	palette:
-	{
-		mode: "light",
-	},
-	components: behaviourLinkOption.components
-});
-
-const	CustomRouter = () =>
-{
-	return (
-		<BrowserRouter >
-			<Routes>
-				<Route path="/" element={<h1>Home</h1>} />
-				<Route path="/redux-test-view" element={<ReduxViewTest/>} />
-				<Route path="/the-game" element={<TheGame />} />
-				<Route path="/signup" element={<Signup />} />
-				<Route path="/signin" element={<Signin />} />
-				<Route path="/logout" element={<Logout/>} />
-				<Route path="*" element={<h1>Error 404</h1>} />
-			</Routes>
-		</BrowserRouter>
-	);
-};
-
-const	RegistrationRouter = () =>
-{
-	return (
-		<BrowserRouter >
-			<Routes>
-				<Route path="*" element={<Signup />} />
-			</Routes>
-		</BrowserRouter>
-	);
-};
-
-const	RegistrationRouting = () =>
-{
-	const	registrationStarted = useAppSelector((state) =>
-	{
-		return (state.controller.registration.startedRegister);
-	});
-
-	if (registrationStarted)
-		return (<RegistrationRouter />);
-	else
-		return (<CustomRouter />);
-};
 
 const	LoadingOverlay = () =>
 {
@@ -175,22 +69,12 @@ const	LoadingOverlay = () =>
 
 const App = () =>
 {
-	let		usedTheme;
-	const	themeSelection = useAppSelector((state) =>
-	{
-		return (state.controller.themeMode);
-	});
-
-	if (themeSelection === "dark")
-		usedTheme = darkTheme;
-	else
-		usedTheme = lightTheme;
+	const theme = Theme();
 	return (
-		<ThemeProvider theme={usedTheme}>
+		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			{/* <CustomRouter /> */}
 			<LoadingOverlay/>
-			<RegistrationRouting />
+			<MainRouter />
 		</ThemeProvider>
 	);
 };
