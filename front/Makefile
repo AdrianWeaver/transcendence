@@ -184,7 +184,7 @@ install: check_dev_image_build
 	@echo "Installation done\n\n"
 	@make -s -C . all
 clean:
-	sudo rm -rf ./app/node_modules ./app/package-lock.json norm.report
+	rm -rf ./app/node_modules ./app/package-lock.json norm.report
 ifneq ($(shell docker ps --filter "name=frontend" -q),)
 	docker kill frontend
 endif
