@@ -9,7 +9,7 @@ import { ServerModel } from "../models/redux-models";
 
 const	initialServerState: ServerModel = {
 	isFetching: false,
-	connexionEnabled: false,
+	connexionEnabled: true,
 	connexionAttempt: 0,
 	error: false,
 	message: ""

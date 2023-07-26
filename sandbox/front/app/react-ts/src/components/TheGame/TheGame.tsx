@@ -8,6 +8,7 @@ import Title from "./Title";
 
 
 import "./customStyle.css";
+import GameCanvas from "../GameCanvas/GameCanvas";
 
 const	AnimatedBackground = () =>
 {
@@ -22,10 +23,11 @@ const	TheGame = () =>
 {
 	return (
 		<>
-			<MenuBar />
+			{/* <MenuBar /> */}
 			{/* <Title />  */}
 			{/* <Background /> */}
-			<AnimatedBackground />
+			{/* <AnimatedBackground /> */}
+			<GameCanvas />
 			{/* <div
 				className="game-element gamefont devfont"
 			>

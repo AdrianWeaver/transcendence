@@ -27,6 +27,7 @@ import { userRequestRegistration } from "../../store/controllerAction";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import Canvas from "../Canvas/Canvas";
+import EscButton from "./EscButton";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -226,6 +227,7 @@ const	Signup = () =>
 
 	return (
 		<>
+			<EscButton />
 			<Container component="main" maxWidth="xs">
 				<Box sx={styleMainBox}>
 					<HeaderForm />
