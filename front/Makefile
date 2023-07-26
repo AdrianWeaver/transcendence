@@ -129,11 +129,11 @@ attach_run_serve:
 
 create_container:
 ifeq ($(shell docker ps --all --filter "name=frontend" -q),)
-	@echo "Container doesnt exist"
+	@echo "Container doesnt exists"
 	@echo "Starting instance of container (preparing installation) from $(pwd)/app"
 	@docker run -d -i -v $(APP_HOST_DIR):/app -p 3001:3000 --name frontend dev_front
 else
-	@echo "Container already exist"
+	@echo "Container already exists"
 endif
 
 check_lock_before_install:
