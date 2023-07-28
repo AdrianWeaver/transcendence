@@ -6,6 +6,8 @@ import HighlightOffRoundedIcon
 	from "@mui/icons-material/HighlightOffRounded";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { useAppDispatch } from "../../hooks/redux-hooks";
+import { setAbortRequestedValue } from "../../store/controllerAction";
 
 const	styleEscBox = {
 	marginTop: 5,
@@ -16,6 +18,7 @@ const	styleEscBox = {
 
 const	EscButton = () =>
 {
+	const	dispatch = useAppDispatch();
 	const
 	[
 		hoverState,
@@ -24,8 +27,7 @@ const	EscButton = () =>
 
 	const	handleClick = () =>
 	{
-		// eslint-disable-next-line no-alert
-		window.alert("Clicked");
+		dispatch(setAbortRequestedValue(true));
 	};
 
 	const	elemOnHover = (

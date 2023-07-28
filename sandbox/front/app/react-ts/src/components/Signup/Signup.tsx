@@ -23,8 +23,8 @@ import Copyright from "./Copyright";
 import HeaderForm from "./HeaderForm";
 import FirstStepFormContent from "./FirstStepFormContent";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
-import { userRequestRegistration } from "../../store/controllerAction";
-import { useLocation } from "react-router-dom";
+import { resetRegistration, userRequestRegistration } from "../../store/controllerAction";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Canvas from "../Canvas/Canvas";
 import EscButton from "./EscButton";
@@ -212,10 +212,14 @@ const	Signup = () =>
 {
 	let		rendering;
 	const	dispatch = useAppDispatch();
+	const navigate = useNavigate();
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);
 	});
+
+	if (controllerState.registration.abortRequested === true)
+		navigate("cancelSignup");
 	if (controllerState.registration.startedRegister === false)
 		if (controllerState.registration.step === 0)
 			dispatch(userRequestRegistration());
@@ -238,7 +242,6 @@ const	Signup = () =>
 				}
 				<Copyright />
 			</Container>
-			<Canvas />
 		</>
 	);
 };

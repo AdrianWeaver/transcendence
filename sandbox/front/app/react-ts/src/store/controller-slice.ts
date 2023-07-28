@@ -74,6 +74,15 @@ const	controllerSlice = createSlice(
 		setCanvasSize(state, action: PayloadAction<ControllerModel>)
 		{
 			state.canvas = action.payload.canvas;
+		},
+		setAbortRequestedValue(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.abortRequested
+				= action.payload.registration.abortRequested;
+		},
+		resetRegistration(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration = initialControllerState.registration;
 		}
 	}
 });

@@ -1,14 +1,16 @@
+/* eslint-disable max-statements */
 import {
 	BrowserRouter,
 	Route,
 	Routes,
 } from "react-router-dom";
-import { useAppSelector } from "../hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import Signup from "../components/Signup/Signup";
 import TheGame from "../components/TheGame/TheGame";
 import ReduxViewTest from "../components/ReduxViewTest";
 import Signin from "../views/Signin";
 import Logout from "../views/Logout";
+import { resetRegistration } from "../store/controllerAction";
 
 const	CustomRouter = () =>
 {
@@ -27,11 +29,27 @@ const	CustomRouter = () =>
 	);
 };
 
+const	CancelSignup = () =>
+{
+	const	registrationState = useAppSelector((state) =>
+	{
+		return (state.controller.registration);
+	});
+
+	const	dispatch = useAppDispatch();
+
+	if (registrationState.startedRegister === true
+		&& registrationState.abortRequested === true)
+		dispatch(resetRegistration());
+	return (<>canceling registration</>);
+};
+
 const	RegistrationRouter = () =>
 {
 	return (
 		<BrowserRouter >
 			<Routes>
+				<Route path="/cancelSignup" element={<CancelSignup />}/>
 				<Route path="*" element={<Signup />} />
 			</Routes>
 		</BrowserRouter>
@@ -49,6 +67,7 @@ const	MainRouter: React.FC = () =>
 	{
 		return (state.controller.registration.startedRegister);
 	});
+
 	if (registrationStarted)
 		return (<RegistrationRouter />);
 	else

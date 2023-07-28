@@ -135,3 +135,42 @@ export const	setCanvasSize = (size: CanvasModel)
 		dispatch(controllerActions.setCanvasSize(response));
 	});
 };
+
+export const	setAbortRequestedValue = (value: boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	reponse: ControllerModel = {
+			...prevState.controller,
+			registration:
+			{
+				...prevState.controller.registration,
+				abortRequested: value
+			}
+		};
+		dispatch(controllerActions.setAbortRequestedValue(reponse));
+	});
+};
+
+export const	resetRegistration = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			registration:
+			{
+				startedRegister: false,
+				codeOauthFT: "unsetted",
+				step: 0,
+				abortRequested: false
+			},
+		};
+		console.log(response);
+		dispatch(controllerActions.setAbortRequestedValue(response));
+	});
+};
