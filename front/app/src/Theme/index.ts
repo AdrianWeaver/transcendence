@@ -1,4 +1,8 @@
-import	createTheme from "@mui/material/styles/createTheme";
+
+import createTheme,
+{
+	ThemeOptions
+} from "@mui/material/styles/createTheme";
 
 // Get data from the store redux.
 import	{ useAppSelector } from "../Redux/hooks/redux-hooks";
@@ -6,23 +10,19 @@ import	{ useAppSelector } from "../Redux/hooks/redux-hooks";
 // Transform all href on the theme to link, for Single Page App rules(SPA)
 import behaviourLinkOption from "./BehaviourLinkOption";
 
+// Theme Designer must modify this two files
+import CustomDarkTheme from "./CustomDarkTheme";
+import CustomLightTheme from "./CustomLightTheme";
+
 const	darkTheme = createTheme(
 {
-	palette:
-	{
-		mode: "dark",
-	},
-	// custom theme style here
+	...CustomDarkTheme as ThemeOptions,
 	components: behaviourLinkOption.components
 });
 
 const	lightTheme = createTheme(
 {
-	palette:
-	{
-		mode: "light",
-	},
-	// custom theme style here
+	...CustomLightTheme as ThemeOptions,
 	components: behaviourLinkOption.components
 });
 
