@@ -9,6 +9,7 @@ import TheGame from "../components/TheGame/TheGame";
 import ReduxViewTest from "../components/ReduxViewTest";
 import Signin from "../views/Signin";
 import Logout from "../views/Logout";
+import AnimationTest from "../components/AnimationTest/AnimationTest";
 
 const	CustomRouter = () =>
 {
@@ -20,7 +21,8 @@ const	CustomRouter = () =>
 				<Route path="/the-game" element={<TheGame />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/signin" element={<Signin />} />
-				<Route path="/logout" element={<Logout/>} />
+				<Route path="/logout" element={<Logout />} />
+				<Route path="/animation-test" element={<AnimationTest />} />
 				<Route path="*" element={<h1>Error 404</h1>} />
 			</Routes>
 		</BrowserRouter>
