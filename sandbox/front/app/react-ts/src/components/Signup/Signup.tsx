@@ -212,14 +212,14 @@ const	Signup = () =>
 {
 	let		rendering;
 	const	dispatch = useAppDispatch();
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);
 	});
 
-	if (controllerState.registration.abortRequested === true)
-		navigate("cancelSignup");
+	// if (controllerState.registration.abortRequested === true)
+	// 	navigate("cancelSignup");
 	if (controllerState.registration.startedRegister === false)
 		if (controllerState.registration.step === 0)
 			dispatch(userRequestRegistration());

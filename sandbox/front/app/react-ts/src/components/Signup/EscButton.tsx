@@ -1,13 +1,14 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
-import { useState } from "react";
+import { useInsertionEffect, useState } from "react";
 import HighlightOffRoundedIcon
 	from "@mui/icons-material/HighlightOffRounded";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch } from "../../hooks/redux-hooks";
-import { setAbortRequestedValue } from "../../store/controllerAction";
+import { resetRegistration, setAbortRequestedValue } from "../../store/controllerAction";
+import { useNavigate } from "react-router-dom";
 
 const	styleEscBox = {
 	marginTop: 5,
@@ -25,9 +26,11 @@ const	EscButton = () =>
 		setHoverState
 	] = useState(false);
 
+	const	navigate = useNavigate();
 	const	handleClick = () =>
 	{
 		dispatch(setAbortRequestedValue(true));
+		navigate("/");
 	};
 
 	const	elemOnHover = (

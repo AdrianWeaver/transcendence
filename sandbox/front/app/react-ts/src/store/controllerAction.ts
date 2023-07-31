@@ -170,7 +170,6 @@ export const	resetRegistration = ()
 				abortRequested: false
 			},
 		};
-		console.log(response);
 		dispatch(controllerActions.setAbortRequestedValue(response));
 	});
 };
