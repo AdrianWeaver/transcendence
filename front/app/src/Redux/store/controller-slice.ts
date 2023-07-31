@@ -80,7 +80,7 @@ const	controllerSlice = createSlice(
 			state.registration.abortRequested
 				= action.payload.registration.abortRequested;
 		},
-		resetRegistration(state, action: PayloadAction<ControllerModel>)
+		resetRegistration(state)
 		{
 			state.registration = initialControllerState.registration;
 		}
