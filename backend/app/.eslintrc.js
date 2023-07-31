@@ -180,7 +180,6 @@ module.exports = {
                 "onlyEquality": true
             }
         ],
-        // Layout and Formatting
         "array-element-newline":
         [
             "error",
@@ -204,11 +203,6 @@ module.exports = {
             "error",
             "allman"
         ],
-        // "comma-dangle":
-        // [
-        //     "error",
-        //     "always"
-        // ],
         "comma-spacing":
         [
             "error",
