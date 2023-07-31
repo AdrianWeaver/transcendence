@@ -1,0 +1,185 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+NC='\033[0m'
+
+check_title()
+{
+	open_parenthesis=0
+	closing_parenthesis=0
+	arg_iterator=1
+	for var in $@
+	do
+		if  [[ "$var" =~ \)\s?(\w+|\)+) ]]
+		then
+			echo "closing parenthesis must be on last position"
+			return 1
+		fi
+
+		#FIRST WORD IN TITLE
+		if [[ $arg_iterator == 1 ]]
+		then
+			if ! [[ "$var" =~ (ADD|FIX|MERGE|DOC|WIP|REWORK|UPDATE)$ ]]
+			then
+				echo "Your flag '$var' is incorrect, choose one of the following : ADD, FIX, MERGE, DOC, WIP, REWORK, UPDATE"
+				return 1
+			fi
+		#LAST WORD IN TITLE
+		elif [ $arg_iterator == $# ]
+		then
+			if ! [[ $var =~ .*: ]]
+			then
+				echo "You are missing ':' at the end of your title"
+				return 1
+			fi
+			if [[ "$var" =~ \):$ ]]
+			then
+				if [[ $open_parenthesis == 1 ]]
+				then
+					return 0
+				elif ! [[ "$var" =~ ^\( ]]
+				then
+					echo "Closing un-opened parenthesis"
+					return 1
+				fi
+			fi
+			if [[ $closing_parenthesis == 1 ]]
+			then
+				if ! [[ "$var" =~ ^:$ ]]
+				then
+					echo "Scope token must be in last position"
+					return 1
+				fi
+			else
+				if ! [[ "$var" =~ (^[A-Z]{0,}:$)|(^\([A-Z]{0,}\):$) ]]
+				then
+					echo "Incorrect trailing word for title or missing ':'."
+					return 1
+				fi
+			fi
+		#MIDDLE WORDS IN TITLE
+		else
+			if [[ "$var" =~ ^\( ]]
+			then
+				if [[ $open_parenthesis == 1 ]]
+				then
+					echo "re-opening parenthesis is not allowed in title."
+					return 1
+				fi
+				open_parenthesis=1
+			fi
+			if [[ "$var" =~ \)$ ]]
+			then
+				closing_parenthesis=1
+				if [[ $open_parenthesis == 0 ]]
+				then
+					echo "Closing un-opened parenthesis"
+					return 1
+				elif [[ $arg_iterator -lt $(($# - 1)) ]]
+				then
+					echo "Scope token must be in last position"
+					echo "arg=$arg_iterator arg_nb=$#"
+					return 1
+				else
+					open_parenthesis=0
+				fi
+			fi
+			if ! [[ "$var" =~ (^\($)|(^\(?[A-Z\&\_\-]{1,}\)?$)|(^\)) ]]
+			then
+				echo "'$var' is not authorized in the title, chars allowed [A-Z], '_' '-' '&' and '('"
+				return 1
+			fi
+		fi
+	arg_iterator=$(($arg_iterator+1))
+	done
+	return 0
+}
+
+check_second_line()
+{
+	if ! [[ -z $1 ]]
+	then
+		return 1
+	fi
+}
+
+check_content()
+{
+
+	echo "words in commit: $(cat $1 | sed -n '3,$p' | grep -v '^\s*#' | wc -w)"
+	if [[ $(cat $1 | grep -v '^\s*#' | sed -n '3,$p' | wc -w) -lt 2 ]]
+	then
+		echo "Please provide a more detailed description"
+		return 1
+	fi
+	line_nb=$(cat $1 | wc -l)
+	for i in $line_nb
+	do
+		line=$(cat $1 | sed -n "${i}p")
+		if [[ line =~ From\s\w{1,}repo\s\w{1,} ]]
+		then
+			echo "${ORANGE}Please note there is no need to add this line:${NC}"
+			echo $line
+		elif [[ line =~ On\sbranch\s\w*\/?\w* ]]
+		then
+			echo "Please do not specify branch in commit message, you wrote:"
+			echo $line
+			return 1
+		fi
+	done
+}
+
+error_printer()
+{
+	echo -e "${RED}${2}${NC}"
+	cat $1 | grep -v '^\s*#'
+	echo -e "${RED}==================================================${NC}"
+	echo -e "${RED}/!\\ Your commit was aborted! /!\\ ${NC}"
+}
+
+commit_msg=$(cat $1 | grep -v '^\s*#')
+if [[ -z $commit_msg ]]
+	then
+		echo "Aborting commit due to empty commit message."
+		exit 1
+	fi
+
+echo -e "${ORANGE}Successfuly called commit checker hook${NC}"
+if [[ $(cat "$1" | sed -n '1p' | wc --chars) -gt 51 ]]
+then
+	error_printer "$1" "========== YOUR TITLE IS TOO LONG MAX50 =========="
+	exit 1
+fi
+
+if [[ -z $(cat $1 | sed -n '1p') ]]
+then
+	error_printer "$1" "==========  FIRST LINE CANNOT BE EMPTY  =========="
+	exit 1
+fi
+
+check_title $(cat $1 | sed -n '1p')
+if [[ $? == 1 ]]
+then
+	error_printer "$1" "===========  INCORRECT COMMIT TITLE  ============="
+	exit 1
+fi
+
+check_second_line "$(cat "$1" | sed -n '2p')"
+if [[ $? == 1 ]]
+then
+	error_printer "$1" "=========== SECOND LINE MUST BE EMPTY ============"
+	exit 1
+fi
+
+check_content "$1"
+if [[ $? == 1 ]]
+then
+	error_printer "$1" "=========== INCORRECT COMMIT CONTENT  ============"
+	exit 1
+fi
+
+echo -e "${GREEN}Successfully commited! Good job ;-)${NC}"
+exit 0
+
