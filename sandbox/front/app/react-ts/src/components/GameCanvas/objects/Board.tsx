@@ -25,11 +25,11 @@ class Board
 		this.irlWidth = 274;
 		this.irlHeight = 152.5;
 		this.irlRatio = this.irlHeight / this.irlWidth;
-		this.canvas = document.getElementById("board");
-		this.ctx = this.canvas.getContext("2d");
-		this.ctx.font = "30px Arial";
-		this.ctx.fillStyle = "#000";
-		this.ctx.textAlign = "center";
+		// this.canvas = document.getElementById("board");
+		// this.ctx = this.canvas.getContext("2d");
+		// this.ctx.font = "30px Arial";
+		// this.ctx.fillStyle = "#000";
+		// this.ctx.textAlign = "center";
 		this.dim = new Dimension();
 		this.game = undefined;
 		this.setHeight = () =>
@@ -42,11 +42,11 @@ class Board
 			let prevWidth = this.dim.width; // this.width 
 			let	prevHeight = this.dim.height; // this.height obj Borad 
 			let windowWidth = window.innerWidth;
-			this.canvasWidth = windowWidth * 0.66;
-			this.canvasHeight = this.setHeight();
+			let canvasWidth = windowWidth * 0.66;
+			let canvasHeight = this.setHeight();
 			
-			this.dim.width = this.canvasWidth;
-			this.dim.height = this.canvasHeight;
+			this.dim.width = canvasWidth;
+			this.dim.height = canvasHeight;
 			this.canvas.width = this.dim.width;
 			this.canvas.height = this.dim.height;
 		
@@ -81,3 +81,5 @@ class Board
 		};
     }
 }
+
+export default Board;
