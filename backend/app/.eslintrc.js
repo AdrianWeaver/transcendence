@@ -79,7 +79,7 @@ module.exports = {
         "no-inner-declarations": "error",
         "no-self-compare": "error",
         "no-use-before-define": "error",
-        // SUGESTED
+        // SUGGESTED
         "accessor-pairs":
         [
             "error",
