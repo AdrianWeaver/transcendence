@@ -78,15 +78,15 @@ class Ball
 			{
 				let newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
 				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speedX;
-				if (this.game.player_one.isLeftPlayer(newPosX, newPosY) == true)
+				if (this.game.playerOne.isLeftPlayer(newPosX, newPosY) == true)
 				{
      				this.angle = Math.PI - this.angle;
 					this.angle = this.degreesToRadians(0);
 					this.angle -= this.degreesToRadians(this.getBounceAngle());
 				}
-				else if (this.game.player_two.isRightPlayer(newPosX, newPosY) == true) 
+				else if (this.game.playerTwo.isRightPlayer(newPosX, newPosY) == true) 
 				{
-					this.pos.x = this.game.player_two.pos.x - this.radius;
+					this.pos.x = this.game.playerTwo.pos.x - this.radius;
      				this.angle = Math.PI - this.angle;
 					this.angle += this.degreesToRadians(this.getBounceAngle());
 				}
@@ -99,14 +99,14 @@ class Ball
 				this.wasBottomWallHit();
 				if (this.pos.x <= 0)
 				{
-					this.game.player_two.score += 1;
+					this.game.playerTwo.score += 1;
 					// this.failedAudio.play();
 					this.angle = this.degrees_to_radians(180);
 					this.init();
 				}
 				if (this.pos.x >= this.game.board.dim.width)
 				{
-					this.game.player_one.score += 1;
+					this.game.playerOne.score += 1;
 					// this.failedAudio.play();
 					this.angle = this.degreesToRadians(0);
 					this.init();
@@ -146,12 +146,12 @@ class Ball
 			let relativeIntersectY = 0;
 			if (this.pos.x > this.game.board.dim.width / 2)
 			{
-				relativeIntersectY = (this.game.player_two.pos.y + (this.game.player_two.racket.dim.height / 2)) - this.pos.y;
+				relativeIntersectY = (this.game.playerTwo.pos.y + (this.game.playerTwo.racket.dim.height / 2)) - this.pos.y;
 			}
 			else
-				relativeIntersectY = (this.game.player_one.pos.y + (this.game.player_two.racket.dim.height / 2)) - this.pos.y;
+				relativeIntersectY = (this.game.playerOne.pos.y + (this.game.playerTwo.racket.dim.height / 2)) - this.pos.y;
 			//ball's interception relative to the middle of the paddle
-			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.player_two.racket.dim.height / 2);
+			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.playerTwo.racket.dim.height / 2);
 			let bounceAngle = normalizedRelativeIntersectionY * this.radians_to_degrees((Math.PI / 4));
 			if (normalizedRelativeIntersectionY < 0)
 				normalizedRelativeIntersectionY *= -1;
@@ -168,3 +168,5 @@ class Ball
 		}
     }
 }
+
+export default Ball;

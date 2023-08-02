@@ -1,5 +1,6 @@
 import Game from "./Game";
 import Position from "./Position";
+import Racket from "./Racket";
 
 class Player
 {
@@ -105,3 +106,5 @@ class Player
 		}
     }
 }
+
+export default Player;
