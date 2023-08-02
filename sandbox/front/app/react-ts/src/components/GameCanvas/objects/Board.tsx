@@ -2,6 +2,9 @@
 import Game from "./Game";
 import Dimension from "./Dimension";
 
+import { useEffect, useRef } from "react";
+import { useAppSelector } from "../../../hooks/redux-hooks";
+
 class Board
 {
     public borderStyle: string;
@@ -9,8 +12,10 @@ class Board
     public irlWidth: number;
     public irlHeight: number;
     public irlRatio: number;
-    public canvas: HTMLCanvasElement;
-    public ctx: CanvasRenderingContext2D;
+	public canvasRef: React.RefObject<HTMLCanvasElement>;
+	// public size: canvasModel;
+    public canvas: HTMLCanvasElement | null;
+	public ctx: CanvasRenderingContext2D | null | undefined;
     public dim: Dimension;
     public game: Game | undefined;
     public setHeight: () => number;
@@ -25,11 +30,20 @@ class Board
 		this.irlWidth = 274;
 		this.irlHeight = 152.5;
 		this.irlRatio = this.irlHeight / this.irlWidth;
+		this.canvasRef = useRef<HTMLCanvasElement>(null);
+		// this.size = useAppSelector((state) =>
+		// {
+		// 	return (state.controller.canvas);
+		// });
 		// this.canvas = document.getElementById("board");
-		// this.ctx = this.canvas.getContext("2d");
-		// this.ctx.font = "30px Arial";
-		// this.ctx.fillStyle = "#000";
-		// this.ctx.textAlign = "center";
+		this.canvas = this.canvasRef.current;
+		this.ctx = this.canvas?.getContext("2d");
+		if (this.ctx)
+		{
+			this.ctx.font = "30px Arial";
+			this.ctx.fillStyle = "#000";
+			this.ctx.textAlign = "center";
+		}
 		this.dim = new Dimension();
 		this.game = undefined;
 		this.setHeight = () =>
@@ -47,20 +61,32 @@ class Board
 			
 			this.dim.width = canvasWidth;
 			this.dim.height = canvasHeight;
-			this.canvas.width = this.dim.width;
-			this.canvas.height = this.dim.height;
+			if (this.canvas)
+			{
+				this.canvas.width = this.dim.width;
+				this.canvas.height = this.dim.height;
 		
+			}
 			let multiplicator_width = this.dim.width / prevWidth;
 			let multiplicator_height = this.dim.height / prevHeight;
 
-			this.game.player_one.pos.x = this.game.player_one.pos.x * multiplicator_width;
-			this.game.player_one.pos.y = this.game.player_one.pos.y * multiplicator_height;
-			this.game.player_two.pos.x = this.game.player_two.pos.x * multiplicator_width;
-			this.game.player_two.pos.y = this.game.player_two.pos.y * multiplicator_height;
-			this.game.ball.pos.x *= multiplicator_width;
-			this.game.ball.pos.y *= multiplicator_height;
-			this.game.player_one.racket.defineRacketSize();
-			this.game.player_two.racket.defineRacketSize();
+			if (this.game && this.game.playerOne)
+			{
+				this.game.playerOne.pos.x = this.game.playerOne.pos.x * multiplicator_width;
+				this.game.playerOne.pos.y = this.game.playerOne.pos.y * multiplicator_height;
+				this.game.playerOne.racket.defineRacketSize();
+			}
+			if (this.game && this.game.playerTwo)
+			{
+				this.game.playerTwo.pos.x = this.game.playerTwo.pos.x * multiplicator_width;
+				this.game.playerTwo.pos.y = this.game.playerTwo.pos.y * multiplicator_height;
+				this.game.playerTwo.racket.defineRacketSize();
+			}
+			if (this.game && this.game.ball)
+			{
+				this.game.ball.pos.x *= multiplicator_width;
+				this.game.ball.pos.y *= multiplicator_height;
+			}
 		};
 		this.registerEvents = () =>
 		{
@@ -72,11 +98,17 @@ class Board
 			let windowWidth = window.innerWidth;
 			this.dim.width = windowWidth * 0.66;
 			this.setHeight();
-			this.canvas.style.border = this.borderStyle;
-			this.canvas.width = this.dim.width;
-			this.canvas.height = this.dim.height;
-			this.game.initPlayers();
-			this.game.ball.init();
+			if (this.canvas)
+			{
+				this.canvas.style.border = this.borderStyle;
+				this.canvas.width = this.dim.width;
+				this.canvas.height = this.dim.height;
+			}
+			if (this.game)
+			{
+				this.game.initPlayers();
+				this.game.ball.init();
+			}
 			this.registerEvents();
 		};
     }
