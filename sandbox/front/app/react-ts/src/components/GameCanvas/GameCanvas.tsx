@@ -13,6 +13,7 @@ import Player from "./objects/Player";
 import Racket from "./objects/Racket";
 import Position from "./objects/Position";
 import Dimension from "./objects/Dimension";
+import { renderMatches } from 'react-router-dom';
 
 /* docu https://css-tricks.com/using-requestanimationframe-with-react-hooks/*/
 const	GameCanvas = () =>
@@ -34,10 +35,6 @@ const	GameCanvas = () =>
 
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
-	// const canvas = canvasRef.current;
-	// const ctx = canvas?.getContext("2d");
-
-	// game.board.init();
 
 	useEffect(() =>
 	{
@@ -47,21 +44,30 @@ const	GameCanvas = () =>
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
-		// if (game.board.ctx)
-		// {
-			const	draw = () =>
+
+		const clear = () =>
+		{
+			game.board.ctx.fillStyle = "#fff";
+			game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+		}
+
+		const	render = () =>
+		{
+			clear();
+
+			game.board.ctx?.beginPath();
+			if (game.board.ctx)
 			{
-				game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
-				game.board.ctx?.beginPath();
-				if (game.board.ctx)
-				{
-					game.board.ctx.fillStyle = "#F5F5DC";
-					game.board.ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
-				}
-				requestId = requestAnimationFrame(draw);
-			};
-			requestId = requestAnimationFrame(draw);
-		// }
+				game.board.ctx.fillStyle = "#F5F5DC";
+				game.board.ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
+			}
+			game.net.render();
+			game.ball.render();
+			game.playerOne.render();
+			game.playerTwo.render();
+			requestId = requestAnimationFrame(render);
+		};
+		requestId = requestAnimationFrame(render);
 		return (() =>
 		{
 			cancelAnimationFrame(requestId);
