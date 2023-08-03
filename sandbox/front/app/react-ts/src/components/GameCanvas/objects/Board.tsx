@@ -13,7 +13,6 @@ class Board
     public irlHeight: number;
     public irlRatio: number;
 	public canvasRef: React.RefObject<HTMLCanvasElement>;
-	// public size: canvasModel;
     public canvas: HTMLCanvasElement | null;
 	public ctx: CanvasRenderingContext2D | null | undefined;
     public dim: Dimension;
@@ -31,11 +30,6 @@ class Board
 		this.irlHeight = 152.5;
 		this.irlRatio = this.irlHeight / this.irlWidth;
 		this.canvasRef = useRef<HTMLCanvasElement>(null);
-		// this.size = useAppSelector((state) =>
-		// {
-		// 	return (state.controller.canvas);
-		// });
-		// this.canvas = document.getElementById("board");
 		this.canvas = this.canvasRef.current;
 		this.ctx = this.canvas?.getContext("2d");
 		if (this.ctx)
