@@ -25,7 +25,7 @@ const	GameCanvas = () =>
 	const	renderBoard = (ctx: CanvasRenderingContext2D) =>
 	{
 		ctx.fillStyle = "#f00";
-		ctx.fillRect((size.width * 0.34) / 2, 0, boardWidth, boardHeight);
+		ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
 	};
 
 	const game = new Game();
@@ -41,34 +41,41 @@ const	GameCanvas = () =>
 
 	useEffect(() =>
 	{
-		if (game.board.ctx)
-		{
+		let requestId;
+		// if (game.board.ctx)
+		// {
 			const	draw = () =>
 			{
 				renderBoard(game.board.ctx);
-				requestAnimationFrame(draw);
+				requestId = requestAnimationFrame(draw);
 			};
-			requestAnimationFrame(draw);
-		}
-		// return (() =>
-		// {
-		// 	cancelAnimationFrame(canvasRef.current);
-		// });
+			requestId = requestAnimationFrame(draw);
+		// }
+		return (() =>
+		{
+			cancelAnimationFrame(requestId);
+		});
 	});
 
-	return (
-		<>
-			<div>
-				<canvas
-
-					height={size.height}
-					width={size.width}
-					ref={game.board.canvasRef}
-				>
-				</canvas>
-			</div>
-		</>
-	);
+	if (game.board.canvas !== null)
+	{
+		return (
+			<>
+				<div>
+					<canvas
+						height={game.board.canvas?.height}
+						width={game.board.canvas?.width}
+						ref={game.board.canvasRef}
+					>
+					</canvas>
+				</div>
+			</>
+		);
+	}
+	// else
+	// {
+	// 	window.alert();
+	// }
 };
 
 export default GameCanvas;

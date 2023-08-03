@@ -2,8 +2,8 @@
 import Game from "./Game";
 import Dimension from "./Dimension";
 
-import { useEffect, useRef } from "react";
-import { useAppSelector } from "../../../hooks/redux-hooks";
+import { useRef } from "react";
+// import { useAppSelector } from "../../../hooks/redux-hooks";
 
 class Board
 {
