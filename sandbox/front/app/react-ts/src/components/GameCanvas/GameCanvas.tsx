@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
+import React, { createContext } from 'react';
 import { useEffect, useRef } from "react";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import UseWindowSize from "../Canvas/UseWindowSize";
@@ -22,12 +23,6 @@ const	GameCanvas = () =>
 	});
 	UseWindowSize();
 
-	const	renderBoard = (ctx: CanvasRenderingContext2D) =>
-	{
-		ctx.fillStyle = "#f00";
-		ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
-	};
-
 	const game = new Game();
 	game.board.game = game;
 
@@ -37,16 +32,32 @@ const	GameCanvas = () =>
 	game.ball.game = game;
 	game.net.game = game;
 
-	game.board.init();
+	const	canvasRef = useRef<HTMLCanvasElement>(null);
+	game.board.canvasRef = canvasRef;
+	// const canvas = canvasRef.current;
+	// const ctx = canvas?.getContext("2d");
+
+	// game.board.init();
 
 	useEffect(() =>
 	{
-		let requestId;
+		let requestId: number;
+		const canvas = canvasRef.current;
+		const ctx = canvas?.getContext("2d");
+		game.board.canvas = canvas;
+		game.board.ctx = ctx;
+		game.board.init();
 		// if (game.board.ctx)
 		// {
 			const	draw = () =>
 			{
-				renderBoard(game.board.ctx);
+				game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+				game.board.ctx?.beginPath();
+				if (game.board.ctx)
+				{
+					game.board.ctx.fillStyle = "#F5F5DC";
+					game.board.ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
+				}
 				requestId = requestAnimationFrame(draw);
 			};
 			requestId = requestAnimationFrame(draw);
@@ -57,10 +68,13 @@ const	GameCanvas = () =>
 		});
 	});
 
-	if (game.board.canvas !== null)
-	{
+	// if (game.board.canvas !== null)
+	// {
 		return (
 			<>
+				<div>
+					FT_TRANSCENDANCE
+				</div>
 				<div>
 					<canvas
 						height={game.board.canvas?.height}
@@ -71,7 +85,7 @@ const	GameCanvas = () =>
 				</div>
 			</>
 		);
-	}
+	// }
 	// else
 	// {
 	// 	window.alert();
