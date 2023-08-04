@@ -24,6 +24,7 @@ ifeq ($(DEV_APP_INSTALLATION_LOCKER), 0)
 	if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
 		make -s -C . show_help_after_install; \
 	fi
+	@make -s -C . start_container
 	@echo "$(GREEN)Happy coding inside your host folder !!!$(NC)"
 else
 	@echo "Please install the dev server with 'make install'"
@@ -190,6 +191,11 @@ ifneq ($(shell docker ps --filter "name=frontend" -q),)
 endif
 ifneq ($(shell docker ps --all --filter "name=frontend" -q),)
 	docker rm frontend
+endif
+
+debug_problem:
+ifneq ($(shell docker ps --filter "name=frontend" -q),)
+	@echo "we've got a problem if container is down and you see that"
 endif
 
 fclean: clean
