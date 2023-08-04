@@ -9,8 +9,8 @@ type	HorizontalStepperProps = {
 
 const	steps = [
 	"Connexion Intra 42",
-	"Couplage Intra 42",
-	"Securite"
+	"Enregistrement utilisateur",
+	"Securite compte"
 ];
 
 const	HorizontalStepper = (props: HorizontalStepperProps) =>

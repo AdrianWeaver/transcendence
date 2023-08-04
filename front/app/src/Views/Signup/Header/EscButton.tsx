@@ -31,7 +31,7 @@ const	EscButton = () =>
 	const	handleClick = () =>
 	{
 		dispatch(setAbortRequestedValue(true));
-		navigate("/");
+		navigate("/cancel");
 	};
 
 	const	elemOnHover = (

@@ -1,10 +1,12 @@
 /* eslint-disable max-lines-per-function */
-import {
+import
+{
 	BrowserRouter,
 	Route,
 	Routes,
-} 	from "react-router-dom";
+}	from "react-router-dom";
 import Signup from "../Views/Signup/Signup";
+import CancelRegister from "../Views/Signup/CancelRegister";
 
 /**
  * This is unauth router
@@ -34,10 +36,18 @@ const	VisitorRouter = () =>
 					path="/signin"
 					element={<p>{"<Signin />"}</p>}
 				/>
+				{/* Must be a protected route with abortRequested 
+					cannot be acceced with no register before
+				*/}
+				<Route
+					path="/cancel"
+					element={<CancelRegister />}
+				/>
 				<Route
 					path="*"
-					element={<h1>Error 404</h1>}
+					element={<h1>Error 404: visitor router</h1>}
 				/>
+				
 			</Routes>
 		</BrowserRouter>
 	);
