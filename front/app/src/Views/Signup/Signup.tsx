@@ -43,7 +43,7 @@ const	Signup = () =>
 	return (
 		<>
 			<EscButton />
-			<Container component="main" maxWidth="xs">
+			<Container component="main" maxWidth="sm">
 				<Box sx={styleMainBox}>
 					<HeaderForm />
 					<HorizontalStepper activeStep={stepper} />

@@ -30,7 +30,7 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="*"
-					element={<h1>Error 404</h1>}
+					element={<h1>Error 404: Logged User</h1>}
 				/>
 			</Routes>
 		</BrowserRouter>

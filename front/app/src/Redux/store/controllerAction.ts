@@ -157,19 +157,8 @@ export const	setAbortRequestedValue = (value: boolean)
 export const	resetRegistration = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch, getState) =>
+	return ((dispatch) =>
 	{
-		const	prevState = getState();
-		const	response: ControllerModel = {
-			...prevState.controller,
-			registration:
-			{
-				startedRegister: false,
-				codeOauthFT: "unsetted",
-				step: 0,
-				abortRequested: false
-			},
-		};
-		dispatch(controllerActions.setAbortRequestedValue(response));
+		dispatch(controllerActions.resetRegistration());
 	});
 };
