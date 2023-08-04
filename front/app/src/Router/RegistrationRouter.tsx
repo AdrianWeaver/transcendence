@@ -3,6 +3,7 @@ import {
 	Route,
 	Routes,
 }	from "react-router-dom";
+import Signup from "../Views/Signup/Signup";
 
 /**
  * The registration router redirect always on signup until esc
@@ -15,7 +16,7 @@ const	RegistrationRouter = () =>
 			<Routes>
 				<Route
 					path="*"
-					element={<p>{"<Signup />"}</p>}
+					element={<Signup/>}
 				/>
 			</Routes>
 		</BrowserRouter>

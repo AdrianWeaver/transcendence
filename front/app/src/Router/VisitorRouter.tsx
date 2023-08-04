@@ -4,6 +4,7 @@ import {
 	Route,
 	Routes,
 } 	from "react-router-dom";
+import Signup from "../Views/Signup/Signup";
 
 /**
  * This is unauth router
@@ -27,7 +28,7 @@ const	VisitorRouter = () =>
 				{/* no save route navigation */}
 				<Route
 					path="/signup"
-					element={<p>{"<Signup />"}</p>}
+					element={<Signup />}
 				/>
 				<Route
 					path="/signin"
