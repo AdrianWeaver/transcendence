@@ -3,7 +3,7 @@ const	DocInfoBase = () =>
 {
 	return (
 		<p className="read-the-docs">
-			Click on the Vite and React logos to learn more
+			Feel free to create component and personnalize theme :)
 		</p>
 	);
 };
