@@ -1,12 +1,12 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import BaseViewFromViteJs from "./Views/BaseViewFromVitejs/BaseViewFromViteJs";
 
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 // I omit intentionnaly index.ts "./Theme" will try "./Theme/index" if exists
 import Theme from "./Theme";
+import MainRouter from "./Router/MainRouter";
 
 const	App = () =>
 {
@@ -14,7 +14,7 @@ const	App = () =>
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<BaseViewFromViteJs />
+			<MainRouter />
 		</ThemeProvider>
 	);
 };
