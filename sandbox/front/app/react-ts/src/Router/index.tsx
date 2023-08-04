@@ -24,6 +24,7 @@ const	LoggedRouter = () =>
 				{/* <Route path="/the-game" element={<TheGame />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/signin" element={<Signin />} /> */}
+				{/* no save route navigation */}
 				<Route path="/logout" element={<Logout/>} />
 				<Route path="*" element={<h1>Error 404</h1>} />
 			</Routes>
@@ -36,12 +37,12 @@ const	VisitorRouter = () =>
 	return (
 		<BrowserRouter >
 			<Routes>
+				{/* Saved route last navigation */}
 				<Route path="/" element={<h1>home view</h1>} />
 				<Route path="/redux-test-view" element={<ReduxViewTest/>} />
-				{/* <Route path="/the-game" element={<TheGame />} />*/}
+				{/* no save route navigation */}
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/signin" element={<Signin />} />
-				{/* <Route path="/logout" element={<Logout/>} /> */}
 				<Route path="*" element={<h1>Error 404</h1>} />
 			</Routes>
 		</BrowserRouter>
