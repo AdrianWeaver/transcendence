@@ -14,6 +14,7 @@ class Game
     public ball: Ball;
     public net: Net;
     public scoreLimit: number;
+    public actionKeyPress: number;
     public startDisplayed: boolean;
     // public requestAnimationFrame
     public continueAnimating: boolean;
@@ -36,7 +37,7 @@ class Game
         //     window.mozRequestAnimationFrame || 
         //     window.webkitRequestAnimationFrame || 
         //     window.msRequestAnimationFrame;
-        this.continueAnimating = false;
+        this.continueAnimating = true;
         // camera
         this.displayStartMessage = () =>
         {

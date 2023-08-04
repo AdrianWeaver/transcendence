@@ -33,8 +33,48 @@ const	GameCanvas = () =>
 	game.ball.game = game;
 	game.net.game = game;
 
+
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
+
+	const	update = () =>
+	{
+		game.playerOne.updatePlayerPosition();
+		game.playerTwo.updatePlayerPosition();
+		game.ball.update();
+	}
+
+	const clear = () =>
+	{
+		game.board.ctx.fillStyle = "#fff";
+		game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+	}
+
+	const	keyHookDown = (e) =>
+	{
+		switch (e.keyCode)
+		{
+			case 38: // fleche up
+				game.actionKeyPress = 38;
+				break; 
+			case 40: // fleche down
+				game.actionKeyPress = 40;
+				break;
+			case 83: //S
+				game.actionKeyPress = 83;
+				break;
+			case 87: //W
+				game.actionKeyPress = 87;
+				break;
+			default:
+				break;
+		}
+	}
+
+	const	keyHookReleased = (e) =>
+	{
+		game.actionKeyPress = -1;
+	}
 
 	useEffect(() =>
 	{
@@ -44,16 +84,13 @@ const	GameCanvas = () =>
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
-
-		const clear = () =>
-		{
-			game.board.ctx.fillStyle = "#fff";
-			game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
-		}
+		addEventListener("keydown", keyHookDown);
+		addEventListener("keyup", keyHookReleased);
 
 		const	render = () =>
 		{
 			clear();
+			update();
 
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
@@ -65,6 +102,8 @@ const	GameCanvas = () =>
 			game.ball.render();
 			game.playerOne.render();
 			game.playerTwo.render();
+			game.playerOne.renderScore();
+			game.playerTwo.renderScore();
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -74,23 +113,21 @@ const	GameCanvas = () =>
 		});
 	});
 
-	// if (game.board.canvas !== null)
-	// {
-		return (
-			<>
-				<div>
-					FT_TRANSCENDANCE
-				</div>
-				<div>
-					<canvas
-						height={game.board.canvas?.height}
-						width={game.board.canvas?.width}
-						ref={game.board.canvasRef}
-					>
-					</canvas>
-				</div>
-			</>
-		);
+	return (
+		<>
+			<div>
+				FT_TRANSCENDANCE
+			</div>
+			<div>
+				<canvas
+					height={game.board.canvas?.height}
+					width={game.board.canvas?.width}
+					ref={game.board.canvasRef}
+				>
+				</canvas>
+			</div>
+		</>
+	);
 	// }
 	// else
 	// {

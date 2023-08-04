@@ -45,7 +45,7 @@ class Player
 		{
 			if (this.game.continueAnimating == true)
 			{
-				switch (actionKeyPress)
+				switch (this.game.actionKeyPress)
 				{
 					case 87:
 						if (this.side === "left")

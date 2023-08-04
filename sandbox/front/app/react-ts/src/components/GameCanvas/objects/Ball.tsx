@@ -101,7 +101,7 @@ class Ball
 				{
 					this.game.playerTwo.score += 1;
 					// this.failedAudio.play();
-					this.angle = this.degrees_to_radians(180);
+					this.angle = this.degreesToRadians(180);
 					this.init();
 				}
 				if (this.pos.x >= this.game.board.dim.width)
