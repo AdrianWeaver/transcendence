@@ -18,5 +18,3 @@ export const	useRedirectRegistration = () =>
 		&& controller.registration.step === 0)
 		dispatch(userRequestRegistration());
 };
-
-// export default useRedirectRegistration;
