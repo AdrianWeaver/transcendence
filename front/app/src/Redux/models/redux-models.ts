@@ -18,6 +18,10 @@ export	interface	RegistrationProcessModel
 	"step": number,
 	"codeOauthFT": string,
 	"abortRequested": boolean,
+	// line bellow is here to reproduce link behaviour
+	// On Copyright signup
+	// server can know user leave the connection
+	"requestHomeLink" : boolean
 }
 
 export interface	ServerModel

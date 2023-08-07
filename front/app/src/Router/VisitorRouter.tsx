@@ -10,6 +10,7 @@ import CancelRegister from "../Views/Signup/CancelRegister";
 import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
+import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
 
 /**
  * This is unauth router
@@ -29,15 +30,20 @@ const	VisitorRouter = () =>
 					path="/redux-test-view"
 					element={<ReduxTestView />}
 				/>
-
-				{/* no save route navigation */}
-				<Route
-					path="/signup"
-					element={<Signup />}
-				/>
 				<Route
 					path="/signin"
 					element={<Signin />}
+				/>
+
+				<Route
+					path="/starter-pack"
+					element={<BaseViewFromViteJs />}
+				/>
+
+				{/* no save route navigation prevent loop */}
+				<Route
+					path="/signup"
+					element={<Signup />}
 				/>
 
 				{/* Must be a protected route with abortRequested 

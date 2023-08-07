@@ -6,9 +6,12 @@ import DocInfoBase from "./components/DocInfoBase";
 import TestComponent from "./components/TestComponent";
 
 import "./styles/Base.css";
+import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 
 const	BaseViewFromViteJs = () =>
 {
+	useSavePrevPage("/starter-pack");
+
 	return (
 		<>
 			<LogoBase />

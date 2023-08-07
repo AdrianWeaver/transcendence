@@ -18,29 +18,33 @@ const	CancelRegister = () =>
 	[
 		message,
 		setMessage
-	] = useState("You'll be redirected soon, please wait...");
+	] = useState("You'll be redirected soon, please wait... (delay)");
 
 	const	registration = useAppSelector((state) =>
 	{
 		return (state.controller.registration);
 	});
+	const	prevPage = useAppSelector((state) =>
+	{
+		return (state.controller.previousPage);
+	});
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 
-	useEffect(() =>
-	{
-		// send request to the back for anonymous user deletion
-		setTimeout(() =>
-		{
-			setMessage("Redirect now...");
-			if (registration.startedRegister === true
-				&& registration.abortRequested === true)
-				dispatch(resetRegistration());
-			// must naviguate to previous saved route 
-			navigate("/");
-		}, 1500);
-	});
+	const	routeToHome = registration.requestHomeLink;
 
+	// send request Here to the back for anonymous user deletion
+	setTimeout(() =>
+	{
+		setMessage("Redirect now...");
+		if (registration.startedRegister === true
+			&& registration.abortRequested === true)
+			dispatch(resetRegistration());
+		if (routeToHome)
+			navigate("/");
+		else
+			navigate(prevPage);
+	}, 1500);
 	return (<p>{message}</p>);
 };
 
