@@ -17,6 +17,7 @@ import Copyright from "./Footer/Copyright";
 import StepOne from "./contentSteps/StepOne";
 import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
+import StepZero from "./contentSteps/StepZero";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -37,8 +38,10 @@ const	Signup = () =>
 	useRedirectRegistration();
 
 	if (stepper === 0)
-		content = <StepOne />;
+		content = <StepZero />;
 	if (stepper === 1)
+		content = <StepOne />;
+	if (stepper === 2)
 		content = <StepTwo />;
 	return (
 		<>

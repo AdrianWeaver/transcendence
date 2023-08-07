@@ -5,6 +5,7 @@ import Link from "@mui/material/Link";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
 	setAbortRequestedValue,
+	setPreviousPage,
 	setRequestHomeLink
 } from "../../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +29,7 @@ const	Copyright = () =>
 		{
 			setAlreadyClicked(true);
 			dispatch(setAbortRequestedValue(true));
+			dispatch(setPreviousPage("/"));
 			dispatch(setRequestHomeLink(true));
 			navigate("/cancel");
 		}
