@@ -7,6 +7,9 @@ import
 }	from "react-router-dom";
 import Signup from "../Views/Signup/Signup";
 import CancelRegister from "../Views/Signup/CancelRegister";
+import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
+import Home from "../Views/Home/Home";
+import Signin from "../Views/Signin/Signin";
 
 /**
  * This is unauth router
@@ -20,11 +23,11 @@ const	VisitorRouter = () =>
 				{/* Saved route last navigation */}
 				<Route
 					path="/"
-					element={<h1>home view</h1>}
+					element={<Home />}
 				/>
 				<Route
 					path="/redux-test-view"
-					element={<p>{"<ReduxViewTest>"}</p>}
+					element={<ReduxTestView />}
 				/>
 
 				{/* no save route navigation */}
@@ -34,8 +37,9 @@ const	VisitorRouter = () =>
 				/>
 				<Route
 					path="/signin"
-					element={<p>{"<Signin />"}</p>}
+					element={<Signin />}
 				/>
+
 				{/* Must be a protected route with abortRequested 
 					cannot be acceced with no register before
 				*/}
