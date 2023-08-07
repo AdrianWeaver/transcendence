@@ -31,20 +31,18 @@ const	CancelRegister = () =>
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 
-	const	routeToHome = registration.requestHomeLink;
-
 	// send request Here to the back for anonymous user deletion
-	setTimeout(() =>
+	useEffect( () =>
 	{
-		setMessage("Redirect now...");
-		if (registration.startedRegister === true
-			&& registration.abortRequested === true)
-			dispatch(resetRegistration());
-		if (routeToHome)
-			navigate("/");
-		else
+		setTimeout(() =>
+		{
+			setMessage("Redirect now...");
+			if (registration.startedRegister === true
+				&& registration.abortRequested === true)
+				dispatch(resetRegistration());
 			navigate(prevPage);
-	}, 1500);
+		}, 1500);
+	});
 	return (<p>{message}</p>);
 };
 
