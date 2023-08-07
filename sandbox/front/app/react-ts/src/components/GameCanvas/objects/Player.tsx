@@ -28,11 +28,16 @@ class Player
 		this.name = undefined;
 		this.render = () =>
 		{
-			this.game.board.ctx.fillStyle = "#000";
-			this.game.board.ctx.fillRect(this.pos.x, this.pos.y, this.racket.dim.width, this.racket.dim.height);
+			if (this.game && this.game.board.ctx)
+			{
+				this.game.board.ctx.fillStyle = "#000";
+				this.game.board.ctx.fillRect(this.pos.x, this.pos.y, this.racket.dim.width, this.racket.dim.height);
+			}
 		}
 		this.renderScore = () =>
 		{
+			if (this.game && this.game.board && this.game.board.ctx)
+			{
 			this.game.board.ctx.fillStyle = "#000";
 			let pixels = this.game.board.dim.width * 0.07;
 			this.game.board.ctx.font = pixels + "px bald Arial";
@@ -40,10 +45,11 @@ class Player
 				this.game.board.ctx.strokeText(this.score, (this.game.board.dim.width / 2) - (this.game.board.dim.width * 0.06) - (pixels / 2), this.game.board.dim.height * 0.15);
 			else
 				this.game.board.ctx.strokeText(this.score, (this.game.board.dim.width / 2) + (this.game.board.dim.width * 0.06), this.game.board.dim.height * 0.15);
+			}
 		}
 		this.updatePlayerPosition = () =>
 		{
-			if (this.game.continueAnimating == true)
+			if (this.game && this.game.continueAnimating == true)
 			{
 				switch (this.game.actionKeyPress)
 				{
@@ -89,9 +95,9 @@ class Player
 		this.isLeftPlayer = (posX, posY) =>
 		{
 			if (posX <= this.pos.x + this.racket.dim.width
-				&& (posY == this.pos.y
+				&& (posY >= this.pos.y
 				&& posY <= this.pos.y + this.racket.dim.height))
-				return (true);
+					return (true);
 			else
 				return (false);
 		}
