@@ -10,6 +10,7 @@ import	{ NIL as NILUUID } from "uuid";
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "dark",
+	previousPage: "/",
 	anonymousUser:
 	{
 		uuid: NILUUID,
@@ -83,6 +84,10 @@ const	controllerSlice = createSlice(
 		resetRegistration(state)
 		{
 			state.registration = initialControllerState.registration;
+		},
+		setPreviousPage(state, action: PayloadAction<ControllerModel>)
+		{
+			state.previousPage = action.payload.previousPage;
 		}
 	}
 });

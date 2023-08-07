@@ -162,3 +162,22 @@ export const	resetRegistration = ()
 		dispatch(controllerActions.resetRegistration());
 	});
 };
+
+export const	setPreviousPage = (pageToSave : string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		let		response: ControllerModel;
+
+		if (prevState.controller.previousPage === pageToSave)
+			return ;
+		else
+			response = {
+				...prevState.controller,
+				previousPage: pageToSave,
+			};
+		dispatch(controllerActions.setPreviousPage(response));
+	});
+};

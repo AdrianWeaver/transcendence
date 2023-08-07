@@ -38,6 +38,7 @@ export interface	CanvasModel
 export interface	ControllerModel
 {
 	"activeView": string,
+	"previousPage": string,
 	"themeMode": string,
 	"anonymousUser": AnonymouseUserModel,
 	"user": UserModel,
