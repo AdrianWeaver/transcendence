@@ -4,7 +4,11 @@ import	displayStyle from "./config/DisplayStyle";
 import	fontConfig from "./config/FontConfig";
 
 import { Icon } from "@mui/material";
+<<<<<<< HEAD
 import icon from "./assets/icon.svg";
+=======
+import icon from "./assets/icon_pure_white.svg";
+>>>>>>> ecfd31d (UPDATE EASTHETICAL CHANGES TO THE GAME:)
 
 type	DisplayProps = {
 	display: string
