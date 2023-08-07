@@ -47,7 +47,6 @@ const	VisitorRouter = () =>
 					path="*"
 					element={<h1>Error 404: visitor router</h1>}
 				/>
-				
 			</Routes>
 		</BrowserRouter>
 	);

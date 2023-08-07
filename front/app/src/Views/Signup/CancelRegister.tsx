@@ -29,7 +29,7 @@ const	CancelRegister = () =>
 
 	useEffect(() =>
 	{
-		// send request anonymous user deletion
+		// send request to the back for anonymous user deletion
 		setTimeout(() =>
 		{
 			setMessage("Redirect now...");
