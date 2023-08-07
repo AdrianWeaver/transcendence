@@ -37,16 +37,19 @@ class Game
         //     window.mozRequestAnimationFrame || 
         //     window.webkitRequestAnimationFrame || 
         //     window.msRequestAnimationFrame;
-        this.continueAnimating = true;
+        this.continueAnimating = false;
         // camera
         this.displayStartMessage = () =>
         {
-            this.board.ctx.fillStyle = "#000";
-			let pixels = this.board.dim.width * 0.05;
-			this.board.ctx.font = pixels + "px bald Arial";
-            const text = "Press enter to start :)";
-            const textWidth = this.board.ctx.measureText(text).width;
-            this.board.ctx.fillText(text, (this.board.dim.width / 2 - textWidth / 2), (this.board.dim.height * 0.3));
+            if (this.board.ctx)
+            {
+                this.board.ctx.fillStyle = "#000";
+                let pixels = this.board.dim.width * 0.05;
+                this.board.ctx.font = pixels + "px bald Arial";
+                const text = "Press enter to start :)";
+                const textWidth = this.board.ctx.measureText(text).width;
+                this.board.ctx.fillText(text, (this.board.dim.width / 2 - textWidth / 2), (this.board.dim.height * 0.3));
+            }
         }
         this.initPlayers = () =>
         {

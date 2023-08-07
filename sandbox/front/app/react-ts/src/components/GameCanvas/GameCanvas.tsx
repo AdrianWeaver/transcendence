@@ -37,6 +37,13 @@ const	GameCanvas = () =>
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
 
+	const startButtonRef = useRef<HTMLInputElement>(null);
+	const startButton = startButtonRef.current;
+	const pauseButtonRef = useRef<HTMLInputElement>(null);
+	const pauseButton = pauseButtonRef.current;
+	const resumeButtonRef = useRef<HTMLInputElement>(null);
+	const resumeButton = resumeButtonRef.current;
+
 	const	update = () =>
 	{
 		game.playerOne.updatePlayerPosition();
@@ -46,8 +53,11 @@ const	GameCanvas = () =>
 
 	const clear = () =>
 	{
-		game.board.ctx.fillStyle = "#fff";
-		game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+		if (game.board.ctx)
+		{
+			game.board.ctx.fillStyle = "#fff";
+			game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+		}
 	}
 
 	const	keyHookDown = (e) =>
@@ -86,6 +96,20 @@ const	GameCanvas = () =>
 		game.board.init();
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
+		startButton?.addEventListener('click', function(){
+			// let startAudio = document.querySelector('#startSound');
+			// startAudio.play();
+			game.continueAnimating = true;
+			game.startDisplayed = false;
+		});
+	
+		pauseButton?.addEventListener('click',function(){
+			game.continueAnimating = false;
+		});
+	
+		resumeButton?.addEventListener('click',function(){
+			game.continueAnimating = true;
+		});
 
 		const	render = () =>
 		{
@@ -104,6 +128,8 @@ const	GameCanvas = () =>
 			game.playerTwo.render();
 			game.playerOne.renderScore();
 			game.playerTwo.renderScore();
+			if (game.startDisplayed == true)
+				game.displayStartMessage();
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -113,10 +139,28 @@ const	GameCanvas = () =>
 		});
 	});
 
+	// startButton?.addEventListener('click',function(){
+	// 	// let startAudio = document.querySelector('#startSound');
+	// 	// startAudio.play();
+	// 	game.continueAnimating = true;
+	// 	game.startDisplayed = false;
+	// });
+
+	// pauseButton?.addEventListener('click',function(){
+	// 	game.continueAnimating = false;
+	// });
+
+	// resumeButton?.addEventListener('click',function(){
+	// 	game.continueAnimating = true;
+	// });
+
 	return (
 		<>
 			<div>
 				FT_TRANSCENDANCE
+			</div>
+			<div>
+				<input type="button" value="START" ref={startButtonRef} />
 			</div>
 			<div>
 				<canvas
@@ -125,6 +169,10 @@ const	GameCanvas = () =>
 					ref={game.board.canvasRef}
 				>
 				</canvas>
+			</div>
+			<div>
+				<input type="button" value="PAUSE" ref={pauseButtonRef} />
+				<input type="button" value="RESUME" ref={resumeButtonRef} />
 			</div>
 		</>
 	);
