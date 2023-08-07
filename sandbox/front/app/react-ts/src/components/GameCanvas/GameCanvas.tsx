@@ -18,11 +18,11 @@ import { renderMatches } from 'react-router-dom';
 /* docu https://css-tricks.com/using-requestanimationframe-with-react-hooks/*/
 const	GameCanvas = () =>
 {
-	const	size = useAppSelector((state) =>
-	{
-		return (state.controller.canvas);
-	});
-	UseWindowSize();
+	// const	size = useAppSelector((state) =>
+	// {
+	// 	return (state.controller.canvas);
+	// });
+	// UseWindowSize();
 
 	const game = new Game();
 	game.board.game = game;
@@ -36,14 +36,6 @@ const	GameCanvas = () =>
 
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
-
-	const startButtonRef = useRef<HTMLInputElement>(null);
-	const startButton = startButtonRef.current;
-	const pauseButtonRef = useRef<HTMLInputElement>(null);
-	const pauseButton = pauseButtonRef.current;
-	const resumeButtonRef = useRef<HTMLInputElement>(null);
-	const resumeButton = resumeButtonRef.current;
-
 	const	update = () =>
 	{
 		game.playerOne.updatePlayerPosition();
@@ -86,27 +78,35 @@ const	GameCanvas = () =>
 		game.actionKeyPress = -1;
 	}
 
+	const startButtonRef = useRef<HTMLInputElement>(null);
+	const pauseButtonRef = useRef<HTMLInputElement>(null);
+	const resumeButtonRef = useRef<HTMLInputElement>(null);
+
+
 	useEffect(() =>
 	{
 		let requestId: number;
 		const canvas = canvasRef.current;
+		const startButton = startButtonRef.current;
+		const pauseButton = pauseButtonRef.current;
+		const resumeButton = resumeButtonRef.current;
+
 		const ctx = canvas?.getContext("2d");
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
+
 		startButton?.addEventListener('click', function(){
 			// let startAudio = document.querySelector('#startSound');
 			// startAudio.play();
 			game.continueAnimating = true;
 			game.startDisplayed = false;
 		});
-	
 		pauseButton?.addEventListener('click',function(){
 			game.continueAnimating = false;
 		});
-	
 		resumeButton?.addEventListener('click',function(){
 			game.continueAnimating = true;
 		});
@@ -139,21 +139,6 @@ const	GameCanvas = () =>
 		});
 	});
 
-	// startButton?.addEventListener('click',function(){
-	// 	// let startAudio = document.querySelector('#startSound');
-	// 	// startAudio.play();
-	// 	game.continueAnimating = true;
-	// 	game.startDisplayed = false;
-	// });
-
-	// pauseButton?.addEventListener('click',function(){
-	// 	game.continueAnimating = false;
-	// });
-
-	// resumeButton?.addEventListener('click',function(){
-	// 	game.continueAnimating = true;
-	// });
-
 	return (
 		<>
 			<div>
@@ -176,11 +161,6 @@ const	GameCanvas = () =>
 			</div>
 		</>
 	);
-	// }
-	// else
-	// {
-	// 	window.alert();
-	// }
 };
 
 export default GameCanvas;
