@@ -10,104 +10,56 @@ import {
 	LinearProgress,
 	Typography,
 }	from "@mui/material";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { redirect, useLocation } from "react-router-dom";
 
 import coalitionImage from "../assets/coalitions_v1.jpg";
+import { checkQueryParams } from "../extras/checkQueryParams";
 
-const	checkQuery = (query: string) =>
+const	getText = () =>
 {
-	let		buffer;
-	let		error;
-	let		message;
-
-	buffer = query.split("?");
-	if (buffer.length === 1)
-	{
-		console.log("no response - not clicked yet");
-		return (
-			{
-				message:
-				"Veuillez cliquez, vous allez etres redirige"
-					+ " sur la page de connexion"
-			});
-	}
-	buffer = buffer[1];
-	const	params = buffer.split("&");
-	if (params.length === 2)
-	{
-		console.log("response error append", params);
-		if (params[0].split("=").length !== 2)
-			error = {error: "malformed_query"};
-		else
-			error = {error: params[0].split("=")[1]};
-		if (params[1].split("=").length !== 2)
-			console.log("malformed");
-		else
-			error = {
-				...error,
-				errorDescription: params[1].split("=")[1].split("+").join(" ")
-			};
-		console.log("Results error", error);
-		return (error);
-	}
-	else if (params.length === 1)
-	{
-		console.log("Code is provied");
-		if (params[0].split("=").length !== 2)
-			message = {error: "malformed_query"};
-		else
-			message = { code: params[0].split("=")[1]};
-		console.log("Response parsed ", message);
-		return (message);
-	}
-	else
-	{
-		console.log("Something went wrong");
-		return ({
-			error: "malformed_query",
-		});
-	}
+	return (
+		"Afin de pouvoir vous connecter a transcendence vous devez "
+		+ "pouvoir vous connecter a votre compte etudiant");
 };
 
-const	StepZero = () =>
-{
-	let		alertInfo;
-	const	[
-		codeApi,
-		setCodeApi
-	] = useState("unsetted");
-	// const	imgSource
-	// = "https://placehold.co/345x140?text=Change+me+UX+Click-here";
-	const	imgSource = coalitionImage;
-	const	url = "https://api.intra.42.fr";
-	const	openInNewTab = () =>
-	{
-		// need to get proper url from server
-		window.open(url, "_self");
-	};
+type	linkIntraModel = {
+	message?: string,
+	error?: string,
+	code?: string,
+	errorDescription?: string,
+	redirected?: boolean
+};
 
-	const	query = useLocation();
-	// const	code = queryParams.get();
-	const	responseQuery = checkQuery(query.search);
-	console.info("Params", responseQuery);
+const	AlertComponent = (responseQuery: linkIntraModel) =>
+{
+	let	alertInfo;
+
 	if (responseQuery.message)
 		alertInfo = (
-			<Alert severity="info">
-				{ responseQuery.message}
-			</Alert>);
+			<>
+				<Alert severity="info">
+					{
+						responseQuery.message
+					}
+				</Alert>
+			</>
+		);
 	if (responseQuery.error)
 		alertInfo = (
-			<Alert severity="error">
-				<AlertTitle>
+			<>
+				<Alert severity="error">
+					<AlertTitle>
+						{
+							responseQuery.error
+						}
+					</AlertTitle>
 					{
-						responseQuery.error
+						responseQuery.errorDescription
 					}
-				</AlertTitle>
-				{
-					responseQuery.errorDescription
-				}
-			</Alert>);
+				</Alert>
+			</>
+		);
 	if (responseQuery.code)
 			alertInfo = (
 				<>
@@ -117,10 +69,71 @@ const	StepZero = () =>
 					<LinearProgress />
 				</>
 			);
+	return (alertInfo);
+};
+
+
+const	locationIsARedirectedPage = (pathname: string) =>
+{
+	if (pathname)
+		if (pathname === "/signup")
+			return (false);
+		else
+			return (true);
+	return (true);
+};
+
+const	StepZero = () =>
+{
+	const	query = useLocation();
+	const	imgSource = coalitionImage;
+
+	const	[
+		codeApi,
+		setCodeApi
+	] = useState("unsetted");
+
+	const	[
+		visible,
+		setVisible
+	] = useState(locationIsARedirectedPage(query.pathname));
+
+
+	const	url = "https://api.intra.42.fr";
+	const	openSameTab = () =>
+	{
+		window.open(url, "_self");
+	};
+
+	useEffect(() =>
+	{
+		const timer = setTimeout(() =>
+		{
+			console.log("Just set visible to false");
+			setVisible(false);
+		}, 3000);
+		return (() =>
+		{
+			clearTimeout(timer);
+		});
+	});
+
+	const	displayRedirect = (<>
+		<Alert severity="warning">
+			Veuillez continuer les etapes.
+			Vous venez d'etre redirige
+		</Alert>
+	</>);
+
+	const	responseQuery = checkQueryParams(query);
+	const	alertInfo = AlertComponent(responseQuery);
+
+	console.log("Redirected Query", responseQuery.redirected);
+
 	return (
 		<Card sx={{ m: 5}}>
 			<CardActionArea
-				onClick={openInNewTab}
+				onClick={openSameTab}
 			>
 				<CardMedia
 					component="img"
@@ -141,16 +154,12 @@ const	StepZero = () =>
 							color="text.secondary"
 						>
 							{
-								// testVar
-								+ "Afin de pouvoir profiter pleinement de "
-								+ " toutes les fonctionnalites de "
-								+ " Transcendence il est nescessaire"
-								+ " de se connecter"
-								+ " a l'intra de 42"
+								getText()
 							}
 						</Typography>
 					</CardContent>
 			</CardActionArea>
+			{(visible) ? displayRedirect : <></>}
 			{alertInfo}
 		</Card>
 	);
