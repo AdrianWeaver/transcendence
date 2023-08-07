@@ -1,4 +1,5 @@
-import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
+/* eslint-disable max-statements */
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { setPreviousPage } from "../../Redux/store/controllerAction";
 
 export const	useSavePrevPage = (pageToSave: string) =>

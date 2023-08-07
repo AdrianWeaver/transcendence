@@ -28,7 +28,8 @@ const	initialControllerState: ControllerModel = {
 		step: 0,
 		codeOauthFT: "unsetted",
 		// need to purge data if abort set to 
-		abortRequested: false
+		abortRequested: false,
+		requestHomeLink: false
 	},
 	canvas:
 	{
@@ -88,7 +89,12 @@ const	controllerSlice = createSlice(
 		setPreviousPage(state, action: PayloadAction<ControllerModel>)
 		{
 			state.previousPage = action.payload.previousPage;
-		}
+		},
+		setRequestHomeLink(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.requestHomeLink
+				= action.payload.registration.requestHomeLink;
+		},
 	}
 });
 

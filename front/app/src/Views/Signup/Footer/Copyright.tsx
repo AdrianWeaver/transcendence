@@ -1,8 +1,38 @@
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
+import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
+import {
+	setAbortRequestedValue,
+	setRequestHomeLink
+} from "../../../Redux/store/controllerAction";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const	Copyright = () =>
 {
+	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
+
+	const
+	[
+		alreadyClicked,
+		setAlreadyClicked
+	] = useState(false);
+
+	const	handleClick = (event: React.MouseEvent<HTMLAnchorElement>) =>
+	{
+		event.preventDefault();
+		if (alreadyClicked === false)
+		{
+			setAlreadyClicked(true);
+			dispatch(setAbortRequestedValue(true));
+			dispatch(setRequestHomeLink(true));
+			navigate("/cancel");
+		}
+	};
+
 	return (
 	<>
 		<Typography
@@ -12,6 +42,7 @@ const	Copyright = () =>
 			sx={{mt: 5}}
 		>
 			<Link
+				onClick={handleClick}
 				color="inherit"
 				href="http://localhost:3001"
 			>

@@ -26,12 +26,22 @@ const	EscButton = () =>
 		setHoverState
 	] = useState(false);
 
+	const
+	[
+		alreadyClicked,
+		setAlreadyClicked
+	] = useState(false);
+
 	const	navigate = useNavigate();
 
 	const	handleClick = () =>
 	{
-		dispatch(setAbortRequestedValue(true));
-		navigate("/cancel");
+		if (alreadyClicked === false)
+		{
+			setAlreadyClicked(true);
+			dispatch(setAbortRequestedValue(true));
+			navigate("/cancel");
+		}
 	};
 
 	const	elemOnHover = (

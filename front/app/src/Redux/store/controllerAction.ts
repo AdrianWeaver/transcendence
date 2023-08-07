@@ -157,9 +157,12 @@ export const	setAbortRequestedValue = (value: boolean)
 export const	resetRegistration = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch) =>
+	return ((dispatch, getState) =>
 	{
-		dispatch(controllerActions.resetRegistration());
+		const	prevState = getState();
+
+		if (prevState.controller.registration.startedRegister === true)
+			dispatch(controllerActions.resetRegistration());
 	});
 };
 
@@ -179,5 +182,23 @@ export const	setPreviousPage = (pageToSave : string)
 				previousPage: pageToSave,
 			};
 		dispatch(controllerActions.setPreviousPage(response));
+	});
+};
+
+export const	setRequestHomeLink = (value: boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			registration:
+			{
+				...prevState.controller.registration,
+				requestHomeLink: value
+			}
+		};
+		dispatch(controllerActions.setRequestHomeLink(response));
 	});
 };
