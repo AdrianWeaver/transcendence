@@ -23,7 +23,8 @@ const	Small = () =>
 
 	return (
 		<>
-			<GamePadIcon sx={sxDyn}/>
+			{/* <GamePadIcon sx={sxDyn}/> */}
+			{/* <SvgIcon /> */}
 			<Typography sx={sxDyntitle} variant="h5">
 				42_transcendence
 			</Typography>
