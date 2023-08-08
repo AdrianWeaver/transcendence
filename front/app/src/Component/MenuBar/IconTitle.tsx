@@ -5,6 +5,7 @@ import	Typography from "@mui/material/Typography";
 import	displayStyle from "./config/DisplayStyle";
 import	fontConfig from "./config/FontConfig";
 
+
 type	DisplayProps = {
 	display: string
 };
