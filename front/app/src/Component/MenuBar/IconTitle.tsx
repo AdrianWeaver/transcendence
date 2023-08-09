@@ -1,10 +1,12 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import	GamePadIcon from "@mui/icons-material/Gamepad";
+// import	GamePadIcon from "@mui/icons-material/Gamepad";
 import	Typography from "@mui/material/Typography";
 import	displayStyle from "./config/DisplayStyle";
 import	fontConfig from "./config/FontConfig";
 
+import { Icon } from "@mui/material";
+import icon from "./assets/icon_pure_white.svg";
 
 type	DisplayProps = {
 	display: string
@@ -25,7 +27,12 @@ const	Small = () =>
 	return (
 		<>
 			{/* <GamePadIcon sx={sxDyn}/> */}
-			{/* <SvgIcon /> */}
+			<Icon
+				sx={sxDyn}
+			>
+				<img src={icon} />
+			</Icon>
+			{/* <Logo /> */}
 			<Typography sx={sxDyntitle} variant="h5">
 				42_transcendence
 			</Typography>
@@ -46,7 +53,12 @@ const	Medium = () =>
 
 	return (
 		<>
-			<GamePadIcon sx={sxDyn}/>
+			{/* <GamePadIcon sx={sxDyn}/> */}
+			<Icon
+				sx={sxDyn}
+			>
+				<img src={icon} />
+			</Icon>
 			<Typography sx={sxDyntitle}>
 				42_transcendence
 			</Typography>

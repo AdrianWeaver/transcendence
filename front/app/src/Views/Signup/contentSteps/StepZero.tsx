@@ -89,11 +89,6 @@ const	StepZero = () =>
 	const	imgSource = coalitionImage;
 
 	const	[
-		codeApi,
-		setCodeApi
-	] = useState("unsetted");
-
-	const	[
 		visible,
 		setVisible
 	] = useState(locationIsARedirectedPage(query.pathname));
