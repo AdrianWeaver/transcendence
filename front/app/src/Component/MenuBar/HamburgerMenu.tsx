@@ -9,7 +9,8 @@ import	MenuItem from "@mui/material/MenuItem";
 import	Typography from "@mui/material/Typography";
 
 import displayStyle from "./config/DisplayStyle";
-import { pages, pagesLinks } from "./config/PagesItem";
+
+import { pagesVisitor, pagesLinksVisitor } from "./config/PagesItemVisitors";
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
 
@@ -40,12 +41,12 @@ const	HamburgerMenu = () =>
 	{
 		const	elem = event.currentTarget as HTMLElement;
 		const	text = strToPascalCase(elem.innerText);
-		const	linkId = pages.findIndex((elem) =>
+		const	linkId = pagesVisitor.findIndex((elem) =>
 		{
 			return (elem === text);
 		});
 		// console.log(pagesLinks[linkId]);
-		navigate(pagesLinks[linkId]);
+		navigate(pagesLinksVisitor[linkId]);
 		setAnchorElNav(null);
 	};
 
@@ -78,7 +79,7 @@ const	HamburgerMenu = () =>
 				sx= {{ display: displayStyle.mediumHidden}}
 			>
 			{
-				pages.map((page) =>
+				pagesVisitor.map((page) =>
 				{
 					return (
 						<MenuItem
