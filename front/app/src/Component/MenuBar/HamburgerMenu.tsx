@@ -9,7 +9,9 @@ import	MenuItem from "@mui/material/MenuItem";
 import	Typography from "@mui/material/Typography";
 
 import displayStyle from "./config/DisplayStyle";
-import pages from "./config/PagesItem";
+import { pages, pagesLinks } from "./config/PagesItem";
+import strToPascalCase from "./extras/strToPascalCase";
+import { useNavigate } from "react-router-dom";
 
 const	boxStyleSmall = {
 	flexGrow: 1,
@@ -18,19 +20,33 @@ const	boxStyleSmall = {
 
 const	HamburgerMenu = () =>
 {
+	const	navigate = useNavigate();
 	const	[
 		anchorElNav,
 		setAnchorElNav
 	] = React.useState<null | HTMLElement>(null);
 
-	const handleCloseNavMenu = () =>
+	const	handleCloseNavMenu = () =>
 	{
 		setAnchorElNav(null);
 	};
 
-	const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) =>
+	const	handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
 		setAnchorElNav(event.currentTarget);
+	};
+
+	const	handleOnClick = (event: React.MouseEvent<HTMLElement>) =>
+	{
+		const	elem = event.currentTarget as HTMLElement;
+		const	text = strToPascalCase(elem.innerText);
+		const	linkId = pages.findIndex((elem) =>
+		{
+			return (elem === text);
+		});
+		// console.log(pagesLinks[linkId]);
+		navigate(pagesLinks[linkId]);
+		setAnchorElNav(null);
 	};
 
 	return (
@@ -67,7 +83,7 @@ const	HamburgerMenu = () =>
 					return (
 						<MenuItem
 							key={page}
-							// onClick
+							onClick={handleOnClick}
 						>
 							<Typography
 								textAlign="center"
