@@ -4,7 +4,7 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 
-import { pages, pagesLinks } from "./config/PagesItem";
+import { pagesVisitor, pagesLinksVisitor } from "./config/PagesItemVisitors";
 import displayStyle from "./config/DisplayStyle";
 import { useNavigate } from "react-router-dom";
 
@@ -22,18 +22,18 @@ const	LargeMenu = () =>
 	{
 		const	elem = event.currentTarget as HTMLElement;
 		const	text = strToPascalCase(elem.innerText);
-		const	linkId = pages.findIndex((elem) =>
+		const	linkId = pagesVisitor.findIndex((elem) =>
 		{
 			return (elem === text);
 		});
 		// console.log(pagesLinks[linkId]);
-		navigate(pagesLinks[linkId]);
+		navigate(pagesLinksVisitor[linkId]);
 	};
 
 	return (
 		<Box sx={sxDyn}>
 		{
-			pages.map((page) =>
+			pagesVisitor.map((page) =>
 			{
 				return(
 					<Button
