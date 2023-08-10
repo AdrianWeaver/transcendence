@@ -9,32 +9,42 @@ import	Menu from "@mui/material/Menu";
 import	MenuItem from "@mui/material/MenuItem";
 import	Typography from "@mui/material/Typography";
 
-import	settings from "./config/SettingsItem";
+import	{ settings, settingsLinks } from "./config/SettingsItem";
 
-import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
-import { logOffUser } from "../../Redux/store/controllerAction";
+import	{ useAppDispatch } from "../../Redux/hooks/redux-hooks";
+import	{ logOffUser } from "../../Redux/store/controllerAction";
+import strToPascalCase from "./extras/strToPascalCase";
+import { useNavigate } from "react-router-dom";
 
 const	AvatarMenu = () =>
 {
-	const	dispatch = useAppDispatch();
-
+	const	navigate = useNavigate();
 	const [
 		anchorElUser,
 		setAnchorElUser
 	] = React.useState<null | HTMLElement>(null);
 
-	const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
+	const	handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
 		setAnchorElUser(event.currentTarget);
 	};
 
-	const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) =>
+	const	handleCloseUserMenu = () =>
 	{
-		event.preventDefault();
+		setAnchorElUser(null);
+	};
 
-		const clickedElement = event.target as HTMLElement;
-		if (clickedElement.textContent === "Logout")
-			dispatch(logOffUser());
+	const	handleOnClickUserMenu = (event: React.MouseEvent<HTMLElement>) =>
+	{
+		const	elem = event.currentTarget as HTMLElement;
+		const	text = strToPascalCase(elem.innerText);
+		console.log(text);
+		const	linkId = settings.findIndex((elem) =>
+		{
+			return (elem === text);
+		});
+		console.log("linkId", linkId);
+		navigate(settingsLinks[linkId]);
 		setAnchorElUser(null);
 	};
 
@@ -75,7 +85,7 @@ const	AvatarMenu = () =>
 					return (
 						<MenuItem
 							key={setting}
-							onClick={handleCloseUserMenu}
+							onClick={handleOnClickUserMenu}
 						>
 							<Typography
 								textAlign="center"
