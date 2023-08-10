@@ -1,3 +1,4 @@
+
 import
 {
 	useAppDispatch,
@@ -14,7 +15,11 @@ export const	useRedirectRegistration = () =>
 	});
 	const	dispatch = useAppDispatch();
 
-	if (controller.registration.startedRegister === false
-		&& controller.registration.step === 0)
-		dispatch(userRequestRegistration());
+	const	redirectRegistration = () =>
+	{
+		if (controller.registration.startedRegister === false
+			&& controller.registration.step === 0)
+			dispatch(userRequestRegistration());
+	};
+	return (redirectRegistration);
 };

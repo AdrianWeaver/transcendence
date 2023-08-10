@@ -1,9 +1,15 @@
+import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 
 const	Home = () =>
 {
-	useSavePrevPage("/");
+	const	savePrevPage = useSavePrevPage();
+
+	useEffect(() =>
+	{
+		savePrevPage("/");
+	});
 
 	return (
 		<>

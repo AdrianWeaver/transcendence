@@ -9,10 +9,17 @@ import "./styles/Base.css";
 
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import MenuBar from "../../Component/MenuBar/MenuBar";
+import { useEffect } from "react";
 
 const	BaseViewFromViteJs = () =>
 {
-	useSavePrevPage("/starter-pack");
+	const	savePrevPage = useSavePrevPage();
+
+	useEffect(() =>
+	{
+		savePrevPage("/starter-pack");
+	});
+
 	return (
 		<>
 			<MenuBar />
