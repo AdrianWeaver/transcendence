@@ -18,6 +18,7 @@ import StepOne from "./contentSteps/StepOne";
 import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
+import { useEffect } from "react";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -33,9 +34,13 @@ const	Signup = () =>
 	{
 		return (state.controller);
 	});
+	const	redirectRegistration = useRedirectRegistration();
 	const	stepper = controllerState.registration.step;
 
-	useRedirectRegistration();
+	useEffect(()=>
+	{
+		redirectRegistration();
+	});
 
 	if (stepper === 0)
 		content = <StepZero />;

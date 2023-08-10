@@ -1,8 +1,14 @@
+import { useEffect } from "react";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 
 const	Signin = () =>
 {
-	useSavePrevPage("/signin");
+	const	savePrevPage = useSavePrevPage();
+
+	useEffect(() =>
+	{
+		savePrevPage("/signin");
+	});
 
 	return (<p>Signin</p>);
 };

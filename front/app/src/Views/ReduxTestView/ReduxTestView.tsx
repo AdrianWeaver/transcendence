@@ -1,9 +1,15 @@
+import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 
 const	ReduxTestView = () =>
 {
-	useSavePrevPage("/redux-test-view");
+	const	savePrevPage = useSavePrevPage();
+
+	useEffect(() =>
+	{
+		savePrevPage("/redux-test-view");
+	});
 
 	return (
 		<>
