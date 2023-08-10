@@ -13,6 +13,8 @@ import displayStyle from "./config/DisplayStyle";
 import { pagesVisitor, pagesLinksVisitor } from "./config/PagesItemVisitors";
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { pagesLogged, pagesLinksLogged } from "./config/PagesItemLogged";
 
 const	boxStyleSmall = {
 	flexGrow: 1,
@@ -22,6 +24,10 @@ const	boxStyleSmall = {
 const	HamburgerMenu = () =>
 {
 	const	navigate = useNavigate();
+	const	isLogged = useAppSelector((state) =>
+	{
+		return (state.controller.user.isLoggedIn);
+	});
 	const	[
 		anchorElNav,
 		setAnchorElNav
@@ -37,7 +43,7 @@ const	HamburgerMenu = () =>
 		setAnchorElNav(event.currentTarget);
 	};
 
-	const	handleOnClick = (event: React.MouseEvent<HTMLElement>) =>
+	const	handleOnClickVisitor = (event: React.MouseEvent<HTMLElement>) =>
 	{
 		const	elem = event.currentTarget as HTMLElement;
 		const	text = strToPascalCase(elem.innerText);
@@ -45,10 +51,53 @@ const	HamburgerMenu = () =>
 		{
 			return (elem === text);
 		});
-		// console.log(pagesLinks[linkId]);
 		navigate(pagesLinksVisitor[linkId]);
 		setAnchorElNav(null);
 	};
+
+	const	handleOnClickLogged = (event: React.MouseEvent<HTMLElement>) =>
+	{
+		const	elem = event.currentTarget as HTMLElement;
+		const	text = strToPascalCase(elem.innerText);
+		const	linkId = pagesLogged.findIndex((elem) =>
+		{
+			return (elem === text);
+		});
+		navigate(pagesLinksLogged[linkId]);
+		setAnchorElNav(null);
+	};
+
+	const	Visitors = pagesVisitor.map((page) =>
+	{
+		return (
+			<MenuItem
+				key={page}
+				onClick={handleOnClickVisitor}
+			>
+				<Typography
+					textAlign="center"
+				>
+					{page}
+				</Typography>
+			</MenuItem>
+		);
+	});
+
+	const	LoggedUsers = pagesLogged.map((page) =>
+	{
+		return (
+			<MenuItem
+				key={page}
+				onClick={handleOnClickLogged}
+			>
+				<Typography
+					textAlign="center"
+				>
+					{page}
+				</Typography>
+			</MenuItem>
+		);
+	});
 
 	return (
 		<Box sx={boxStyleSmall}>
@@ -79,21 +128,9 @@ const	HamburgerMenu = () =>
 				sx= {{ display: displayStyle.mediumHidden}}
 			>
 			{
-				pagesVisitor.map((page) =>
-				{
-					return (
-						<MenuItem
-							key={page}
-							onClick={handleOnClick}
-						>
-							<Typography
-								textAlign="center"
-							>
-								{page}
-							</Typography>
-						</MenuItem>
-					);
-				})
+				(isLogged)
+				? LoggedUsers
+				: Visitors
 			}
 			</Menu>
 		</Box>

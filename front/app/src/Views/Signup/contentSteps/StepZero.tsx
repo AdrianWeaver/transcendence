@@ -11,7 +11,7 @@ import {
 	Typography,
 }	from "@mui/material";
 import { useEffect, useState } from "react";
-import { redirect, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";

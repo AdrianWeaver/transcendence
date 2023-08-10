@@ -2,7 +2,7 @@
 export const	pagesLinksLogged = [
 	"/",
 	"/redux-test-view",
-	"/play-Game",
+	"/play-game",
 	"/starter-pack"
 ];
 
@@ -11,12 +11,13 @@ export const	pagesLinksLogged = [
  * Pascal case 
  * 	requires the first letter of each word to be capitalized,
  * 	including the first word.
+ * 
+ *  If you do for example "Play the Game"
+ * 		It will not redirect to the page
  */
 export const	pagesLogged = [
 	"Accueil",
-
-	// these page are for dev purpose, not final navigation
 	"Redux Test View",
-	"Play the Game",
+	"Play The Game",
 	"Starter Pack"
 ];
