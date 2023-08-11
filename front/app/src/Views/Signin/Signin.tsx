@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
+import MenuBar from "../../Component/MenuBar/MenuBar";
 
 const	Signin = () =>
 {
@@ -10,7 +11,12 @@ const	Signin = () =>
 		savePrevPage("/signin");
 	});
 
-	return (<p>Signin</p>);
+	return (
+		<>
+			<MenuBar />
+			<p>Signin</p>
+		</>
+	);
 };
 
 export default Signin;
