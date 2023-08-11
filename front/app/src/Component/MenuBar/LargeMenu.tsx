@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
 import Box from "@mui/material/Box";

@@ -11,8 +11,6 @@ import	Typography from "@mui/material/Typography";
 
 import	{ settings, settingsLinks } from "./config/SettingsItem";
 
-import	{ useAppDispatch } from "../../Redux/hooks/redux-hooks";
-import	{ logOffUser } from "../../Redux/store/controllerAction";
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
 
@@ -38,14 +36,12 @@ const	AvatarMenu = () =>
 	{
 		const	elem = event.currentTarget as HTMLElement;
 		const	text = strToPascalCase(elem.innerText);
-		console.log(text);
 		const	linkId = settings.findIndex((elem) =>
 		{
 			return (elem === text);
 		});
-		console.log("linkId", linkId);
-		navigate(settingsLinks[linkId]);
 		setAnchorElUser(null);
+		navigate(settingsLinks[linkId]);
 	};
 
 	return (

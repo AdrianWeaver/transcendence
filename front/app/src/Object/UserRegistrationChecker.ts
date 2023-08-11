@@ -1,6 +1,6 @@
 import UserRegistration from "./UserRegistration";
 /* eslint-disable max-statements */
-/* eslint-disable max-lines-per-function */
+
 
 class	UserRegistrationChecker
 {

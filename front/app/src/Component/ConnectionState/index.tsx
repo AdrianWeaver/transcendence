@@ -18,7 +18,7 @@ import {
 import
 {
 	getServerConnection,
-	resetConnexionAttempt
+	// resetConnexionAttempt
 } from "../../Redux/store/serverAction";
 
 const	ConnectionState = () =>

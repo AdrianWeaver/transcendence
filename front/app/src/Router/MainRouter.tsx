@@ -1,5 +1,4 @@
 
-/* eslint-disable max-statements */
 import LoggedRouter from "./LoggedRouter";
 import RegistrationRouter from "./RegistrationRouter";
 import VisitorRouter from "./VisitorRouter";

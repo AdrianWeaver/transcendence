@@ -1,5 +1,4 @@
-/* eslint-disable max-statements */
-/* eslint-disable max-lines-per-function */
+
 import { Button } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
