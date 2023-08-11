@@ -1,6 +1,3 @@
-/* eslint-disable max-lines-per-function */
-/* eslint-disable max-statements */
-
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 

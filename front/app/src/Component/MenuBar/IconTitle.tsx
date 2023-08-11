@@ -1,6 +1,4 @@
-/* eslint-disable max-statements */
-/* eslint-disable max-lines-per-function */
-// import	GamePadIcon from "@mui/icons-material/Gamepad";
+
 import	Typography from "@mui/material/Typography";
 import	displayStyle from "./config/DisplayStyle";
 import	fontConfig from "./config/FontConfig";
@@ -26,7 +24,6 @@ const	Small = () =>
 
 	return (
 		<>
-			{/* <GamePadIcon sx={sxDyn}/> */}
 			<Icon
 				sx={sxDyn}
 			>
@@ -53,7 +50,6 @@ const	Medium = () =>
 
 	return (
 		<>
-			{/* <GamePadIcon sx={sxDyn}/> */}
 			<Icon
 				sx={sxDyn}
 			>

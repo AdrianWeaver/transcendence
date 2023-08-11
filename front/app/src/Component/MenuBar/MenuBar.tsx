@@ -1,5 +1,4 @@
-/* eslint-disable max-statements */
-/* eslint-disable max-lines-per-function */
+
 import	AppBar from "@mui/material/AppBar";
 import	Container from "@mui/material/Container";
 import	Toolbar from "@mui/material/Toolbar";

@@ -7,6 +7,10 @@ import {
 import Home from "../Views/Home/Home";
 import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
+import Logout from "../Views/Logout/Logout";
+import MyProfile from "../Views/MyProfile/MyProfile";
+import Settings from "../Views/Settings/Settings";
+import PlayGame from "../Views/PlayGame/PlayGame";
 
 /**
  * This is the router for a logged user
@@ -29,11 +33,21 @@ const	LoggedRouter = () =>
 				{/* no save route navigation */}
 				<Route
 					path="/logout"
-					element={<p>{"<Logout>"}</p>}
+					element={<Logout />}
+				/>
+
+				<Route
+					path="/me/profile"
+					element={<MyProfile />}
+				/>
+
+				<Route
+					path="me/settings"
+					element={<Settings />}
 				/>
 				<Route
 					path="/play-game"
-					element={<p>{"<PlayGame>"}</p>}
+					element={<PlayGame />}
 				/>
 				<Route
 					path="/starter-pack"
