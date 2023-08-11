@@ -10,6 +10,7 @@ const	TheGame = () =>
 	{
 		savePrevPage("/play-game");
 	});
+
 	return (
 		<>
 			<MenuBar />
