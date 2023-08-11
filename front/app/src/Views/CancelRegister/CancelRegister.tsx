@@ -1,7 +1,6 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { useEffect, useState } from "react";
-// import { useAbortRequest } from "../../Router/Hooks/useAbortRequest";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { resetRegistration } from "../../Redux/store/controllerAction";
@@ -18,7 +17,7 @@ const	CancelRegister = () =>
 	[
 		message,
 		setMessage
-	] = useState("You'll be redirected soon, please wait... (delay)");
+	] = useState("You'll be redirected soon, please wait... (delayed)");
 
 	const	registration = useAppSelector((state) =>
 	{

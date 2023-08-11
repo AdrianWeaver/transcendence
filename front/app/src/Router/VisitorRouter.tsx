@@ -6,7 +6,7 @@ import
 	Routes,
 }	from "react-router-dom";
 import Signup from "../Views/Signup/Signup";
-import CancelRegister from "../Views/Signup/CancelRegister";
+import CancelRegister from "../Views/CancelRegister/CancelRegister";
 import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
