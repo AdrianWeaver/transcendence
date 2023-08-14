@@ -160,16 +160,45 @@ export const	resetRegistration = ()
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
+
+		if (prevState.controller.registration.startedRegister === true)
+			dispatch(controllerActions.resetRegistration());
+	});
+};
+
+export const	setPreviousPage = (pageToSave : string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		let		response: ControllerModel;
+
+		if (prevState.controller.previousPage === pageToSave)
+			return ;
+		else
+			response = {
+				...prevState.controller,
+				previousPage: pageToSave,
+			};
+		dispatch(controllerActions.setPreviousPage(response));
+	});
+};
+
+export const	setRequestHomeLink = (value: boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
 		const	response: ControllerModel = {
 			...prevState.controller,
 			registration:
 			{
-				startedRegister: false,
-				codeOauthFT: "unsetted",
-				step: 0,
-				abortRequested: false
-			},
+				...prevState.controller.registration,
+				requestHomeLink: value
+			}
 		};
-		dispatch(controllerActions.setAbortRequestedValue(response));
+		dispatch(controllerActions.setRequestHomeLink(response));
 	});
 };

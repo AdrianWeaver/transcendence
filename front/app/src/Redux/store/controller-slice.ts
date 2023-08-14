@@ -10,6 +10,7 @@ import	{ NIL as NILUUID } from "uuid";
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "dark",
+	previousPage: "/",
 	anonymousUser:
 	{
 		uuid: NILUUID,
@@ -26,8 +27,8 @@ const	initialControllerState: ControllerModel = {
 		startedRegister: false,
 		step: 0,
 		codeOauthFT: "unsetted",
-		// need to purge data if abort set to 
-		abortRequested: false
+		abortRequested: false,
+		requestHomeLink: false
 	},
 	canvas:
 	{
@@ -83,7 +84,16 @@ const	controllerSlice = createSlice(
 		resetRegistration(state)
 		{
 			state.registration = initialControllerState.registration;
-		}
+		},
+		setPreviousPage(state, action: PayloadAction<ControllerModel>)
+		{
+			state.previousPage = action.payload.previousPage;
+		},
+		setRequestHomeLink(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.requestHomeLink
+				= action.payload.registration.requestHomeLink;
+		},
 	}
 });
 
