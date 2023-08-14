@@ -27,7 +27,6 @@ const	initialControllerState: ControllerModel = {
 		startedRegister: false,
 		step: 0,
 		codeOauthFT: "unsetted",
-		// need to purge data if abort set to 
 		abortRequested: false,
 		requestHomeLink: false
 	},
