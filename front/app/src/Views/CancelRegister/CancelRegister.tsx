@@ -17,7 +17,7 @@ const	CancelRegister = () =>
 	[
 		message,
 		setMessage
-	] = useState("You'll be redirected soon, please wait... (delay)");
+	] = useState("You'll be redirected soon, please wait... (delayed)");
 
 	const	registration = useAppSelector((state) =>
 	{
