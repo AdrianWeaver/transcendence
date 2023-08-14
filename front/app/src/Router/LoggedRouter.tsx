@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import {
 	BrowserRouter,
+	Navigate,
 	Route,
 	Routes,
 } from "react-router-dom";
@@ -42,7 +43,7 @@ const	LoggedRouter = () =>
 				/>
 
 				<Route
-					path="me/settings"
+					path="/me/settings"
 					element={<Settings />}
 				/>
 				<Route
@@ -53,6 +54,13 @@ const	LoggedRouter = () =>
 					path="/starter-pack"
 					element={<BaseViewFromViteJs />}
 				/>
+
+				<Route
+					path="/signup"
+					element={<Navigate to="/me/profile"/>}
+					>
+
+				</Route>
 				<Route
 					path="*"
 					element={<h1>Error 404: Logged User</h1>}

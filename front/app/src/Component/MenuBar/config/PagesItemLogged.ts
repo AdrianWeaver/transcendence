@@ -3,7 +3,8 @@ export const	pagesLinksLogged = [
 	"/",
 	"/redux-test-view",
 	"/play-game",
-	"/starter-pack"
+	"/starter-pack",
+	"/stats"
 ];
 
 /**
@@ -19,5 +20,6 @@ export const	pagesLogged = [
 	"Accueil",
 	"Redux Test View",
 	"Play The Game",
-	"Starter Pack"
+	"Starter Pack",
+	"High Score"
 ];

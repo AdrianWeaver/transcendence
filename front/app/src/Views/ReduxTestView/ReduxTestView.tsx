@@ -19,6 +19,8 @@ import {
 }	from "@mui/material";
 import { ControllerModel, ServerModel } from "../../Redux/models/redux-models";
 import { PersistPartial } from "redux-persist/lib/persistReducer";
+import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
+import { useEffect } from "react";
 
 type	KeyValuePair = {
 	key: string,
@@ -211,6 +213,13 @@ const	TableVisualisation = (props: TableVisualisationProps) =>
 
 const	ReduxTestView = () =>
 {
+	const	savePrevPage = useSavePrevPage();
+
+	useEffect(() =>
+	{
+		savePrevPage("/redux-test-view");
+	});
+
 	const	dispatch = useAppDispatch();
 	const	controller = useAppSelector((state) =>
 	{
