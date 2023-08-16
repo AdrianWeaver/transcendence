@@ -11,6 +11,7 @@ import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
+import TheGame from "../Views/TheGame/TheGame";
 
 /**
  * This is unauth router
@@ -52,6 +53,11 @@ const	VisitorRouter = () =>
 				<Route
 					path="/cancel"
 					element={<CancelRegister />}
+				/>
+
+				<Route
+					path="/the-game"
+					element={<TheGame/>}
 				/>
 
 				
