@@ -46,7 +46,7 @@ class Game
                 this.board.ctx.fillStyle = "#000";
                 let pixels = this.board.dim.width * 0.05;
                 this.board.ctx.font = pixels + "px bald Arial";
-                const text = "Press enter to start :)";
+                const text = "Press ENTER to start :)";
                 const textWidth = this.board.ctx.measureText(text).width;
                 this.board.ctx.fillText(text, (this.board.dim.width / 2 - textWidth / 2), (this.board.dim.height * 0.3));
             }

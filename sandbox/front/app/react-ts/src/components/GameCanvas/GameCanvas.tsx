@@ -78,7 +78,12 @@ const	GameCanvas = () =>
 		game.actionKeyPress = -1;
 	}
 
-	const startButtonRef = useRef<HTMLInputElement>(null);
+	const keyEnter = (e) =>
+	{
+		game.continueAnimating = true;
+		game.startDisplayed = false;
+	}
+
 	const pauseButtonRef = useRef<HTMLInputElement>(null);
 	const resumeButtonRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +92,6 @@ const	GameCanvas = () =>
 	{
 		let requestId: number;
 		const canvas = canvasRef.current;
-		const startButton = startButtonRef.current;
 		const pauseButton = pauseButtonRef.current;
 		const resumeButton = resumeButtonRef.current;
 
@@ -97,19 +101,7 @@ const	GameCanvas = () =>
 		game.board.init();
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
-
-		startButton?.addEventListener('click', function(){
-			// let startAudio = document.querySelector('#startSound');
-			// startAudio.play();
-			game.continueAnimating = true;
-			game.startDisplayed = false;
-		});
-		pauseButton?.addEventListener('click',function(){
-			game.continueAnimating = false;
-		});
-		resumeButton?.addEventListener('click',function(){
-			game.continueAnimating = true;
-		});
+		addEventListener("keydown", keyEnter);
 
 		const	render = () =>
 		{
@@ -130,6 +122,15 @@ const	GameCanvas = () =>
 			game.playerTwo.renderScore();
 			if (game.startDisplayed == true)
 				game.displayStartMessage();
+			if (game.startDisplayed === false)
+			{
+			pauseButton?.addEventListener('click',function(){
+				game.continueAnimating = false;
+			});
+			resumeButton?.addEventListener('click',function(){
+				game.continueAnimating = true;
+			});
+			}
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -141,13 +142,11 @@ const	GameCanvas = () =>
 
 	return (
 		<>
-			<div>
+			<div style={{textAlign: "center"}}>
 				FT_TRANSCENDANCE
 			</div>
-			<div>
-				<input type="button" value="START" ref={startButtonRef} />
-			</div>
-			<div>
+			<br></br>
+			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}
 					width={game.board.canvas?.width}
@@ -155,7 +154,7 @@ const	GameCanvas = () =>
 				>
 				</canvas>
 			</div>
-			<div>
+			<div style={{textAlign: "center"}}>
 				<input type="button" value="PAUSE" ref={pauseButtonRef} />
 				<input type="button" value="RESUME" ref={resumeButtonRef} />
 			</div>
