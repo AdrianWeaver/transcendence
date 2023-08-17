@@ -10,7 +10,6 @@ ENV PATH "$VOLTA_HOME/bin:$PATH"
 
 RUN volta install node@18.12.0
 
-RUN npm install -g nodemon
 RUN npm install -g @nestjs/cli
 RUN npm install -g pm2
 RUN npm install -g pm2-monit

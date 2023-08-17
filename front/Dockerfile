@@ -10,7 +10,6 @@ ENV PATH "$VOLTA_HOME/bin:$PATH"
 
 RUN volta install node@18.12.0
 
-RUN npm install -g nodemon
 RUN npm install -g vite
 RUN npm install -g eslint
 
