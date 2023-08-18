@@ -7,9 +7,9 @@ import
 
 import { ServerModel } from "../models/redux-models";
 
-const	initialServerState: ServerModel = {
-	isFetching: false,
-	connexionEnabled: true,
+export const	initialServerState: ServerModel = {
+	isFetching: true,
+	connexionEnabled: false,
 	connexionAttempt: 0,
 	error: false,
 	message: ""
@@ -36,6 +36,10 @@ const	serverSlice = createSlice(
 		increaseConnectionAttempt(state, action: PayloadAction<ServerModel>)
 		{
 			state.connexionAttempt = action.payload.connexionAttempt;
+		},
+		resetState(state, action: PayloadAction<ServerModel>)
+		{
+			state = action.payload;
 		}
 	}
 });

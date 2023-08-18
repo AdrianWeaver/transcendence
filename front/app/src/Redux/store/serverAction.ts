@@ -52,6 +52,26 @@ export const	increaseConnectionAttempt = ()
 	});
 };
 
+export const	resetState = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		const	response: ServerModel = {
+			isFetching: false,
+			connexionEnabled: false,
+			connexionAttempt: 0,
+			error: false,
+			message: ""
+		};
+		dispatch(serverActions.resetState(response));
+	});
+};
+
+// if server.isFetching === true
+// 		we reset and make a new serverConnection.
+// else
+// 		we dont dispach
 export	const	getServerConnection = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -59,7 +79,18 @@ export	const	getServerConnection = ()
 	return (async (dispatch, getState) =>
 	{
 		const	prevState = getState();
+		console.log("prevState: ", prevState);
 
+		const	server = prevState.server;
+		console.log("previous Server: ", server);
+
+		const	user = prevState.controller.user;
+		console.log("Previous user: ", user);
+
+		if (server.isFetching === true)
+			resetState();
+		else
+			return ;
 		// if (prevState.server.error)
 		// {
 		// 	console.log("Prevent always call to api");
@@ -82,13 +113,14 @@ export	const	getServerConnection = ()
 		// {
 		const	data = await ServerService.getConnection();
 
+		console.log("DATA: ", data);
 		if (data.success === false)
 		{
 			const response: ServerModel = {
 				...prevState.server,
 				connexionAttempt: prevState.server.connexionAttempt + 1,
 			};
-			dispatch(serverActions.getServerConnection(response));
+			// dispatch(serverActions.getServerConnection(response));
 		}
 		else
 		{
@@ -99,7 +131,7 @@ export	const	getServerConnection = ()
 				connexionAttempt: 0,
 				connexionEnabled: true
 			};
-			dispatch(serverActions.getServerConnection(response));
+			// dispatch(serverActions.getServerConnection(response));
 		}
 		// }
 	});
