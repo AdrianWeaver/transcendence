@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import Game from "./Game";
 import Dimension from "./Dimension";
 
@@ -15,12 +16,18 @@ class Racket
 		{
 			const	ratioHeight = 0.1276595745;
 			const	ratioWidth = 0.01183899;
-
-			const	newRacketHeight = this.game.board.dim.height * ratioHeight;
-			const	newRacketWidth = this.game.board.dim.width * ratioWidth;
-
-			this.dim.setDimension(newRacketHeight, newRacketWidth);
-		}
+			let newRacketHeight;
+			let	newRacketWidth;
+			if (this.game)
+			{
+				newRacketHeight = this.game.board.dim.height
+										* ratioHeight;
+				newRacketWidth = this.game.board.dim.width
+										* ratioWidth;
+			}
+			if (newRacketHeight && newRacketWidth)
+				this.dim.setDimension(newRacketHeight, newRacketWidth);
+		};
     }
 }
 

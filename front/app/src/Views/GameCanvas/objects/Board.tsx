@@ -1,9 +1,9 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import Game from "./Game";
 import Dimension from "./Dimension";
 
-import { useRef } from "react";
-// import { useAppSelector } from "../../../hooks/redux-hooks";
+import { createRef } from "react";
 
 class Board
 {
@@ -12,7 +12,7 @@ class Board
     public irlWidth: number;
     public irlHeight: number;
     public irlRatio: number;
-	public canvasRef: React.RefObject<HTMLCanvasElement>;
+	public canvasRef: React.RefObject<HTMLCanvasElement> | null;
     public canvas: HTMLCanvasElement | null;
 	public ctx: CanvasRenderingContext2D | null | undefined;
     public dim: Dimension;
@@ -29,7 +29,7 @@ class Board
 		this.irlWidth = 274;
 		this.irlHeight = 152.5;
 		this.irlRatio = this.irlHeight / this.irlWidth;
-		this.canvasRef = useRef<HTMLCanvasElement>(null);
+		this.canvasRef = createRef<HTMLCanvasElement>();
 		this.canvas = this.canvasRef.current;
 		this.ctx = this.canvas?.getContext("2d");
 		if (this.ctx)
@@ -47,39 +47,42 @@ class Board
 		};
 		this.updateSizeAfterResize = () =>
 		{
-			let prevWidth = this.dim.width; // this.width 
-			let	prevHeight = this.dim.height; // this.height obj Borad 
-			let windowWidth = window.innerWidth;
-			let canvasWidth = windowWidth * 0.66;
-			let canvasHeight = this.setHeight();
-			
+			const	prevWidth = this.dim.width;
+			const	prevHeight = this.dim.height;
+			const	windowWidth = window.innerWidth;
+			const	canvasWidth = windowWidth * 0.66;
+			const	canvasHeight = this.setHeight();
+
 			this.dim.width = canvasWidth;
 			this.dim.height = canvasHeight;
 			if (this.canvas)
 			{
 				this.canvas.width = this.dim.width;
 				this.canvas.height = this.dim.height;
-		
 			}
-			let multiplicator_width = this.dim.width / prevWidth;
-			let multiplicator_height = this.dim.height / prevHeight;
+			const	multiplicatorWidth = this.dim.width / prevWidth;
+			const	multiplicatorHeight = this.dim.height / prevHeight;
 
 			if (this.game && this.game.playerOne)
 			{
-				this.game.playerOne.pos.x = this.game.playerOne.pos.x * multiplicator_width;
-				this.game.playerOne.pos.y = this.game.playerOne.pos.y * multiplicator_height;
+				this.game.playerOne.pos.x = this.game.playerOne.pos.x
+											* multiplicatorWidth;
+				this.game.playerOne.pos.y = this.game.playerOne.pos.y
+											* multiplicatorHeight;
 				this.game.playerOne.racket.defineRacketSize();
 			}
 			if (this.game && this.game.playerTwo)
 			{
-				this.game.playerTwo.pos.x = this.game.playerTwo.pos.x * multiplicator_width;
-				this.game.playerTwo.pos.y = this.game.playerTwo.pos.y * multiplicator_height;
+				this.game.playerTwo.pos.x = this.game.playerTwo.pos.x
+											* multiplicatorWidth;
+				this.game.playerTwo.pos.y = this.game.playerTwo.pos.y
+											* multiplicatorHeight;
 				this.game.playerTwo.racket.defineRacketSize();
 			}
 			if (this.game && this.game.ball)
 			{
-				this.game.ball.pos.x *= multiplicator_width;
-				this.game.ball.pos.y *= multiplicator_height;
+				this.game.ball.pos.x *= multiplicatorWidth;
+				this.game.ball.pos.y *= multiplicatorHeight;
 			}
 		};
 		this.registerEvents = () =>
@@ -89,7 +92,7 @@ class Board
 		// eslint-disable-next-line max-statements
 		this.init = () =>
 		{
-			let windowWidth = window.innerWidth;
+			const windowWidth = window.innerWidth;
 			this.dim.width = windowWidth * 0.66;
 			this.setHeight();
 			if (this.canvas)
