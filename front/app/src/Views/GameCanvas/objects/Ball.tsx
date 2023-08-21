@@ -1,3 +1,7 @@
+/* eslint-disable curly */
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
+// import { ConstructionOutlined } from "@mui/icons-material";
 import Game from "./Game";
 import Position from "./Position";
 
@@ -53,16 +57,16 @@ class Ball
 			}
 			// this.speedY = (this.radius / 2) * 0.5;
 			this.maxAngle = this.degreesToRadians(75);
-			if (this.firstSetDirection == 1)
+			if (this.firstSetDirection === 1)
 			{
-				let direction = Math.floor(Math.random() * 10);	
-				if (direction % 2 == 0)
+				const direction = Math.floor(Math.random() * 10);
+				if (direction % 2 === 0)
 					this.angle = this.degreesToRadians(180);
 				else
 					this.angle = this.radiansToDegrees(0);
 			}
 			this.firstSetDirection = 0;
-		}
+		};
         this.update = () =>
         {
 			if (this.game)
@@ -70,39 +74,42 @@ class Ball
 				this.radius = this.game.board.dim.width * 0.012;
 				this.move();
 			}
-		}
+		};
 		this.render = () =>
 		{
 			if (this.game && this.game.board && this.game.board.ctx)
 			{
 				this.radius = this.game.board.dim.width * 0.012;
 				this.game.board.ctx.beginPath();
-				this.game.board.ctx.arc(this.pos.x, this.pos.y, this.radius, this.startAngle, this.endAngle);
+				this.game.board.ctx.arc(this.pos.x, this.pos.y, this.radius,
+										this.startAngle, this.endAngle);
 				this.game.board.ctx.fill();
 			}
-		}
+		};
 		this.move = () =>
 		{
-			if (this.game && this.game.continueAnimating == true)
+			if (this.game && this.game.continueAnimating === true)
 			{
-				let newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
-				let newPosY = this.pos.y + Math.sin ( this.angle ) * this.speedX;
-				if (this.game.playerOne.isLeftPlayer(newPosX, newPosY) == true)
+				const newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
+				const newPosY = this.pos.y
+								+ Math.sin(this.angle) * this.speedX;
+				const rp = this.game.playerTwo.isRightPlayer(newPosX, newPosY);
+				if (this.game.playerOne.isLeftPlayer(newPosX, newPosY) === true)
 				{
-     				this.angle = Math.PI - this.angle;
+					this.angle = Math.PI - this.angle;
 					this.angle = this.degreesToRadians(0);
 					this.angle -= this.degreesToRadians(this.getBounceAngle());
 				}
-				else if (this.game.playerTwo.isRightPlayer(newPosX, newPosY) == true) 
+				else if (rp === true)
 				{
 					this.pos.x = this.game.playerTwo.pos.x - this.radius;
-     				this.angle = Math.PI - this.angle;
+					this.angle = Math.PI - this.angle;
 					this.angle += this.degreesToRadians(this.getBounceAngle());
 				}
 				else
 				{
-					this.pos.x += Math.cos (this.angle) * this.speedX;
-					this.pos.y += Math.sin (this.angle) * this.speedX;
+					this.pos.x += Math.cos(this.angle) * this.speedX;
+					this.pos.y += Math.sin(this.angle) * this.speedX;
 				}
 				this.wasTopWallHit();
 				this.wasBottomWallHit();
@@ -121,66 +128,77 @@ class Ball
 					this.init();
 				}
 			}
-		}
+		};
 		this.wasTopWallHit = () =>
 		{
-			if ( this.pos.y < this.radius ) 
+			if ( this.pos.y < this.radius )
 			{
 				// this.touchAudio.play();
 				this.pos.y = this.radius;
 				this.angle = ( Math.PI * 2 ) - this.angle;
 			}
-		}
+		};
 		this.wasBottomWallHit = () =>
 		{
 			if (this.game)
 			{
-				if ( this.pos.y + this.radius > this.game.board.dim.height )
+				if (this.pos.y + this.radius > this.game.board.dim.height)
 				{
 					// this.touchAudio.play();
 					this.pos.y = this.game.board.dim.height - this.radius;
 					this.angle = ( Math.PI * 2 ) - this.angle;
 				}
 			}
-		}
+		};
 		this.degreesToRadians = (degrees) =>
 		{
-			let pi = Math.PI;
+			const pi = Math.PI;
 			return (degrees * (pi/180));
 		};
 		this.radiansToDegrees = (radians) =>
 		{
-			let pi = Math.PI;
+			const pi = Math.PI;
 			return (radians * (180/pi));
 		};
 		this.getBounceAngle = () =>
 		{
-			let relativeIntersectY = 0;
+			let relativeIntersectY;
+			relativeIntersectY = 0;
 			if (this.game)
 			{
 				if (this.pos.x > this.game.board.dim.width / 2)
-				{
-					relativeIntersectY = (this.game.playerTwo.pos.y + (this.game.playerTwo.racket.dim.height / 2)) - this.pos.y;
-				}
+					relativeIntersectY = (this.game.playerTwo.pos.y
+						+ (this.game.playerTwo.racket.dim.height / 2))
+						- this.pos.y;
 				else
-					relativeIntersectY = (this.game.playerOne.pos.y + (this.game.playerTwo.racket.dim.height / 2)) - this.pos.y;
+					relativeIntersectY = (this.game.playerOne.pos.y
+						+ (this.game.playerTwo.racket.dim.height / 2))
+						- this.pos.y;
 			}
-			//ball's interception relative to the middle of the paddle
-			let normalizedRelativeIntersectionY = relativeIntersectY / (this.game.playerTwo.racket.dim.height / 2);
-			let bounceAngle = normalizedRelativeIntersectionY * this.radiansToDegrees((Math.PI / 4));
-			if (normalizedRelativeIntersectionY < 0)
-				normalizedRelativeIntersectionY *= -1;
-			if (normalizedRelativeIntersectionY <= 0.15)
-				this.speedX = (this.radius / 2) * 0.5;
-			else if (normalizedRelativeIntersectionY <= 0.4)
-				this.speedX = ((this.radius / 2) * 0.5) * 1.5;
-			else if (normalizedRelativeIntersectionY <= 0.7)
-				this.speedX = ((this.radius / 2) * 0.5) * 2;
-			else
-				this.speedX = ((this.radius / 2) * 0.5) * 2.5;
-			// let direction = this.pos.x + this.radius < this.game.board.dim.width / 2 ? 1 : -1;
+			// ball's interception relative to the middle of the paddle
+			let normalizedRelativeIntersectionY;
+			if (this.game)
+				normalizedRelativeIntersectionY = relativeIntersectY
+					/ (this.game.playerTwo.racket.dim.height / 2);
+			let bounceAngle;
+			bounceAngle = 0;
+			if (normalizedRelativeIntersectionY)
+			{
+				bounceAngle = normalizedRelativeIntersectionY
+					* this.radiansToDegrees((Math.PI / 4));
+				if (normalizedRelativeIntersectionY < 0)
+					normalizedRelativeIntersectionY *= -1;
+				if (normalizedRelativeIntersectionY <= 0.15)
+					this.speedX = (this.radius / 2) * 0.5;
+				else if (normalizedRelativeIntersectionY <= 0.4)
+					this.speedX = ((this.radius / 2) * 0.5) * 1.5;
+				else if (normalizedRelativeIntersectionY <= 0.7)
+					this.speedX = ((this.radius / 2) * 0.5) * 2;
+				else
+					this.speedX = ((this.radius / 2) * 0.5) * 2.5;
+			}
 			return (bounceAngle);
-		}
+		};
     }
 }
 

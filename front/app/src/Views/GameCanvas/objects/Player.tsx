@@ -1,3 +1,6 @@
+/* eslint-disable curly */
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
 import Game from "./Game";
 import Position from "./Position";
 import Racket from "./Racket";
@@ -31,32 +34,40 @@ class Player
 			if (this.game && this.game.board.ctx)
 			{
 				this.game.board.ctx.fillStyle = "#000";
-				this.game.board.ctx.fillRect(this.pos.x, this.pos.y, this.racket.dim.width, this.racket.dim.height);
+				this.game.board.ctx.fillRect(this.pos.x,
+					this.pos.y, this.racket.dim.width, this.racket.dim.height);
 			}
-		}
+		};
 		this.renderScore = () =>
 		{
 			if (this.game && this.game.board && this.game.board.ctx)
 			{
 			this.game.board.ctx.fillStyle = "#000";
-			let pixels = this.game.board.dim.width * 0.07;
+			const pixels = this.game.board.dim.width * 0.07;
 			this.game.board.ctx.font = pixels + "px bald Arial";
 			if (this.side === "left")
-				this.game.board.ctx.strokeText(this.score, (this.game.board.dim.width / 2) - (this.game.board.dim.width * 0.06) - (pixels / 2), this.game.board.dim.height * 0.15);
+				this.game.board.ctx.strokeText(this.score.toString(),
+					(this.game.board.dim.width / 2)
+					- (this.game.board.dim.width * 0.06)
+					- (pixels / 2), this.game.board.dim.height * 0.15);
 			else
-				this.game.board.ctx.strokeText(this.score, (this.game.board.dim.width / 2) + (this.game.board.dim.width * 0.06), this.game.board.dim.height * 0.15);
+				this.game.board.ctx.strokeText(this.score.toString(),
+					(this.game.board.dim.width / 2)
+					+ (this.game.board.dim.width * 0.06),
+					this.game.board.dim.height * 0.15);
 			}
-		}
+		};
 		this.updatePlayerPosition = () =>
 		{
-			if (this.game && this.game.continueAnimating == true)
+			if (this.game && this.game.continueAnimating === true)
 			{
 				switch (this.game.actionKeyPress)
 				{
 					case 87:
 						if (this.side === "left")
 						{
-							this.pos.y = this.pos.y - ((this.racket.dim.height / 2) * 0.5);
+							this.pos.y = this.pos.y
+								- ((this.racket.dim.height / 2) * 0.5);
 							if (this.pos.y < 0)
 								this.pos.y = 0;
 						}
@@ -64,16 +75,20 @@ class Player
 					case 83:
 						if (this.side === "left")
 						{
-							if (this.pos.y + this.racket.dim.height >= this.game.board.dim.height)
-								this.pos.y = this.game.board.dim.height - this.racket.dim.height;
+							if (this.pos.y + this.racket.dim.height
+								>= this.game.board.dim.height)
+								this.pos.y = this.game.board.dim.height
+									- this.racket.dim.height;
 							else
-								this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
+								this.pos.y = this.pos.y
+									+ ((this.racket.dim.height / 2) * 0.5);
 						}
 						break;
 					case 38:
 						if (this.side === "right")
 						{
-							this.pos.y = this.pos.y - ((this.racket.dim.height / 2) * 0.5);
+							this.pos.y = this.pos.y
+										- ((this.racket.dim.height / 2) * 0.5);
 							if (this.pos.y < 0)
 								this.pos.y = 0;
 						}
@@ -81,17 +96,20 @@ class Player
 						case 40:
 							if (this.side === "right")
 							{
-								if (this.pos.y + this.racket.dim.height >= this.game.board.dim.height)
-									this.pos.y = this.game.board.dim.height - this.racket.dim.height;
+								if (this.pos.y + this.racket.dim.height
+									>= this.game.board.dim.height)
+									this.pos.y = this.game.board.dim.height
+										- this.racket.dim.height;
 								else
-									this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
+									this.pos.y = this.pos.y
+										+ ((this.racket.dim.height / 2) * 0.5);
 							}
 							break;
 					default:
 						break;
 				}
 			}
-		}
+		};
 		this.isLeftPlayer = (posX, posY) =>
 		{
 			if (posX <= this.pos.x + this.racket.dim.width
@@ -100,7 +118,7 @@ class Player
 					return (true);
 			else
 				return (false);
-		}
+		};
 		this.isRightPlayer = (posX, posY) =>
 		{
 			if (posX >= this.pos.x
@@ -109,7 +127,7 @@ class Player
 				return (true);
 			else
 				return (false);
-		}
+		};
     }
 }
 

@@ -1,10 +1,8 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import React, { createContext } from 'react';
 import { useEffect, useRef } from "react";
-import { useAppSelector } from "../../hooks/redux-hooks";
-import UseWindowSize from "../Canvas/UseWindowSize";
 
+// if we don't import all objects, the game will not work
 import Game from "./objects/Game";
 import Board from "./objects/Board";
 import Ball from "./objects/Ball";
@@ -13,26 +11,14 @@ import Player from "./objects/Player";
 import Racket from "./objects/Racket";
 import Position from "./objects/Position";
 import Dimension from "./objects/Dimension";
-import { renderMatches } from 'react-router-dom';
 
-/* docu https://css-tricks.com/using-requestanimationframe-with-react-hooks/*/
 const	GameCanvas = () =>
 {
-	// const	size = useAppSelector((state) =>
-	// {
-	// 	return (state.controller.canvas);
-	// });
-	// UseWindowSize();
-
 	const game = new Game();
 	game.board.game = game;
 
-	let actionKeyPress;
-	actionKeyPress = -1;
-
 	game.ball.game = game;
 	game.net.game = game;
-
 
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
@@ -41,48 +27,50 @@ const	GameCanvas = () =>
 		game.playerOne.updatePlayerPosition();
 		game.playerTwo.updatePlayerPosition();
 		game.ball.update();
-	}
+	};
 
 	const clear = () =>
 	{
 		if (game.board.ctx)
 		{
 			game.board.ctx.fillStyle = "#fff";
-			game.board.ctx?.clearRect(0, 0, game.board.dim.width, game.board.dim.height);
+			game.board.ctx?.clearRect(0, 0,
+				game.board.dim.width, game.board.dim.height);
 		}
-	}
+	};
 
+	// I don't know what type we need to put here
 	const	keyHookDown = (e) =>
 	{
 		switch (e.keyCode)
 		{
-			case 38: // fleche up
+			case 38:
 				game.actionKeyPress = 38;
-				break; 
-			case 40: // fleche down
+				break;
+			case 40:
 				game.actionKeyPress = 40;
 				break;
-			case 83: //S
+			case 83:
 				game.actionKeyPress = 83;
 				break;
-			case 87: //W
+			case 87:
 				game.actionKeyPress = 87;
 				break;
 			default:
 				break;
 		}
-	}
+	};
 
-	const	keyHookReleased = (e) =>
+	const	keyHookReleased = () =>
 	{
 		game.actionKeyPress = -1;
-	}
+	};
 
-	const keyEnter = (e) =>
+	const keyEnter = () =>
 	{
 		game.continueAnimating = true;
 		game.startDisplayed = false;
-	}
+	};
 
 	const pauseButtonRef = useRef<HTMLInputElement>(null);
 	const resumeButtonRef = useRef<HTMLInputElement>(null);
@@ -112,7 +100,8 @@ const	GameCanvas = () =>
 			if (game.board.ctx)
 			{
 				game.board.ctx.fillStyle = "#F5F5DC";
-				game.board.ctx.fillRect(0, 0, game.board.dim.width, game.board.dim.height);
+				game.board.ctx.fillRect(0, 0, game.board.dim.width,
+					game.board.dim.height);
 			}
 			game.net.render();
 			game.ball.render();
@@ -120,14 +109,16 @@ const	GameCanvas = () =>
 			game.playerTwo.render();
 			game.playerOne.renderScore();
 			game.playerTwo.renderScore();
-			if (game.startDisplayed == true)
+			if (game.startDisplayed === true)
 				game.displayStartMessage();
 			if (game.startDisplayed === false)
 			{
-			pauseButton?.addEventListener('click',function(){
+			pauseButton?.addEventListener("click", function()
+			{
 				game.continueAnimating = false;
 			});
-			resumeButton?.addEventListener('click',function(){
+			resumeButton?.addEventListener("click", function()
+			{
 				game.continueAnimating = true;
 			});
 			}

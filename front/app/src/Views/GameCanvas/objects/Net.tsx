@@ -22,23 +22,33 @@ class Net
             const	ratioHeight = 0.1;
 			const	ratioWidth = 0.001;
 
-			const	newNetHeight = this.game.board.dim.height * ratioHeight;
-			const	newNetWidth = this.game.board.dim.width * ratioWidth;
+			let newNetHeight;
+			let newNetWidth;
+            if (this.game)
+            {
+                newNetHeight = this.game.board.dim.height * ratioHeight;
+                newNetWidth = this.game.board.dim.width * ratioWidth;
+            }
 
-			this.dim.setDimension(newNetHeight, newNetWidth);
+            if (newNetHeight && newNetWidth)
+                this.dim.setDimension(newNetHeight, newNetWidth);
         };
         this.render = () =>
 		{
-			this.pos.x = this.game.board.dim.width /2;
-			this.defineNetRectSize();
-			this.game.board.ctx.fillStyle = "#000";
-			let delay = 0;
-			while (delay < this.game.board.dim.height + this.dim.height)
-			{
-				this.game.board.ctx.fillRect(this.pos.x,
-                    this.pos.y + delay, this.dim.width, this.dim.height);
-				delay += this.dim.height + this.dim.height/2;
-			}
+            if (this.game && this.game.board.ctx)
+            {
+                this.pos.x = this.game.board.dim.width /2;
+                this.defineNetRectSize();
+                this.game.board.ctx.fillStyle = "#000";
+                let delay;
+                delay = 0;
+                while (delay < this.game.board.dim.height + this.dim.height)
+                {
+                    this.game.board.ctx.fillRect(this.pos.x,
+                        this.pos.y + delay, this.dim.width, this.dim.height);
+                    delay += this.dim.height + this.dim.height/2;
+                }
+            }
 		};
     }
 
