@@ -6,7 +6,10 @@ RUN apt install -y curl git htop
 
 RUN groupadd -g 1000 node 
 RUN useradd -lm -u 1000 -g 1000 node 
-USER node
+
+#  if at school, comment out the following line
+# USER node
+
 
 ENV VOLTA_HOME "/home/node/.volta"
 ENV PATH "$VOLTA_HOME/bin:$PATH"
