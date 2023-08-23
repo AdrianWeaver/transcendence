@@ -166,7 +166,11 @@ else
 	@echo "Application is not installed"
 endif
 	@make -s -C . attach_container_app_install
+	@make -s -C . install_global
 	docker stop frontend
+
+install_global:
+	@echo "cd /app && npm install" | docker exec -i frontend /bin/bash
 
 check_dev_image_build:
 	@echo "Checking existing installation of previous dev server"
