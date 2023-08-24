@@ -2,15 +2,7 @@
 /* eslint-disable max-statements */
 import { useEffect, useRef } from "react";
 
-// if we don't import all objects, the game will not work
 import Game from "./objects/Game";
-import Board from "./objects/Board";
-import Ball from "./objects/Ball";
-import Net from "./objects/Net";
-import Player from "./objects/Player";
-import Racket from "./objects/Racket";
-import Position from "./objects/Position";
-import Dimension from "./objects/Dimension";
 
 const	GameCanvas = () =>
 {
@@ -39,21 +31,20 @@ const	GameCanvas = () =>
 		}
 	};
 
-	// I don't know what type we need to put here
-	const	keyHookDown = (e) =>
+	const	keyHookDown = (e: KeyboardEvent) =>
 	{
-		switch (e.keyCode)
+		switch (e.code)
 		{
-			case 38:
+			case "ArrowUp":
 				game.actionKeyPress = 38;
 				break;
-			case 40:
+			case "ArrowDown":
 				game.actionKeyPress = 40;
 				break;
-			case 83:
+			case "KeyS":
 				game.actionKeyPress = 83;
 				break;
-			case 87:
+			case "KeyW":
 				game.actionKeyPress = 87;
 				break;
 			default:
@@ -113,14 +104,21 @@ const	GameCanvas = () =>
 				game.displayStartMessage();
 			if (game.startDisplayed === false)
 			{
-			pauseButton?.addEventListener("click", function()
-			{
-				game.continueAnimating = false;
-			});
-			resumeButton?.addEventListener("click", function()
-			{
-				game.continueAnimating = true;
-			});
+				pauseButton?.addEventListener("click", function()
+				{
+					game.continueAnimating = false;
+				});
+				resumeButton?.addEventListener("click", function()
+				{
+					game.continueAnimating = true;
+				});
+				if (game.playerOne.score === 7
+					|| game.playerTwo.score === 7)
+				{
+					game.continueAnimating = false;
+					game.displayEndMessage();
+					game.ball.init();
+				}
 			}
 			requestId = requestAnimationFrame(render);
 		};
