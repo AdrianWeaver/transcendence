@@ -7,22 +7,22 @@ import Racket from "./Racket";
 
 class Player
 {
-    public pos: Position;
-    public racket: Racket;
-    public score: number;
-    public game: Game | undefined;
-    public side: string | undefined;
-    public uuid: number | undefined;
-    public name: string | undefined;
-    public render: () => void;
-    public renderScore: () => void;
-    public updatePlayerPosition: () => void;
-    public isLeftPlayer: (posX: number, posY: number) => boolean;
-    public isRightPlayer: (posX: number, posY: number) => boolean;
+	public pos: Position;
+	public racket: Racket;
+	public score: number;
+	public game: Game | undefined;
+	public side: string | undefined;
+	public uuid: number | undefined;
+	public name: string | undefined;
+	public render: () => void;
+	public renderScore: () => void;
+	public updatePlayerPosition: () => void;
+	public isLeftPlayer: (posX: number, posY: number) => boolean;
+	public isRightPlayer: (posX: number, posY: number) => boolean;
 
-    public constructor()
-    {
-        this.pos = new Position();
+	public constructor()
+	{
+		this.pos = new Position();
 		this.racket = new Racket();
 		this.score = 0;
 		this.game = undefined;

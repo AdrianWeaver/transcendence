@@ -7,24 +7,24 @@ import { createRef } from "react";
 
 class Board
 {
-    public borderStyle: string;
-    public backgroundColor: string;
-    public irlWidth: number;
-    public irlHeight: number;
-    public irlRatio: number;
+	public borderStyle: string;
+	public backgroundColor: string;
+	public irlWidth: number;
+	public irlHeight: number;
+	public irlRatio: number;
 	public canvasRef: React.RefObject<HTMLCanvasElement> | null;
-    public canvas: HTMLCanvasElement | null;
+	public canvas: HTMLCanvasElement | null;
 	public ctx: CanvasRenderingContext2D | null | undefined;
-    public dim: Dimension;
-    public game: Game | undefined;
-    public setHeight: () => number;
-    public updateSizeAfterResize: () => void;
-    public registerEvents: () => void;
-    public init: () => void;
+	public dim: Dimension;
+	public game: Game | undefined;
+	public setHeight: () => number;
+	public updateSizeAfterResize: () => void;
+	public registerEvents: () => void;
+	public init: () => void;
 
-    public constructor()
-    {
-        this.borderStyle = "1px solid";
+	public constructor()
+	{
+		this.borderStyle = "1px solid";
 		this.backgroundColor = "#FFF";
 		this.irlWidth = 274;
 		this.irlHeight = 152.5;
@@ -108,7 +108,7 @@ class Board
 			}
 			this.registerEvents();
 		};
-    }
+	}
 }
 
 export default Board;

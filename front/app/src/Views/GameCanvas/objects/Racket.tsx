@@ -4,13 +4,13 @@ import Dimension from "./Dimension";
 
 class Racket
 {
-    public dim: Dimension;
-    public game: Game | undefined;
-    public defineRacketSize: () => void;
+	public dim: Dimension;
+	public game: Game | undefined;
+	public defineRacketSize: () => void;
 
-    public constructor()
-    {
-        this.dim = new Dimension();
+	public constructor()
+	{
+		this.dim = new Dimension();
 		this.game = undefined;
 		this.defineRacketSize = () =>
 		{
@@ -28,7 +28,7 @@ class Racket
 			if (newRacketHeight && newRacketWidth)
 				this.dim.setDimension(newRacketHeight, newRacketWidth);
 		};
-    }
+	}
 }
 
 export default Racket;
