@@ -1,37 +1,37 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-// import { ConstructionOutlined } from "@mui/icons-material";
+
 import Game from "./Game";
 import Position from "./Position";
 
 class Ball
 {
-    public pos: Position;
-    public radius: number;
-    public startAngle: number;
-    public endAngle: number;
-    public game: Game | undefined;
-    public speedX: number;
-    public speedY: number;
-    public angle: number;
-    public moveDirection: number | undefined;
-    public firstSetDirection: number;
-    public maxAngle: number;
-    public maxSpeed: number;
-    public init: () => void;
-    public update: () => void;
-    public render: () => void;
-    public move: () => void;
-    public wasTopWallHit: () => void;
-    public wasBottomWallHit: () => void;
-    public degreesToRadians: (degrees: number) => number;
-    public radiansToDegrees: (radians: number) => number;
-    public getBounceAngle: () => number;
+	public pos: Position;
+	public radius: number;
+	public startAngle: number;
+	public endAngle: number;
+	public game: Game | undefined;
+	public speedX: number;
+	public speedY: number;
+	public angle: number;
+	public moveDirection: number | undefined;
+	public firstSetDirection: number;
+	public maxAngle: number;
+	public maxSpeed: number;
+	public init: () => void;
+	public update: () => void;
+	public render: () => void;
+	public move: () => void;
+	public wasTopWallHit: () => void;
+	public wasBottomWallHit: () => void;
+	public degreesToRadians: (degrees: number) => number;
+	public radiansToDegrees: (radians: number) => number;
+	public getBounceAngle: () => number;
 
-    public constructor()
-    {
-        this.pos = new Position();
+	public constructor()
+	{
+		this.pos = new Position();
 		this.radius = 0;
 		this.startAngle = 0;
 		this.endAngle = 2 * Math.PI;
@@ -39,8 +39,6 @@ class Ball
 		this.speedX = 0;
 		this.speedY = 0;
 		this.angle = 0;
-		// this.failedAudio = document.querySelector('#fail');
-		// this.touchAudio = document.querySelector('#touch');
 		this.moveDirection = undefined;
 		this.firstSetDirection = 1;
 		// this.maxbounceAngle = 0;
@@ -55,7 +53,6 @@ class Ball
 				this.radius = this.game.board.dim.width * 0.012;
 				this.speedX = (this.radius / 2) * 0.5;
 			}
-			// this.speedY = (this.radius / 2) * 0.5;
 			this.maxAngle = this.degreesToRadians(75);
 			if (this.firstSetDirection === 1)
 			{
@@ -67,8 +64,8 @@ class Ball
 			}
 			this.firstSetDirection = 0;
 		};
-        this.update = () =>
-        {
+		this.update = () =>
+		{
 			if (this.game)
 			{
 				this.radius = this.game.board.dim.width * 0.012;
@@ -199,7 +196,7 @@ class Ball
 			}
 			return (bounceAngle);
 		};
-    }
+	}
 }
 
 export default Ball;
