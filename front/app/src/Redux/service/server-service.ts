@@ -112,6 +112,7 @@ const	ServerService = {
 							message: data.message,
 							token: data.token
 						};
+					console.log("data login: ", data);
 					return (response);
 				})
 				.catch((error) =>
@@ -121,6 +122,35 @@ const	ServerService = {
 				})
 		);
 	},
+	async	verifyTokenAnonymousUser(token: string)
+	{
+		const	config:AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+		console.log("the token -->", token);
+		return (
+			Api()
+				.post("anonymous-user/verify-token", {}, config)
+				.then((res) =>
+				{
+					return (res.data);
+				})
+				.then((data) =>
+				{
+					console.log(data);
+					return ("SUCCESS");
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+					return ("ERROR");
+				})
+		);
+	}
 };
 
 export default ServerService;
