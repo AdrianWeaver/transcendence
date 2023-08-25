@@ -9,7 +9,30 @@ export interface	UserModel
 
 export interface	AnonymouseUserModel
 {
+	"registrationStep": string,
 	"uuid": string,
+	"creationDate": string,
+	"password": string,
+	"message": string,
+	"token": string,
+	"expireAt": number
+}
+
+export interface	AnonymousUserRegisterResponseModel
+{
+	statusCode?: number,
+	creationDate?: string,
+	message?: string,
+	password?: string,
+	uuid?: string
+}
+
+export interface	AnonymousUserLoginResponseModel
+{
+	statusCode?: number,
+	message?: string,
+	token?: string,
+	expireAt?: number,
 }
 
 export	interface	RegistrationProcessModel
@@ -28,9 +51,11 @@ export interface	ServerModel
 {
 	"isFetching": boolean,
 	"connexionEnabled": boolean,
+	"serverActiveSince": string,
 	"connexionAttempt": number,
 	"error": boolean,
-	"message": string
+	"message": string,
+	"anonymousUser": AnonymouseUserModel,
 }
 
 export interface	CanvasModel
@@ -44,7 +69,6 @@ export interface	ControllerModel
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,
-	"anonymousUser": AnonymouseUserModel,
 	"user": UserModel,
 	"registration": RegistrationProcessModel,
 	"canvas": CanvasModel

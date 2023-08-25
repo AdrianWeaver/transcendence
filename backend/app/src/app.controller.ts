@@ -18,6 +18,7 @@ export class AppController implements OnModuleInit
 	@Get("/server-status")
 	getServerStatus(): {success: string, availableSince: string}
 	{
+		console.log("User request /server-status");
 		return (this.appService.getServerStatus());
 	}
 
