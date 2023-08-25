@@ -166,7 +166,12 @@ else
 	@echo "Application is not installed"
 endif
 	@make -s -C . attach_container_app_install
+
+	@make -s -C . install_global
 	docker stop frontend
+
+install_global:
+	@echo "cd /app && npm install" | docker exec -i frontend /bin/bash
 
 check_dev_image_build:
 	@echo "Checking existing installation of previous dev server"
@@ -184,7 +189,8 @@ install: check_dev_image_build
 	@echo "Installation done\n\n"
 	@make -s -C . all
 clean:
-	sudo rm -rf ./app/node_modules ./app/package-lock.json norm.report
+
+	rm -rf ./app/node_modules ./app/package-lock.json norm.report
 ifneq ($(shell docker ps --filter "name=frontend" -q),)
 	docker kill frontend
 endif

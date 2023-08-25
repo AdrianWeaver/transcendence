@@ -7,5 +7,4 @@
 *tags
 
 
-backend/app/transcendence/package-lock.json
-sandbox/front/app/react-ts/package-lock.json
+front/app/package-lock.json

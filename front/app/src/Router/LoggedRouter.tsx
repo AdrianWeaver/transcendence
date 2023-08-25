@@ -66,6 +66,7 @@ const	LoggedRouter = () =>
 					path="the-game"
 					element={<GameCanvas />}
 				/>
+        
 				<Route
 					path="*"
 					element={<h1>Error 404: Logged User</h1>}
