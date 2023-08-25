@@ -14,13 +14,13 @@ import {
 	LinearProgress,
 	Typography
 }	from "@mui/material";
+
 import
 {
 	createAnonymousSession,
-	getServerConnection,
-	increaseConnectionAttempt,
 	setAnonymousRegistrationStep,
-}	from "../../Redux/store/serverAction";
+}	from "../../Redux/store/anonymousUserAction";
+
 import { useEffect } from "react";
 
 const	DisplayAnonymousConnect = () =>
@@ -29,6 +29,11 @@ const	DisplayAnonymousConnect = () =>
 	const	server = useAppSelector((state) =>
 	{
 		return (state.server);
+	});
+
+	const	anonymousUser = useAppSelector((state) =>
+	{
+		return (state.anonymousUser);
 	});
 
 	let	message;
@@ -61,13 +66,15 @@ const	DisplayAnonymousConnect = () =>
 	{
 		setTimeout(() =>
 		{
-			if (server.anonymousUser.registrationStep === "undefined")
+			if (anonymousUser.registrationStep === "undefined")
 			{
 				dispatch(setAnonymousRegistrationStep("register"));
 				dispatch(createAnonymousSession());
 			}
 		}, 400);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
 	if (server.isFetching)
 	{
 		message = "Creating you visitor session";

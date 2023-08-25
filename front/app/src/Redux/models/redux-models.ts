@@ -7,7 +7,7 @@ export interface	UserModel
 	"rememberMe": boolean
 }
 
-export interface	AnonymouseUserModel
+export interface	AnonymousUserModel
 {
 	"registrationStep": string,
 	"uuid": string,
@@ -55,7 +55,6 @@ export interface	ServerModel
 	"connexionAttempt": number,
 	"error": boolean,
 	"message": string,
-	"anonymousUser": AnonymouseUserModel,
 }
 
 export interface	CanvasModel

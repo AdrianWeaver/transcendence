@@ -106,7 +106,7 @@ export class AnonymousUserService
 			const	response: AnonymousUserLoginResponseModel = {
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
-				exprireAt:
+				expireAt:
 					searchUser.lastConnection + (1000 * 60 * 60 * 24)
 			};
 			return (response);

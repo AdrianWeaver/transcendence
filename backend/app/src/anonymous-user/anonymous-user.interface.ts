@@ -44,7 +44,7 @@ export interface AnonymousUserLoginResponseModel
 {
 	message: string;
 	token: string;
-	exprireAt: number;
+	expireAt: number;
 }
 
 export interface AnonymousUserVerifyTokenResModel

@@ -112,6 +112,7 @@ const	ServerService = {
 							message: data.message,
 							token: data.token
 						};
+					console.log("data login: ", data);
 					return (response);
 				})
 				.catch((error) =>
