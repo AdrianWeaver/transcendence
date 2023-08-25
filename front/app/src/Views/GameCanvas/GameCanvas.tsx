@@ -126,9 +126,6 @@ const	GameCanvas = () =>
 		return (() =>
 		{
 			cancelAnimationFrame(requestId);
-			removeEventListener("keydown", keyHookDown);
-			removeEventListener("keyup", keyHookReleased);
-			removeEventListener("keydown", keyEnter);
 		});
 	});
 
