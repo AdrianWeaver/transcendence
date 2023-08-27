@@ -187,9 +187,9 @@ class Ball
 					normalizedRelativeIntersectionY *= -1;
 				if (normalizedRelativeIntersectionY <= 0.15)
 					this.speedX = (this.radius / 2) * 0.5;
-				else if (normalizedRelativeIntersectionY <= 0.4)
+				else if (normalizedRelativeIntersectionY <= 0.2)
 					this.speedX = ((this.radius / 2) * 0.5) * 1.5;
-				else if (normalizedRelativeIntersectionY <= 0.7)
+				else if (normalizedRelativeIntersectionY <= 0.35)
 					this.speedX = ((this.radius / 2) * 0.5) * 2;
 				else
 					this.speedX = ((this.radius / 2) * 0.5) * 2.5;
@@ -200,3 +200,8 @@ class Ball
 }
 
 export default Ball;
+
+
+/*
+computeSpeed
+*/
