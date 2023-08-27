@@ -80,7 +80,7 @@ const	GameCanvas = () =>
 		game.board.init();
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
-		addEventListener("keydown", keyEnter);
+		addEventListener("keypress", keyEnter);
 
 		const	render = () =>
 		{
