@@ -4,22 +4,27 @@ import { AppService } from "./app.service";
 import {
 	AnonymousUserService
 } from "./anonymous-user/anonymous-user.service";
+import { AdminsModule } from './admins/admins.module';
 import
 {
 	AnonymousUserController
 }	from "./anonymous-user/anonymous-user.controller";
+import { AdminsService } from "./admins/admins.service";
+import { AdminsController } from "./admins/admins.controller";
 
 
 @Module(
 {
-	imports: [],
+	imports: [AdminsModule],
 	controllers: [
 		AppController,
-		AnonymousUserController
+		AnonymousUserController,
+		AdminsController
 	],
 	providers: [
 		AppService,
-		AnonymousUserService
+		AnonymousUserService,
+		AdminsService
 	],
 })
 

@@ -17,6 +17,7 @@ import {
 
 import
 {
+	clearTokenDataAnonymousUser,
 	createAnonymousSession,
 	loginAnonymousUser,
 	setAnonymousRegistrationStep,
@@ -89,6 +90,11 @@ const	DisplayAnonymousConnect = () =>
 			message = "session active";
 			descriptMessage = "";
 			break ;
+		case "reloggin":
+			severity = "info";
+			message = "";
+			descriptMessage = "veuillez patienter";
+			break ;
 		default:
 			severity= "info";
 			message = "Chargement en cours";
@@ -130,8 +136,10 @@ const	DisplayAnonymousConnect = () =>
 				}
 				else
 				{
-					console.log("relogin process needed !");
-					console.log("to-do");
+					dispatch(setAnonymousRegistrationStep("reloggin"));
+					dispatch(clearTokenDataAnonymousUser());
+					dispatch(setAnonymousRegistrationStep("login"));
+					dispatch(loginAnonymousUser());
 				}
 			}
 		}, 400);

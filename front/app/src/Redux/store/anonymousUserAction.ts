@@ -150,6 +150,7 @@ export const	createAnonymousSession = ()
 				// normal procedure
 				// (We are inside register, see display anonymous connect)
 				console.error("UUID is " + prevState.anonymousUser.uuid);
+				console.error("Anonymous user is " + prevState.anonymousUser);
 			}
 		}
 		dispatch(action.createAnonymousSession(response));
@@ -189,5 +190,22 @@ export const	verifyTokenAnonymousUser = ()
 			dispatch(action.verifyTokenAnonymousUser(res));
 		}
 		// dispatch(action.verifyTokenAnonymousUser(res));
+	});
+};
+
+export const	clearTokenDataAnonymousUser = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.anonymousUser,
+			message: "",
+			expireAt: -1,
+			token: "no token"
+		};
+		dispatch(action.clearTokenDataAnonymousUser(res));
 	});
 };
