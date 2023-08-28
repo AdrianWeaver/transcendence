@@ -52,6 +52,11 @@ const anonymousUserSlice = createSlice(
 			state.message = action.payload.message;
 			state.expireAt = action.payload.expireAt;
 			state.token = action.payload.token;
+		},
+		verifyTokenAnonymousUser(state, action: PayloadAction<Model>)
+		{
+			state.expireAt = action.payload.expireAt;
+			state.token = action.payload.token;
 		}
 	}
 });

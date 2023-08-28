@@ -99,7 +99,7 @@ export class AnonymousUserService
 				},
 				this.secret,
 				{
-					expiresIn: "1d"
+					expiresIn: "5s"
 				}
 			);
 			console.log(searchUser);
@@ -107,7 +107,8 @@ export class AnonymousUserService
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
-					searchUser.lastConnection + (1000 * 60 * 60 * 24)
+				//	searchUser.lastConnection + (1000 * 60 * 60 * 24)
+				Date.now()
 			};
 			return (response);
 		}

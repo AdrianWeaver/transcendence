@@ -16,18 +16,24 @@ import storage from "redux-persist/lib/storage";
 import	serverSlice from "./server-slice";
 import	anonymousUserSlice from "./anonymousUser-slice";
 
-const	persistConfig = {
+const	persistConfigController = {
 	key: "root",
 	// version: 2,
 	storage
 };
 
+const	persistConfigAnonymousUser = {
+	key: "anonymousUser",
+	// version: 2,
+	storage
+};
+
 const	persistedControllerReducer = persistReducer(
-	persistConfig, controllerSlice.reducer
+	persistConfigController, controllerSlice.reducer
 );
 
 const	persistedAnonymousUserReducer = persistReducer(
-	persistConfig, anonymousUserSlice.reducer
+	persistConfigAnonymousUser, anonymousUserSlice.reducer
 );
 
 export const	store = configureStore(
@@ -37,7 +43,6 @@ export const	store = configureStore(
 		controller: persistedControllerReducer,
 		server: serverSlice.reducer,
 		anonymousUser: persistedAnonymousUserReducer
-		// anonymousUser: anonymousUserSlice.reducer
 	},
 	middleware: (getDefaultMiddleware) =>
 	{

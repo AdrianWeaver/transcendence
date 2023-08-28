@@ -126,7 +126,6 @@ export const	registerAnonymousUser = ()
 	});
 };
 
-
 export const	createAnonymousSession = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -154,5 +153,41 @@ export const	createAnonymousSession = ()
 			}
 		}
 		dispatch(action.createAnonymousSession(response));
+	});
+};
+
+export const	verifyTokenAnonymousUser = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		let		res: Model;
+		const	prevState = getState();
+
+
+		dispatch(setAnonymousRegistrationStep("VerifyToken"));
+
+		const	token = prevState.anonymousUser.token;
+		const	data = await ServerService.verifyTokenAnonymousUser(token);
+		console.log("Result of verify token : ", data);
+		if (data === "ERROR")
+		{
+			res = {
+				...prevState.anonymousUser,
+				expireAt: -1,
+				token: "no token"
+			};
+			console.log("Res befor dispatch", res);
+			dispatch(action.verifyTokenAnonymousUser(res));
+			dispatch(setAnonymousRegistrationStep("TokenVerificationFailure"));
+			// set relog dispatcher 
+		}
+		else
+		{
+			dispatch(setAnonymousRegistrationStep("Anonymous User Registred"));
+			res = {...prevState.anonymousUser};
+			dispatch(action.verifyTokenAnonymousUser(res));
+		}
+		// dispatch(action.verifyTokenAnonymousUser(res));
 	});
 };
