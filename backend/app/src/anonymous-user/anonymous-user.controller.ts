@@ -6,7 +6,8 @@ import {
 	Post,
 	UseGuards,
 	Req,
-	Get
+	Get,
+	Logger
 } from "@nestjs/common";
 import {Request} from "express";
 import { IsJWT, IsNotEmpty, IsUUID } from "class-validator";
@@ -44,16 +45,18 @@ class AnonymousUserLoginDto
 @Controller("anonymous-user")
 export class AnonymousUserController
 {
+	private readonly logger;
 	constructor(private readonly anonymousUserService: AnonymousUserService)
 	{
-
+		this.logger = new Logger("anonymous-user controller");
 	}
 
 	@Post("register")
 	getAnonymousRegister(@Body() body:AnonymousRegisterDto)
 	: AnonymousUserRegisterResponseModel
 	{
-		console.log(body.uuid);
+		this.logger
+			.log("A user request 'register' route with uid :" + body.uuid);
 		return (this.anonymousUserService.register(body.uuid));
 	}
 
@@ -61,6 +64,8 @@ export class AnonymousUserController
 	anonymousUserLogin(@Body() body: AnonymousUserLoginDto)
 	: AnonymousUserLoginResponseModel
 	{
+		this.logger
+			.log("A user request 'login' route with uid :" + body.uuid);
 		return (this.anonymousUserService.login(body.uuid, body.password));
 	}
 
@@ -69,6 +74,8 @@ export class AnonymousUserController
 	verifyToken()
 	: AnonymousUserVerifyTokenResModel
 	{
+		this.logger
+			.log("A user request 'verify-token' router ");
 		const	response: AnonymousUserVerifyTokenResModel = {
 			message: "Sucessfully verify token",
 			statusCode: 200
@@ -82,24 +89,9 @@ export class AnonymousUserController
 	revokeToken(@Req() req: CustomRequest)
 		: string
 	{
-		console.log(req.user);
+		this.logger
+			.log("A user request 'close-session' route with uid :");
 		this.anonymousUserService.revokeTokenByUuid(req.user.uuid);
 		return ("your session is now closed, please relog for access to data");
-	}
-
-	// Unprotected for now may use a special Guard For Administrator/Moderator
-	@Get("admin/list-all-anonymous")
-	adminListAllAnonymous()
-	: AnonymousAdminResponseModel
-	{
-		return (this.anonymousUserService.getAnonymousUserArray());
-	}
-
-	// Unprotected for now 
-	@Post("admin/close-all-connection")
-	adminCloseAllClient()
-	: string
-	{
-		return (this.anonymousUserService.adminCloseAllClient());
 	}
 }
