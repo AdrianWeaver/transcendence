@@ -1,7 +1,8 @@
 /* eslint-disable max-statements */
 import DisplayConnectionState from "./DisplayConnectionState";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
-import DisplayAnonymousConnect from "./DisplayAnonymousConnect";
+import DisplayAnonymousConnection from "./DisplayAnonymousConnection";
+// import DisplayAnonymousConnect from "./DisplayAnonymousConnect";
 
 const	ConnectionState = () =>
 {
@@ -11,7 +12,7 @@ const	ConnectionState = () =>
 	});
 
 	const	renderConnectState = <DisplayConnectionState />;
-	const	renderAnonymousConnect = <DisplayAnonymousConnect />;
+	const	renderAnonymousConnect = <DisplayAnonymousConnection />;
 
 	if (server.connexionEnabled === false)
 		return (renderConnectState);

@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 
 import
 {
@@ -16,7 +17,10 @@ export const	initialAnonymousUserState: Model = {
 	password: "undefined",
 	message: "",
 	expireAt: -1,
-	token: "no token"
+	token: "no token",
+	error: false,
+	errorMessage: "",
+	errorStatusCode: 0,
 };
 
 const anonymousUserSlice = createSlice(
@@ -63,6 +67,31 @@ const anonymousUserSlice = createSlice(
 			state.message = action.payload.message;
 			state.expireAt = action.payload.expireAt;
 			state.token = action.payload.token;
+		},
+		clearAllDataAnonymousUser(state, action: PayloadAction<Model>)
+		{
+			state.registrationStep = action.payload.registrationStep;
+			state.uuid = action.payload.uuid;
+			state.creationDate = action.payload.creationDate;
+			state.password = action.payload.password;
+			state.message = action.payload.message;
+			state.expireAt = action.payload.expireAt;
+			state.token = action.payload.token;
+			state.error = action.payload.error;
+			state.errorMessage = action.payload.errorMessage;
+			state.errorStatusCode = action.payload.errorStatusCode;
+		},
+		errorLoginAnonymousUser(state, action: PayloadAction<Model>)
+		{
+			state.error = action.payload.error;
+			state.errorMessage = action.payload.errorMessage;
+			state.errorStatusCode = action.payload.errorStatusCode;
+		},
+		errorRegisterAnonymousUser(state, action: PayloadAction<Model>)
+		{
+			state.error = action.payload.error;
+			state.errorMessage = action.payload.errorMessage;
+			state.errorStatusCode = action.payload.errorStatusCode;
 		}
 	}
 });

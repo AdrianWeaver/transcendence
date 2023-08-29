@@ -17,6 +17,7 @@ import {
 
 import
 {
+	clearAllDataAnonymousUser,
 	clearTokenDataAnonymousUser,
 	createAnonymousSession,
 	loginAnonymousUser,
@@ -105,34 +106,29 @@ const	DisplayAnonymousConnect = () =>
 	{
 		const timerRegister = setTimeout(() =>
 		{
+			if (registrationStep === "error loggin")
+				dispatch(clearAllDataAnonymousUser());
+			if (registrationStep === "reloggin")
+			{
+				dispatch(setAnonymousRegistrationStep("login"));
+				dispatch(loginAnonymousUser());
+			}
 			if (registrationStep === "undefined")
 			{
-				console.info("Registration of the user \
-				 -- the registration step is undefined");
 				dispatch(setAnonymousRegistrationStep("register"));
 				dispatch(createAnonymousSession());
 			}
 			else if (registrationStep === "TokenVerificationFailure")
-			{
-				console.log("Attempt to relog to the anonymous user");
-				console.log(anonymousUser);
 				dispatch(setAnonymousRegistrationStep("login"));
-				// dispatch(loginAnonymousUser());
-			}
 			else if (registrationStep === "Anonymous User Registred"
 				|| registrationStep === "VerifyToken")
 			{
-				// check validity of token else login again
 				dispatch(setIsFetching(true));
-				console.info("The anonymous user is alreaddy registred ");
-				console.info("--> ", anonymousUser);
 				if (anonymousUser.expireAt
 					&& anonymousUser.expireAt > Date.now())
 				{
-					console.log("The token stored is not expired \
-					but the value is not checked here");
-					console.log("    -->", anonymousUser.expireAt);
 					dispatch(verifyTokenAnonymousUser());
+					console.log("Verifing token");
 				}
 				else
 				{
@@ -164,6 +160,8 @@ const	DisplayAnonymousConnect = () =>
 				clearTimeout(timerUnmount);
 			});
 		}
+		if (registrationStep === "error loggin")
+			dispatch(clearAllDataAnonymousUser());
 		return (() =>
 		{
 			undefined;

@@ -2,7 +2,11 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 
-import	anonymousUserSlice from "./anonymousUser-slice";
+import
+	anonymousUserSlice,
+	{
+		initialAnonymousUserState
+	} from "./anonymousUser-slice";
 import	serverSlice from "./server-slice";
 
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
@@ -56,6 +60,27 @@ export const	setAnonymousUuid = ()
 	});
 };
 
+
+export const	errorLoginAnonymousUser = (
+	error: boolean,
+	message: string,
+	statusCode: number
+): ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	res: Model = {
+			...prevState.anonymousUser,
+			error: error,
+			errorMessage: message,
+			errorStatusCode: statusCode
+		};
+		dispatch(action.errorLoginAnonymousUser(res));
+	});
+};
+
+
 export const	loginAnonymousUser = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -76,18 +101,39 @@ export const	loginAnonymousUser = ()
 				token: data.token as string
 			};
 			dispatch(action.loginAnonymousUser(response));
-			dispatch(setAnonymousRegistrationStep("Anonymous User Registred"));
+			dispatch(setAnonymousRegistrationStep("login-anonymous-success"));
 		}
 		else
 		{
-			const	error: ServerModel = {
-				...prevState.server,
-				error: true,
-				message: "501 Not Implemented",
-			};
-			dispatch(serverActions.setErrorService(error));
-			dispatch(setAnonymousRegistrationStep("error loggin"));
+			dispatch(
+				errorLoginAnonymousUser(
+					true,
+					"not implemented yet error login :"
+						+ data.message as string,
+					data.statusCode as number,
+				)
+			);
+			console.error("Need to implement the properties: ");
 		}
+	});
+};
+
+export const	errorRegisterAnonymousUser = (
+	error: boolean,
+	message: string,
+	statusCode: number
+): ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	res: Model = {
+			...prevState.anonymousUser,
+			error: error,
+			errorMessage: message,
+			errorStatusCode: statusCode
+		};
+		dispatch(action.errorRegisterAnonymousUser(res));
 	});
 };
 
@@ -110,18 +156,21 @@ export const	registerAnonymousUser = ()
 				message: data.message as string
 			};
 			dispatch(action.registerAnomymousUser(res));
-			dispatch(setAnonymousRegistrationStep("login"));
-			dispatch(loginAnonymousUser());
+			dispatch(
+				setAnonymousRegistrationStep("register-anonymous-success")
+			);
 		}
 		else
 		{
-			const	error: ServerModel = {
-				...prev.server,
-				error: true,
-				message: "501 Not Implemented"
-			};
-			dispatch(serverActions.setErrorService(error));
-			dispatch(setAnonymousRegistrationStep("Register Anonymous Error"));
+			dispatch(
+				errorLoginAnonymousUser(
+					true,
+					"not implemented yet error login :"
+						+ data.message as string,
+					data.statusCode as number,
+				)
+			);
+			console.error("Need to implement the properties: ");
 		}
 	});
 };
@@ -145,10 +194,6 @@ export const	createAnonymousSession = ()
 			}
 			else
 			{
-				// login or clear, cause user already have an uuid
-				// but seams to be an error, user are trigger without
-				// normal procedure
-				// (We are inside register, see display anonymous connect)
 				console.error("UUID is " + prevState.anonymousUser.uuid);
 				console.error("Anonymous user is " + prevState.anonymousUser);
 			}
@@ -165,31 +210,29 @@ export const	verifyTokenAnonymousUser = ()
 		let		res: Model;
 		const	prevState = getState();
 
-
-		dispatch(setAnonymousRegistrationStep("VerifyToken"));
-
 		const	token = prevState.anonymousUser.token;
 		const	data = await ServerService.verifyTokenAnonymousUser(token);
-		console.log("Result of verify token : ", data);
 		if (data === "ERROR")
 		{
 			res = {
 				...prevState.anonymousUser,
+				message: "",
 				expireAt: -1,
 				token: "no token"
 			};
-			console.log("Res befor dispatch", res);
 			dispatch(action.verifyTokenAnonymousUser(res));
-			dispatch(setAnonymousRegistrationStep("TokenVerificationFailure"));
-			// set relog dispatcher 
+			dispatch(
+				setAnonymousRegistrationStep("token-verification-failure"
+			));
 		}
 		else
 		{
-			dispatch(setAnonymousRegistrationStep("Anonymous User Registred"));
 			res = {...prevState.anonymousUser};
 			dispatch(action.verifyTokenAnonymousUser(res));
+			dispatch(
+				setAnonymousRegistrationStep("token-verification-success")
+			);
 		}
-		// dispatch(action.verifyTokenAnonymousUser(res));
 	});
 };
 
@@ -207,5 +250,17 @@ export const	clearTokenDataAnonymousUser = ()
 			token: "no token"
 		};
 		dispatch(action.clearTokenDataAnonymousUser(res));
+	});
+};
+
+export const	clearAllDataAnonymousUser = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch ) =>
+	{
+		const	res: Model = {
+			...initialAnonymousUserState
+		};
+		dispatch(action.clearAllDataAnonymousUser(res));
 	});
 };
