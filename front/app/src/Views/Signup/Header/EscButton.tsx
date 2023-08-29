@@ -46,7 +46,7 @@ const	EscButton = () =>
 
 	const	elemOnHover = (
 		<HighlightOffRoundedIcon
-			color="primary"
+			color="secondary"
 		/>
 	);
 
@@ -57,7 +57,7 @@ const	EscButton = () =>
 	);
 
 	const	elemTypoOn = (
-		<Typography color={"text.primary"} >
+		<Typography color={"text.secondary"} >
 			Annuler
 		</Typography>
 	);

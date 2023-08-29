@@ -1,7 +1,8 @@
+import { Typography } from "@mui/material";
 
 const	TitleBase = () =>
 {
-	return (<h1>Vite + React</h1>);
+	return (<Typography variant="h4" color="text.secondary">Vite + React</Typography>);
 };
 
 export default TitleBase;

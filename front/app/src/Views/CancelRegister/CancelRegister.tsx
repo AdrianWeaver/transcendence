@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { resetRegistration } from "../../Redux/store/controllerAction";
+import { Typography } from "@mui/material";
 
 /**
  * 
@@ -42,7 +43,7 @@ const	CancelRegister = () =>
 			navigate(prevPage);
 		}, 1500);
 	});
-	return (<p>{message}</p>);
+	return (<Typography color="text.secondary">{message}</Typography>);
 };
 
 export default CancelRegister;

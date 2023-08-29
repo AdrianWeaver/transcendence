@@ -25,7 +25,7 @@ const	MenuBar = () =>
 	else
 		jsxElementLogin = <LoginSignupButton />;
 	return (
-		<AppBar position="static">
+		<AppBar position="static" enableColorOnDark color="primary">
 			<Container maxWidth="xl">
 				<Toolbar disableGutters>
 					<IconTitle display="hidde-small"/>

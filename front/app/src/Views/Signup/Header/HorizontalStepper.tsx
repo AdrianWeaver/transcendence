@@ -2,6 +2,7 @@ import Stepper from "@mui/material/Stepper";
 import Box from "@mui/material/Box";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
+import { colors } from "@mui/material";
 
 type	HorizontalStepperProps = {
 	activeStep: number
@@ -25,13 +26,31 @@ const	HorizontalStepper = (props: HorizontalStepperProps) =>
 		>
 			<Stepper activeStep={props.activeStep}>
 			{
-				steps.map((step) =>
+				steps.map((step, index) =>
 				{
-					return (
-						<Step key={step}>
-							<StepLabel>{step}</StepLabel>
-						</Step>
-					);
+					console.log("Step " , index);
+					console.log("active : ", props.activeStep);
+					if (index === props.activeStep)
+						return (
+							<Step key={step}>
+								<StepLabel sx={
+									{
+										colors: "white"
+									}
+								}>{step}
+								</StepLabel>
+							</Step>
+						);
+					else
+						return (
+							<Step key={step}>
+								<StepLabel sx={
+									{
+										colors: "white"
+									}
+								}>{step}</StepLabel>
+							</Step>
+						);
 				})
 			}
 			</Stepper>

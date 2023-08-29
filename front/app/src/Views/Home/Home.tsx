@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
+import { Typography } from "@mui/material";
 
 const	Home = () =>
 {
@@ -14,7 +15,9 @@ const	Home = () =>
 	return (
 		<>
 			<MenuBar />
-			<h1>home view</h1>
+			<Typography variant="h4" color="text.secondary">
+				Home
+			</Typography>
 		</>
 	);
 };

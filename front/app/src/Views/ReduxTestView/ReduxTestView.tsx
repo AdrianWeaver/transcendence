@@ -15,7 +15,8 @@ import {
 	TableCell,
 	TableContainer,
 	TableHead,
-	TableRow
+	TableRow,
+	Typography
 }	from "@mui/material";
 import { ControllerModel, ServerModel } from "../../Redux/models/redux-models";
 import { PersistPartial } from "redux-persist/lib/persistReducer";
@@ -245,7 +246,9 @@ const	ReduxTestView = () =>
 		<>
 			<MenuBar />
 			<div>
-				<h1>Redux Test View</h1>
+				<Typography variant="h4" color="text.secondary">
+					Redux Test View
+				</Typography>
 			</div>
 			<div>
 				<ToggleButtonGroup

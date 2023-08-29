@@ -141,6 +141,7 @@ const	StepZero = () =>
 							gutterBottom
 							variant="h5"
 							component="div"
+							color="text.secondary"
 						>
 							Connexion intra 42
 						</Typography>

@@ -13,7 +13,7 @@ const	HeaderForm = () =>
 			>
 				<LockOutlinedIcon />
 			</Avatar>
-			<Typography component="h1" variant="h5">
+			<Typography component="h1" variant="h5" color="text.secondary">
 				S'enregistrer
 			</Typography>
 		</>
