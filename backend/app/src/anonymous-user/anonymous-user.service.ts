@@ -63,7 +63,7 @@ export class AnonymousUserService
 				isRegistredAsRegularUser: false,
 				revokeConnectionRequest: false
 			};
-			console.log(newAnonymous);
+			// console.log(newAnonymous);
 			this.anonymousUser.push(newAnonymous);
 			const	response: AnonymousUserRegisterResponseModel = {
 				message: "Your session has been created, you must loggin",
@@ -89,7 +89,7 @@ export class AnonymousUserService
 			throw new ForbiddenException("Invalid credential");
 		else
 		{
-			console.log(this.secret);
+			// console.log(this.secret);
 			searchUser.lastConnection = Date.now();
 			searchUser.revokeConnectionRequest = false;
 			searchUser.token = "Bearer " + jwt.sign(
@@ -99,16 +99,16 @@ export class AnonymousUserService
 				},
 				this.secret,
 				{
-					expiresIn: "5s"
+					expiresIn: "1d"
 				}
 			);
-			console.log(searchUser);
+			// console.log(searchUser);
 			const	response: AnonymousUserLoginResponseModel = {
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
-				//	searchUser.lastConnection + (1000 * 60 * 60 * 24)
-				Date.now()
+					searchUser.lastConnection + (1000 * 60 * 60 * 24)
+				// Date.now()
 			};
 			return (response);
 		}
@@ -137,7 +137,7 @@ export class AnonymousUserService
 		user.lastConnection = Date.now();
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
-		console.log("Anonymous user revoke session uuid : " + user.uuid);
+		// console.log("Anonymous user revoke session uuid : " + user.uuid);
 		return (false);
 	}
 

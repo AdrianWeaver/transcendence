@@ -16,6 +16,9 @@ export interface	AnonymousUserModel
 	"message": string,
 	"token": string,
 	"expireAt": number
+	"error": boolean;
+	"errorStatusCode": number,
+	"errorMessage": string
 }
 
 export interface	AnonymousUserRegisterResponseModel

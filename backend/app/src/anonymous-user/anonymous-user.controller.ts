@@ -6,20 +6,20 @@ import {
 	Post,
 	UseGuards,
 	Req,
-	Get,
 	Logger
 } from "@nestjs/common";
-import {Request} from "express";
-import { IsJWT, IsNotEmpty, IsUUID } from "class-validator";
+import
+{
+	IsNotEmpty,
+	IsUUID
+}	from	"class-validator";
 import
 {
 	AnonymousUserService,
 }	from "./anonymous-user.service";
 import
 {
-	AnonymousAdminResponseModel,
 	AnonymousUserLoginResponseModel,
-	AnonymousUserModel,
 	AnonymousUserRegisterResponseModel,
 	AnonymousUserVerifyTokenResModel,
 	CustomRequest
@@ -72,7 +72,10 @@ export class AnonymousUserController
 	@Post("verify-token")
 	@UseGuards(AuthorizationGuard)
 	verifyToken()
-	: AnonymousUserVerifyTokenResModel
+	: AnonymousUserVerifyTokenResModel				// login or clear, cause user already have an uuid
+	// but seams to be an error, user are trigger without
+	// normal procedure
+	// (We are inside register, see display anonymous connect)
 	{
 		this.logger
 			.log("A user request 'verify-token' router ");
