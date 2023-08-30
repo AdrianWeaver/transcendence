@@ -16,7 +16,7 @@ const	LoginSignupButton = () =>
 	{
 		navigate("/signup");
 	};
-//JO WAS HERE ↓↓
+
 	return (
 		<>
 			<Button onClick={handleLoginButton} color="inherit">Login</Button> 

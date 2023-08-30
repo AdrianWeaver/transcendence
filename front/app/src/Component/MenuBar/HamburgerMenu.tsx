@@ -75,7 +75,7 @@ const	HamburgerMenu = () =>
 				onClick={handleOnClickVisitor}
 			>
 				<Typography
-					textAlign="center" color="text.secondary" //JO WAS HERE
+					textAlign="center" color="text.secondary"
 				>
 					{page}
 				</Typography>

@@ -57,7 +57,7 @@ const	LargeMenu = () =>
 				sx={
 				{
 					my: 2,
-					color: "text.primary",  //JO WAS HERE
+					color: "text.primary",
 					display: "block"
 				}}
 			>

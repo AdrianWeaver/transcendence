@@ -26,31 +26,15 @@ const	HorizontalStepper = (props: HorizontalStepperProps) =>
 		>
 			<Stepper activeStep={props.activeStep}>
 			{
-				steps.map((step, index) =>
+				steps.map((step) =>
 				{
-					console.log("Step " , index);
-					console.log("active : ", props.activeStep);
-					if (index === props.activeStep)
-						return (
-							<Step key={step}>
-								<StepLabel sx={
-									{
-										colors: "white"
-									}
-								}>{step}
-								</StepLabel>
-							</Step>
-						);
-					else
-						return (
-							<Step key={step}>
-								<StepLabel sx={
-									{
-										colors: "white"
-									}
-								}>{step}</StepLabel>
-							</Step>
-						);
+					return (
+						<Step key={step}>
+							<StepLabel>
+								{step}
+							</StepLabel>
+						</Step>
+					);
 				})
 			}
 			</Stepper>
