@@ -113,10 +113,27 @@ export const	loginAnonymousUser = ()
 					data.statusCode as number,
 				)
 			);
-			console.error("Need to implement the pro/perties: ");
-			// dispatch(serverActions.setErrorService(error));
-			// dispatch(setAnonymousRegistrationStep("error loggin"));
+			console.error("Need to implement the properties: ");
 		}
+	});
+};
+
+export const	errorRegisterAnonymousUser = (
+	error: boolean,
+	message: string,
+	statusCode: number
+): ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	res: Model = {
+			...prevState.anonymousUser,
+			error: error,
+			errorMessage: message,
+			errorStatusCode: statusCode
+		};
+		dispatch(action.errorRegisterAnonymousUser(res));
 	});
 };
 
@@ -142,18 +159,18 @@ export const	registerAnonymousUser = ()
 			dispatch(
 				setAnonymousRegistrationStep("register-anonymous-success")
 			);
-			// dispatch(loginAnonymousUser());
 		}
 		else
 		{
-			// convertir cet objet dans le anonymous user model
-			const	error: ServerModel = {
-				...prev.server,
-				error: true,
-				message: "501 Not Implemented"
-			};
-			console.error("Need to implement the properties: ", error);
-			// dispatch(serverActions.setErrorService(error));
+			dispatch(
+				errorLoginAnonymousUser(
+					true,
+					"not implemented yet error login :"
+						+ data.message as string,
+					data.statusCode as number,
+				)
+			);
+			console.error("Need to implement the properties: ");
 		}
 	});
 };
@@ -193,30 +210,29 @@ export const	verifyTokenAnonymousUser = ()
 		let		res: Model;
 		const	prevState = getState();
 
-
-		dispatch(setAnonymousRegistrationStep("VerifyToken"));
-
 		const	token = prevState.anonymousUser.token;
 		const	data = await ServerService.verifyTokenAnonymousUser(token);
-		// console.log("Result of verify token : ", data);
 		if (data === "ERROR")
 		{
 			res = {
 				...prevState.anonymousUser,
+				message: "",
 				expireAt: -1,
 				token: "no token"
 			};
 			dispatch(action.verifyTokenAnonymousUser(res));
-			dispatch(setAnonymousRegistrationStep("TokenVerificationFailure"));
-			// set relog dispatcher 
+			dispatch(
+				setAnonymousRegistrationStep("token-verification-failure"
+			));
 		}
 		else
 		{
-			dispatch(setAnonymousRegistrationStep("Anonymous User Registred"));
 			res = {...prevState.anonymousUser};
 			dispatch(action.verifyTokenAnonymousUser(res));
+			dispatch(
+				setAnonymousRegistrationStep("token-verification-success")
+			);
 		}
-		// dispatch(action.verifyTokenAnonymousUser(res));
 	});
 };
 

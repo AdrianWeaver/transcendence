@@ -86,6 +86,12 @@ const anonymousUserSlice = createSlice(
 			state.error = action.payload.error;
 			state.errorMessage = action.payload.errorMessage;
 			state.errorStatusCode = action.payload.errorStatusCode;
+		},
+		errorRegisterAnonymousUser(state, action: PayloadAction<Model>)
+		{
+			state.error = action.payload.error;
+			state.errorMessage = action.payload.errorMessage;
+			state.errorStatusCode = action.payload.errorStatusCode;
 		}
 	}
 });

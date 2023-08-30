@@ -22,8 +22,10 @@ import {
 	loginAnonymousUser,
 	registerAnonymousUser,
 	setAnonymousRegistrationStep,
-	setAnonymousUuid
+	setAnonymousUuid,
+	verifyTokenAnonymousUser
 }	from "../../Redux/store/anonymousUserAction";
+import { setIsFetching } from "../../Redux/store/serverAction";
 
 type DisplayedProps = {
 	message: string;
@@ -138,7 +140,17 @@ const	DisplayAnonymousConnection = () =>
 		case "login-anonymous-success":
 			severity = "success";
 			message = "";
-			descriptMessage = "Connecte avec succees au serveur ";
+			descriptMessage = "Session Active";
+			break ;
+		case "token-verification-started":
+			severity = "info";
+			message = "";
+			descriptMessage = "Verify you session token";
+			break ;
+		case "token-verification-success":
+			severity = "success";
+			message = "";
+			descriptMessage = "Your session token is valid";
 			break ;
 		default:
 			severity= "warning";
@@ -147,7 +159,7 @@ const	DisplayAnonymousConnection = () =>
 			break ;
 	}
 
-	console.info(anonymousUser);
+	// console.info(anonymousUser);
 
 	// logic of registration
 	useEffect(() =>
@@ -157,6 +169,9 @@ const	DisplayAnonymousConnection = () =>
 		{
 			if (anonymousUser.uuid !== NIL)
 			{
+				// stored value tested to trigger:
+				// eslint-disable-next-line max-len
+				// {"registrationStep":"\"undefined\"","uuid":"\"161e3594-be9d-4afd-bdfe-d21aa7128350\"","creationDate":"\"\"","password":"\"\"","message":"\"\"","expireAt":"-1","token":"\"\"","error":"false","errorMessage":"\"\"","errorStatusCode":"0","_persist":"{\"version\":-1,\"rehydrated\":true}"}
 				console.error("Logic failure",
 				"Unidentified registration state can't"
 					+ " be with a generated uuid");
@@ -165,7 +180,6 @@ const	DisplayAnonymousConnection = () =>
 			else
 			{
 				console.log("need to create uuid");
-				// action here
 				dispatch(setAnonymousUuid());
 				dispatch(setAnonymousRegistrationStep("uuid-creation-sucess"));
 			}
@@ -185,7 +199,28 @@ const	DisplayAnonymousConnection = () =>
 			dispatch(setAnonymousRegistrationStep("login-anonymous-started"));
 			dispatch(loginAnonymousUser());
 		}
-		// the uuid is alredy created
+		else if (registrationStep === "login-anonymous-success")
+			dispatch(
+				setAnonymousRegistrationStep("token-verification-started")
+			);
+		else if (registrationStep === "token-verification-started")
+			dispatch(verifyTokenAnonymousUser());
+		else if (registrationStep === "token-verification-failure")
+		{
+			console.log("token failure");
+		}
+		else if (registrationStep === "token-verification-success")
+		{
+			console.log("token success");
+			const	timerUnmount = setTimeout(() =>
+			{
+				dispatch(setIsFetching(false));
+			}, 300);
+			return (() =>
+			{
+				clearTimeout(timerUnmount);
+			});
+		}
 		else
 		{
 			console.log("already make uuid");
