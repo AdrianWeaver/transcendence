@@ -14,7 +14,7 @@ ENV VOLTA_HOME "/home/node/.volta"
 ENV PATH "$VOLTA_HOME/bin:$PATH"
 RUN curl https://get.volta.sh | bash
 
-RUN volta install node@18.12.0
+RUN volta install node@18.17.1
 
 RUN npm install -g @nestjs/cli
 RUN npm install -g pm2
