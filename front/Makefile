@@ -186,9 +186,10 @@ endif
 install: check_dev_image_build
 	@clear -x
 	@echo "Installation done\n\n"
-	@make -s -C . all
+	@make all
+
 clean:
-	rm -rf ./app/node_modules ./app/package-lock.json norm.report
+	rm -vrf ./app/node_modules ./app/package-lock.json norm.report
 ifneq ($(shell docker ps --filter "name=frontend" -q),)
 	docker kill frontend
 endif
@@ -202,5 +203,7 @@ ifneq ($(shell docker images -q $(DEV_IMAGE_NAME) 2>/dev/null),)
 endif
 
 re: fclean
-	make -s -C . install
-	make -s -C . all 
+	make install
+	make all 
+
+.PHONY: all re clean fclean show_help_after_install already_launch_serve warn_check_norm_bypass_agreement do_norm_bypass_check check_norm_bypass linter attach_run_serve create_container check_lock_before_install start_container attach_container_app_install install_app install_global check_dev_image_build install
