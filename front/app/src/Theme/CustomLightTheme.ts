@@ -18,7 +18,6 @@ const	CustomLightTheme = {
 		  paper: '#bbd8c0',
 		},
 	  }
-	// Custom theme options here
 };
 
 export default CustomLightTheme;
