@@ -4,7 +4,7 @@ import	displayStyle from "./config/DisplayStyle";
 import	fontConfig from "./config/FontConfig";
 
 import { Icon } from "@mui/material";
-import icon from "./assets/icon_pure_white.svg";
+import icon from "./assets/icon.svg";
 
 type	DisplayProps = {
 	display: string
