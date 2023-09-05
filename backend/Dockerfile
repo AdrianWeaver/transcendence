@@ -2,12 +2,20 @@ FROM debian:buster
 
 RUN apt update && apt upgrade -y
 
-RUN apt install -y nodejs npm curl git htop
+RUN apt install -y curl htop
 
-RUN npm install -g n 
-RUN n latest
+RUN groupadd -g 1000 node \
+&& useradd -lm -u 1000 -g 1000 node 
 
-RUN npm install -g nodemon
+#  if at school, comment out the following line
+# USER node
+
+ENV VOLTA_HOME "/home/node/.volta"
+ENV PATH "$VOLTA_HOME/bin:$PATH"
+RUN curl https://get.volta.sh | bash
+
+RUN volta install node@18.17.1
+
 RUN npm install -g @nestjs/cli
 RUN npm install -g pm2
 RUN npm install -g pm2-monit

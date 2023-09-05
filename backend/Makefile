@@ -155,7 +155,11 @@ else
 	@echo "Application is not installed"
 endif
 	@make -s -C . attach_container_app_install
+	@make -s -C . install_global
 	docker stop backend
+
+install_global:
+	@echo "cd /app && npm install" | docker exec -i backend /bin/bash
 
 check_dev_image_build:
 	@echo "Checking existing installation of previous dev server"
@@ -173,7 +177,7 @@ install: check_dev_image_build
 	@echo "Installation done\n\n"
 	@make -s -C . all
 clean:
-	rm -rf ./app/node_modules ./app/package-lock.json norm.report
+	rm -rf ./app/node_modules ./app/package-lock.json norm.report ./app/dist
 ifneq ($(shell docker ps --filter "name=backend" -q),)
 	docker kill backend
 endif

@@ -19,8 +19,8 @@ const	LoginSignupButton = () =>
 
 	return (
 		<>
-			<Button onClick={handleLoginButton}>Login</Button>
-			<Button onClick={handleSignupButton}>Signup</Button>
+			<Button onClick={handleLoginButton} color="inherit">Login</Button>
+			<Button onClick={handleSignupButton} color="inherit">Signup</Button>
 		</>
 	);
 };
