@@ -1,11 +1,18 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Game from "./Objects/Game";
 
-const	GameCanvas = () =>
+import { io } from "socket.io-client";
+
+const	TestBall = () =>
 {
+	const
+	[
+		connected,
+		setConnected
+	] = useState(false);
 	const game = new Game();
 	game.board.game = game;
 
@@ -66,6 +73,23 @@ const	GameCanvas = () =>
 	const pauseButtonRef = useRef<HTMLInputElement>(null);
 	const resumeButtonRef = useRef<HTMLInputElement>(null);
 
+	useEffect(() =>
+	{
+		const socket = io("http://localhost:3000",
+		{
+			autoConnect: false
+		});
+
+		console.log(socket);
+		socket.on("connect", () =>
+		{
+			console.log("Client connected");
+		});
+		socket.on("disconnect", () =>
+		{
+			console.log("Client disconnected");
+		});
+	}, []);
 
 	useEffect(() =>
 	{
@@ -129,10 +153,39 @@ const	GameCanvas = () =>
 		});
 	});
 
+	const	ConnectStateOn = () =>
+	{
+		return (
+			<>
+				online
+			</>
+		);
+	};
+
+	const	ConnecStateOff = () =>
+	{
+		return (
+			<>
+				offline
+			</>
+		);
+	};
+
 	return (
 		<>
 			<div style={{textAlign: "center"}}>
 				FT_TRANSCENDANCE
+			</div>
+			<div style={{textAlign: "center"}}>
+				Your connection :
+				{
+					(connected)
+					? <ConnectStateOn />
+					: <ConnecStateOff />
+				}
+			</div>
+			<div style={{textAlign: "center"}} >
+				number of client connected :
 			</div>
 			<br></br>
 			<div style={{textAlign: "center"}}>
@@ -151,4 +204,4 @@ const	GameCanvas = () =>
 	);
 };
 
-export default GameCanvas;
+export default TestBall;

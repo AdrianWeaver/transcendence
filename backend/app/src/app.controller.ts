@@ -18,7 +18,7 @@ export class AppController implements OnModuleInit
 	@Get("/server-status")
 	getServerStatus(): {success: string, availableSince: string}
 	{
-		this.logger.log("User request /server-status");
+		this.logger.log("User request /server-status here");
 		return (this.appService.getServerStatus());
 	}
 
