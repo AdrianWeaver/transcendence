@@ -1,6 +1,7 @@
 CREATE DATABASE blop;
 
 \c blop
+
 CREATE TABLE "User" (
   id SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR(255),
