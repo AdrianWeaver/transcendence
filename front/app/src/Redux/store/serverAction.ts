@@ -1,3 +1,5 @@
+/* eslint-disable curly */
+/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
 import	serverSlice from "./server-slice";
@@ -5,7 +7,10 @@ import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
 
-import { ServerModel } from "../models/redux-models";
+import
+{
+	ServerModel
+}	from "../models/redux-models";
 import ServerService from "../service/server-service";
 
 export const	serverActions = serverSlice.actions;
@@ -41,14 +46,72 @@ export const	resetConnexionAttempt = ()
 export const	increaseConnectionAttempt = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
+	console.log("Connection attempt ");
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
 		const	response: ServerModel = {
 			...prevState.server,
-			connexionAttempt: prevState.server.connexionAttempt + 1,
+			connexionAttempt:
+				(prevState.server.connexionAttempt >= 4)
+				? prevState.server.connexionAttempt
+				: prevState.server.connexionAttempt + 1,
 		};
 		dispatch(serverActions.increaseConnectionAttempt(response));
+	});
+};
+
+export const	resetState = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		const	response: ServerModel = {
+			isFetching: false,
+			connexionEnabled: false,
+			connexionAttempt: 0,
+			error: false,
+			message: "",
+			serverActiveSince: "unknow"
+		};
+		dispatch(serverActions.resetState(response));
+	});
+};
+
+export const	setServerConnectionErr = (basicErrMsg: string, fullMsg: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	// console.log("Failure to connect to server ");
+	// console.log("Basic err message : ", basicErrMsg);
+	// console.log("Full message :", fullMsg);
+	return (async (dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ServerModel = {
+			...prevState.server,
+			isFetching: false,
+			connexionEnabled: false,
+			error: true,
+			message: basicErrMsg + ": " + fullMsg
+		};
+		console.info("Response error", response);
+		dispatch(serverActions.setServerConnectionError(response));
+	});
+};
+
+export const	setServerConnectionSuccess = (activeSince: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ServerModel = {
+			...prevState.server,
+			serverActiveSince: activeSince,
+			connexionEnabled: true
+		};
+		// console.log(response);
+		dispatch(serverActions.setServerConnectionSuccess(response));
 	});
 };
 
@@ -59,48 +122,35 @@ export	const	getServerConnection = ()
 	return (async (dispatch, getState) =>
 	{
 		const	prevState = getState();
+		const	server = prevState.server;
 
-		// if (prevState.server.error)
-		// {
-		// 	console.log("Prevent always call to api");
-		// 	const	response: ServerModel = {
-		// 		...prevState.server
-		// 	};
-		// 	dispatch(serverActions.getServerConnection(response));
-		// }
-		// if (prevState.server.connexionAttempt > 3)
-		// {
-		// 	const response: ServerModel = {
-		// 		...prevState.server,
-		// 		error: true,
-		// 		message: "Connexion is lost with the backend"
-		// 		+ " check your internet connextion"
-		// 	};
-		// 	dispatch(serverActions.getServerConnection(response));
-		// }
-		// else
-		// {
+		// const	user = prevState.controller.user;
+
 		const	data = await ServerService.getConnection();
-
 		if (data.success === false)
 		{
-			const response: ServerModel = {
-				...prevState.server,
-				connexionAttempt: prevState.server.connexionAttempt + 1,
-			};
-			dispatch(serverActions.getServerConnection(response));
+			// console.log("data tyes", data);
+			dispatch(increaseConnectionAttempt());
+			if (server.connexionAttempt < 3)
+				setTimeout(() =>
+				{
+					dispatch(getServerConnection());
+				}, 1000);
+			else
+				dispatch(
+					setServerConnectionErr(data.errorMessage,
+						data.fullError.message));
 		}
 		else
-		{
-			const response: ServerModel = {
-				...prevState.server,
-				error: false,
-				message: "Successfully call the server",
-				connexionAttempt: 0,
-				connexionEnabled: true
-			};
-			dispatch(serverActions.getServerConnection(response));
-		}
-		// }
+			dispatch(setServerConnectionSuccess(data.availableSince));
+	});
+};
+
+export	const	setErrorService = (server: ServerModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		dispatch(setErrorService(server));
 	});
 };
