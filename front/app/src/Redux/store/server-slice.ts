@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 
 import
 {
@@ -7,12 +8,13 @@ import
 
 import { ServerModel } from "../models/redux-models";
 
-const	initialServerState: ServerModel = {
-	isFetching: false,
-	connexionEnabled: true,
+export const	initialServerState: ServerModel = {
+	isFetching: true,
+	connexionEnabled: false,
+	serverActiveSince: "unknow",
 	connexionAttempt: 0,
 	error: false,
-	message: ""
+	message: "",
 };
 
 const	serverSlice = createSlice(
@@ -36,6 +38,32 @@ const	serverSlice = createSlice(
 		increaseConnectionAttempt(state, action: PayloadAction<ServerModel>)
 		{
 			state.connexionAttempt = action.payload.connexionAttempt;
+		},
+		resetState(state, action: PayloadAction<ServerModel>)
+		{
+			state = action.payload;
+		},
+		setServerConnectionError(state, action: PayloadAction<ServerModel>)
+		{
+			state.error = action.payload.error;
+			state.connexionEnabled = action.payload.connexionEnabled;
+			state.error = action.payload.error;
+			state.message = action.payload.message;
+			state.serverActiveSince = action.payload.serverActiveSince;
+		},
+		setServerConnectionSuccess(state, action: PayloadAction<ServerModel>)
+		{
+			state.connexionEnabled = action.payload.connexionEnabled;
+			state.serverActiveSince = action.payload.serverActiveSince;
+			state.error = action.payload.error;
+			state.connexionAttempt = action.payload.connexionAttempt;
+			state.message = action.payload.message;
+			state.isFetching = action.payload.isFetching;
+		},
+		setErrorService(state, action: PayloadAction<ServerModel>)
+		{
+			state.error = action.payload.error;
+			state.message = action.payload.message;
 		}
 	}
 });

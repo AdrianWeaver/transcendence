@@ -94,7 +94,7 @@ const	StepZero = () =>
 	] = useState(locationIsARedirectedPage(query.pathname));
 
 
-	const	url = "https://api.intra.42.fr";
+	const	url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-02b8cd3d7697b316dbc57f3303fc08e7da9c40c93915e87d03e73090aed467c7&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code";
 	const	openSameTab = () =>
 	{
 		window.open(url, "_self");
