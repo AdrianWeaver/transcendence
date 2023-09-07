@@ -6,6 +6,8 @@ import Game from "./Objects/Game";
 
 import { io } from "socket.io-client";
 
+const	URL = "http://localhost:3000";
+
 const	TestBall = () =>
 {
 	const
@@ -75,19 +77,38 @@ const	TestBall = () =>
 
 	useEffect(() =>
 	{
-		const socket = io("http://localhost:3000",
+		const socket = io(URL,
 		{
-			autoConnect: false
+			autoConnect: false,
+			reconnectionAttempts: 5,
 		});
 
-		console.log(socket);
-		socket.on("connect", () =>
+		const connect = () =>
 		{
-			console.log("Client connected");
-		});
-		socket.on("disconnect", () =>
+			console.log("ws connected");
+			setConnected(true);
+		};
+
+		const disconnect = () =>
 		{
-			console.log("Client disconnected");
+			console.log("ws disconnected");
+			setConnected(false);
+		};
+
+		const	connectError = (error: Error) =>
+		{
+			console.error("ws_connect_error", error);
+		};
+
+		socket.on("connect", connect);
+		socket.on("disconnect", disconnect);
+		socket.on("error", connectError);
+		socket.connect();
+		return (() =>
+		{
+			socket.off("connect", connect);
+			socket.off("disconnect", disconnect);
+			socket.off("error", connectError);
 		});
 	}, []);
 

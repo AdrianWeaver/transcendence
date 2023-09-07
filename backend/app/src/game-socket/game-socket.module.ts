@@ -1,7 +1,11 @@
 
 import { Module } from "@nestjs/common";
+import { GameSocketEvents } from "./GameSocketEvents";
 
-@Module({})
+@Module({
+	providers:
+	[GameSocketEvents]
+})
 export class GameSocketModule
 {
 
