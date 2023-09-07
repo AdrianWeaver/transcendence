@@ -13,6 +13,7 @@ import MyProfile from "../Views/MyProfile/MyProfile";
 import Settings from "../Views/Settings/Settings";
 import PlayGame from "../Views/PlayGame/PlayGame";
 import GameCanvas from "../Views/GameCanvas/GameCanvas";
+import TestBall from "../Views/TestBall/TestBall";
 
 /**
  * This is the router for a logged user
@@ -59,12 +60,14 @@ const	LoggedRouter = () =>
 				<Route
 					path="/signup"
 					element={<Navigate to="/me/profile"/>}
-					>
-
-				</Route>
+				/>
 				<Route
 					path="the-game"
 					element={<GameCanvas />}
+				/>
+				<Route
+					path="test-ball"
+					element={<TestBall />}
 				/>
 				<Route
 					path="*"
