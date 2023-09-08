@@ -19,14 +19,14 @@ ifeq ($(DEV_APP_INSTALLATION_LOCKER), 0)
 	@echo "Starting the dev server"
 	@make -s -C . already_launch_serve
 	@make -s -C . start_container
-	@echo "$(ORANGE)Show help ? [y/n]$(NC)"
-	@read -r answer; \
-	if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
-		make -s -C . show_help_after_install; \
-	fi
+# @echo "$(ORANGE)Show help ? [y/n]$(NC)"
+# @read -r answer; \
+	# if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
+	# 	make -s -C . show_help_after_install; \
+	# fi
 	@echo "$(GREEN)Happy coding inside your host folder !!!$(NC)"
 else
-	@echo "Please install the dev server with 'make install'"
+	@make install
 endif
 
 show_help_after_install:
