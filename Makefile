@@ -22,7 +22,7 @@ clean_front:
 clean_back:
 	@cd backend && make clean
 
-clean_all: clean_front clean_back
+clean: clean_front clean_back
 
 fclean_front:
 	@cd front && make fclean
@@ -30,6 +30,6 @@ fclean_front:
 fclean_back:
 	@cd backend && make fclean
 
-fclean_all: fclean_front fclean_back
+fclean: fclean_front fclean_back
 
 .PHONY: all frontend backend clean_front clean_back fclean_front fclean_back clean_all fclean_all
