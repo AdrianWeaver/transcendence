@@ -11,10 +11,6 @@ const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "dark",
 	previousPage: "/",
-	anonymousUser:
-	{
-		uuid: NILUUID,
-	},
 	user:
 	{
 		isLoggedIn: false,

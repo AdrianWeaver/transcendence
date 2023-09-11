@@ -12,6 +12,7 @@ import Logout from "../Views/Logout/Logout";
 import MyProfile from "../Views/MyProfile/MyProfile";
 import Settings from "../Views/Settings/Settings";
 import PlayGame from "../Views/PlayGame/PlayGame";
+import GameCanvas from "../Views/GameCanvas/GameCanvas";
 
 /**
  * This is the router for a logged user
@@ -61,6 +62,10 @@ const	LoggedRouter = () =>
 					>
 
 				</Route>
+				<Route
+					path="the-game"
+					element={<GameCanvas />}
+				/>
 				<Route
 					path="*"
 					element={<h1>Error 404: Logged User</h1>}

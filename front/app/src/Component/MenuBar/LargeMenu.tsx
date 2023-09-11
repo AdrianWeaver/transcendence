@@ -57,7 +57,7 @@ const	LargeMenu = () =>
 				sx={
 				{
 					my: 2,
-					color: "white",
+					color: "black",
 					display: "block"
 				}}
 			>
@@ -75,7 +75,7 @@ const	LargeMenu = () =>
 				sx={
 				{
 					my: 2,
-					color: "white",
+					color: "black",
 					display: "block"
 				}}
 			>

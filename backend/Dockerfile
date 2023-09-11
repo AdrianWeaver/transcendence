@@ -1,11 +1,9 @@
 FROM debian:buster
-
 RUN apt update && apt upgrade -y
-
 RUN apt install -y curl htop
 
 RUN groupadd -g 1000 node \
-&& useradd -lm -u 1000 -g 1000 node 
+&& useradd -lm -u 1000 -g 1000 node
 
 #  if at school, comment out the following line
 # USER node
