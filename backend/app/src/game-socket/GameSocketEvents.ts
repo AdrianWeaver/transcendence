@@ -74,7 +74,6 @@ class	NodeAnimationFrame
 	{
 		origin: "*"
 	},
-	// namespace: "/game-engine-v2d"
 })
 export class GameSocketEvents
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -99,11 +98,6 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
-			// console.log(timestamp, frame);
-			// // console.log(frame);
-			// console.log("x: ", this.gameServe.ball.pos.x);
-			// console.log("y: ", this.gameServe.ball.pos.y);
-
 			this.update();
 			// console.log(this.gameServe);
 			// exit(1);
@@ -135,21 +129,37 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
-		console.log("DEBUG: A client is connected: " + client.id);
 		this.users += 1;
+
+		const	action = {
+			type: "connect",
+			payload: {
+				numberUsers: this.users
+			}
+		};
+
+		this.server.emit("player-info", action);
 	}
 
 	handleDisconnect(client: Socket)
 	{
-		// console.log("DEBUG: A client disconnected", client);
-		// if (this.users > 0)
 		this.users -= 1;
+
+		const	action = {
+			type: "disconnect",
+			payload: {
+				numberUsers: this.users
+			}
+		};
+
+		this.server.emit("player-info", action);
 	}
 
 	@SubscribeMessage("info")
 	handleInfo(
 		@MessageBody() data: string,
-		@ConnectedSocket() client: Socket)
+		@ConnectedSocket() client: Socket
+	)
 	{
 		// console.log(data);
 		if (data === "Get board size")

@@ -11,6 +11,7 @@ const	URL = "http://localhost:3000";
 
 const	TestBall = () =>
 {
+	/* local state */
 	const
 	[
 		connected,
@@ -20,6 +21,11 @@ const	TestBall = () =>
 	[
 		frameNumber,
 		setFrameNumber
+	] = useState(0);
+	const
+	[
+		numberOfUsers,
+		setNumberOfUsers
 	] = useState(0);
 
 	const
@@ -108,11 +114,18 @@ const	TestBall = () =>
 			);
 		};
 
+		const	newPlayer = (data: any) =>
+		{
+			console.log("new player incoming", data);
+			setNumberOfUsers(data.payload.numberUsers);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
+		socket.on("player-info", newPlayer);
 		socket.connect();
 
 		return (() =>
@@ -122,6 +135,7 @@ const	TestBall = () =>
 			socket.off("error", connectError);
 			socket.off("game-event", updateGame);
 			socket.off("info", initServerDim);
+			socket.off("player-info", newPlayer);
 		});
 	}, []);
 
@@ -159,27 +173,52 @@ const	TestBall = () =>
 
 	return (
 		<>
-			<div style={{textAlign: "center"}}>
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
 				FT_TRANSCENDANCE
 			</div>
 
 			{/* This part show the connection to the websocket */}
-			<div style={{textAlign: "center"}}>
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
 				<ConnectState connected={connected} />
 			</div>
 
 			{/* This part show the number of client connected */}
-			<div style={{textAlign: "center"}} >
-				number of client connected :
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				number of client connected : {numberOfUsers}
 			</div>
 
-			{/* /* This part show the frame number (the time of the server) */}
-			<div style={{textAlign: "center"}} >
-				frame number: {frameNumber} <br/>
+			{/* This part show the frame number */}
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				frame number (time server): {frameNumber} <br/>
 			</div>
 
 			{/* /* This part show more information */ }
-			<div style={{textAlign: "center"}} >
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
 				dimension width du server: {serverDim.width} <br />
 				dimension height du server: {serverDim.height} <br />
 				scale to server :
