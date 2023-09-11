@@ -11,11 +11,16 @@ import
 }	from "./anonymous-user/anonymous-user.controller";
 import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
+import { GameSocketModule } from "./game-socket/game-socket.module";
 
 
 @Module(
 {
-	imports: [AdminsModule],
+	imports:
+	[
+		AdminsModule,
+		GameSocketModule
+	],
 	controllers: [
 		AppController,
 		AnonymousUserController,
