@@ -47,37 +47,11 @@ const	TestBall = () =>
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
 
-	const	update = () =>
-	{
-		// will Update data from backend;
-		game.playerOne.updatePlayerPosition();
-		game.playerTwo.updatePlayerPosition();
-
-		game.ball.update();
-	};
-
+	// cleaned 
 	const clear = () =>
 	{
-		if (game.board.ctx)
-		{
-			console.log("clear executed from testball");
-			game.board.ctx.fillStyle = "#fff";
-			// game.board.ctx?.clearRect(0, 0,
-			// 	game.board.dim.width, game.board.dim.height);
-		}
+		return ;
 	};
-
-	const pauseButtonRef = useRef<HTMLInputElement>(null);
-	const resumeButtonRef = useRef<HTMLInputElement>(null);
-
-	// useEffect(() =>
-	// {
-	// 	setDim(
-	// 	{
-	// 		width: game.board.dim.width,
-	// 		height: game.board.dim.height
-	// 	});
-	// }, []);
 
 	useEffect(() =>
 	{
@@ -105,37 +79,16 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		const	render = () =>
+		// change GameEvent to a more appropriate name
+		const	updateGame = (data: any) =>
 		{
-			clear();
-			update();
-
-			game.board.ctx?.beginPath();
-			if (game.board.ctx)
-			{
-				game.board.ctx.fillStyle = "#F5F5DC";
-				game.board.ctx.fillRect(0, 0, game.board.dim.width,
-					game.board.dim.height);
-			}
-			game.net.render();
-			game.ball.render();
-			game.playerOne.render();
-			game.playerTwo.render();
-			game.playerOne.renderScore();
-			game.playerTwo.renderScore();
-		};
-
-		const	gameEvent = (data: any) =>
-		{
-			// console.log(data);
 			setFrameNumber(data.frameNumber);
 			game.ball.move(
 				data.ballPos.x / scaleServer.width,
 				data.ballPos.y / scaleServer.height);
-			// render();
 		};
 
-		const	setServerDimEvent = (data: any) =>
+		const	initServerDim = (data: any) =>
 		{
 			setServerDim(
 			{
@@ -152,22 +105,20 @@ const	TestBall = () =>
 			}
 			);
 		};
-		// addEventListener("resize", setServerDimEvent);
 
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
-		socket.on("game-event", gameEvent);
-		socket.on("info", setServerDimEvent);
+		socket.on("game-event", updateGame);
+		socket.on("info", initServerDim);
 		socket.connect();
 		return (() =>
 		{
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
-			socket.off("game-event", gameEvent);
-			socket.off("info", setServerDimEvent);
-			// removeEventListener("resize", setServerDimEvent);
+			socket.off("game-event", updateGame);
+			socket.off("info", initServerDim);
 		});
 	}, []);
 
@@ -180,14 +131,10 @@ const	TestBall = () =>
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
-		// addEventListener("keydown", keyHookDown);
-		// addEventListener("keyup", keyHookReleased);
-		// addEventListener("keypress", keyEnter);
 
 		const	render = () =>
 		{
 			clear();
-			update();
 
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
@@ -225,6 +172,9 @@ const	TestBall = () =>
 		);
 	};
 
+	console.log("Dimension of the client",
+	game.board.canvas?.width, game.board.canvas?.height);
+
 	return (
 		<>
 			<div style={{textAlign: "center"}}>
@@ -248,8 +198,11 @@ const	TestBall = () =>
 			<div style={{textAlign: "center"}} >
 				dimension width du server: {serverDim.width} <br />
 				dimension height du server: {serverDim.height} <br />
-				dimension width du client : {game.board.canvas?.width} <br />
-				dimension height du client: {game.board.canvas?.height} 
+				scale to server :
+					scale_width: {scaleServer.width},
+					scale_height: {scaleServer.height} <br />
+				dimension width du client : {game.board.dim.width} <br />
+				dimension height du client: {game.board.dim.height} <br />
 			</div>
 			<div style={{textAlign: "center"}}>
 				<canvas
