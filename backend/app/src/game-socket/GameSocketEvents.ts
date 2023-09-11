@@ -12,14 +12,16 @@ import
 } from "@nestjs/websockets";
 
 import { Server, Socket } from "socket.io";
+import GameServe from "./Objects/GameServe";
+import { exit } from "process";
 
-class	GameServe
-{
-	// constructor()
-	// {
+// class	GameServe
+// {
+// 	constructor()
+// 	{
 
-	// }
-}
+// 	}
+// }
 
 class	NodeAnimationFrame
 {
@@ -80,14 +82,36 @@ export class GameSocketEvents
 	loop: NodeAnimationFrame;
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
+	update: () => void;
 
 	public	constructor()
 	{
+		this.update = () =>
+		{
+			this.gameServe.playerOne.updatePlayerPosition();
+			this.gameServe.playerTwo.updatePlayerPosition();
+
+			this.gameServe.ball.update();
+		};
+
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
 			// console.log(timestamp, frame);
-			// console.log(frame);
-			this.server.volatile.emit("game-event", {data: frame});
+			// // console.log(frame);
+			// console.log("x: ", this.gameServe.ball.pos.x);
+			// console.log("y: ", this.gameServe.ball.pos.y);
+
+			this.update();
+			// console.log(this.gameServe);
+			// exit(1);
+			this.server.volatile.emit("game-event",
+			{
+				frameNumber: frame,
+				ballPos: {
+					x: this.gameServe.ball.pos.x,
+					y: this.gameServe.ball.pos.y,
+				}
+			});
 		};
 	}
 
@@ -98,6 +122,11 @@ export class GameSocketEvents
 		this.loop = new NodeAnimationFrame();
 		// console.log("DEBUG: Server gateway initialized :", server);
 		this.loop.callbackFunction = this.printPerformance;
+		this.gameServe = new GameServe();
+		this.gameServe.ball.game = this.gameServe;
+		this.gameServe.board.game = this.gameServe;
+		this.gameServe.net.game = this.gameServe;
+		this.gameServe.board.init();
 		this.loop.update(performance.now());
 	}
 
@@ -110,8 +139,7 @@ export class GameSocketEvents
 	handleDisconnect(client: Socket)
 	{
 		// console.log("DEBUG: A client disconnected", client);
+		// if (this.users > 0)
 		this.users -= 1;
 	}
-
-
 }
