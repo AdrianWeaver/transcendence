@@ -17,6 +17,7 @@ import
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
 import { exit } from "process";
+import { type } from "os";
 
 // class	GameServe
 // {
@@ -68,6 +69,11 @@ class	NodeAnimationFrame
 	}
 }
 
+type	ActionSocket = {
+	type: string,
+	payload?: any
+};
+
 @WebSocketGateway(
 {
 	cors:
@@ -81,6 +87,8 @@ export class GameSocketEvents
 	@WebSocketServer()
 	server: Server;
 	users: number;
+	userReady: number;
+	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
@@ -88,6 +96,7 @@ export class GameSocketEvents
 
 	public	constructor()
 	{
+		this.userReady = 0;
 		this.update = () =>
 		{
 			this.gameServe.playerOne.updatePlayerPosition();
@@ -99,8 +108,6 @@ export class GameSocketEvents
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
 			this.update();
-			// console.log(this.gameServe);
-			// exit(1);
 			this.server.volatile.emit("game-event",
 			{
 				frameNumber: frame,
@@ -129,6 +136,7 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
+		// need to verify the user if already exist or not
 		this.users += 1;
 
 		const	action = {
@@ -145,24 +153,62 @@ export class GameSocketEvents
 	{
 		this.users -= 1;
 
+		const	wasReady = this.socketIdReady.findIndex((element) =>
+		{
+			return (element === client.id);
+		});
+		if (wasReady !== -1)
+		{
+			this.socketIdReady.splice(wasReady, 1);
+			this.userReady--;
+		}
+
 		const	action = {
 			type: "disconnect",
 			payload: {
 				numberUsers: this.users
 			}
 		};
-
 		this.server.emit("player-info", action);
 	}
 
 	@SubscribeMessage("info")
 	handleInfo(
-		@MessageBody() data: string,
+		@MessageBody() data: ActionSocket,
 		@ConnectedSocket() client: Socket
 	)
 	{
-		// console.log(data);
-		if (data === "Get board size")
+		if (data.type === "GET_BOARD_SIZE")
 			client.emit("info", this.gameServe.board.dim);
+	}
+
+	@SubscribeMessage("game-event")
+	handleGameEvent(
+		@MessageBody() data: ActionSocket,
+		@ConnectedSocket() client: Socket
+	)
+	{
+		if (data.type === "ready")
+		{
+			const search = this.socketIdReady.find((element) =>
+			{
+				return (element === client.id);
+			});
+
+			// We check if user isn't already in the array
+			if (search === undefined)
+			{
+				this.socketIdReady.push(client.id);
+				this.userReady++;
+
+				const	action = {
+					type: "ready-player",
+					payload: {
+						userReadyCount: this.userReady
+					}
+				};
+				this.server.emit("player-info", action);
+			}
+		}
 	}
 }

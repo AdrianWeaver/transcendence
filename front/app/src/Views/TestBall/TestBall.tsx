@@ -7,11 +7,28 @@ import Game from "./Objects/Game";
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
 
+
 const	URL = "http://localhost:3000";
+
+type	ActionSocket = {
+	type: string,
+	payload?: any
+};
 
 const	TestBall = () =>
 {
 	/* local state */
+	const
+	[
+		readyPlayer,
+		setReadyPlayer
+	] = useState(false);
+
+	const
+	[
+		readyPlayerCount,
+		setReadyPlayerCount
+	] = useState(0);
 	const
 	[
 		connected,
@@ -37,6 +54,7 @@ const	TestBall = () =>
 		width: 0,
 		height: 0
 	});
+
 	const
 	[
 		scaleServer,
@@ -47,18 +65,14 @@ const	TestBall = () =>
 		height: 1
 	});
 
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
 	const game = new Game();
 	game.board.game = game;
 	game.ball.game = game;
 	game.net.game = game;
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
-
-	// cleaned 
-	const clear = () =>
-	{
-		return ;
-	};
 
 	useEffect(() =>
 	{
@@ -68,16 +82,21 @@ const	TestBall = () =>
 			reconnectionAttempts: 5,
 		});
 
+		socketRef.current = socket;
+
 		const connect = () =>
 		{
-			console.log("ws connected");
-			socket.emit("info", "Get board size");
+			// console.log("ws connected");
+			const	action = {
+				type: "GET_BOARD_SIZE"
+			};
+			socket.emit("info", action);
 			setConnected(true);
 		};
 
 		const disconnect = () =>
 		{
-			console.log("ws disconnected");
+			// console.log("ws disconnected");
 			setConnected(false);
 		};
 
@@ -86,8 +105,7 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		// change GameEvent 
-		//   to a more appropriate name
+		// change GameEvent to a more appropriate name
 		const	updateGame = (data: any) =>
 		{
 			setFrameNumber(data.frameNumber);
@@ -114,10 +132,21 @@ const	TestBall = () =>
 			);
 		};
 
-		const	newPlayer = (data: any) =>
+		const	playerInfo = (data: any) =>
 		{
-			console.log("new player incoming", data);
-			setNumberOfUsers(data.payload.numberUsers);
+			console.log(data);
+			switch (data.type)
+			{
+				case "connect":
+				case "disconnect":
+					setNumberOfUsers(data.payload.numberUsers);
+					break ;
+				case "ready-player":
+					setReadyPlayerCount(data.payload.userReadyCount);
+					break ;
+				default:
+					break ;
+			}
 		};
 
 		socket.on("connect", connect);
@@ -125,7 +154,7 @@ const	TestBall = () =>
 		socket.on("error", connectError);
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
-		socket.on("player-info", newPlayer);
+		socket.on("player-info", playerInfo);
 		socket.connect();
 
 		return (() =>
@@ -135,7 +164,7 @@ const	TestBall = () =>
 			socket.off("error", connectError);
 			socket.off("game-event", updateGame);
 			socket.off("info", initServerDim);
-			socket.off("player-info", newPlayer);
+			socket.off("player-info", playerInfo);
 		});
 	}, []);
 
@@ -151,8 +180,6 @@ const	TestBall = () =>
 
 		const	render = () =>
 		{
-			clear();
-
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -170,6 +197,18 @@ const	TestBall = () =>
 			cancelAnimationFrame(requestId);
 		});
 	}, []);
+
+	const	setReadyAction = () =>
+	{
+		if (readyPlayer === false)
+		{
+			const	action = {
+				type: "ready"
+			};
+			console.log("ready action", action);
+			socketRef.current?.emit("game-event", action);
+		}
+	};
 
 	return (
 		<>
@@ -199,7 +238,8 @@ const	TestBall = () =>
 					fontSize: "8px"
 				}}
 			>
-				number of client connected : {numberOfUsers}
+				number of client connected : {numberOfUsers}<br/>
+				number of client ready : {readyPlayerCount}
 			</div>
 
 			{/* This part show the frame number */}
@@ -227,7 +267,14 @@ const	TestBall = () =>
 				dimension width du client : {game.board.dim.width} <br />
 				dimension height du client: {game.board.dim.height} <br />
 			</div>
-
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				<button onClick={setReadyAction}>I'm ready</button>
+			</div>
 			{/* This is the canvas part */}
 			<div style={{textAlign: "center"}}>
 				<canvas
