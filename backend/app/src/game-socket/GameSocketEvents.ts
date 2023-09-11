@@ -4,9 +4,12 @@
 // eslint-disable-next-line max-classes-per-file
 import
 {
+	ConnectedSocket,
+	MessageBody,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 	OnGatewayInit,
+	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer
 } from "@nestjs/websockets";
@@ -141,5 +144,18 @@ export class GameSocketEvents
 		// console.log("DEBUG: A client disconnected", client);
 		// if (this.users > 0)
 		this.users -= 1;
+	}
+
+	@SubscribeMessage("info")
+	handleInfo(
+		@MessageBody() data: string,
+		@ConnectedSocket() client: Socket)
+	{
+		// console.log(data);
+		if (data === "Get board size")
+		{
+			// console.log(this.server);
+			client.emit("info", this.gameServe.board.dim);
+		}
 	}
 }

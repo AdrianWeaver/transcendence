@@ -93,8 +93,8 @@ class Board
 		this.init = () =>
 		{
 			// const windowWidth = window.innerWidth;
-			const	windowWidth = 662;
-			this.dim.width = windowWidth * 0.66;
+			// const	windowWidth = 4096;
+			this.dim.width = 4096;
 			this.setHeight();
 			// if (this.canvas)
 			// {

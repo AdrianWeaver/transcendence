@@ -35,7 +35,7 @@ class Game
 		this.net = new Net();
 		this.actionKeyPress = -1;
 		this.scoreLimit = 7;
-		this.startDisplayed = true;
+		this.startDisplayed = false;
 		this.continueAnimating = false;
 		this.displayStartMessage = () =>
 		{
