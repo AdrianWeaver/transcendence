@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Game from "./Objects/Game";
 
 import { io } from "socket.io-client";
+import ConnectState from "./Component/ConnectState";
 
 const	URL = "http://localhost:3000";
 
@@ -79,7 +80,8 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		// change GameEvent to a more appropriate name
+		// change GameEvent 
+		//   to a more appropriate name
 		const	updateGame = (data: any) =>
 		{
 			setFrameNumber(data.frameNumber);
@@ -112,6 +114,7 @@ const	TestBall = () =>
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
 		socket.connect();
+
 		return (() =>
 		{
 			socket.off("connect", connect);
@@ -154,47 +157,28 @@ const	TestBall = () =>
 		});
 	}, []);
 
-	const	ConnectStateOn = () =>
-	{
-		return (
-			<>
-				online
-			</>
-		);
-	};
-
-	const	ConnecStateOff = () =>
-	{
-		return (
-			<>
-				offline
-			</>
-		);
-	};
-
-	console.log("Dimension of the client",
-	game.board.canvas?.width, game.board.canvas?.height);
-
 	return (
 		<>
 			<div style={{textAlign: "center"}}>
 				FT_TRANSCENDANCE
 			</div>
+
+			{/* This part show the connection to the websocket */}
 			<div style={{textAlign: "center"}}>
-				Your connection :
-				{
-					(connected)
-					? <ConnectStateOn />
-					: <ConnecStateOff />
-				}
+				<ConnectState connected={connected} />
 			</div>
+
+			{/* This part show the number of client connected */}
 			<div style={{textAlign: "center"}} >
 				number of client connected :
 			</div>
+
+			{/* /* This part show the frame number (the time of the server) */}
 			<div style={{textAlign: "center"}} >
-				frame number: {frameNumber}
+				frame number: {frameNumber} <br/>
 			</div>
-			<br></br>
+
+			{/* /* This part show more information */ }
 			<div style={{textAlign: "center"}} >
 				dimension width du server: {serverDim.width} <br />
 				dimension height du server: {serverDim.height} <br />
@@ -204,6 +188,8 @@ const	TestBall = () =>
 				dimension width du client : {game.board.dim.width} <br />
 				dimension height du client: {game.board.dim.height} <br />
 			</div>
+
+			{/* This is the canvas part */}
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}
