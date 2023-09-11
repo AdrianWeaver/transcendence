@@ -73,7 +73,6 @@ class Game
 			this.playerOne.side = "left";
 			this.playerTwo.racket.game = this;
 			this.playerTwo.side = "right";
-
 			const border = this.board.dim.width * 0.01;
 			this.playerOne.pos.x = border;
 			this.playerOne.pos.y = border;

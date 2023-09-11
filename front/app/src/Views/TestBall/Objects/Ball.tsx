@@ -85,6 +85,13 @@ class Ball
 		};
 		this.move = () =>
 		{
+			// console.log("Element to send to server :",
+			// 	{
+			// 		ballPos: {
+			// 			x: this.pos.x,
+			// 			y: this.pos.y
+			// 		}
+			// 	});
 			if (this.game && this.game.continueAnimating === true)
 			{
 				const newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;

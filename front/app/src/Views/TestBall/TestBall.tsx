@@ -15,6 +15,11 @@ const	TestBall = () =>
 		connected,
 		setConnected
 	] = useState(false);
+	const
+	[
+		frameNumber,
+		setFrameNumber
+	] = useState(0);
 	const game = new Game();
 	game.board.game = game;
 
@@ -100,15 +105,23 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
+		const	gameEvent = (data: any) =>
+		{
+			console.log(data.data);
+			setFrameNumber(data.data);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
+		socket.on("game-event", gameEvent);
 		socket.connect();
 		return (() =>
 		{
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
+			socket.off("game-event", gameEvent);
 		});
 	}, []);
 
@@ -207,6 +220,9 @@ const	TestBall = () =>
 			</div>
 			<div style={{textAlign: "center"}} >
 				number of client connected :
+			</div>
+			<div style={{textAlign: "center"}} >
+				frame number: {frameNumber}
 			</div>
 			<br></br>
 			<div style={{textAlign: "center"}}>
