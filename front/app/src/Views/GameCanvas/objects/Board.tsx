@@ -55,6 +55,7 @@ class Board
 
 			this.dim.width = canvasWidth;
 			this.dim.height = canvasHeight;
+			console.log(this.dim);
 			if (this.canvas)
 			{
 				this.canvas.width = this.dim.width;

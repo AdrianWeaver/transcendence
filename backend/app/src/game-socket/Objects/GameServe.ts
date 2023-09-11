@@ -5,7 +5,7 @@ import Board from "./Board";
 import Ball from "./Ball";
 import Net from "./Net";
 
-class Game
+class GameServe
 {
 	public uuid: number | undefined;
 	public frameRate: number | undefined;
@@ -35,36 +35,36 @@ class Game
 		this.net = new Net();
 		this.actionKeyPress = -1;
 		this.scoreLimit = 7;
-		this.startDisplayed = false;
-		this.continueAnimating = false;
-		this.displayStartMessage = () =>
-		{
-			if (this.board.ctx)
-			{
-				this.board.ctx.fillStyle = "#000";
-				const pixels = this.board.dim.width * 0.05;
-				this.board.ctx.font = pixels + "px bald Arial";
-				const text = "Press ENTER to start :)";
-				const textWidth = this.board.ctx.measureText(text).width;
-				this.board.ctx.fillText(text,
-					(this.board.dim.width / 2 - textWidth / 2),
-					(this.board.dim.height * 0.3));
-			}
-		};
-		this.displayEndMessage = () =>
-		{
-			if (this.board.ctx)
-			{
-				this.board.ctx.fillStyle = "#000";
-				const pixels = this.board.dim.width * 0.05;
-				this.board.ctx.font = pixels + "px bald Arial";
-				const text = "End of game !";
-				const textWidth = this.board.ctx.measureText(text).width;
-				this.board.ctx.fillText(text,
-					(this.board.dim.width / 2 - textWidth / 2),
-					(this.board.dim.height * 0.3));
-			}
-		};
+		this.startDisplayed = true;
+		this.continueAnimating = true;
+		// this.displayStartMessage = () =>
+		// {
+		// 	if (this.board.ctx)
+		// 	{
+		// 		this.board.ctx.fillStyle = "#000";
+		// 		const pixels = this.board.dim.width * 0.05;
+		// 		this.board.ctx.font = pixels + "px bald Arial";
+		// 		const text = "Press ENTER to start :)";
+		// 		const textWidth = this.board.ctx.measureText(text).width;
+		// 		this.board.ctx.fillText(text,
+		// 			(this.board.dim.width / 2 - textWidth / 2),
+		// 			(this.board.dim.height * 0.3));
+		// 	}
+		// };
+		// this.displayEndMessage = () =>
+		// {
+		// 	if (this.board.ctx)
+		// 	{
+		// 		this.board.ctx.fillStyle = "#000";
+		// 		const pixels = this.board.dim.width * 0.05;
+		// 		this.board.ctx.font = pixels + "px bald Arial";
+		// 		const text = "End of game !";
+		// 		const textWidth = this.board.ctx.measureText(text).width;
+		// 		this.board.ctx.fillText(text,
+		// 			(this.board.dim.width / 2 - textWidth / 2),
+		// 			(this.board.dim.height * 0.3));
+		// 	}
+		// };
 		this.initPlayers = () =>
 		{
 			this.playerOne.game = this;
@@ -86,4 +86,4 @@ class Game
 	}
 }
 
-export default Game;
+export default GameServe;

@@ -15,18 +15,44 @@ const	TestBall = () =>
 		connected,
 		setConnected
 	] = useState(false);
+	const
+	[
+		frameNumber,
+		setFrameNumber
+	] = useState(0);
+
+	const
+	[
+		serverDim,
+		setServerDim
+	] = useState(
+	{
+		width: 0,
+		height: 0
+	});
+	const
+	[
+		scaleServer,
+		setScaleServer
+	] = useState(
+	{
+		width: 1,
+		height: 1
+	});
+
 	const game = new Game();
 	game.board.game = game;
-
 	game.ball.game = game;
 	game.net.game = game;
-
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
+
 	const	update = () =>
 	{
+		// will Update data from backend;
 		game.playerOne.updatePlayerPosition();
 		game.playerTwo.updatePlayerPosition();
+
 		game.ball.update();
 	};
 
@@ -34,46 +60,24 @@ const	TestBall = () =>
 	{
 		if (game.board.ctx)
 		{
+			console.log("clear executed from testball");
 			game.board.ctx.fillStyle = "#fff";
-			game.board.ctx?.clearRect(0, 0,
-				game.board.dim.width, game.board.dim.height);
+			// game.board.ctx?.clearRect(0, 0,
+			// 	game.board.dim.width, game.board.dim.height);
 		}
-	};
-
-	const	keyHookDown = (e: KeyboardEvent) =>
-	{
-		switch (e.code)
-		{
-			case "ArrowUp":
-				game.actionKeyPress = 38;
-				break;
-			case "ArrowDown":
-				game.actionKeyPress = 40;
-				break;
-			case "KeyS":
-				game.actionKeyPress = 83;
-				break;
-			case "KeyW":
-				game.actionKeyPress = 87;
-				break;
-			default:
-				break;
-		}
-	};
-
-	const	keyHookReleased = () =>
-	{
-		game.actionKeyPress = -1;
-	};
-
-	const keyEnter = () =>
-	{
-		game.continueAnimating = true;
-		game.startDisplayed = false;
 	};
 
 	const pauseButtonRef = useRef<HTMLInputElement>(null);
 	const resumeButtonRef = useRef<HTMLInputElement>(null);
+
+	// useEffect(() =>
+	// {
+	// 	setDim(
+	// 	{
+	// 		width: game.board.dim.width,
+	// 		height: game.board.dim.height
+	// 	});
+	// }, []);
 
 	useEffect(() =>
 	{
@@ -86,6 +90,7 @@ const	TestBall = () =>
 		const connect = () =>
 		{
 			console.log("ws connected");
+			socket.emit("info", "Get board size");
 			setConnected(true);
 		};
 
@@ -99,33 +104,6 @@ const	TestBall = () =>
 		{
 			console.error("ws_connect_error", error);
 		};
-
-		socket.on("connect", connect);
-		socket.on("disconnect", disconnect);
-		socket.on("error", connectError);
-		socket.connect();
-		return (() =>
-		{
-			socket.off("connect", connect);
-			socket.off("disconnect", disconnect);
-			socket.off("error", connectError);
-		});
-	}, []);
-
-	useEffect(() =>
-	{
-		let requestId: number;
-		const canvas = canvasRef.current;
-		const pauseButton = pauseButtonRef.current;
-		const resumeButton = resumeButtonRef.current;
-
-		const ctx = canvas?.getContext("2d");
-		game.board.canvas = canvas;
-		game.board.ctx = ctx;
-		game.board.init();
-		addEventListener("keydown", keyHookDown);
-		addEventListener("keyup", keyHookReleased);
-		addEventListener("keypress", keyEnter);
 
 		const	render = () =>
 		{
@@ -145,26 +123,81 @@ const	TestBall = () =>
 			game.playerTwo.render();
 			game.playerOne.renderScore();
 			game.playerTwo.renderScore();
-			if (game.startDisplayed === true)
-				game.displayStartMessage();
-			if (game.startDisplayed === false)
+		};
+
+		const	gameEvent = (data: any) =>
+		{
+			// console.log(data);
+			setFrameNumber(data.frameNumber);
+			game.ball.move(
+				data.ballPos.x / scaleServer.width,
+				data.ballPos.y / scaleServer.height);
+			// render();
+		};
+
+		const	setServerDimEvent = (data: any) =>
+		{
+			setServerDim(
 			{
-				pauseButton?.addEventListener("click", function()
-				{
-					game.continueAnimating = false;
-				});
-				resumeButton?.addEventListener("click", function()
-				{
-					game.continueAnimating = true;
-				});
-				if (game.playerOne.score === 7
-					|| game.playerTwo.score === 7)
-				{
-					game.continueAnimating = false;
-					game.displayEndMessage();
-					game.ball.init();
-				}
+				width: data.width,
+				height: data.height
+			});
+			const	ratioWidth = data.width / game.board.dim.width;
+			const	ratioHeight = data.height / game.board.dim.height;
+			console.log("Ration Width and height", ratioWidth, ratioHeight);
+			setScaleServer(
+			{
+				width: ratioWidth,
+				height: ratioHeight
 			}
+			);
+		};
+		// addEventListener("resize", setServerDimEvent);
+
+		socket.on("connect", connect);
+		socket.on("disconnect", disconnect);
+		socket.on("error", connectError);
+		socket.on("game-event", gameEvent);
+		socket.on("info", setServerDimEvent);
+		socket.connect();
+		return (() =>
+		{
+			socket.off("connect", connect);
+			socket.off("disconnect", disconnect);
+			socket.off("error", connectError);
+			socket.off("game-event", gameEvent);
+			socket.off("info", setServerDimEvent);
+			// removeEventListener("resize", setServerDimEvent);
+		});
+	}, []);
+
+	useEffect(() =>
+	{
+		let requestId: number;
+		const canvas = canvasRef.current;
+
+		const ctx = canvas?.getContext("2d");
+		game.board.canvas = canvas;
+		game.board.ctx = ctx;
+		game.board.init();
+		// addEventListener("keydown", keyHookDown);
+		// addEventListener("keyup", keyHookReleased);
+		// addEventListener("keypress", keyEnter);
+
+		const	render = () =>
+		{
+			clear();
+			update();
+
+			game.board.ctx?.beginPath();
+			if (game.board.ctx)
+			{
+				game.board.ctx.fillStyle = "#F5F5DC";
+				game.board.ctx.fillRect(0, 0, game.board.dim.width,
+					game.board.dim.height);
+			}
+			game.net.render();
+			game.ball.render();
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -172,7 +205,7 @@ const	TestBall = () =>
 		{
 			cancelAnimationFrame(requestId);
 		});
-	});
+	}, []);
 
 	const	ConnectStateOn = () =>
 	{
@@ -208,7 +241,16 @@ const	TestBall = () =>
 			<div style={{textAlign: "center"}} >
 				number of client connected :
 			</div>
+			<div style={{textAlign: "center"}} >
+				frame number: {frameNumber}
+			</div>
 			<br></br>
+			<div style={{textAlign: "center"}} >
+				dimension width du server: {serverDim.width} <br />
+				dimension height du server: {serverDim.height} <br />
+				dimension width du client : {game.board.canvas?.width} <br />
+				dimension height du client: {game.board.canvas?.height} 
+			</div>
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}
@@ -216,10 +258,6 @@ const	TestBall = () =>
 					ref={game.board.canvasRef}
 				>
 				</canvas>
-			</div>
-			<div style={{textAlign: "center"}}>
-				<input type="button" value="PAUSE" ref={pauseButtonRef} />
-				<input type="button" value="RESUME" ref={resumeButtonRef} />
 			</div>
 		</>
 	);

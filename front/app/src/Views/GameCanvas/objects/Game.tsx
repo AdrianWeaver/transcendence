@@ -36,7 +36,7 @@ class Game
 		this.actionKeyPress = -1;
 		this.scoreLimit = 7;
 		this.startDisplayed = true;
-		this.continueAnimating = false;
+		this.continueAnimating = true;
 		this.displayStartMessage = () =>
 		{
 			if (this.board.ctx)

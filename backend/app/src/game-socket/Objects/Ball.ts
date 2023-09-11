@@ -2,7 +2,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
-import Game from "./Game";
+import Game from "./GameServe";
 import Position from "./Position";
 
 class Ball
@@ -22,7 +22,7 @@ class Ball
 	public init: () => void;
 	public update: () => void;
 	public render: () => void;
-	public move: (x: number, y: number) => void;
+	public move: () => void;
 	public wasTopWallHit: () => void;
 	public wasBottomWallHit: () => void;
 	public degreesToRadians: (degrees: number) => number;
@@ -69,24 +69,69 @@ class Ball
 			if (this.game)
 			{
 				this.radius = this.game.board.dim.width * 0.012;
-				// this.move();
+				this.move();
 			}
 		};
 		this.render = () =>
 		{
-			if (this.game && this.game.board && this.game.board.ctx)
-			{
-				this.radius = this.game.board.dim.width * 0.012;
-				this.game.board.ctx.beginPath();
-				this.game.board.ctx.arc(this.pos.x, this.pos.y, this.radius,
-										this.startAngle, this.endAngle);
-				this.game.board.ctx.fill();
-			}
+			// if (this.game && this.game.board && this.game.board.ctx)
+			// {
+			// 	this.radius = this.game.board.dim.width * 0.012;
+			// 	this.game.board.ctx.beginPath();
+			// 	this.game.board.ctx.arc(this.pos.x, this.pos.y, this.radius,
+			// 							this.startAngle, this.endAngle);
+			// 	this.game.board.ctx.fill();
+			// }
 		};
-		this.move = (x: number, y: number) =>
+		this.move = () =>
 		{
-			this.pos.x = x;
-			this.pos.y = y;
+			// console.log("Element to send to server :",
+			// 	{
+			// 		ballPos: {
+			// 			x: this.pos.x,
+			// 			y: this.pos.y
+			// 		}
+			// 	});
+			if (this.game && this.game.continueAnimating === true)
+			{
+				const newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
+				const newPosY = this.pos.y
+								+ Math.sin(this.angle) * this.speedX;
+				const rp = this.game.playerTwo.isRightPlayer(newPosX, newPosY);
+				if (this.game.playerOne.isLeftPlayer(newPosX, newPosY) === true)
+				{
+					this.angle = Math.PI - this.angle;
+					this.angle = this.degreesToRadians(0);
+					this.angle -= this.degreesToRadians(this.getBounceAngle());
+				}
+				else if (rp === true)
+				{
+					this.pos.x = this.game.playerTwo.pos.x - this.radius;
+					this.angle = Math.PI - this.angle;
+					this.angle += this.degreesToRadians(this.getBounceAngle());
+				}
+				else
+				{
+					this.pos.x += Math.cos(this.angle) * this.speedX;
+					this.pos.y += Math.sin(this.angle) * this.speedX;
+				}
+				this.wasTopWallHit();
+				this.wasBottomWallHit();
+				if (this.pos.x <= 0)
+				{
+					this.game.playerTwo.score += 1;
+					// this.failedAudio.play();
+					this.angle = this.degreesToRadians(180);
+					this.init();
+				}
+				if (this.pos.x >= this.game.board.dim.width)
+				{
+					this.game.playerOne.score += 1;
+					// this.failedAudio.play();
+					this.angle = this.degreesToRadians(0);
+					this.init();
+				}
+			}
 		};
 		this.wasTopWallHit = () =>
 		{
@@ -162,8 +207,3 @@ class Ball
 }
 
 export default Ball;
-
-
-/*
-computeSpeed
-*/
