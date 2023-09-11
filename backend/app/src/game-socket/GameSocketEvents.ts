@@ -153,9 +153,6 @@ export class GameSocketEvents
 	{
 		// console.log(data);
 		if (data === "Get board size")
-		{
-			// console.log(this.server);
 			client.emit("info", this.gameServe.board.dim);
-		}
 	}
 }

@@ -21,6 +21,25 @@ const	TestBall = () =>
 		setFrameNumber
 	] = useState(0);
 
+	const
+	[
+		serverDim,
+		setServerDim
+	] = useState(
+	{
+		width: 0,
+		height: 0
+	});
+	const
+	[
+		scaleServer,
+		setScaleServer
+	] = useState(
+	{
+		width: 1,
+		height: 1
+	});
+
 	const game = new Game();
 	game.board.game = game;
 	game.ball.game = game;
@@ -50,6 +69,15 @@ const	TestBall = () =>
 
 	const pauseButtonRef = useRef<HTMLInputElement>(null);
 	const resumeButtonRef = useRef<HTMLInputElement>(null);
+
+	// useEffect(() =>
+	// {
+	// 	setDim(
+	// 	{
+	// 		width: game.board.dim.width,
+	// 		height: game.board.dim.height
+	// 	});
+	// }, []);
 
 	useEffect(() =>
 	{
@@ -101,14 +129,36 @@ const	TestBall = () =>
 		{
 			// console.log(data);
 			setFrameNumber(data.frameNumber);
-			game.ball.move(data.ballPos.x, data.ballPos.y);
+			game.ball.move(
+				data.ballPos.x / scaleServer.width,
+				data.ballPos.y / scaleServer.height);
 			// render();
 		};
+
+		const	setServerDimEvent = (data: any) =>
+		{
+			setServerDim(
+			{
+				width: data.width,
+				height: data.height
+			});
+			const	ratioWidth = data.width / game.board.dim.width;
+			const	ratioHeight = data.height / game.board.dim.height;
+			console.log("Ration Width and height", ratioWidth, ratioHeight);
+			setScaleServer(
+			{
+				width: ratioWidth,
+				height: ratioHeight
+			}
+			);
+		};
+		// addEventListener("resize", setServerDimEvent);
 
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("game-event", gameEvent);
+		socket.on("info", setServerDimEvent);
 		socket.connect();
 		return (() =>
 		{
@@ -116,6 +166,8 @@ const	TestBall = () =>
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
 			socket.off("game-event", gameEvent);
+			socket.off("info", setServerDimEvent);
+			// removeEventListener("resize", setServerDimEvent);
 		});
 	}, []);
 
@@ -193,6 +245,12 @@ const	TestBall = () =>
 				frame number: {frameNumber}
 			</div>
 			<br></br>
+			<div style={{textAlign: "center"}} >
+				dimension width du server: {serverDim.width} <br />
+				dimension height du server: {serverDim.height} <br />
+				dimension width du client : {game.board.canvas?.width} <br />
+				dimension height du client: {game.board.canvas?.height} 
+			</div>
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}

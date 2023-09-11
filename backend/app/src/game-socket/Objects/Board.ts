@@ -85,23 +85,11 @@ class Board
 				this.game.ball.pos.y *= multiplicatorHeight;
 			}
 		};
-		// this.registerEvents = () =>
-		// {
-		// 	addEventListener("resize", this.updateSizeAfterResize);
-		// };
 		// eslint-disable-next-line max-statements
 		this.init = () =>
 		{
-			// const windowWidth = window.innerWidth;
-			// const	windowWidth = 4096;
 			this.dim.width = 4096;
 			this.setHeight();
-			// if (this.canvas)
-			// {
-			// 	this.canvas.style.border = this.borderStyle;
-			// 	this.canvas.width = this.dim.width;
-			// 	this.canvas.height = this.dim.height;
-			// }
 			if (this.game)
 			{
 				this.game.initPlayers();
@@ -109,7 +97,6 @@ class Board
 			}
 			else
 				console.error(this.game);
-			// this.registerEvents();
 		};
 	}
 }
