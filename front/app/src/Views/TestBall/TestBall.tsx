@@ -57,6 +57,16 @@ const	TestBall = () =>
 
 	const
 	[
+		ballPos,
+		setBallPos
+	] = useState(
+	{
+		x: 0,
+		y: 0
+	});
+
+	const
+	[
 		scaleServer,
 		setScaleServer
 	] = useState(
@@ -108,10 +118,17 @@ const	TestBall = () =>
 		// change GameEvent to a more appropriate name
 		const	updateGame = (data: any) =>
 		{
-			setFrameNumber(data.frameNumber);
-			game.ball.move(
-				data.ballPos.x / scaleServer.width,
-				data.ballPos.y / scaleServer.height);
+			if (data.type === "game-data")
+			{
+				setFrameNumber(data.payload.frameNumber);
+				const	ballPos = {
+					x: (data.payload.ballPos.x / scaleServer.width),
+					y: (data.payload.ballPos.y / scaleServer.height)
+				};
+				setBallPos(ballPos);
+				// console.log("updateGame", ballPos);
+				game.ball.move(ballPos.x, ballPos.y);
+			}
 		};
 
 		const	initServerDim = (data: any) =>
@@ -123,7 +140,7 @@ const	TestBall = () =>
 			});
 			const	ratioWidth = data.width / game.board.dim.width;
 			const	ratioHeight = data.height / game.board.dim.height;
-			console.log("Ration Width and height", ratioWidth, ratioHeight);
+			// console.log("Ratio Width and height", ratioWidth, ratioHeight);
 			setScaleServer(
 			{
 				width: ratioWidth,
@@ -140,6 +157,7 @@ const	TestBall = () =>
 				case "connect":
 				case "disconnect":
 					setNumberOfUsers(data.payload.numberUsers);
+					setReadyPlayerCount(data.payload.userReadyCount);
 					break ;
 				case "ready-player":
 					setReadyPlayerCount(data.payload.userReadyCount);
@@ -198,6 +216,9 @@ const	TestBall = () =>
 		});
 	}, []);
 
+	// this can be used for showing a start and waiting ]
+	// for all player to be ready before starting the game
+	// client.id checked on backend to avoid cheating
 	const	setReadyAction = () =>
 	{
 		if (readyPlayer === false)
@@ -207,7 +228,11 @@ const	TestBall = () =>
 			};
 			console.log("ready action", action);
 			socketRef.current?.emit("game-event", action);
+			setReadyPlayer(true);
 		}
+		// just for understanding the code 
+		else
+			console.log("You are already ready !");
 	};
 
 	return (
@@ -259,6 +284,8 @@ const	TestBall = () =>
 					fontSize: "8px"
 				}}
 			>
+				position ball x: {ballPos.x} <br />
+				position ball y: {ballPos.y} <br />
 				dimension width du server: {serverDim.width} <br />
 				dimension height du server: {serverDim.height} <br />
 				scale to server :

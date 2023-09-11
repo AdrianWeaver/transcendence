@@ -16,16 +16,6 @@ import
 
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
-import { exit } from "process";
-import { type } from "os";
-
-// class	GameServe
-// {
-// 	constructor()
-// 	{
-
-// 	}
-// }
 
 class	NodeAnimationFrame
 {
@@ -41,7 +31,7 @@ class	NodeAnimationFrame
 	// eslint-disable-next-line max-statements
 	constructor()
 	{
-		this.frameRate = 30;
+		this.frameRate = 60;
 		this.frameNumber = 0;
 		this.gameActive = true;
 		this.game = undefined;
@@ -108,14 +98,19 @@ export class GameSocketEvents
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
 			this.update();
-			this.server.volatile.emit("game-event",
-			{
-				frameNumber: frame,
-				ballPos: {
-					x: this.gameServe.ball.pos.x,
-					y: this.gameServe.ball.pos.y,
+
+			const action = {
+				type: "game-data",
+				payload:
+				{
+					frameNumber: frame,
+					ballPos: {
+						x: this.gameServe.ball.pos.x,
+						y: this.gameServe.ball.pos.y,
+					}
 				}
-			});
+			};
+			this.server.volatile.emit("game-event", action);
 		};
 	}
 
@@ -142,7 +137,8 @@ export class GameSocketEvents
 		const	action = {
 			type: "connect",
 			payload: {
-				numberUsers: this.users
+				numberUsers: this.users,
+				userReadyCount: this.userReady
 			}
 		};
 
@@ -166,7 +162,8 @@ export class GameSocketEvents
 		const	action = {
 			type: "disconnect",
 			payload: {
-				numberUsers: this.users
+				numberUsers: this.users,
+				userReadyCount: this.userReady
 			}
 		};
 		this.server.emit("player-info", action);
