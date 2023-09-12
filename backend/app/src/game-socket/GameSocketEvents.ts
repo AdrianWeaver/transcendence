@@ -110,6 +110,20 @@ export class GameSocketEvents
 					ballPos: {
 						x: this.gameServe.ball.pos.x,
 						y: this.gameServe.ball.pos.y,
+					},
+					playerOne:
+					{
+						pos: {
+							x: this.gameServe.playerOne.pos.x,
+							y: this.gameServe.playerOne.pos.y,
+						}
+					},
+					playerTwo:
+					{
+						pos: {
+							x: this.gameServe.playerTwo.pos.x,
+							y: this.gameServe.playerTwo.pos.y,
+						}
 					}
 				}
 			};

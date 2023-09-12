@@ -86,6 +86,24 @@ const	TestBall = () =>
 			height: 0
 	});
 
+	const
+	[
+		playerOnePos,
+		setPlayerOnePos
+	] = useState({
+		x: 0,
+		y: 0
+	});
+
+	const
+	[
+		playerTwoPos,
+		setPlayerTwoPos
+	] = useState({
+		x: 0,
+		y: 0
+	});
+
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	const game = new Game();
@@ -126,7 +144,6 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		// change GameEvent to a more appropriate name
 		const	updateGame = (data: any) =>
 		{
 			if (data.type === "game-data")
@@ -137,8 +154,22 @@ const	TestBall = () =>
 					y: (data.payload.ballPos.y / scaleServer.height)
 				};
 				setBallPos(ballPos);
-				console.log("updateGame", ballPos);
+				// console.log("updateGame", ballPos);
+
 				game.ball.move(ballPos.x, ballPos.y);
+
+				// recuperer du server pos player one et player two
+				// game.playerOne.etc...
+				setPlayerOnePos(
+				{
+					x: (data.payload.playerOne.pos.x / scaleServer.width),
+					y: (data.payload.playerOne.pos.y / scaleServer.width)
+				});
+				setPlayerTwoPos(
+				{
+					x: (data.payload.playerTwo.pos.x / scaleServer.width),
+					y: (data.payload.playerTwo.pos.y / scaleServer.width)
+				});
 			}
 		};
 
@@ -289,6 +320,8 @@ const	TestBall = () =>
 					scale_height: {scaleServer.height} <br />
 				dimension width du client : {boardDim.width} <br />
 				dimension height du client: {boardDim.height} <br />
+				position du player 1: {JSON.stringify(playerOnePos)} <br />
+				position du player 2: {JSON.stringify(playerTwoPos)} <br />
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
