@@ -48,11 +48,11 @@ const	TestBall = () =>
 	const
 	[
 		serverDim,
-		setServerDim
+	setServerDim
 	] = useState(
 	{
 		width: 0,
-		height: 0
+	height: 0
 	});
 
 	const
@@ -96,7 +96,7 @@ const	TestBall = () =>
 
 		const connect = () =>
 		{
-			// console.log("ws connected");
+		
 			const	action = {
 				type: "GET_BOARD_SIZE"
 			};
@@ -126,27 +126,26 @@ const	TestBall = () =>
 					y: (data.payload.ballPos.y / scaleServer.height)
 				};
 				setBallPos(ballPos);
-				// console.log("updateGame", ballPos);
+								// console.log("updateGame", ballPos);
 				game.ball.move(ballPos.x, ballPos.y);
 			}
 		};
 
 		const	initServerDim = (data: any) =>
 		{
-			setServerDim(
-			{
-				width: data.width,
-				height: data.height
-			});
-			const	ratioWidth = data.width / game.board.dim.width;
-			const	ratioHeight = data.height / game.board.dim.height;
-			// console.log("Ratio Width and height", ratioWidth, ratioHeight);
-			setScaleServer(
-			{
-				width: ratioWidth,
-				height: ratioHeight
-			}
-			);
+				setServerDim(
+				{
+					width: data.width,
+					height: data.height
+				});
+				const	ratioWidth = data.width / game.board.dim.width;
+				const	ratioHeight = data.height / game.board.dim.height;
+				setScaleServer(
+				{
+					width: ratioWidth,
+					height: ratioHeight
+				});
+				console.log("test");
 		};
 
 		const	playerInfo = (data: any) =>
@@ -235,55 +234,35 @@ const	TestBall = () =>
 			console.log("You are already ready !");
 	};
 
+	const	displayStyle: React.CSSProperties = {
+		textAlign: "center",
+		fontSize: "8px"
+	};
+
 	return (
 		<>
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
 
 			{/* This part show the connection to the websocket */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
 
 			{/* This part show the number of client connected */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				number of client connected : {numberOfUsers}<br/>
 				number of client ready : {readyPlayerCount}
 			</div>
 
 			{/* This part show the frame number */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				frame number (time server): {frameNumber} <br/>
 			</div>
 
 			{/* /* This part show more information */ }
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				position ball x: {ballPos.x} <br />
 				position ball y: {ballPos.y} <br />
 				dimension width du server: {serverDim.width} <br />
@@ -294,12 +273,7 @@ const	TestBall = () =>
 				dimension width du client : {game.board.dim.width} <br />
 				dimension height du client: {game.board.dim.height} <br />
 			</div>
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}

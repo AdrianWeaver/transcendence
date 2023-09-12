@@ -77,6 +77,7 @@ export class GameSocketEvents
 	@WebSocketServer()
 	server: Server;
 	users: number;
+	socketIdUsers: string[] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
@@ -131,8 +132,15 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
-		// need to verify the user if already exist or not
-		this.users += 1;
+		const searchUser = this.socketIdUsers.find((element) =>
+		{
+			return (element === client.id);
+		});
+		if (searchUser === undefined)
+		{
+			this.socketIdUsers.push(client.id);
+			this.users += 1;
+		}
 
 		const	action = {
 			type: "connect",
@@ -147,15 +155,23 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
-		this.users -= 1;
-
-		const	wasReady = this.socketIdReady.findIndex((element) =>
+		const userIndex = this.socketIdUsers.findIndex((element) =>
 		{
 			return (element === client.id);
 		});
-		if (wasReady !== -1)
+		if (userIndex !== -1)
 		{
-			this.socketIdReady.splice(wasReady, 1);
+			this.socketIdUsers.splice(userIndex, 1);
+			this.users -= 1;
+		}
+
+		const	wasReadyIndex = this.socketIdReady.findIndex((element) =>
+		{
+			return (element === client.id);
+		});
+		if (wasReadyIndex !== -1)
+		{
+			this.socketIdReady.splice(wasReadyIndex, 1);
 			this.userReady--;
 		}
 
@@ -176,7 +192,7 @@ export class GameSocketEvents
 	)
 	{
 		if (data.type === "GET_BOARD_SIZE")
-			client.emit("info", this.gameServe.board.dim);
+		client.emit("info", this.gameServe.board.dim);
 	}
 
 	@SubscribeMessage("game-event")
