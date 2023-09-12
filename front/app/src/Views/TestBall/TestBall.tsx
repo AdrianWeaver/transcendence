@@ -5,11 +5,30 @@ import { useEffect, useRef, useState } from "react";
 import Game from "./Objects/Game";
 
 import { io } from "socket.io-client";
+import ConnectState from "./Component/ConnectState";
+
 
 const	URL = "http://localhost:3000";
 
+type	ActionSocket = {
+	type: string,
+	payload?: any
+};
+
 const	TestBall = () =>
 {
+	/* local state */
+	const
+	[
+		readyPlayer,
+		setReadyPlayer
+	] = useState(false);
+
+	const
+	[
+		readyPlayerCount,
+		setReadyPlayerCount
+	] = useState(0);
 	const
 	[
 		connected,
@@ -19,6 +38,11 @@ const	TestBall = () =>
 	[
 		frameNumber,
 		setFrameNumber
+	] = useState(0);
+	const
+	[
+		numberOfUsers,
+		setNumberOfUsers
 	] = useState(0);
 
 	const
@@ -30,6 +54,17 @@ const	TestBall = () =>
 		width: 0,
 		height: 0
 	});
+
+	const
+	[
+		ballPos,
+		setBallPos
+	] = useState(
+	{
+		x: 0,
+		y: 0
+	});
+
 	const
 	[
 		scaleServer,
@@ -40,44 +75,14 @@ const	TestBall = () =>
 		height: 1
 	});
 
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
 	const game = new Game();
 	game.board.game = game;
 	game.ball.game = game;
 	game.net.game = game;
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
 	game.board.canvasRef = canvasRef;
-
-	const	update = () =>
-	{
-		// will Update data from backend;
-		game.playerOne.updatePlayerPosition();
-		game.playerTwo.updatePlayerPosition();
-
-		game.ball.update();
-	};
-
-	const clear = () =>
-	{
-		if (game.board.ctx)
-		{
-			console.log("clear executed from testball");
-			game.board.ctx.fillStyle = "#fff";
-			// game.board.ctx?.clearRect(0, 0,
-			// 	game.board.dim.width, game.board.dim.height);
-		}
-	};
-
-	const pauseButtonRef = useRef<HTMLInputElement>(null);
-	const resumeButtonRef = useRef<HTMLInputElement>(null);
-
-	// useEffect(() =>
-	// {
-	// 	setDim(
-	// 	{
-	// 		width: game.board.dim.width,
-	// 		height: game.board.dim.height
-	// 	});
-	// }, []);
 
 	useEffect(() =>
 	{
@@ -87,16 +92,21 @@ const	TestBall = () =>
 			reconnectionAttempts: 5,
 		});
 
+		socketRef.current = socket;
+
 		const connect = () =>
 		{
-			console.log("ws connected");
-			socket.emit("info", "Get board size");
+			// console.log("ws connected");
+			const	action = {
+				type: "GET_BOARD_SIZE"
+			};
+			socket.emit("info", action);
 			setConnected(true);
 		};
 
 		const disconnect = () =>
 		{
-			console.log("ws disconnected");
+			// console.log("ws disconnected");
 			setConnected(false);
 		};
 
@@ -105,37 +115,23 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		const	render = () =>
+		// change GameEvent to a more appropriate name
+		const	updateGame = (data: any) =>
 		{
-			clear();
-			update();
-
-			game.board.ctx?.beginPath();
-			if (game.board.ctx)
+			if (data.type === "game-data")
 			{
-				game.board.ctx.fillStyle = "#F5F5DC";
-				game.board.ctx.fillRect(0, 0, game.board.dim.width,
-					game.board.dim.height);
+				setFrameNumber(data.payload.frameNumber);
+				const	ballPos = {
+					x: (data.payload.ballPos.x / scaleServer.width),
+					y: (data.payload.ballPos.y / scaleServer.height)
+				};
+				setBallPos(ballPos);
+				// console.log("updateGame", ballPos);
+				game.ball.move(ballPos.x, ballPos.y);
 			}
-			game.net.render();
-			game.ball.render();
-			game.playerOne.render();
-			game.playerTwo.render();
-			game.playerOne.renderScore();
-			game.playerTwo.renderScore();
 		};
 
-		const	gameEvent = (data: any) =>
-		{
-			// console.log(data);
-			setFrameNumber(data.frameNumber);
-			game.ball.move(
-				data.ballPos.x / scaleServer.width,
-				data.ballPos.y / scaleServer.height);
-			// render();
-		};
-
-		const	setServerDimEvent = (data: any) =>
+		const	initServerDim = (data: any) =>
 		{
 			setServerDim(
 			{
@@ -144,7 +140,7 @@ const	TestBall = () =>
 			});
 			const	ratioWidth = data.width / game.board.dim.width;
 			const	ratioHeight = data.height / game.board.dim.height;
-			console.log("Ration Width and height", ratioWidth, ratioHeight);
+			// console.log("Ratio Width and height", ratioWidth, ratioHeight);
 			setScaleServer(
 			{
 				width: ratioWidth,
@@ -152,22 +148,41 @@ const	TestBall = () =>
 			}
 			);
 		};
-		// addEventListener("resize", setServerDimEvent);
+
+		const	playerInfo = (data: any) =>
+		{
+			console.log(data);
+			switch (data.type)
+			{
+				case "connect":
+				case "disconnect":
+					setNumberOfUsers(data.payload.numberUsers);
+					setReadyPlayerCount(data.payload.userReadyCount);
+					break ;
+				case "ready-player":
+					setReadyPlayerCount(data.payload.userReadyCount);
+					break ;
+				default:
+					break ;
+			}
+		};
 
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
-		socket.on("game-event", gameEvent);
-		socket.on("info", setServerDimEvent);
+		socket.on("game-event", updateGame);
+		socket.on("info", initServerDim);
+		socket.on("player-info", playerInfo);
 		socket.connect();
+
 		return (() =>
 		{
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
-			socket.off("game-event", gameEvent);
-			socket.off("info", setServerDimEvent);
-			// removeEventListener("resize", setServerDimEvent);
+			socket.off("game-event", updateGame);
+			socket.off("info", initServerDim);
+			socket.off("player-info", playerInfo);
 		});
 	}, []);
 
@@ -180,15 +195,9 @@ const	TestBall = () =>
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
-		// addEventListener("keydown", keyHookDown);
-		// addEventListener("keyup", keyHookReleased);
-		// addEventListener("keypress", keyEnter);
 
 		const	render = () =>
 		{
-			clear();
-			update();
-
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -207,50 +216,93 @@ const	TestBall = () =>
 		});
 	}, []);
 
-	const	ConnectStateOn = () =>
+	// this can be used for showing a start and waiting ]
+	// for all player to be ready before starting the game
+	// client.id checked on backend to avoid cheating
+	const	setReadyAction = () =>
 	{
-		return (
-			<>
-				online
-			</>
-		);
-	};
-
-	const	ConnecStateOff = () =>
-	{
-		return (
-			<>
-				offline
-			</>
-		);
+		if (readyPlayer === false)
+		{
+			const	action = {
+				type: "ready"
+			};
+			console.log("ready action", action);
+			socketRef.current?.emit("game-event", action);
+			setReadyPlayer(true);
+		}
+		// just for understanding the code 
+		else
+			console.log("You are already ready !");
 	};
 
 	return (
 		<>
-			<div style={{textAlign: "center"}}>
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
 				FT_TRANSCENDANCE
 			</div>
-			<div style={{textAlign: "center"}}>
-				Your connection :
+
+			{/* This part show the connection to the websocket */}
+			<div style={
 				{
-					(connected)
-					? <ConnectStateOn />
-					: <ConnecStateOff />
-				}
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				<ConnectState connected={connected} />
 			</div>
-			<div style={{textAlign: "center"}} >
-				number of client connected :
+
+			{/* This part show the number of client connected */}
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				number of client connected : {numberOfUsers}<br/>
+				number of client ready : {readyPlayerCount}
 			</div>
-			<div style={{textAlign: "center"}} >
-				frame number: {frameNumber}
+
+			{/* This part show the frame number */}
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				frame number (time server): {frameNumber} <br/>
 			</div>
-			<br></br>
-			<div style={{textAlign: "center"}} >
+
+			{/* /* This part show more information */ }
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				position ball x: {ballPos.x} <br />
+				position ball y: {ballPos.y} <br />
 				dimension width du server: {serverDim.width} <br />
 				dimension height du server: {serverDim.height} <br />
-				dimension width du client : {game.board.canvas?.width} <br />
-				dimension height du client: {game.board.canvas?.height} 
+				scale to server :
+					scale_width: {scaleServer.width},
+					scale_height: {scaleServer.height} <br />
+				dimension width du client : {game.board.dim.width} <br />
+				dimension height du client: {game.board.dim.height} <br />
 			</div>
+			<div style={
+				{
+					textAlign: "center",
+					fontSize: "8px"
+				}}
+			>
+				<button onClick={setReadyAction}>I'm ready</button>
+			</div>
+			{/* This is the canvas part */}
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}

@@ -16,15 +16,6 @@ import
 
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
-import { exit } from "process";
-
-// class	GameServe
-// {
-// 	constructor()
-// 	{
-
-// 	}
-// }
 
 class	NodeAnimationFrame
 {
@@ -40,7 +31,7 @@ class	NodeAnimationFrame
 	// eslint-disable-next-line max-statements
 	constructor()
 	{
-		this.frameRate = 30;
+		this.frameRate = 60;
 		this.frameNumber = 0;
 		this.gameActive = true;
 		this.game = undefined;
@@ -68,13 +59,17 @@ class	NodeAnimationFrame
 	}
 }
 
+type	ActionSocket = {
+	type: string,
+	payload?: any
+};
+
 @WebSocketGateway(
 {
 	cors:
 	{
 		origin: "*"
 	},
-	// namespace: "/game-engine-v2d"
 })
 export class GameSocketEvents
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -82,6 +77,8 @@ export class GameSocketEvents
 	@WebSocketServer()
 	server: Server;
 	users: number;
+	userReady: number;
+	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
@@ -89,6 +86,7 @@ export class GameSocketEvents
 
 	public	constructor()
 	{
+		this.userReady = 0;
 		this.update = () =>
 		{
 			this.gameServe.playerOne.updatePlayerPosition();
@@ -99,22 +97,20 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
-			// console.log(timestamp, frame);
-			// // console.log(frame);
-			// console.log("x: ", this.gameServe.ball.pos.x);
-			// console.log("y: ", this.gameServe.ball.pos.y);
-
 			this.update();
-			// console.log(this.gameServe);
-			// exit(1);
-			this.server.volatile.emit("game-event",
-			{
-				frameNumber: frame,
-				ballPos: {
-					x: this.gameServe.ball.pos.x,
-					y: this.gameServe.ball.pos.y,
+
+			const action = {
+				type: "game-data",
+				payload:
+				{
+					frameNumber: frame,
+					ballPos: {
+						x: this.gameServe.ball.pos.x,
+						y: this.gameServe.ball.pos.y,
+					}
 				}
-			});
+			};
+			this.server.volatile.emit("game-event", action);
 		};
 	}
 
@@ -135,24 +131,81 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
-		console.log("DEBUG: A client is connected: " + client.id);
+		// need to verify the user if already exist or not
 		this.users += 1;
+
+		const	action = {
+			type: "connect",
+			payload: {
+				numberUsers: this.users,
+				userReadyCount: this.userReady
+			}
+		};
+
+		this.server.emit("player-info", action);
 	}
 
 	handleDisconnect(client: Socket)
 	{
-		// console.log("DEBUG: A client disconnected", client);
-		// if (this.users > 0)
 		this.users -= 1;
+
+		const	wasReady = this.socketIdReady.findIndex((element) =>
+		{
+			return (element === client.id);
+		});
+		if (wasReady !== -1)
+		{
+			this.socketIdReady.splice(wasReady, 1);
+			this.userReady--;
+		}
+
+		const	action = {
+			type: "disconnect",
+			payload: {
+				numberUsers: this.users,
+				userReadyCount: this.userReady
+			}
+		};
+		this.server.emit("player-info", action);
 	}
 
 	@SubscribeMessage("info")
 	handleInfo(
-		@MessageBody() data: string,
-		@ConnectedSocket() client: Socket)
+		@MessageBody() data: ActionSocket,
+		@ConnectedSocket() client: Socket
+	)
 	{
-		// console.log(data);
-		if (data === "Get board size")
+		if (data.type === "GET_BOARD_SIZE")
 			client.emit("info", this.gameServe.board.dim);
+	}
+
+	@SubscribeMessage("game-event")
+	handleGameEvent(
+		@MessageBody() data: ActionSocket,
+		@ConnectedSocket() client: Socket
+	)
+	{
+		if (data.type === "ready")
+		{
+			const search = this.socketIdReady.find((element) =>
+			{
+				return (element === client.id);
+			});
+
+			// We check if user isn't already in the array
+			if (search === undefined)
+			{
+				this.socketIdReady.push(client.id);
+				this.userReady++;
+
+				const	action = {
+					type: "ready-player",
+					payload: {
+						userReadyCount: this.userReady
+					}
+				};
+				this.server.emit("player-info", action);
+			}
+		}
 	}
 }
