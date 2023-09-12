@@ -20,7 +20,6 @@ class Ball
 	public maxAngle: number;
 	public maxSpeed: number;
 	public init: () => void;
-	public update: () => void;
 	public render: () => void;
 	public move: (x: number, y: number) => void;
 	public wasTopWallHit: () => void;
@@ -64,14 +63,6 @@ class Ball
 			}
 			this.firstSetDirection = 0;
 		};
-		this.update = () =>
-		{
-			if (this.game)
-			{
-				this.radius = this.game.board.dim.width * 0.012;
-				// this.move();
-			}
-		};
 		this.render = () =>
 		{
 			if (this.game && this.game.board && this.game.board.ctx)
@@ -82,6 +73,13 @@ class Ball
 										this.startAngle, this.endAngle);
 				this.game.board.ctx.fill();
 			}
+			if (this.game === undefined)
+				console.error("this.game is undefined");
+			if (this.game && this.game.board === undefined)
+				console.error("this.game.board is undefined");
+			if (this.game && this.game.board
+				&& this.game.board.ctx === undefined)
+				console.error("this.game.board.ctx is undefined");
 		};
 		this.move = (x: number, y: number) =>
 		{
@@ -162,8 +160,3 @@ class Ball
 }
 
 export default Ball;
-
-
-/*
-computeSpeed
-*/

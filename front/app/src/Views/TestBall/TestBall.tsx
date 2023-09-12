@@ -6,6 +6,18 @@ import Game from "./Objects/Game";
 
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import {
+	setBallPosition,
+	setBoardDimension,
+	setFrameNumber,
+	setNumberOfUsers,
+	setPlayerOnePos,
+	setPlayerTwoPos,
+	setReadyPlayerCount,
+	setScaleServer,
+	setServerDimension
+} from "../../Redux/store/gameEngineAction";
 
 
 const	URL = "http://localhost:3000";
@@ -18,95 +30,62 @@ type	ActionSocket = {
 const	TestBall = () =>
 {
 	/* local state */
-
 	const
 	[
 		readyPlayer,
 		setReadyPlayer
 	] = useState(false);
 
-	const
-	[
-		readyPlayerCount,
-		setReadyPlayerCount
-	] = useState(0);
+	/* local state */
 	const
 	[
 		connected,
 		setConnected
 	] = useState(false);
-	const
-	[
-		frameNumber,
-		setFrameNumber
-	] = useState(0);
-	const
-	[
-		numberOfUsers,
-		setNumberOfUsers
-	] = useState(0);
 
-	const
-	[
-		serverDim,
-	setServerDim
-	] = useState(
+	const	dispatch = useAppDispatch();
+	const	serverDim = useAppSelector((state) =>
 	{
-		width: 0,
-	height: 0
+		return (state.gameEngine.server.dimension);
 	});
-
-	const
-	[
-		ballPos,
-		setBallPos
-	] = useState(
+	const	scaleServer = useAppSelector((state) =>
 	{
-		x: 0,
-		y: 0
+		return (state.gameEngine.server.scaleServer);
 	});
-
-	const
-	[
-		scaleServer,
-		setScaleServer
-	] = useState(
+	const	boardDim = useAppSelector((state) =>
 	{
-		width: 1,
-		height: 1
+		return (state.gameEngine.board.dimension);
 	});
-
-	const
-	[
-		boardDim,
-		setBoardDim
-	] = useState(
+	const	numberOfUsers = useAppSelector((state) =>
 	{
-			width: 0,
-			height: 0
+		return (state.gameEngine.server.numberOfUser);
 	});
-
-	const
-	[
-		playerOnePos,
-		setPlayerOnePos
-	] = useState({
-		x: 0,
-		y: 0
+	const	readyPlayerCount = useAppSelector((state) =>
+	{
+		return (state.gameEngine.server.readyPlayerCount);
 	});
-
-	const
-	[
-		playerTwoPos,
-		setPlayerTwoPos
-	] = useState({
-		x: 0,
-		y: 0
+	const	frameNumber = useAppSelector((state) =>
+	{
+		return (state.gameEngine.server.frameNumber);
+	});
+	const	ballPos = useAppSelector((state) =>
+	{
+		return (state.gameEngine.board.ball.position);
+	});
+	const	playerOnePos = useAppSelector((state) =>
+	{
+		return (state.gameEngine.board.playerOne.position);
+	});
+	const	playerTwoPos = useAppSelector((state) =>
+	{
+		return (state.gameEngine.board.playerTwo.position);
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	const game = new Game();
+	const	game = new Game();
+	const	gameRef = useRef<Game>(game);
+	gameRef.current = game;
 	game.board.game = game;
 	game.ball.game = game;
 	game.net.game = game;
@@ -148,52 +127,52 @@ const	TestBall = () =>
 		{
 			if (data.type === "game-data")
 			{
-				setFrameNumber(data.payload.frameNumber);
-				const	ballPos = {
-					x: (data.payload.ballPos.x / scaleServer.width),
-					y: (data.payload.ballPos.y / scaleServer.height)
-				};
-				setBallPos(ballPos);
-				// console.log("updateGame", ballPos);
-
-				game.ball.move(ballPos.x, ballPos.y);
-
-				// recuperer du server pos player one et player two
-				// game.playerOne.etc...
-				setPlayerOnePos(
-				{
-					x: (data.payload.playerOne.pos.x / scaleServer.width),
-					y: (data.payload.playerOne.pos.y / scaleServer.width)
-				});
-				setPlayerTwoPos(
-				{
-					x: (data.payload.playerTwo.pos.x / scaleServer.width),
-					y: (data.payload.playerTwo.pos.y / scaleServer.width)
-				});
+				// console.log(data.payload.ballPos);
+				dispatch(setFrameNumber(data.payload.frameNumber));
+				dispatch(
+					setBallPosition(
+						data.payload.ballPos.x,
+						data.payload.ballPos.y
+					)
+				);
+				dispatch(
+					setPlayerOnePos(
+						(data.payload.playerOne.pos.x),
+						(data.payload.playerOne.pos.y)
+					)
+				);
+				dispatch(
+					setPlayerTwoPos(
+						(data.payload.playerTwo.pos.x),
+						(data.payload.playerTwo.pos.y)
+					)
+				);
 			}
 		};
 
 		const	initServerDim = (data: ActionSocket) =>
 		{
 			const	serverBoardDim = data.payload.serverBoardDim;
-			setServerDim(
-			{
-				width: serverBoardDim.width,
-				height: serverBoardDim.height
-			});
+			dispatch(
+				setServerDimension(
+					serverBoardDim.width,
+					serverBoardDim.height
+				)
+			);
 			const	ratioWidth = serverBoardDim.width / game.board.dim.width;
 			const	ratioHeight = serverBoardDim.height / game.board.dim.height;
-			setBoardDim(
-			{
-				width: game.board.dim.width,
-				height: game.board.dim.height
-			});
-			setScaleServer(
-			{
-				width: ratioWidth,
-				height: ratioHeight
-			});
-			console.log("info sended by server");
+			dispatch(
+				setBoardDimension(
+					game.board.dim.width,
+					game.board.dim.height
+				)
+			);
+			dispatch(
+				setScaleServer(
+					ratioWidth,
+					ratioHeight
+				)
+			);
 		};
 
 		const	playerInfo = (data: any) =>
@@ -203,11 +182,11 @@ const	TestBall = () =>
 			{
 				case "connect":
 				case "disconnect":
-					setNumberOfUsers(data.payload.numberUsers);
-					setReadyPlayerCount(data.payload.userReadyCount);
+					dispatch(setNumberOfUsers(data.payload.numberUsers));
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					break ;
 				case "ready-player":
-					setReadyPlayerCount(data.payload.userReadyCount);
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					break ;
 				default:
 					break ;
@@ -245,6 +224,8 @@ const	TestBall = () =>
 
 		const	render = () =>
 		{
+			// update fix
+			game.ball.move(ballPos.x, ballPos.y);
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -261,7 +242,10 @@ const	TestBall = () =>
 		{
 			cancelAnimationFrame(requestId);
 		});
-	}, []);
+	},
+	[
+		ballPos,
+	]);
 
 	// this can be used for showing a start and waiting ]
 	// for all player to be ready before starting the game

@@ -15,6 +15,9 @@ import storage from "redux-persist/lib/storage";
 
 import	serverSlice from "./server-slice";
 import	anonymousUserSlice from "./anonymousUser-slice";
+import	gameEngineSlice from "./gameEngine-slice";
+
+// import
 
 const	persistConfigController = {
 	key: "root",
@@ -42,7 +45,8 @@ export const	store = configureStore(
 	{
 		controller: persistedControllerReducer,
 		server: serverSlice.reducer,
-		anonymousUser: persistedAnonymousUserReducer
+		anonymousUser: persistedAnonymousUserReducer,
+		gameEngine: gameEngineSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>
 	{

@@ -90,7 +90,8 @@ class Board
 			const	action = {
 				type: "resize",
 			};
-			this.socket.emit("info", action);
+			if (this.socket)
+				this.socket.emit("info", action);
 		};
 		this.registerEvents = () =>
 		{
@@ -99,7 +100,7 @@ class Board
 		// eslint-disable-next-line max-statements
 		this.init = () =>
 		{
-			console.log("board front initialized");
+			// console.log("board front initialized");
 			const windowWidth = window.innerWidth;
 			this.dim.width = windowWidth * 0.66;
 			this.setHeight();
