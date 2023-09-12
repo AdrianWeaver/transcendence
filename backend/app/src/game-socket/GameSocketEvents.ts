@@ -33,7 +33,7 @@ class	NodeAnimationFrame
 	{
 		this.frameRate = 60;
 		this.frameNumber = 0;
-		this.gameActive = true;
+		this.gameActive = false;
 		this.game = undefined;
 		this.requestFrame = (callbackFunction) =>
 		{
@@ -53,7 +53,8 @@ class	NodeAnimationFrame
 				return ;
 			}
 			this.callbackFunction(timestamp, this.frameNumber);
-			this.frameNumber++;
+			if (this.gameActive === true)
+				this.frameNumber++;
 			this.requestFrame(this.update);
 		};
 	}
@@ -98,8 +99,9 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
+			if (this.loop.gameActive === false)
+				return ;
 			this.update();
-
 			const action = {
 				type: "game-data",
 				payload:
@@ -221,6 +223,8 @@ export class GameSocketEvents
 					}
 				};
 				this.server.emit("player-info", action);
+				if (this.userReady === 2)
+					this.loop.gameActive = true;
 			}
 		}
 	}

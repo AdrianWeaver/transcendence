@@ -18,6 +18,7 @@ type	ActionSocket = {
 const	TestBall = () =>
 {
 	/* local state */
+
 	const
 	[
 		readyPlayer,
@@ -96,7 +97,6 @@ const	TestBall = () =>
 
 		const connect = () =>
 		{
-		
 			const	action = {
 				type: "GET_BOARD_SIZE"
 			};
