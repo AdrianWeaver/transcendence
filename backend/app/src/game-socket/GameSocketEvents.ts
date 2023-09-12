@@ -176,6 +176,7 @@ export class GameSocketEvents
 			this.socketIdReady.splice(wasReadyIndex, 1);
 			this.userReady--;
 		}
+		this.loop.gameActive = false;
 
 		const	action = {
 			type: "disconnect",
@@ -194,7 +195,37 @@ export class GameSocketEvents
 	)
 	{
 		if (data.type === "GET_BOARD_SIZE")
-		client.emit("info", this.gameServe.board.dim);
+		{
+			const	action = {
+				type: "serverBoard_info",
+				payload:
+				{
+					serverBoardDim:
+					{
+						width: this.gameServe.board.dim.width,
+						height: this.gameServe.board.dim.height
+					}
+				}
+			};
+			client.emit("info", action);
+			return ;
+		}
+		if (data.type === "resize")
+		{
+			const action = {
+				type: "reset_your_scale",
+				payload:
+				{
+					serverBoardDim:
+					{
+						width: this.gameServe.board.dim.width,
+						height: this.gameServe.board.dim.height
+					}
+				}
+			};
+			client.emit("info", action);
+			return;
+		}
 	}
 
 	@SubscribeMessage("game-event")
@@ -209,8 +240,6 @@ export class GameSocketEvents
 			{
 				return (element === client.id);
 			});
-
-			// We check if user isn't already in the array
 			if (search === undefined)
 			{
 				this.socketIdReady.push(client.id);

@@ -76,6 +76,16 @@ const	TestBall = () =>
 		height: 1
 	});
 
+	const
+	[
+		boardDim,
+		setBoardDim
+	] = useState(
+	{
+			width: 0,
+			height: 0
+	});
+
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	const game = new Game();
@@ -94,6 +104,7 @@ const	TestBall = () =>
 		});
 
 		socketRef.current = socket;
+		game.board.socket = socketRef.current;
 
 		const connect = () =>
 		{
@@ -126,26 +137,32 @@ const	TestBall = () =>
 					y: (data.payload.ballPos.y / scaleServer.height)
 				};
 				setBallPos(ballPos);
-								// console.log("updateGame", ballPos);
+				console.log("updateGame", ballPos);
 				game.ball.move(ballPos.x, ballPos.y);
 			}
 		};
 
-		const	initServerDim = (data: any) =>
+		const	initServerDim = (data: ActionSocket) =>
 		{
-				setServerDim(
-				{
-					width: data.width,
-					height: data.height
-				});
-				const	ratioWidth = data.width / game.board.dim.width;
-				const	ratioHeight = data.height / game.board.dim.height;
-				setScaleServer(
-				{
-					width: ratioWidth,
-					height: ratioHeight
-				});
-				console.log("test");
+			const	serverBoardDim = data.payload.serverBoardDim;
+			setServerDim(
+			{
+				width: serverBoardDim.width,
+				height: serverBoardDim.height
+			});
+			const	ratioWidth = serverBoardDim.width / game.board.dim.width;
+			const	ratioHeight = serverBoardDim.height / game.board.dim.height;
+			setBoardDim(
+			{
+				width: game.board.dim.width,
+				height: game.board.dim.height
+			});
+			setScaleServer(
+			{
+				width: ratioWidth,
+				height: ratioHeight
+			});
+			console.log("info sended by server");
 		};
 
 		const	playerInfo = (data: any) =>
@@ -270,8 +287,8 @@ const	TestBall = () =>
 				scale to server :
 					scale_width: {scaleServer.width},
 					scale_height: {scaleServer.height} <br />
-				dimension width du client : {game.board.dim.width} <br />
-				dimension height du client: {game.board.dim.height} <br />
+				dimension width du client : {boardDim.width} <br />
+				dimension height du client: {boardDim.height} <br />
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
