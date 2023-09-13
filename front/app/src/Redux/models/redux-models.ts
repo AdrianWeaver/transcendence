@@ -76,54 +76,42 @@ export interface	ControllerModel
 	"canvas": CanvasModel
 }
 
+export interface	Dimension
+{
+	width: number,
+	height: number
+}
+
+export interface	Position
+{
+	x: number,
+	y: number
+}
+
 export interface	GameEngineModel
 {
 	server:
 	{
-		dimension:
-		{
-			width: number,
-			height: number,
-		}
-		scaleServer:
-		{
-			width: number,
-			height: number,
-		},
+		dimension: Dimension,
+		scaleServer: Dimension,
 		frameNumber: number,
 		numberOfUser: number,
 		readyPlayerCount: number,
 	},
 	board:
 	{
-		dimension:
-		{
-			width: number,
-			height: number
-		},
+		dimension: Dimension,
 		ball:
 		{
-			position:
-			{
-				x: number,
-				y: number,
-			}
+			position: Position,
 		},
 		playerOne:
 		{
-			position:
-			{
-				x: number,
-				y: number,
-			}
+			position: Position,
 		}
 		playerTwo:
 		{
-			position:
-			{
-				x: number,
-				y: number,
-			}
+			position: Position
 		}
 	}
 }

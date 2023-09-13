@@ -19,7 +19,6 @@ import {
 	setServerDimension
 } from "../../Redux/store/gameEngineAction";
 
-
 const	URL = "http://localhost:3000";
 
 type	ActionSocket = {
@@ -44,41 +43,15 @@ const	TestBall = () =>
 	] = useState(false);
 
 	const	dispatch = useAppDispatch();
-	const	serverDim = useAppSelector((state) =>
+
+	const	theServer = useAppSelector((state) =>
 	{
-		return (state.gameEngine.server.dimension);
+		return (state.gameEngine.server);
 	});
-	const	scaleServer = useAppSelector((state) =>
+
+	const theBoard = useAppSelector((state) =>
 	{
-		return (state.gameEngine.server.scaleServer);
-	});
-	const	boardDim = useAppSelector((state) =>
-	{
-		return (state.gameEngine.board.dimension);
-	});
-	const	numberOfUsers = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.numberOfUser);
-	});
-	const	readyPlayerCount = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.readyPlayerCount);
-	});
-	const	frameNumber = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.frameNumber);
-	});
-	const	ballPos = useAppSelector((state) =>
-	{
-		return (state.gameEngine.board.ball.position);
-	});
-	const	playerOnePos = useAppSelector((state) =>
-	{
-		return (state.gameEngine.board.playerOne.position);
-	});
-	const	playerTwoPos = useAppSelector((state) =>
-	{
-		return (state.gameEngine.board.playerTwo.position);
+		return (state.gameEngine.board);
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
@@ -131,8 +104,8 @@ const	TestBall = () =>
 				dispatch(setFrameNumber(data.payload.frameNumber));
 				dispatch(
 					setBallPosition(
-						data.payload.ballPos.x,
-						data.payload.ballPos.y
+						data.payload.theBoard.ball.position.x,
+						data.payload.theBoard.ball.position.y
 					)
 				);
 				dispatch(
@@ -225,7 +198,8 @@ const	TestBall = () =>
 		const	render = () =>
 		{
 			// update fix
-			game.ball.move(ballPos.x, ballPos.y);
+			game.ball.move(theBoard.ball.position.x, theBoard.ball.position.y);
+			
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -244,7 +218,7 @@ const	TestBall = () =>
 		});
 	},
 	[
-		ballPos,
+		theBoard.ball.position,
 	]);
 
 	// this can be used for showing a start and waiting ]
@@ -284,28 +258,31 @@ const	TestBall = () =>
 
 			{/* This part show the number of client connected */}
 			<div style={displayStyle}>
-				number of client connected : {numberOfUsers}<br/>
-				number of client ready : {readyPlayerCount}
+				number of client connected : {theServer.numberOfUser}<br/>
+				number of client ready : {theServer.readyPlayerCount}
 			</div>
 
 			{/* This part show the frame number */}
 			<div style={displayStyle}>
-				frame number (time server): {frameNumber} <br/>
+				frame number (time server): {theServer.frameNumber} <br/>
 			</div>
 
 			{/* /* This part show more information */ }
 			<div style={displayStyle}>
-				position ball x: {ballPos.x} <br />
-				position ball y: {ballPos.y} <br />
-				dimension width du server: {serverDim.width} <br />
-				dimension height du server: {serverDim.height} <br />
+				position ball x: {theBoard.ball.position.x} <br />
+				position ball y: {theBoard.ball.position.y} <br />
+				dimension width du server: {theServer.dimension.width} <br />
+				dimension height du server: {theServer.dimension.height} <br />
 				scale to server :
-					scale_width: {scaleServer.width},
-					scale_height: {scaleServer.height} <br />
-				dimension width du client : {boardDim.width} <br />
-				dimension height du client: {boardDim.height} <br />
-				position du player 1: {JSON.stringify(playerOnePos)} <br />
-				position du player 2: {JSON.stringify(playerTwoPos)} <br />
+					scale_width: {theServer.scaleServer.width},
+					scale_height:
+								{theServer.scaleServer.height} <br />
+				dimension width du client : {theBoard.dimension.width} <br />
+				dimension height du client: {theBoard.dimension.height} <br />
+				position du player 1:
+							{JSON.stringify(theBoard.playerOne.position)} <br />
+				position du player 2:
+							{JSON.stringify(theBoard.playerTwo.position)} <br />
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
