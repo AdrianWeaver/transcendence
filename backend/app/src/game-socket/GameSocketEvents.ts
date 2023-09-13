@@ -82,6 +82,7 @@ export class GameSocketEvents
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
+	// enregistrer 2 players
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
 	update: () => void;

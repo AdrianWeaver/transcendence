@@ -104,8 +104,8 @@ const	TestBall = () =>
 				dispatch(setFrameNumber(data.payload.frameNumber));
 				dispatch(
 					setBallPosition(
-						data.payload.theBoard.ball.position.x,
-						data.payload.theBoard.ball.position.y
+						data.payload.ballPos.x,
+						data.payload.ballPos.y
 					)
 				);
 				dispatch(
@@ -150,7 +150,7 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
-			console.log(data);
+			// console.log(data);
 			switch (data.type)
 			{
 				case "connect":
@@ -199,7 +199,7 @@ const	TestBall = () =>
 		{
 			// update fix
 			game.ball.move(theBoard.ball.position.x, theBoard.ball.position.y);
-			
+			// render here
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -209,6 +209,8 @@ const	TestBall = () =>
 			}
 			game.net.render();
 			game.ball.render();
+			game.playerOne.render();
+			game.playerTwo.render();
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
