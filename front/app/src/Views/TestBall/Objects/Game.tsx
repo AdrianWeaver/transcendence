@@ -73,17 +73,16 @@ class Game
 			this.playerOne.side = "left";
 			this.playerTwo.racket.game = this;
 			this.playerTwo.side = "right";
-			const border = this.board.dim.width * 0.01;
-			this.playerOne.pos.x = border;
-			this.playerOne.pos.y = this.board.dim.height / 2;
-			this.playerOne.racket.defineRacketSize();
-			this.playerOne.pos.y -= this.playerOne.racket.dim.height / 2;
-			this.playerTwo.racket.dim = this.playerOne.racket.dim;
-			this.playerTwo.pos.x = this.board.dim.width - border
-				- this.playerTwo.racket.dim.width;
-			this.playerTwo.pos.y = this.board.dim.height / 2;
-			this.playerTwo.racket.defineRacketSize();
-			this.playerTwo.pos.y -= this.playerTwo.racket.dim.height / 2;
+			// const border = this.board.dim.width * 0.01;
+			// this.playerOne.pos.x = border;
+			// this.playerOne.pos.x = border;
+			// this.playerOne.pos.y = border;
+			// this.playerOne.racket.defineRacketSize();
+			// this.playerTwo.racket.dim = this.playerOne.racket.dim;
+			// this.playerTwo.pos.x = this.board.dim.width - border
+			// 	- this.playerTwo.racket.dim.width;
+			// this.playerTwo.pos.y = border;
+			// this.playerTwo.racket.defineRacketSize();
 		};
 	}
 }

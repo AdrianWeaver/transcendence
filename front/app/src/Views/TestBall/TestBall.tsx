@@ -209,6 +209,13 @@ const	TestBall = () =>
 			}
 			game.net.render();
 			game.ball.render();
+
+			game.playerOne.pos.setCoordinateXYZ(theBoard.playerOne.position.x,
+												theBoard.playerOne.position.y);
+			game.playerOne.racket.defineRacketSize();
+			game.playerTwo.pos.setCoordinateXYZ(theBoard.playerTwo.position.x,
+				theBoard.playerTwo.position.y);
+			game.playerTwo.racket.defineRacketSize();
 			game.playerOne.render();
 			game.playerTwo.render();
 			requestId = requestAnimationFrame(render);
