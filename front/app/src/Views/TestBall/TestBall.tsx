@@ -185,6 +185,45 @@ const	TestBall = () =>
 		});
 	}, []);
 
+	const	keyHookDown = (e: KeyboardEvent) =>
+	{
+		const	action = {
+			type: ""
+		};
+		socketRef.current?.emit("game-event", action);
+		switch (e.code)
+		{
+			case "ArrowUp":
+				game.actionKeyPress = 38;
+				action.type = "arrow-up";
+				socketRef.current?.emit("game-event", action);
+				break;
+			case "ArrowDown":
+				game.actionKeyPress = 40;
+				action.type = "arrow-down";
+				socketRef.current?.emit("game-event", action);
+				break;
+			// case "KeyS":
+			// 	game.actionKeyPress = 83;
+			// 	break;
+			// case "KeyW":
+			// 	game.actionKeyPress = 87;
+			// 	break;
+			default:
+				break;
+		}
+	};
+
+	const	keyHookReleased = () =>
+	{
+		game.actionKeyPress = -1;
+		const	action = {
+			type: ""
+		};
+		action.type = "stop-key";
+		socketRef.current?.emit("game-event", action);
+	};
+
 	useEffect(() =>
 	{
 		let requestId: number;
@@ -194,6 +233,8 @@ const	TestBall = () =>
 		game.board.canvas = canvas;
 		game.board.ctx = ctx;
 		game.board.init();
+		addEventListener("keydown", keyHookDown);
+		addEventListener("keyup", keyHookReleased);
 
 		const	render = () =>
 		{

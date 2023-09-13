@@ -271,5 +271,11 @@ export class GameSocketEvents
 					this.loop.gameActive = true;
 			}
 		}
+		if (data.type === "arrow-up")
+			this.gameServe.actionKeyPress = 38;
+		if (data.type === "arrow-down")
+			this.gameServe.actionKeyPress = 40;
+		if (data.type === "stop-key")
+			this.gameServe.actionKeyPress = -1;
 	}
 }
