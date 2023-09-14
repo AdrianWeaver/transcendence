@@ -169,6 +169,7 @@ const	TestBall = () =>
 			switch (data.type)
 			{
 				case "connect":
+					console.log("LOL");
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
 					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					if (game.playerOne.socketId === undefined)
@@ -223,10 +224,6 @@ const	TestBall = () =>
 			case "ArrowUp":
 				game.actionKeyPress = 38;
 				action.type = "arrow-up"
-				// action = {
-				// 	type: "arrow-up",
-				// 	payload: game.pl
-				// }
 				socketRef.current?.emit("game-event", action);
 				break;
 			case "ArrowDown":

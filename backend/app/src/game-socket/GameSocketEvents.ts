@@ -283,14 +283,14 @@ export class GameSocketEvents
 			{
 				this.gameServe.actionKeyPress = 38;
 			}
-			else
+			else if (client.id === this.gameServe.playerTwo.socketId)
 				this.gameServe.actionKeyPress = 87;
 		}
 		if (data.type === "arrow-down")
 		{
 			if (client.id === this.gameServe.playerOne.socketId)
 				this.gameServe.actionKeyPress = 40;
-			else
+			else if (client.id === this.gameServe.playerTwo.socketId)
 				this.gameServe.actionKeyPress = 83;
 		}
 		if (data.type === "stop-key")
