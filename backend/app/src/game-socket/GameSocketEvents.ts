@@ -158,12 +158,17 @@ export class GameSocketEvents
 			this.socketIdUsers.push(client.id);
 			this.users += 1;
 		}
+		if (this.users === 1)
+			this.gameServe.playerOne.socketId = client.id;
+		else
+			this.gameServe.playerTwo.socketId = client.id;
 
 		const	action = {
 			type: "connect",
 			payload: {
 				numberUsers: this.users,
-				userReadyCount: this.userReady
+				userReadyCount: this.userReady,
+				socketId: client.id
 			}
 		};
 
@@ -251,7 +256,8 @@ export class GameSocketEvents
 	{
 		if (data.type === "ready")
 		{
-			const search = this.socketIdReady.find((element) =>
+			const	socketId = client.id;
+			const	search = this.socketIdReady.find((element) =>
 			{
 				return (element === client.id);
 			});
@@ -272,9 +278,21 @@ export class GameSocketEvents
 			}
 		}
 		if (data.type === "arrow-up")
-			this.gameServe.actionKeyPress = 38;
+		{
+			if (client.id === this.gameServe.playerOne.socketId)
+			{
+				this.gameServe.actionKeyPress = 38;
+			}
+			else
+				this.gameServe.actionKeyPress = 87;
+		}
 		if (data.type === "arrow-down")
-			this.gameServe.actionKeyPress = 40;
+		{
+			if (client.id === this.gameServe.playerOne.socketId)
+				this.gameServe.actionKeyPress = 40;
+			else
+				this.gameServe.actionKeyPress = 83;
+		}
 		if (data.type === "stop-key")
 			this.gameServe.actionKeyPress = -1;
 	}

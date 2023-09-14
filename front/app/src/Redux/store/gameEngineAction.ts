@@ -81,6 +81,29 @@ export const	setBoardDimension = (width: number, height: number)
 	});
 };
 
+export const	setSocketId = (width: number, height: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				dimension:
+				{
+					height: height,
+					width: width,
+				}
+			}
+		};
+		dispatch(action.setBoardDimension(res));
+	});
+};
+
 export const	setReadyPlayerCount = (readyPlayerCounted: number)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -149,6 +172,25 @@ export const	setPlayerTwoPos = (x: number, y: number)
 			}
 		};
 		dispatch(action.setPlayerTwoPos(res));
+	});
+};
+
+export const	setPlOneSocket = (plOneSocket: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				plOneSocket: plOneSocket
+			}
+		};
+		dispatch(action.setPlOneSocket(res));
 	});
 };
 

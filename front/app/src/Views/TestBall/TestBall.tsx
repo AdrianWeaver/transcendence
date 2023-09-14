@@ -12,6 +12,7 @@ import {
 	setBoardDimension,
 	setFrameNumber,
 	setNumberOfUsers,
+	setPlOneSocket,
 	setPlayerOnePos,
 	setPlayerTwoPos,
 	setReadyPlayerCount,
@@ -41,6 +42,20 @@ const	TestBall = () =>
 		connected,
 		setConnected
 	] = useState(false);
+
+	/* local state */
+
+	const
+	[
+		playerOneSocket,
+		setPlayerOneSocket
+	] = useState(null);
+
+	const
+	[
+		playerTwoSocket,
+		setPlayerTwoSocket
+	] = useState("");
 
 	const	dispatch = useAppDispatch();
 
@@ -154,6 +169,17 @@ const	TestBall = () =>
 			switch (data.type)
 			{
 				case "connect":
+					dispatch(setNumberOfUsers(data.payload.numberUsers));
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
+					if (game.playerOne.socketId === undefined)
+					{
+						game.playerOne.socketId = data.payload.socketId;
+					}
+					else
+					{
+						game.playerTwo.socketId = data.payload.socketId;
+					}
+					break ;
 				case "disconnect":
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
 					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
@@ -172,6 +198,7 @@ const	TestBall = () =>
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
+
 		socket.connect();
 
 		return (() =>
@@ -195,7 +222,11 @@ const	TestBall = () =>
 		{
 			case "ArrowUp":
 				game.actionKeyPress = 38;
-				action.type = "arrow-up";
+				action.type = "arrow-up"
+				// action = {
+				// 	type: "arrow-up",
+				// 	payload: game.pl
+				// }
 				socketRef.current?.emit("game-event", action);
 				break;
 			case "ArrowDown":
@@ -203,12 +234,6 @@ const	TestBall = () =>
 				action.type = "arrow-down";
 				socketRef.current?.emit("game-event", action);
 				break;
-			// case "KeyS":
-			// 	game.actionKeyPress = 83;
-			// 	break;
-			// case "KeyW":
-			// 	game.actionKeyPress = 87;
-			// 	break;
 			default:
 				break;
 		}
@@ -223,6 +248,27 @@ const	TestBall = () =>
 		action.type = "stop-key";
 		socketRef.current?.emit("game-event", action);
 	};
+
+		// this can be used for showing a start and waiting ]
+	// for all player to be ready before starting the game
+	// client.id checked on backend to avoid cheating
+	const	setReadyAction = () =>
+	{
+		if (readyPlayer === false)
+		{
+			const	action = {
+				type: "ready"
+			};
+			console.log("ready action", action);
+			socketRef.current?.emit("game-event", action);
+			setReadyPlayer(true);
+		}
+		// just for understanding the code 
+		else
+			console.log("You are already ready !");
+	};
+
+
 
 	useEffect(() =>
 	{
@@ -270,25 +316,6 @@ const	TestBall = () =>
 	[
 		theBoard.ball.position,
 	]);
-
-	// this can be used for showing a start and waiting ]
-	// for all player to be ready before starting the game
-	// client.id checked on backend to avoid cheating
-	const	setReadyAction = () =>
-	{
-		if (readyPlayer === false)
-		{
-			const	action = {
-				type: "ready"
-			};
-			console.log("ready action", action);
-			socketRef.current?.emit("game-event", action);
-			setReadyPlayer(true);
-		}
-		// just for understanding the code 
-		else
-			console.log("You are already ready !");
-	};
 
 	const	displayStyle: React.CSSProperties = {
 		textAlign: "center",

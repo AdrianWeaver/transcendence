@@ -113,5 +113,7 @@ export interface	GameEngineModel
 		{
 			position: Position
 		}
+		plOneSocket: string,
+		plTwoSocket: string
 	}
 }
