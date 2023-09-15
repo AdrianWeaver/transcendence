@@ -66,24 +66,27 @@ class Player
 				switch (this.game.actionKeyPress)
 				{
 					case 87:
-						if (this.side === "left")
+						if (this.side === "right")
 						{
-							this.pos.y = this.pos.y - ((this.racket.dim.height / 2) * 0.5);
+							this.pos.y = this.pos.y
+								- ((this.racket.dim.height / 2) * 0.5);
 							if (this.pos.y < 0)
 								this.pos.y = 0;
 						}
 						break;
 					case 83:
-						if (this.side === "left")
+						if (this.side === "right")
 						{
-							if (this.pos.y + this.racket.dim.height >= this.game.board.dim.height)
+							if (this.pos.y + this.racket.dim.height
+								>= this.game.board.dim.height)
 								this.pos.y = this.game.board.dim.height - this.racket.dim.height;
 							else
-								this.pos.y = this.pos.y + ((this.racket.dim.height / 2) * 0.5);
+								this.pos.y = this.pos.y
+									+ ((this.racket.dim.height / 2) * 0.5);
 						}
 						break;
 					case 38:
-						if (this.side === "right")
+						if (this.side === "left")
 						{
 							this.pos.y = this.pos.y
 										- ((this.racket.dim.height / 2) * 0.5);
@@ -92,7 +95,7 @@ class Player
 						}
 						break;
 						case 40:
-							if (this.side === "right")
+							if (this.side === "left")
 							{
 								if (this.pos.y + this.racket.dim.height
 									>= this.game.board.dim.height)

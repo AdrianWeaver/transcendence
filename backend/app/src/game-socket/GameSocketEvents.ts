@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
@@ -158,10 +159,20 @@ export class GameSocketEvents
 			this.socketIdUsers.push(client.id);
 			this.users += 1;
 		}
+		const	userMessage = {
+			type: "",
+		};
 		if (this.users === 1)
+		{
 			this.gameServe.playerOne.socketId = client.id;
+			userMessage.type = "player-one";
+		}
 		else
+		{
 			this.gameServe.playerTwo.socketId = client.id;
+			userMessage.type = "player-two";
+		}
+		client.emit("init-message", userMessage);
 
 		const	action = {
 			type: "connect",

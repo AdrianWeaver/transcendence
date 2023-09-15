@@ -13,6 +13,7 @@ import {
 	setFrameNumber,
 	setNumberOfUsers,
 	setPlOneSocket,
+	setPlTwoSocket,
 	setPlayerOnePos,
 	setPlayerTwoPos,
 	setReadyPlayerCount,
@@ -169,16 +170,17 @@ const	TestBall = () =>
 			switch (data.type)
 			{
 				case "connect":
-					console.log("LOL");
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
 					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					if (game.playerOne.socketId === undefined)
 					{
 						game.playerOne.socketId = data.payload.socketId;
+						dispatch(setPlOneSocket(data.payload.socketId));
 					}
 					else
 					{
 						game.playerTwo.socketId = data.payload.socketId;
+						dispatch(setPlTwoSocket(data.payload.socketId));
 					}
 					break ;
 				case "disconnect":
@@ -193,12 +195,45 @@ const	TestBall = () =>
 			}
 		};
 
+		const	sendInitMessage = (data: any) =>
+		{
+			let text: string;
+			text = "";
+			switch (data.type)
+			{
+				case "player-one":
+					text = "You are player one";
+					break ;
+				case "player-two":
+					text = "You are player two";
+					break ;
+				default:
+					break ;
+			}
+			const render = () =>
+			{
+				if (game.board.ctx)
+				{
+					game.board.ctx.fillStyle = "#000";
+					const pixels = game.board.dim.width * 0.05;
+					game.board.ctx.font = pixels + "px bald Arial";
+					const textWidth = game.board.ctx.measureText(text).width;
+					game.board.ctx.fillText(text,
+						(game.board.dim.width / 2 - textWidth / 2),
+						(game.board.dim.height * 0.3));
+				}
+				requestAnimationFrame(render);
+			};
+			requestAnimationFrame(render);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
+		socket.on("init-message", sendInitMessage);
 
 		socket.connect();
 
@@ -210,6 +245,7 @@ const	TestBall = () =>
 			socket.off("game-event", updateGame);
 			socket.off("info", initServerDim);
 			socket.off("player-info", playerInfo);
+			socket.off("init-message", sendInitMessage);
 		});
 	}, []);
 
@@ -223,7 +259,7 @@ const	TestBall = () =>
 		{
 			case "ArrowUp":
 				game.actionKeyPress = 38;
-				action.type = "arrow-up"
+				action.type = "arrow-up";
 				socketRef.current?.emit("game-event", action);
 				break;
 			case "ArrowDown":
@@ -265,8 +301,6 @@ const	TestBall = () =>
 			console.log("You are already ready !");
 	};
 
-
-
 	useEffect(() =>
 	{
 		let requestId: number;
@@ -293,7 +327,6 @@ const	TestBall = () =>
 			}
 			game.net.render();
 			game.ball.render();
-
 			game.playerOne.pos.setCoordinateXYZ(theBoard.playerOne.position.x,
 												theBoard.playerOne.position.y);
 			game.playerOne.racket.defineRacketSize();
@@ -321,6 +354,7 @@ const	TestBall = () =>
 
 	return (
 		<>
+		{/* < MenuBar /> */}
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>

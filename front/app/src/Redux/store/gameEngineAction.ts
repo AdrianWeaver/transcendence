@@ -194,6 +194,25 @@ export const	setPlOneSocket = (plOneSocket: string)
 	});
 };
 
+export const	setPlTwoSocket = (plTwoSocket: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				plTwoSocket: plTwoSocket
+			}
+		};
+		dispatch(action.setPlTwoSocket(res));
+	});
+};
+
 export const	setFrameNumber = (frameNumber: number)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
