@@ -318,7 +318,6 @@ const	TestBall = () =>
 			game.playerTwo.racket.defineRacketSize();
 			game.playerOne.render();
 			game.playerTwo.render();
-			console.log("test: " + theBoard.plOneScore);
 			game.playerOne.renderScore(theBoard.plOneScore);
 			game.playerTwo.renderScore(theBoard.plTwoScore);
 			requestId = requestAnimationFrame(render);

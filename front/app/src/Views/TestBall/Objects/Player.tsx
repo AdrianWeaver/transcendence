@@ -135,7 +135,7 @@ class Player
 		this.setSocketId = (element: string) =>
 		{
 			this.socketId = element;
-		}
+		};
     }
 }
 

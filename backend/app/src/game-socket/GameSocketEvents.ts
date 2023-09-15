@@ -132,6 +132,9 @@ export class GameSocketEvents
 				}
 			};
 			this.server.volatile.emit("game-event", action);
+			if (this.gameServe.playerOne.score === 7
+					|| this.gameServe.playerTwo.score === 7)
+				this.loop.gameActive = false;
 		};
 	}
 
