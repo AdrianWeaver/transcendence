@@ -114,6 +114,8 @@ export interface	GameEngineModel
 			position: Position
 		}
 		plOneSocket: string,
-		plTwoSocket: string
+		plTwoSocket: string,
+		plOneScore: number,
+		plTwoScore:number
 	}
 }

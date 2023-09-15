@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 import Game from "./Objects/Game";
 
+import MenuBar from "../../Component/MenuBar/MenuBar";
+
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
@@ -16,6 +18,8 @@ import {
 	setPlTwoSocket,
 	setPlayerOnePos,
 	setPlayerTwoPos,
+	setPlOneScore,
+	setPlTwoScore,
 	setReadyPlayerCount,
 	setScaleServer,
 	setServerDimension
@@ -45,18 +49,6 @@ const	TestBall = () =>
 	] = useState(false);
 
 	/* local state */
-
-	const
-	[
-		playerOneSocket,
-		setPlayerOneSocket
-	] = useState(null);
-
-	const
-	[
-		playerTwoSocket,
-		setPlayerTwoSocket
-	] = useState("");
 
 	const	dispatch = useAppDispatch();
 
@@ -136,6 +128,12 @@ const	TestBall = () =>
 						(data.payload.playerTwo.pos.y)
 					)
 				);
+				dispatch(
+					setPlOneScore(data.payload.plOneScore)
+				);
+				dispatch(
+					setPlTwoScore(data.payload.plTwoScore)
+				);
 			}
 		};
 
@@ -166,7 +164,6 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
-			// console.log(data);
 			switch (data.type)
 			{
 				case "connect":
@@ -195,7 +192,7 @@ const	TestBall = () =>
 			}
 		};
 
-		const	sendInitMessage = (data: any) =>
+		const	sendInitMessageToPlayers = (data: any) =>
 		{
 			let text: string;
 			text = "";
@@ -211,21 +208,6 @@ const	TestBall = () =>
 					break ;
 			}
 			game.renderInitMessage(text);
-			// const render = (text: string) =>
-			// {
-			// 	if (game.board.ctx)
-			// 	{
-			// 		game.board.ctx.fillStyle = "#000";
-			// 		const pixels = game.board.dim.width * 0.05;
-			// 		game.board.ctx.font = pixels + "px bald Arial";
-			// 		const textWidth = game.board.ctx.measureText(text).width;
-			// 		game.board.ctx.fillText(text,
-			// 			(game.board.dim.width / 2 - textWidth / 2),
-			// 			(game.board.dim.height * 0.3));
-			// 	}
-			// 	requestAnimationFrame(render);
-			// };
-			// requestAnimationFrame(render);
 		};
 
 		socket.on("connect", connect);
@@ -234,7 +216,7 @@ const	TestBall = () =>
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
-		socket.on("init-message", sendInitMessage);
+		socket.on("init-message", sendInitMessageToPlayers);
 
 		socket.connect();
 
@@ -246,7 +228,7 @@ const	TestBall = () =>
 			socket.off("game-event", updateGame);
 			socket.off("info", initServerDim);
 			socket.off("player-info", playerInfo);
-			socket.off("init-message", sendInitMessage);
+			socket.off("init-message", sendInitMessageToPlayers);
 		});
 	}, []);
 
@@ -336,6 +318,9 @@ const	TestBall = () =>
 			game.playerTwo.racket.defineRacketSize();
 			game.playerOne.render();
 			game.playerTwo.render();
+			console.log("test: " + theBoard.plOneScore);
+			game.playerOne.renderScore(theBoard.plOneScore);
+			game.playerTwo.renderScore(theBoard.plTwoScore);
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -355,7 +340,7 @@ const	TestBall = () =>
 
 	return (
 		<>
-		{/* < MenuBar /> */}
+			< MenuBar />
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>

@@ -79,7 +79,8 @@ class Player
 						{
 							if (this.pos.y + this.racket.dim.height
 								>= this.game.board.dim.height)
-								this.pos.y = this.game.board.dim.height - this.racket.dim.height;
+								this.pos.y = this.game.board.dim.height
+												- this.racket.dim.height;
 							else
 								this.pos.y = this.pos.y
 									+ ((this.racket.dim.height / 2) * 0.5);

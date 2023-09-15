@@ -87,6 +87,7 @@ class Game
 		};
 		this.renderInitMessage = (text: string) =>
 		{
+			let	requestID: number;
 			const	render = () =>
 			{
 				if (this.board.ctx)
@@ -99,9 +100,13 @@ class Game
 						(this.board.dim.width / 2 - textWidth / 2),
 						(this.board.dim.height * 0.3));
 				}
-				requestAnimationFrame(render);
+				requestID = requestAnimationFrame(render);
 			};
-			requestAnimationFrame(render);
+			requestID = requestAnimationFrame(render);
+			return (() =>
+			{
+				cancelAnimationFrame(requestID);
+			});
 		};
 	}
 }

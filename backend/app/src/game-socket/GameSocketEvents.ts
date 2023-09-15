@@ -126,7 +126,9 @@ export class GameSocketEvents
 							x: this.gameServe.playerTwo.pos.x,
 							y: this.gameServe.playerTwo.pos.y,
 						}
-					}
+					},
+					plOneScore: this.gameServe.playerOne.score,
+					plTwoScore: this.gameServe.playerTwo.score,
 				}
 			};
 			this.server.volatile.emit("game-event", action);
@@ -267,7 +269,6 @@ export class GameSocketEvents
 	{
 		if (data.type === "ready")
 		{
-			const	socketId = client.id;
 			const	search = this.socketIdReady.find((element) =>
 			{
 				return (element === client.id);

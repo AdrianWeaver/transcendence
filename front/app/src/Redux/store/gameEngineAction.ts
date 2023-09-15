@@ -213,6 +213,44 @@ export const	setPlTwoSocket = (plTwoSocket: string)
 	});
 };
 
+export const	setPlOneScore = (plOneScore: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				plOneScore: plOneScore
+			}
+		};
+		dispatch(action.setPlOneScore(res));
+	});
+};
+
+export const	setPlTwoScore = (plTwoScore: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				plTwoScore: plTwoScore
+			}
+		};
+		dispatch(action.setPlTwoScore(res));
+	});
+};
+
 export const	setFrameNumber = (frameNumber: number)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {

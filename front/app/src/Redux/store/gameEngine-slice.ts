@@ -102,6 +102,16 @@ const	gameEngineSlice = createSlice(
 			state.board.plTwoSocket
 				= action.payload.board.plTwoSocket;
 		},
+		setPlOneScore(state, action: PayloadAction<Model>)
+		{
+			state.board.plOneScore
+				= action.payload.board.plOneScore;
+		},
+		setPlTwoScore(state, action: PayloadAction<Model>)
+		{
+			state.board.plTwoScore
+				= action.payload.board.plTwoScore;
+		},
 		setFrameNumber(state, action: PayloadAction<Model>)
 		{
 			state.server.frameNumber

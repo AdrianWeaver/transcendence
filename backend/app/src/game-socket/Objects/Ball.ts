@@ -85,13 +85,6 @@ class Ball
 		};
 		this.move = () =>
 		{
-			// console.log("Element to send to server :",
-			// 	{
-			// 		ballPos: {
-			// 			x: this.pos.x,
-			// 			y: this.pos.y
-			// 		}
-			// 	});
 			if (this.game && this.game.continueAnimating === true)
 			{
 				const newPosX = this.pos.x + Math.cos(this.angle) * this.speedX;
@@ -120,14 +113,14 @@ class Ball
 				if (this.pos.x <= 0)
 				{
 					this.game.playerTwo.score += 1;
-					// this.failedAudio.play();
 					this.angle = this.degreesToRadians(180);
 					this.init();
 				}
-				if (this.pos.x >= this.game.board.dim.width)
+				// if (this.pos.x >= this.game.board.dim.width)
+				if (this.pos.x > this.game.playerTwo.pos.x
+					+ this.game.playerTwo.racket.dim.width)
 				{
 					this.game.playerOne.score += 1;
-					// this.failedAudio.play();
 					this.angle = this.degreesToRadians(0);
 					this.init();
 				}
