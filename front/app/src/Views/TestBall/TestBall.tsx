@@ -50,6 +50,12 @@ const	TestBall = () =>
 
 	/* local state */
 
+	const
+	[
+		gameOver,
+		setGameOver
+	] = useState(false);
+
 	const	dispatch = useAppDispatch();
 
 	const	theServer = useAppSelector((state) =>
@@ -210,6 +216,11 @@ const	TestBall = () =>
 			game.renderInitMessage(text);
 		};
 
+		const	endOfGame = () =>
+		{
+			setGameOver(true);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -217,6 +228,7 @@ const	TestBall = () =>
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
 		socket.on("init-message", sendInitMessageToPlayers);
+		socket.on("end-of-game", endOfGame);
 
 		socket.connect();
 
@@ -229,6 +241,7 @@ const	TestBall = () =>
 			socket.off("info", initServerDim);
 			socket.off("player-info", playerInfo);
 			socket.off("init-message", sendInitMessageToPlayers);
+			socket.off("end-of-game", endOfGame);
 		});
 	}, []);
 
@@ -296,8 +309,18 @@ const	TestBall = () =>
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
 
+		const clear = () =>
+	{
+		if (game.board.ctx)
+		{
+			game.board.ctx.fillStyle = "#fff";
+			game.board.ctx?.clearRect(0, 0,
+				game.board.dim.width, game.board.dim.height);
+		}
+	};
 		const	render = () =>
 		{
+			clear();
 			// update fix
 			game.ball.move(theBoard.ball.position.x, theBoard.ball.position.y);
 			// render here
@@ -320,6 +343,8 @@ const	TestBall = () =>
 			game.playerTwo.render();
 			game.playerOne.renderScore(theBoard.plOneScore);
 			game.playerTwo.renderScore(theBoard.plTwoScore);
+			if (gameOver === true)
+				game.displayEndMessage();
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
@@ -328,9 +353,7 @@ const	TestBall = () =>
 			cancelAnimationFrame(requestId);
 		});
 	},
-	[
-		theBoard.ball.position,
-	]);
+	[ theBoard.ball.position ]);
 
 	const	displayStyle: React.CSSProperties = {
 		textAlign: "center",

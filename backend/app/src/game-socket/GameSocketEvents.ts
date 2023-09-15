@@ -102,7 +102,10 @@ export class GameSocketEvents
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
 			if (this.loop.gameActive === false)
+			{
+				this.server.volatile.emit("end-of-game");
 				return ;
+			}
 			this.update();
 			const action = {
 				type: "game-data",
@@ -132,9 +135,11 @@ export class GameSocketEvents
 				}
 			};
 			this.server.volatile.emit("game-event", action);
-			if (this.gameServe.playerOne.score === 7
-					|| this.gameServe.playerTwo.score === 7)
+			if (this.gameServe.playerOne.score === 3
+					|| this.gameServe.playerTwo.score === 3)
+			{
 				this.loop.gameActive = false;
+			}
 		};
 	}
 
@@ -143,7 +148,6 @@ export class GameSocketEvents
 		this.server = server;
 		this.users = 0;
 		this.loop = new NodeAnimationFrame();
-		// console.log("DEBUG: Server gateway initialized :", server);
 		this.loop.callbackFunction = this.printPerformance;
 		this.gameServe = new GameServe();
 		this.gameServe.ball.game = this.gameServe;
@@ -295,9 +299,7 @@ export class GameSocketEvents
 		if (data.type === "arrow-up")
 		{
 			if (client.id === this.gameServe.playerOne.socketId)
-			{
 				this.gameServe.actionKeyPress = 38;
-			}
 			else if (client.id === this.gameServe.playerTwo.socketId)
 				this.gameServe.actionKeyPress = 87;
 		}

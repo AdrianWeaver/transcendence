@@ -55,7 +55,9 @@ export const	initialGameEngineState: Model = {
 				x: 1,
 				y: 1,
 			}
-		}
+		},
+		plOneScore: 0,
+		plTwoScore: 0
 	}
 };
 

@@ -54,6 +54,7 @@ class Game
 		};
 		this.displayEndMessage = () =>
 		{
+			console.log("LOL");
 			if (this.board.ctx)
 			{
 				this.board.ctx.fillStyle = "#000";
