@@ -19,6 +19,7 @@ class Game
 	public actionKeyPress: number;
 	public startDisplayed: boolean;
 	public continueAnimating: boolean;
+	public renderInitMessage: (text: string) => void;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
@@ -83,6 +84,24 @@ class Game
 			// 	- this.playerTwo.racket.dim.width;
 			// this.playerTwo.pos.y = border;
 			// this.playerTwo.racket.defineRacketSize();
+		};
+		this.renderInitMessage = (text: string) =>
+		{
+			const	render = () =>
+			{
+				if (this.board.ctx)
+				{
+					this.board.ctx.fillStyle = "#000";
+					const pixels = this.board.dim.width * 0.05;
+					this.board.ctx.font = pixels + "px bald Arial";
+					const textWidth = this.board.ctx.measureText(text).width;
+					this.board.ctx.fillText(text,
+						(this.board.dim.width / 2 - textWidth / 2),
+						(this.board.dim.height * 0.3));
+				}
+				requestAnimationFrame(render);
+			};
+			requestAnimationFrame(render);
 		};
 	}
 }

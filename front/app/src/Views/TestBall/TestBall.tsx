@@ -210,21 +210,22 @@ const	TestBall = () =>
 				default:
 					break ;
 			}
-			const render = () =>
-			{
-				if (game.board.ctx)
-				{
-					game.board.ctx.fillStyle = "#000";
-					const pixels = game.board.dim.width * 0.05;
-					game.board.ctx.font = pixels + "px bald Arial";
-					const textWidth = game.board.ctx.measureText(text).width;
-					game.board.ctx.fillText(text,
-						(game.board.dim.width / 2 - textWidth / 2),
-						(game.board.dim.height * 0.3));
-				}
-				requestAnimationFrame(render);
-			};
-			requestAnimationFrame(render);
+			game.renderInitMessage(text);
+			// const render = (text: string) =>
+			// {
+			// 	if (game.board.ctx)
+			// 	{
+			// 		game.board.ctx.fillStyle = "#000";
+			// 		const pixels = game.board.dim.width * 0.05;
+			// 		game.board.ctx.font = pixels + "px bald Arial";
+			// 		const textWidth = game.board.ctx.measureText(text).width;
+			// 		game.board.ctx.fillText(text,
+			// 			(game.board.dim.width / 2 - textWidth / 2),
+			// 			(game.board.dim.height * 0.3));
+			// 	}
+			// 	requestAnimationFrame(render);
+			// };
+			// requestAnimationFrame(render);
 		};
 
 		socket.on("connect", connect);
