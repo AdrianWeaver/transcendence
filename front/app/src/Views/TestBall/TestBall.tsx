@@ -256,7 +256,7 @@ const	TestBall = () =>
 	const	keyHookDown = (e: KeyboardEvent) =>
 	{
 		const	action = {
-			type: ""
+			type: "",
 		};
 		socketRef.current?.emit("game-event", action);
 		switch (e.code)
@@ -286,7 +286,7 @@ const	TestBall = () =>
 		socketRef.current?.emit("game-event", action);
 	};
 
-		// this can be used for showing a start and waiting ]
+	// this can be used for showing a start and waiting ]
 	// for all player to be ready before starting the game
 	// client.id checked on backend to avoid cheating
 	const	setReadyAction = () =>
@@ -296,7 +296,6 @@ const	TestBall = () =>
 			const	action = {
 				type: "ready"
 			};
-			console.log("ready action", action);
 			socketRef.current?.emit("game-event", action);
 			setReadyPlayer(true);
 		}
@@ -394,11 +393,6 @@ const	TestBall = () =>
 		<>
 			< MenuBar />
 			<div style={displayStyle}>
-				FT_TRANSCENDANCE
-			</div>
-
-			{/* This part show the connection to the websocket */}
-			<div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
 
@@ -406,29 +400,6 @@ const	TestBall = () =>
 			<div style={displayStyle}>
 				number of client connected : {theServer.numberOfUser}<br/>
 				number of client ready : {theServer.readyPlayerCount}
-			</div>
-
-			{/* This part show the frame number */}
-			<div style={displayStyle}>
-				frame number (time server): {theServer.frameNumber} <br/>
-			</div>
-
-			{/* /* This part show more information */ }
-			<div style={displayStyle}>
-				position ball x: {theBoard.ball.position.x} <br />
-				position ball y: {theBoard.ball.position.y} <br />
-				dimension width du server: {theServer.dimension.width} <br />
-				dimension height du server: {theServer.dimension.height} <br />
-				scale to server :
-					scale_width: {theServer.scaleServer.width},
-					scale_height:
-								{theServer.scaleServer.height} <br />
-				dimension width du client : {theBoard.dimension.width} <br />
-				dimension height du client: {theBoard.dimension.height} <br />
-				position du player 1:
-							{JSON.stringify(theBoard.playerOne.position)} <br />
-				position du player 2:
-							{JSON.stringify(theBoard.playerTwo.position)} <br />
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>

@@ -17,6 +17,7 @@ import
 
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
+import { LargeNumberLike } from "crypto";
 
 class	NodeAnimationFrame
 {
@@ -169,20 +170,9 @@ export class GameSocketEvents
 			this.users += 1;
 			this.totalUsers += 1;
 			// We will create each time a new room
-			// There can be each time only two players in the same room
 			roomName = "Room " + (Math.round(this.totalUsers / 2)).toString();
 			client.join(roomName);
-			// Check whether a client is present in a room:
-			// const room = this.server.sockets.adapter.rooms.get(roomName);
-			// if (room)
-			// {
-			// 	if (room.has(client.id))
-			// 		console.log("User is in the room");
-			// 	else
-			// 		console.log("User is not in the room");
-			// }
-			// else
-			// 	console.log("Room does not exist");
+			console.log("joined " + roomName);
 		}
 		else
 		{
@@ -230,8 +220,7 @@ export class GameSocketEvents
 				socketId: client.id
 			}
 		};
-
-		this.server.emit("player-info", action);
+		this.server.to(roomName).emit("player-info", action);
 	}
 
 	handleDisconnect(client: Socket)
@@ -313,6 +302,29 @@ export class GameSocketEvents
 		@ConnectedSocket() client: Socket
 	)
 	{
+		let	userRoom: string;
+		userRoom = "";
+		this.server.sockets.adapter.rooms.forEach((room, roomName) =>
+		{
+			// Check if the socket ID is in the room
+			if (room.has(client.id))
+				userRoom = roomName;
+		});
+		if (!userRoom)
+		{
+			console.log("An error occured with socket.io");
+			return ;
+		}
+		const roomInfo = this.server.sockets.adapter.rooms.get(userRoom);
+		if (roomInfo)
+			console.log(roomInfo);
+		if (!roomInfo)
+		{
+			console.log("An error occured with socket.io");
+			return ;
+		}
+		const socketIdsInRoom = Array.from(roomInfo.keys());
+
 		if (data.type === "ready")
 		{
 			const	search = this.socketIdReady.find((element) =>
@@ -324,32 +336,63 @@ export class GameSocketEvents
 				this.socketIdReady.push(client.id);
 				this.userReady++;
 
+				// check and add the user to the ready list
+
+				let	countReadyInRoom: number;
+				countReadyInRoom = 0;
+				for (const socketId of socketIdsInRoom)
+				{
+					const	searchReady = this.socketIdReady.find((element) =>
+					{
+						return (element === socketId);
+					});
+					if (searchReady !== undefined)
+						countReadyInRoom++;
+				}
+
 				const	action = {
 					type: "ready-player",
 					payload: {
 						userReadyCount: this.userReady
 					}
 				};
-				this.server.emit("player-info", action);
-				if (this.userReady === 2)
+
+				this.server.to(userRoom).emit("player-info", action);
+
+				if (countReadyInRoom === 2)
 				{
-					this.server.emit("game-active", action);
+					this.server.to(userRoom).emit("game-active", action);
 					this.loop.gameActive = true;
 				}
 			}
 		}
+
+		if (roomInfo)
+			console.log(roomInfo);
+		// Determine whether the player is right or left player
+		let	playerIndex: number;
+		playerIndex = 0;
+		for (const socketId of socketIdsInRoom)
+		{
+			if (socketId === client.id)
+				playerIndex = 1;
+			else
+				playerIndex = 2;
+			break ;
+		}
+
 		if (data.type === "arrow-up")
 		{
-			if (client.id === this.gameServe.playerOne.socketId)
+			if (playerIndex === 1)
 				this.gameServe.actionKeyPress = 38;
-			else if (client.id === this.gameServe.playerTwo.socketId)
+			else if (playerIndex === 2)
 				this.gameServe.actionKeyPress = 87;
 		}
 		if (data.type === "arrow-down")
 		{
-			if (client.id === this.gameServe.playerOne.socketId)
+			if (playerIndex === 1)
 				this.gameServe.actionKeyPress = 40;
-			else if (client.id === this.gameServe.playerTwo.socketId)
+			else if (playerIndex === 2)
 				this.gameServe.actionKeyPress = 83;
 		}
 		if (data.type === "stop-key")
