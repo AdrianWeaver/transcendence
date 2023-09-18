@@ -103,7 +103,7 @@ export class GameSocketEvents
 		{
 			if (this.loop.gameActive === false)
 			{
-				this.server.volatile.emit("end-of-game");
+				// this.server.volatile.emit("end-of-game");
 				return ;
 			}
 			this.update();

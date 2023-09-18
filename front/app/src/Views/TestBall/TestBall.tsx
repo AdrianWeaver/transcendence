@@ -343,7 +343,7 @@ const	TestBall = () =>
 			game.playerTwo.render();
 			game.playerOne.renderScore(theBoard.plOneScore);
 			game.playerTwo.renderScore(theBoard.plTwoScore);
-			if (gameOver === true)
+			if (game.playerOne.score === 3 || game.playerTwo.score === 3)
 				game.displayEndMessage();
 			requestId = requestAnimationFrame(render);
 		};
