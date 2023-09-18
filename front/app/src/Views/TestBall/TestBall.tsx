@@ -50,10 +50,16 @@ const	TestBall = () =>
 
 	/* local state */
 
+		// const
+		// [
+		// 	gameOver,
+		// 	setGameOver
+		// ] = useState(false);
+
 	const
 	[
-		gameOver,
-		setGameOver
+		gameActive,
+		setGameActive
 	] = useState(false);
 
 	const	dispatch = useAppDispatch();
@@ -114,7 +120,6 @@ const	TestBall = () =>
 		{
 			if (data.type === "game-data")
 			{
-				// console.log(data.payload.ballPos);
 				dispatch(setFrameNumber(data.payload.frameNumber));
 				dispatch(
 					setBallPosition(
@@ -216,9 +221,9 @@ const	TestBall = () =>
 			game.renderInitMessage(text);
 		};
 
-		const	endOfGame = () =>
+		const	activateGame = (data: any) =>
 		{
-			setGameOver(true);
+			setGameActive(true);
 		};
 
 		socket.on("connect", connect);
@@ -228,8 +233,7 @@ const	TestBall = () =>
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
 		socket.on("init-message", sendInitMessageToPlayers);
-		socket.on("end-of-game", endOfGame);
-
+		socket.on("game-active", activateGame);
 		socket.connect();
 
 		return (() =>
@@ -241,7 +245,7 @@ const	TestBall = () =>
 			socket.off("info", initServerDim);
 			socket.off("player-info", playerInfo);
 			socket.off("init-message", sendInitMessageToPlayers);
-			socket.off("end-of-game", endOfGame);
+			socket.off("game-active", activateGame);
 		});
 	}, []);
 
@@ -310,20 +314,18 @@ const	TestBall = () =>
 		addEventListener("keyup", keyHookReleased);
 
 		const clear = () =>
-	{
-		if (game.board.ctx)
 		{
-			game.board.ctx.fillStyle = "#fff";
-			game.board.ctx?.clearRect(0, 0,
-				game.board.dim.width, game.board.dim.height);
-		}
-	};
+			if (game.board.ctx)
+			{
+				game.board.ctx.fillStyle = "#fff";
+				game.board.ctx?.clearRect(0, 0,
+					game.board.dim.width, game.board.dim.height);
+			}
+		};
+
 		const	render = () =>
 		{
 			clear();
-			// update fix
-			game.ball.move(theBoard.ball.position.x, theBoard.ball.position.y);
-			// render here
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -331,16 +333,39 @@ const	TestBall = () =>
 				game.board.ctx.fillRect(0, 0, game.board.dim.width,
 					game.board.dim.height);
 			}
+			if (gameActive === false)
+			{
+				const border = game.board.dim.width * 0.01;
+				game.playerOne.pos.x = border;
+				game.playerOne.pos.y = game.board.dim.height / 2;
+				game.playerOne.racket.defineRacketSize();
+				game.playerOne.pos.y -= game.playerOne.racket.dim.height / 2;
+				game.playerTwo.racket.dim = game.playerOne.racket.dim;
+				game.playerTwo.pos.x = game.board.dim.width - border
+					- game.playerTwo.racket.dim.width;
+				game.playerTwo.pos.y = game.board.dim.height / 2;
+				game.playerTwo.racket.defineRacketSize();
+				game.playerTwo.pos.y -= game.playerTwo.racket.dim.height / 2;
+				game.playerOne.render();
+				game.playerTwo.render();
+			}
+			else
+			{
+				game.playerOne.pos.setCoordinateXYZ(
+					theBoard.playerOne.position.x,
+					theBoard.playerOne.position.y);
+				game.playerOne.racket.defineRacketSize();
+				game.playerTwo.pos.setCoordinateXYZ(
+					theBoard.playerTwo.position.x,
+					theBoard.playerTwo.position.y);
+				game.playerTwo.racket.defineRacketSize();
+				game.playerOne.render();
+				game.playerTwo.render();
+				game.ball.move(theBoard.ball.position.x,
+								theBoard.ball.position.y);
+			}
 			game.net.render();
 			game.ball.render();
-			game.playerOne.pos.setCoordinateXYZ(theBoard.playerOne.position.x,
-												theBoard.playerOne.position.y);
-			game.playerOne.racket.defineRacketSize();
-			game.playerTwo.pos.setCoordinateXYZ(theBoard.playerTwo.position.x,
-				theBoard.playerTwo.position.y);
-			game.playerTwo.racket.defineRacketSize();
-			game.playerOne.render();
-			game.playerTwo.render();
 			game.playerOne.renderScore(theBoard.plOneScore);
 			game.playerTwo.renderScore(theBoard.plTwoScore);
 			if (game.playerOne.score === 3 || game.playerTwo.score === 3)

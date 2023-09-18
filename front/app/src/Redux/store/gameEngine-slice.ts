@@ -36,8 +36,8 @@ export const	initialGameEngineState: Model = {
 		{
 			position:
 			{
-				x: 1,
-				y: 1,
+				x: 200,
+				y: 200,
 			}
 		},
 		playerOne:

@@ -83,7 +83,6 @@ export class GameSocketEvents
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
-	// enregistrer 2 players
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
 	update: () => void;
@@ -102,10 +101,7 @@ export class GameSocketEvents
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
 			if (this.loop.gameActive === false)
-			{
-				// this.server.volatile.emit("end-of-game");
 				return ;
-			}
 			this.update();
 			const action = {
 				type: "game-data",
@@ -293,7 +289,10 @@ export class GameSocketEvents
 				};
 				this.server.emit("player-info", action);
 				if (this.userReady === 2)
+				{
+					this.server.emit("game-active", action);
 					this.loop.gameActive = true;
+				}
 			}
 		}
 		if (data.type === "arrow-up")
