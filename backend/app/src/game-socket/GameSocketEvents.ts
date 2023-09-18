@@ -79,7 +79,9 @@ export class GameSocketEvents
 	@WebSocketServer()
 	server: Server;
 	users: number;
+	totalUsers: number;
 	socketIdUsers: string[] = [];
+	rooms: string[][] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
@@ -143,6 +145,7 @@ export class GameSocketEvents
 	{
 		this.server = server;
 		this.users = 0;
+		this.totalUsers = 0;
 		this.loop = new NodeAnimationFrame();
 		this.loop.callbackFunction = this.printPerformance;
 		this.gameServe = new GameServe();
@@ -155,6 +158,7 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
+		let roomName: string;
 		const searchUser = this.socketIdUsers.find((element) =>
 		{
 			return (element === client.id);
@@ -163,19 +167,56 @@ export class GameSocketEvents
 		{
 			this.socketIdUsers.push(client.id);
 			this.users += 1;
+			this.totalUsers += 1;
+			// We will create each time a new room
+			// There can be each time only two players in the same room
+			roomName = "Room " + (Math.round(this.totalUsers / 2)).toString();
+			client.join(roomName);
+			// Check whether a client is present in a room:
+			// const room = this.server.sockets.adapter.rooms.get(roomName);
+			// if (room)
+			// {
+			// 	if (room.has(client.id))
+			// 		console.log("User is in the room");
+			// 	else
+			// 		console.log("User is not in the room");
+			// }
+			// else
+			// 	console.log("Room does not exist");
 		}
+		else
+		{
+			console.log("Something odd happened");
+			return ;
+		}
+
+		// Count number of users in a room
+		const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
+		let	roomSize: number;
+		if (roomInfo)
+			roomSize = roomInfo.size;
+		else
+		{
+			console.log("An error occured due to rooms");
+			return ;
+		}
+
 		const	userMessage = {
 			type: "",
+			payload: ""
 		};
-		if (this.users === 1)
+
+		if (roomSize === 1)
 		{
 			this.gameServe.playerOne.socketId = client.id;
 			userMessage.type = "player-one";
+			userMessage.payload = roomName;
 		}
-		else if (this.users === 2)
+		else if (roomSize === 2)
 		{
 			this.gameServe.playerTwo.socketId = client.id;
 			userMessage.type = "player-two";
+			userMessage.payload = roomName;
 		}
 		else
 			userMessage.type = "visitor";

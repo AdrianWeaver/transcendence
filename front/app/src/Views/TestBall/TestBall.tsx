@@ -211,10 +211,10 @@ const	TestBall = () =>
 			switch (data.type)
 			{
 				case "player-one":
-					text = "You are player one";
+					text = "You are player one in " + data.payload;
 					break ;
 				case "player-two":
-					text = "You are player two";
+					text = "You are player two in " + data.payload;
 					break ;
 				case "visitor":
 					text = "You are a visitor";
