@@ -75,3 +75,47 @@ export interface	ControllerModel
 	"registration": RegistrationProcessModel,
 	"canvas": CanvasModel
 }
+
+export interface	Dimension
+{
+	width: number,
+	height: number
+}
+
+export interface	Position
+{
+	x: number,
+	y: number
+}
+
+export interface	GameEngineModel
+{
+	server:
+	{
+		dimension: Dimension,
+		scaleServer: Dimension,
+		frameNumber: number,
+		numberOfUser: number,
+		readyPlayerCount: number,
+	},
+	board:
+	{
+		dimension: Dimension,
+		ball:
+		{
+			position: Position,
+		},
+		playerOne:
+		{
+			position: Position,
+		}
+		playerTwo:
+		{
+			position: Position
+		}
+		plOneSocket: string,
+		plTwoSocket: string,
+		plOneScore: number,
+		plTwoScore:number
+	}
+}

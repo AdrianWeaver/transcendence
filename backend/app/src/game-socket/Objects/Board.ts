@@ -29,15 +29,6 @@ class Board
 		this.irlWidth = 274;
 		this.irlHeight = 152.5;
 		this.irlRatio = this.irlHeight / this.irlWidth;
-		// this.canvasRef = createRef<HTMLCanvasElement>();
-		// this.canvas = this.canvasRef.current;
-		// this.ctx = this.canvas?.getContext("2d");
-		// if (this.ctx)
-		// {
-		// 	this.ctx.font = "30px Arial";
-		// 	this.ctx.fillStyle = "#000";
-		// 	this.ctx.textAlign = "center";
-		// }
 		this.dim = new Dimension();
 		this.game = undefined;
 		this.setHeight = () =>
@@ -55,11 +46,7 @@ class Board
 
 			this.dim.width = canvasWidth;
 			this.dim.height = canvasHeight;
-			// if (this.canvas)
-			// {
-			// 	this.canvas.width = this.dim.width;
-			// 	this.canvas.height = this.dim.height;
-			// }
+
 			const	multiplicatorWidth = this.dim.width / prevWidth;
 			const	multiplicatorHeight = this.dim.height / prevHeight;
 

@@ -13,12 +13,14 @@ class Player
 	public game: Game | undefined;
 	public side: string | undefined;
 	public uuid: number | undefined;
+	public socketId: string | undefined;
 	public name: string | undefined;
 	public render: () => void;
-	public renderScore: () => void;
+	public renderScore: (scoreFromServer: number) => void;
 	public updatePlayerPosition: () => void;
 	public isLeftPlayer: (posX: number, posY: number) => boolean;
 	public isRightPlayer: (posX: number, posY: number) => boolean;
+	public setSocketId: (element: string) => void;
 
 	public constructor()
 	{
@@ -28,6 +30,7 @@ class Player
 		this.game = undefined;
 		this.side = undefined;
 		this.uuid = undefined;
+		this.socketId = undefined;
 		this.name = undefined;
 		this.render = () =>
 		{
@@ -38,8 +41,9 @@ class Player
 					this.pos.y, this.racket.dim.width, this.racket.dim.height);
 			}
 		};
-		this.renderScore = () =>
+		this.renderScore = (scoreFromServer: number) =>
 		{
+			this.score = scoreFromServer;
 			if (this.game && this.game.board && this.game.board.ctx)
 			{
 			this.game.board.ctx.fillStyle = "#000";
@@ -127,6 +131,10 @@ class Player
 				return (true);
 			else
 				return (false);
+		};
+		this.setSocketId = (element: string) =>
+		{
+			this.socketId = element;
 		};
     }
 }

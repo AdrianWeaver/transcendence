@@ -13,6 +13,7 @@ class Player
 	public game: Game | undefined;
 	public side: string | undefined;
 	public uuid: number | undefined;
+	public socketId: string | undefined;
 	public name: string | undefined;
 	public render: () => void;
 	public renderScore: () => void;
@@ -28,6 +29,7 @@ class Player
 		this.game = undefined;
 		this.side = undefined;
 		this.uuid = undefined;
+		this.socketId = undefined;
 		this.name = undefined;
 		this.render = () =>
 		{
@@ -64,7 +66,7 @@ class Player
 				switch (this.game.actionKeyPress)
 				{
 					case 87:
-						if (this.side === "left")
+						if (this.side === "right")
 						{
 							this.pos.y = this.pos.y
 								- ((this.racket.dim.height / 2) * 0.5);
@@ -73,19 +75,19 @@ class Player
 						}
 						break;
 					case 83:
-						if (this.side === "left")
+						if (this.side === "right")
 						{
 							if (this.pos.y + this.racket.dim.height
 								>= this.game.board.dim.height)
 								this.pos.y = this.game.board.dim.height
-									- this.racket.dim.height;
+												- this.racket.dim.height;
 							else
 								this.pos.y = this.pos.y
 									+ ((this.racket.dim.height / 2) * 0.5);
 						}
 						break;
 					case 38:
-						if (this.side === "right")
+						if (this.side === "left")
 						{
 							this.pos.y = this.pos.y
 										- ((this.racket.dim.height / 2) * 0.5);
@@ -94,7 +96,7 @@ class Player
 						}
 						break;
 						case 40:
-							if (this.side === "right")
+							if (this.side === "left")
 							{
 								if (this.pos.y + this.racket.dim.height
 									>= this.game.board.dim.height)

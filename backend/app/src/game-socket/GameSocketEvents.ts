@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
@@ -33,7 +34,7 @@ class	NodeAnimationFrame
 	{
 		this.frameRate = 60;
 		this.frameNumber = 0;
-		this.gameActive = true;
+		this.gameActive = false;
 		this.game = undefined;
 		this.requestFrame = (callbackFunction) =>
 		{
@@ -53,7 +54,8 @@ class	NodeAnimationFrame
 				return ;
 			}
 			this.callbackFunction(timestamp, this.frameNumber);
-			this.frameNumber++;
+			if (this.gameActive === true)
+				this.frameNumber++;
 			this.requestFrame(this.update);
 		};
 	}
@@ -77,6 +79,7 @@ export class GameSocketEvents
 	@WebSocketServer()
 	server: Server;
 	users: number;
+	socketIdUsers: string[] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
@@ -97,8 +100,9 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
+			if (this.loop.gameActive === false)
+				return ;
 			this.update();
-
 			const action = {
 				type: "game-data",
 				payload:
@@ -107,10 +111,31 @@ export class GameSocketEvents
 					ballPos: {
 						x: this.gameServe.ball.pos.x,
 						y: this.gameServe.ball.pos.y,
-					}
+					},
+					playerOne:
+					{
+						pos: {
+							x: this.gameServe.playerOne.pos.x,
+							y: this.gameServe.playerOne.pos.y,
+						}
+					},
+					playerTwo:
+					{
+						pos: {
+							x: this.gameServe.playerTwo.pos.x,
+							y: this.gameServe.playerTwo.pos.y,
+						}
+					},
+					plOneScore: this.gameServe.playerOne.score,
+					plTwoScore: this.gameServe.playerTwo.score,
 				}
 			};
 			this.server.volatile.emit("game-event", action);
+			if (this.gameServe.playerOne.score === this.gameServe.scoreLimit
+				|| this.gameServe.playerTwo.score === this.gameServe.scoreLimit)
+			{
+				this.loop.gameActive = false;
+			}
 		};
 	}
 
@@ -119,7 +144,6 @@ export class GameSocketEvents
 		this.server = server;
 		this.users = 0;
 		this.loop = new NodeAnimationFrame();
-		// console.log("DEBUG: Server gateway initialized :", server);
 		this.loop.callbackFunction = this.printPerformance;
 		this.gameServe = new GameServe();
 		this.gameServe.ball.game = this.gameServe;
@@ -131,14 +155,38 @@ export class GameSocketEvents
 
 	handleConnection(client: Socket)
 	{
-		// need to verify the user if already exist or not
-		this.users += 1;
+		const searchUser = this.socketIdUsers.find((element) =>
+		{
+			return (element === client.id);
+		});
+		if (searchUser === undefined)
+		{
+			this.socketIdUsers.push(client.id);
+			this.users += 1;
+		}
+		const	userMessage = {
+			type: "",
+		};
+		if (this.users === 1)
+		{
+			this.gameServe.playerOne.socketId = client.id;
+			userMessage.type = "player-one";
+		}
+		else if (this.users === 2)
+		{
+			this.gameServe.playerTwo.socketId = client.id;
+			userMessage.type = "player-two";
+		}
+		else
+			userMessage.type = "visitor";
+		client.emit("init-message", userMessage);
 
 		const	action = {
 			type: "connect",
 			payload: {
 				numberUsers: this.users,
-				userReadyCount: this.userReady
+				userReadyCount: this.userReady,
+				socketId: client.id
 			}
 		};
 
@@ -147,17 +195,26 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
-		this.users -= 1;
-
-		const	wasReady = this.socketIdReady.findIndex((element) =>
+		const userIndex = this.socketIdUsers.findIndex((element) =>
 		{
 			return (element === client.id);
 		});
-		if (wasReady !== -1)
+		if (userIndex !== -1)
 		{
-			this.socketIdReady.splice(wasReady, 1);
+			this.socketIdUsers.splice(userIndex, 1);
+			this.users -= 1;
+		}
+
+		const	wasReadyIndex = this.socketIdReady.findIndex((element) =>
+		{
+			return (element === client.id);
+		});
+		if (wasReadyIndex !== -1)
+		{
+			this.socketIdReady.splice(wasReadyIndex, 1);
 			this.userReady--;
 		}
+		this.loop.gameActive = false;
 
 		const	action = {
 			type: "disconnect",
@@ -176,7 +233,37 @@ export class GameSocketEvents
 	)
 	{
 		if (data.type === "GET_BOARD_SIZE")
-			client.emit("info", this.gameServe.board.dim);
+		{
+			const	action = {
+				type: "serverBoard_info",
+				payload:
+				{
+					serverBoardDim:
+					{
+						width: this.gameServe.board.dim.width,
+						height: this.gameServe.board.dim.height
+					}
+				}
+			};
+			client.emit("info", action);
+			return ;
+		}
+		if (data.type === "resize")
+		{
+			const action = {
+				type: "reset_your_scale",
+				payload:
+				{
+					serverBoardDim:
+					{
+						width: this.gameServe.board.dim.width,
+						height: this.gameServe.board.dim.height
+					}
+				}
+			};
+			client.emit("info", action);
+			return;
+		}
 	}
 
 	@SubscribeMessage("game-event")
@@ -187,12 +274,10 @@ export class GameSocketEvents
 	{
 		if (data.type === "ready")
 		{
-			const search = this.socketIdReady.find((element) =>
+			const	search = this.socketIdReady.find((element) =>
 			{
 				return (element === client.id);
 			});
-
-			// We check if user isn't already in the array
 			if (search === undefined)
 			{
 				this.socketIdReady.push(client.id);
@@ -205,7 +290,28 @@ export class GameSocketEvents
 					}
 				};
 				this.server.emit("player-info", action);
+				if (this.userReady === 2)
+				{
+					this.server.emit("game-active", action);
+					this.loop.gameActive = true;
+				}
 			}
 		}
+		if (data.type === "arrow-up")
+		{
+			if (client.id === this.gameServe.playerOne.socketId)
+				this.gameServe.actionKeyPress = 38;
+			else if (client.id === this.gameServe.playerTwo.socketId)
+				this.gameServe.actionKeyPress = 87;
+		}
+		if (data.type === "arrow-down")
+		{
+			if (client.id === this.gameServe.playerOne.socketId)
+				this.gameServe.actionKeyPress = 40;
+			else if (client.id === this.gameServe.playerTwo.socketId)
+				this.gameServe.actionKeyPress = 83;
+		}
+		if (data.type === "stop-key")
+			this.gameServe.actionKeyPress = -1;
 	}
 }

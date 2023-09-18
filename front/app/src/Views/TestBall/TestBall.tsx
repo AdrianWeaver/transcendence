@@ -4,9 +4,26 @@ import { useEffect, useRef, useState } from "react";
 
 import Game from "./Objects/Game";
 
+import MenuBar from "../../Component/MenuBar/MenuBar";
+
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
-
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import {
+	setBallPosition,
+	setBoardDimension,
+	setFrameNumber,
+	setNumberOfUsers,
+	setPlOneSocket,
+	setPlTwoSocket,
+	setPlayerOnePos,
+	setPlayerTwoPos,
+	setPlOneScore,
+	setPlTwoScore,
+	setReadyPlayerCount,
+	setScaleServer,
+	setServerDimension
+} from "../../Redux/store/gameEngineAction";
 
 const	URL = "http://localhost:3000";
 
@@ -24,60 +41,44 @@ const	TestBall = () =>
 		setReadyPlayer
 	] = useState(false);
 
-	const
-	[
-		readyPlayerCount,
-		setReadyPlayerCount
-	] = useState(0);
+	/* local state */
 	const
 	[
 		connected,
 		setConnected
 	] = useState(false);
-	const
-	[
-		frameNumber,
-		setFrameNumber
-	] = useState(0);
-	const
-	[
-		numberOfUsers,
-		setNumberOfUsers
-	] = useState(0);
+
+	/* local state */
+
+		// const
+		// [
+		// 	gameOver,
+		// 	setGameOver
+		// ] = useState(false);
 
 	const
 	[
-		serverDim,
-		setServerDim
-	] = useState(
+		gameActive,
+		setGameActive
+	] = useState(false);
+
+	const	dispatch = useAppDispatch();
+
+	const	theServer = useAppSelector((state) =>
 	{
-		width: 0,
-		height: 0
+		return (state.gameEngine.server);
 	});
 
-	const
-	[
-		ballPos,
-		setBallPos
-	] = useState(
+	const theBoard = useAppSelector((state) =>
 	{
-		x: 0,
-		y: 0
-	});
-
-	const
-	[
-		scaleServer,
-		setScaleServer
-	] = useState(
-	{
-		width: 1,
-		height: 1
+		return (state.gameEngine.board);
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	const game = new Game();
+	const	game = new Game();
+	const	gameRef = useRef<Game>(game);
+	gameRef.current = game;
 	game.board.game = game;
 	game.ball.game = game;
 	game.net.game = game;
@@ -93,10 +94,10 @@ const	TestBall = () =>
 		});
 
 		socketRef.current = socket;
+		game.board.socket = socketRef.current;
 
 		const connect = () =>
 		{
-			// console.log("ws connected");
 			const	action = {
 				type: "GET_BOARD_SIZE"
 			};
@@ -115,56 +116,118 @@ const	TestBall = () =>
 			console.error("ws_connect_error", error);
 		};
 
-		// change GameEvent to a more appropriate name
 		const	updateGame = (data: any) =>
 		{
 			if (data.type === "game-data")
 			{
-				setFrameNumber(data.payload.frameNumber);
-				const	ballPos = {
-					x: (data.payload.ballPos.x / scaleServer.width),
-					y: (data.payload.ballPos.y / scaleServer.height)
-				};
-				setBallPos(ballPos);
-				// console.log("updateGame", ballPos);
-				game.ball.move(ballPos.x, ballPos.y);
+				dispatch(setFrameNumber(data.payload.frameNumber));
+				dispatch(
+					setBallPosition(
+						data.payload.ballPos.x,
+						data.payload.ballPos.y
+					)
+				);
+				dispatch(
+					setPlayerOnePos(
+						(data.payload.playerOne.pos.x),
+						(data.payload.playerOne.pos.y)
+					)
+				);
+				dispatch(
+					setPlayerTwoPos(
+						(data.payload.playerTwo.pos.x),
+						(data.payload.playerTwo.pos.y)
+					)
+				);
+				dispatch(
+					setPlOneScore(data.payload.plOneScore)
+				);
+				dispatch(
+					setPlTwoScore(data.payload.plTwoScore)
+				);
 			}
 		};
 
-		const	initServerDim = (data: any) =>
+		const	initServerDim = (data: ActionSocket) =>
 		{
-			setServerDim(
-			{
-				width: data.width,
-				height: data.height
-			});
-			const	ratioWidth = data.width / game.board.dim.width;
-			const	ratioHeight = data.height / game.board.dim.height;
-			// console.log("Ratio Width and height", ratioWidth, ratioHeight);
-			setScaleServer(
-			{
-				width: ratioWidth,
-				height: ratioHeight
-			}
+			const	serverBoardDim = data.payload.serverBoardDim;
+			dispatch(
+				setServerDimension(
+					serverBoardDim.width,
+					serverBoardDim.height
+				)
+			);
+			const	ratioWidth = serverBoardDim.width / game.board.dim.width;
+			const	ratioHeight = serverBoardDim.height / game.board.dim.height;
+			dispatch(
+				setBoardDimension(
+					game.board.dim.width,
+					game.board.dim.height
+				)
+			);
+			dispatch(
+				setScaleServer(
+					ratioWidth,
+					ratioHeight
+				)
 			);
 		};
 
 		const	playerInfo = (data: any) =>
 		{
-			console.log(data);
 			switch (data.type)
 			{
 				case "connect":
+					dispatch(setNumberOfUsers(data.payload.numberUsers));
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
+					if (game.playerOne.socketId === undefined)
+					{
+						game.playerOne.socketId = data.payload.socketId;
+						dispatch(setPlOneSocket(data.payload.socketId));
+					}
+					else if (game.playerOne.socketId
+								&& game.playerTwo.socketId === undefined)
+					{
+						game.playerTwo.socketId = data.payload.socketId;
+						dispatch(setPlTwoSocket(data.payload.socketId));
+					}
+					break ;
 				case "disconnect":
-					setNumberOfUsers(data.payload.numberUsers);
-					setReadyPlayerCount(data.payload.userReadyCount);
+					dispatch(setNumberOfUsers(data.payload.numberUsers));
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					break ;
 				case "ready-player":
-					setReadyPlayerCount(data.payload.userReadyCount);
+					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
 					break ;
 				default:
 					break ;
 			}
+		};
+
+		const	sendInitMessageToPlayers = (data: any) =>
+		{
+			let text: string;
+			text = "";
+			switch (data.type)
+			{
+				case "player-one":
+					text = "You are player one";
+					break ;
+				case "player-two":
+					text = "You are player two";
+					break ;
+				case "visitor":
+					text = "You are a visitor";
+					break ;
+				default:
+					break ;
+			}
+			game.renderInitMessage(text);
+		};
+
+		const	activateGame = (data: any) =>
+		{
+			setGameActive(true);
 		};
 
 		socket.on("connect", connect);
@@ -173,6 +236,8 @@ const	TestBall = () =>
 		socket.on("game-event", updateGame);
 		socket.on("info", initServerDim);
 		socket.on("player-info", playerInfo);
+		socket.on("init-message", sendInitMessageToPlayers);
+		socket.on("game-active", activateGame);
 		socket.connect();
 
 		return (() =>
@@ -183,40 +248,45 @@ const	TestBall = () =>
 			socket.off("game-event", updateGame);
 			socket.off("info", initServerDim);
 			socket.off("player-info", playerInfo);
+			socket.off("init-message", sendInitMessageToPlayers);
+			socket.off("game-active", activateGame);
 		});
 	}, []);
 
-	useEffect(() =>
+	const	keyHookDown = (e: KeyboardEvent) =>
 	{
-		let requestId: number;
-		const canvas = canvasRef.current;
-
-		const ctx = canvas?.getContext("2d");
-		game.board.canvas = canvas;
-		game.board.ctx = ctx;
-		game.board.init();
-
-		const	render = () =>
-		{
-			game.board.ctx?.beginPath();
-			if (game.board.ctx)
-			{
-				game.board.ctx.fillStyle = "#F5F5DC";
-				game.board.ctx.fillRect(0, 0, game.board.dim.width,
-					game.board.dim.height);
-			}
-			game.net.render();
-			game.ball.render();
-			requestId = requestAnimationFrame(render);
+		const	action = {
+			type: ""
 		};
-		requestId = requestAnimationFrame(render);
-		return (() =>
+		socketRef.current?.emit("game-event", action);
+		switch (e.code)
 		{
-			cancelAnimationFrame(requestId);
-		});
-	}, []);
+			case "ArrowUp":
+				game.actionKeyPress = 38;
+				action.type = "arrow-up";
+				socketRef.current?.emit("game-event", action);
+				break;
+			case "ArrowDown":
+				game.actionKeyPress = 40;
+				action.type = "arrow-down";
+				socketRef.current?.emit("game-event", action);
+				break;
+			default:
+				break;
+		}
+	};
 
-	// this can be used for showing a start and waiting ]
+	const	keyHookReleased = () =>
+	{
+		game.actionKeyPress = -1;
+		const	action = {
+			type: ""
+		};
+		action.type = "stop-key";
+		socketRef.current?.emit("game-event", action);
+	};
+
+		// this can be used for showing a start and waiting ]
 	// for all player to be ready before starting the game
 	// client.id checked on backend to avoid cheating
 	const	setReadyAction = () =>
@@ -235,71 +305,132 @@ const	TestBall = () =>
 			console.log("You are already ready !");
 	};
 
+	useEffect(() =>
+	{
+		let requestId: number;
+		const canvas = canvasRef.current;
+
+		const ctx = canvas?.getContext("2d");
+		game.board.canvas = canvas;
+		game.board.ctx = ctx;
+		game.board.init();
+		addEventListener("keydown", keyHookDown);
+		addEventListener("keyup", keyHookReleased);
+
+		const clear = () =>
+		{
+			if (game.board.ctx)
+			{
+				game.board.ctx.fillStyle = "#fff";
+				game.board.ctx?.clearRect(0, 0,
+					game.board.dim.width, game.board.dim.height);
+			}
+		};
+
+		const	render = () =>
+		{
+			clear();
+			game.board.ctx?.beginPath();
+			if (game.board.ctx)
+			{
+				game.board.ctx.fillStyle = "#F5F5DC";
+				game.board.ctx.fillRect(0, 0, game.board.dim.width,
+					game.board.dim.height);
+			}
+			if (gameActive === false)
+			{
+				const border = game.board.dim.width * 0.01;
+				game.playerOne.pos.x = border;
+				game.playerOne.pos.y = game.board.dim.height / 2;
+				game.playerOne.racket.defineRacketSize();
+				game.playerOne.pos.y -= game.playerOne.racket.dim.height / 2;
+				game.playerTwo.racket.dim = game.playerOne.racket.dim;
+				game.playerTwo.pos.x = game.board.dim.width - border
+					- game.playerTwo.racket.dim.width;
+				game.playerTwo.pos.y = game.board.dim.height / 2;
+				game.playerTwo.racket.defineRacketSize();
+				game.playerTwo.pos.y -= game.playerTwo.racket.dim.height / 2;
+				game.playerOne.render();
+				game.playerTwo.render();
+			}
+			else
+			{
+				game.playerOne.pos.setCoordinateXYZ(
+					theBoard.playerOne.position.x,
+					theBoard.playerOne.position.y);
+				game.playerOne.racket.defineRacketSize();
+				game.playerTwo.pos.setCoordinateXYZ(
+					theBoard.playerTwo.position.x,
+					theBoard.playerTwo.position.y);
+				game.playerTwo.racket.defineRacketSize();
+				game.playerOne.render();
+				game.playerTwo.render();
+				game.ball.move(theBoard.ball.position.x,
+								theBoard.ball.position.y);
+			}
+			game.net.render();
+			game.ball.render();
+			game.playerOne.renderScore(theBoard.plOneScore);
+			game.playerTwo.renderScore(theBoard.plTwoScore);
+			if (game.playerOne.score === game.scoreLimit
+				|| game.playerTwo.score === game.scoreLimit)
+				game.displayEndMessage();
+			requestId = requestAnimationFrame(render);
+		};
+		requestId = requestAnimationFrame(render);
+		return (() =>
+		{
+			cancelAnimationFrame(requestId);
+		});
+	},
+	[ theBoard.ball.position ]);
+
+	const	displayStyle: React.CSSProperties = {
+		textAlign: "center",
+		fontSize: "8px"
+	};
+
 	return (
 		<>
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			< MenuBar />
+			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
 
 			{/* This part show the connection to the websocket */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
 
 			{/* This part show the number of client connected */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
-				number of client connected : {numberOfUsers}<br/>
-				number of client ready : {readyPlayerCount}
+			<div style={displayStyle}>
+				number of client connected : {theServer.numberOfUser}<br/>
+				number of client ready : {theServer.readyPlayerCount}
 			</div>
 
 			{/* This part show the frame number */}
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
-				frame number (time server): {frameNumber} <br/>
+			<div style={displayStyle}>
+				frame number (time server): {theServer.frameNumber} <br/>
 			</div>
 
 			{/* /* This part show more information */ }
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
-				position ball x: {ballPos.x} <br />
-				position ball y: {ballPos.y} <br />
-				dimension width du server: {serverDim.width} <br />
-				dimension height du server: {serverDim.height} <br />
+			<div style={displayStyle}>
+				position ball x: {theBoard.ball.position.x} <br />
+				position ball y: {theBoard.ball.position.y} <br />
+				dimension width du server: {theServer.dimension.width} <br />
+				dimension height du server: {theServer.dimension.height} <br />
 				scale to server :
-					scale_width: {scaleServer.width},
-					scale_height: {scaleServer.height} <br />
-				dimension width du client : {game.board.dim.width} <br />
-				dimension height du client: {game.board.dim.height} <br />
+					scale_width: {theServer.scaleServer.width},
+					scale_height:
+								{theServer.scaleServer.height} <br />
+				dimension width du client : {theBoard.dimension.width} <br />
+				dimension height du client: {theBoard.dimension.height} <br />
+				position du player 1:
+							{JSON.stringify(theBoard.playerOne.position)} <br />
+				position du player 2:
+							{JSON.stringify(theBoard.playerTwo.position)} <br />
 			</div>
-			<div style={
-				{
-					textAlign: "center",
-					fontSize: "8px"
-				}}
-			>
+			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
