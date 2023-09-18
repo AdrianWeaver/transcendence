@@ -185,7 +185,8 @@ const	TestBall = () =>
 						game.playerOne.socketId = data.payload.socketId;
 						dispatch(setPlOneSocket(data.payload.socketId));
 					}
-					else
+					else if (game.playerOne.socketId
+								&& game.playerTwo.socketId === undefined)
 					{
 						game.playerTwo.socketId = data.payload.socketId;
 						dispatch(setPlTwoSocket(data.payload.socketId));
@@ -214,6 +215,9 @@ const	TestBall = () =>
 					break ;
 				case "player-two":
 					text = "You are player two";
+					break ;
+				case "visitor":
+					text = "You are a visitor";
 					break ;
 				default:
 					break ;
@@ -368,7 +372,8 @@ const	TestBall = () =>
 			game.ball.render();
 			game.playerOne.renderScore(theBoard.plOneScore);
 			game.playerTwo.renderScore(theBoard.plTwoScore);
-			if (game.playerOne.score === 3 || game.playerTwo.score === 3)
+			if (game.playerOne.score === game.scoreLimit
+				|| game.playerTwo.score === game.scoreLimit)
 				game.displayEndMessage();
 			requestId = requestAnimationFrame(render);
 		};

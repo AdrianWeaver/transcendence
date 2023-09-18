@@ -131,8 +131,8 @@ export class GameSocketEvents
 				}
 			};
 			this.server.volatile.emit("game-event", action);
-			if (this.gameServe.playerOne.score === 3
-					|| this.gameServe.playerTwo.score === 3)
+			if (this.gameServe.playerOne.score === this.gameServe.scoreLimit
+				|| this.gameServe.playerTwo.score === this.gameServe.scoreLimit)
 			{
 				this.loop.gameActive = false;
 			}
@@ -172,11 +172,13 @@ export class GameSocketEvents
 			this.gameServe.playerOne.socketId = client.id;
 			userMessage.type = "player-one";
 		}
-		else
+		else if (this.users === 2)
 		{
 			this.gameServe.playerTwo.socketId = client.id;
 			userMessage.type = "player-two";
 		}
+		else
+			userMessage.type = "visitor";
 		client.emit("init-message", userMessage);
 
 		const	action = {
