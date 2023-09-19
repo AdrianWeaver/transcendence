@@ -173,7 +173,6 @@ export class GameSocketEvents
 			// We will create each time a new room
 			roomName = "Room " + (Math.round(this.totalUsers / 2)).toString();
 			await client.join(roomName);
-			console.log("joined " + roomName);
 		}
 		else
 		{
@@ -366,8 +365,6 @@ export class GameSocketEvents
 			}
 		}
 
-		if (roomInfo)
-			console.log(roomInfo);
 		// Determine whether the player is right or left player
 		let	playerIndex: number;
 		playerIndex = 0;
