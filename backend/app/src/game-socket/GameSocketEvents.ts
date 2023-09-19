@@ -18,6 +18,7 @@ import
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
 import { LargeNumberLike } from "crypto";
+import { async } from "rxjs/internal/scheduler/async";
 
 class	NodeAnimationFrame
 {
@@ -133,7 +134,7 @@ export class GameSocketEvents
 					plTwoScore: this.gameServe.playerTwo.score,
 				}
 			};
-			this.server.volatile.emit("game-event", action);
+			this.server.emit("game-event", action);
 			if (this.gameServe.playerOne.score === this.gameServe.scoreLimit
 				|| this.gameServe.playerTwo.score === this.gameServe.scoreLimit)
 			{
@@ -157,7 +158,7 @@ export class GameSocketEvents
 		this.loop.update(performance.now());
 	}
 
-	handleConnection(client: Socket)
+	async handleConnection(client: Socket)
 	{
 		let roomName: string;
 		const searchUser = this.socketIdUsers.find((element) =>
@@ -171,7 +172,7 @@ export class GameSocketEvents
 			this.totalUsers += 1;
 			// We will create each time a new room
 			roomName = "Room " + (Math.round(this.totalUsers / 2)).toString();
-			client.join(roomName);
+			await client.join(roomName);
 			console.log("joined " + roomName);
 		}
 		else
@@ -307,7 +308,7 @@ export class GameSocketEvents
 		this.server.sockets.adapter.rooms.forEach((room, roomName) =>
 		{
 			// Check if the socket ID is in the room
-			if (room.has(client.id))
+			if (room.has(client.id) && roomName !== client.id)
 				userRoom = roomName;
 		});
 		if (!userRoom)
@@ -316,8 +317,6 @@ export class GameSocketEvents
 			return ;
 		}
 		const roomInfo = this.server.sockets.adapter.rooms.get(userRoom);
-		if (roomInfo)
-			console.log(roomInfo);
 		if (!roomInfo)
 		{
 			console.log("An error occured with socket.io");
