@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -83,10 +84,10 @@ export class GameSocketEvents
 	users: number;
 	totalUsers: number;
 	socketIdUsers: string[] = [];
-	rooms: string[][] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
 	loop: NodeAnimationFrame;
+	gameInstances: GameServe[] = [];
 	gameServe: GameServe;
 	printPerformance: (timestamp: number, frame: number) => void;
 	update: () => void;
@@ -96,49 +97,50 @@ export class GameSocketEvents
 		this.userReady = 0;
 		this.update = () =>
 		{
-			this.gameServe.playerOne.updatePlayerPosition();
-			this.gameServe.playerTwo.updatePlayerPosition();
+			this.gameInstances[0].playerOne.updatePlayerPosition();
+			this.gameInstances[0].playerTwo.updatePlayerPosition();
 
-			this.gameServe.ball.update();
+			this.gameInstances[0].ball.update();
 		};
 
 		this.printPerformance = (timestamp: number, frame: number) =>
 		{
-			if (this.loop.gameActive === false)
-				return ;
-			this.update();
-			const action = {
-				type: "game-data",
-				payload:
-				{
-					frameNumber: frame,
-					ballPos: {
-						x: this.gameServe.ball.pos.x,
-						y: this.gameServe.ball.pos.y,
-					},
-					playerOne:
-					{
-						pos: {
-							x: this.gameServe.playerOne.pos.x,
-							y: this.gameServe.playerOne.pos.y,
-						}
-					},
-					playerTwo:
-					{
-						pos: {
-							x: this.gameServe.playerTwo.pos.x,
-							y: this.gameServe.playerTwo.pos.y,
-						}
-					},
-					plOneScore: this.gameServe.playerOne.score,
-					plTwoScore: this.gameServe.playerTwo.score,
-				}
-			};
-			this.server.emit("game-event", action);
-			if (this.gameServe.playerOne.score === this.gameServe.scoreLimit
-				|| this.gameServe.playerTwo.score === this.gameServe.scoreLimit)
+			for (const instance of this.gameInstances)
 			{
-				this.loop.gameActive = false;
+				if (this.loop.gameActive === false)
+					return ;
+				this.update();
+				const action = {
+					type: "game-data",
+					payload:
+					{
+						frameNumber: frame,
+						ballPos: {
+							x: instance.ball.pos.x,
+							y: instance.ball.pos.y,
+						},
+						playerOne:
+						{
+							pos: {
+								x: instance.playerOne.pos.x,
+								y: instance.playerOne.pos.y,
+							}
+						},
+						playerTwo:
+						{
+							pos: {
+								x: instance.playerTwo.pos.x,
+								y: instance.playerTwo.pos.y,
+							}
+						},
+						plOneScore: instance.playerOne.score,
+						plTwoScore: instance.playerTwo.score,
+					}
+				};
+				this.server.to(instance.roomName).emit("game-event", action);
+				if (instance.playerOne.score === instance.scoreLimit
+					|| instance.playerTwo.score === instance.scoreLimit)
+					this.loop.gameActive = false;
 			}
 		};
 	}
@@ -150,11 +152,12 @@ export class GameSocketEvents
 		this.totalUsers = 0;
 		this.loop = new NodeAnimationFrame();
 		this.loop.callbackFunction = this.printPerformance;
-		this.gameServe = new GameServe();
-		this.gameServe.ball.game = this.gameServe;
-		this.gameServe.board.game = this.gameServe;
-		this.gameServe.net.game = this.gameServe;
-		this.gameServe.board.init();
+		const	gameServe = new GameServe("room0");
+		this.gameInstances.push(gameServe);
+		this.gameInstances[0].ball.game = this.gameInstances[0];
+		this.gameInstances[0].board.game = this.gameInstances[0];
+		this.gameInstances[0].net.game = this.gameInstances[0];
+		this.gameInstances[0].board.init();
 		this.loop.update(performance.now());
 	}
 
@@ -171,8 +174,10 @@ export class GameSocketEvents
 			this.users += 1;
 			this.totalUsers += 1;
 			// We will create each time a new room
-			roomName = "Room " + (Math.round(this.totalUsers / 2)).toString();
+			roomName = "room" + (Math.round(this.totalUsers / 2)).toString();
 			await client.join(roomName);
+			const newRoom = new GameServe(roomName);
+			this.gameInstances.push(newRoom);
 		}
 		else
 		{
@@ -191,36 +196,45 @@ export class GameSocketEvents
 			return ;
 		}
 
+		// This will send the right message to each player but it will
+		// also create a room instance on the client side
 		const	userMessage = {
 			type: "",
-			payload: ""
-		};
-
-		if (roomSize === 1)
-		{
-			this.gameServe.playerOne.socketId = client.id;
-			userMessage.type = "player-one";
-			userMessage.payload = roomName;
-		}
-		else if (roomSize === 2)
-		{
-			this.gameServe.playerTwo.socketId = client.id;
-			userMessage.type = "player-two";
-			userMessage.payload = roomName;
-		}
-		else
-			userMessage.type = "visitor";
-		client.emit("init-message", userMessage);
-
-		const	action = {
-			type: "connect",
 			payload: {
-				numberUsers: this.users,
-				userReadyCount: this.userReady,
-				socketId: client.id
+				roomName: roomName,
+				roomSize: roomSize
 			}
 		};
-		this.server.to(roomName).emit("player-info", action);
+
+		for (const instance of this.gameInstances)
+		{
+			if (instance.roomName === roomName)
+			{
+				if (roomSize === 1)
+				{
+					instance.playerOne.socketId = client.id;
+					userMessage.type = "player-one";
+				}
+				else if (roomSize === 2)
+				{
+					instance.playerTwo.socketId = client.id;
+					userMessage.type = "player-two";
+				}
+				else
+					userMessage.type = "visitor";
+				client.emit("init-message", userMessage);
+
+				const	action = {
+					type: "connect",
+					payload: {
+						numberUsers: this.users,
+						userReadyCount: this.userReady,
+						socketId: client.id,
+					}
+				};
+				this.server.to(roomName).emit("player-info", action);
+			}
+		}
 	}
 
 	handleDisconnect(client: Socket)
@@ -262,37 +276,44 @@ export class GameSocketEvents
 		@ConnectedSocket() client: Socket
 	)
 	{
-		if (data.type === "GET_BOARD_SIZE")
+		for (const instance of this.gameInstances)
 		{
-			const	action = {
-				type: "serverBoard_info",
-				payload:
+			if (instance.playerOne.socketId === client.id
+				|| instance.playerTwo.socketId === client.id)
+			{
+				if (data.type === "GET_BOARD_SIZE")
 				{
-					serverBoardDim:
-					{
-						width: this.gameServe.board.dim.width,
-						height: this.gameServe.board.dim.height
-					}
+					const	action = {
+						type: "serverBoard_info",
+						payload:
+						{
+							serverBoardDim:
+							{
+								width: instance.board.dim.width,
+								height: instance.board.dim.height
+							}
+						}
+					};
+					client.emit("info", action);
+					return ;
 				}
-			};
-			client.emit("info", action);
-			return ;
-		}
-		if (data.type === "resize")
-		{
-			const action = {
-				type: "reset_your_scale",
-				payload:
+				if (data.type === "resize")
 				{
-					serverBoardDim:
-					{
-						width: this.gameServe.board.dim.width,
-						height: this.gameServe.board.dim.height
-					}
+					const action = {
+						type: "reset_your_scale",
+						payload:
+						{
+							serverBoardDim:
+							{
+								width: instance.board.dim.width,
+								height: instance.board.dim.height
+							}
+						}
+					};
+					client.emit("info", action);
+					return;
 				}
-			};
-			client.emit("info", action);
-			return;
+			}
 		}
 	}
 

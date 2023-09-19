@@ -90,7 +90,6 @@ class Ball
 		{
 			if ( this.pos.y < this.radius )
 			{
-				// this.touchAudio.play();
 				this.pos.y = this.radius;
 				this.angle = ( Math.PI * 2 ) - this.angle;
 			}
