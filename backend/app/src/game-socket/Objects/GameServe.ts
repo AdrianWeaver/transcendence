@@ -4,6 +4,7 @@ import Player from "./Player";
 import Board from "./Board";
 import Ball from "./Ball";
 import Net from "./Net";
+import { NodeAnimationFrame } from "../GameSocketEvents";
 
 class GameServe
 {
@@ -20,6 +21,7 @@ class GameServe
 	public actionKeyPress: number;
 	public startDisplayed: boolean;
 	public continueAnimating: boolean;
+	public loop: NodeAnimationFrame | undefined;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
@@ -39,6 +41,7 @@ class GameServe
 		this.scoreLimit = 7;
 		this.startDisplayed = true;
 		this.continueAnimating = true;
+		this.loop = undefined;
 
 		this.initPlayers = () =>
 		{
