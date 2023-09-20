@@ -147,18 +147,6 @@ export class GameSocketEvents
 		this.server = server;
 		this.users = 0;
 		this.totalUsers = 0;
-		// this.loop = new NodeAnimationFrame();
-		// this.loop.callbackFunction = this.printPerformance;
-		// const	gameServe = new GameServe("room0");
-		// this.gameInstances.push(gameServe);
-		// for (const instance of this.gameInstances)
-		// {
-		// 	instance.ball.game = instance;
-		// 	instance.board.game = instance;
-		// 	instance.net.game = instance;
-		// 	instance.board.init();
-		// 	this.loop.update(performance.now());
-		// }
 	}
 
 	async handleConnection(client: Socket)
