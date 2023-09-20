@@ -2,6 +2,7 @@
 import {
 	BrowserRouter,
 	Navigate,
+	Outlet,
 	Route,
 	Routes,
 } from "react-router-dom";
@@ -15,12 +16,17 @@ import PlayGame from "../Views/PlayGame/PlayGame";
 import GameCanvas from "../Views/GameCanvas/GameCanvas";
 import TestBall from "../Views/TestBall/TestBall";
 import Chat from "../Views/Chat/Chat";
+import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
+import { setBigWindow } from "../Redux/store/controllerAction";
+import { Landing } from "../Views/Chat/Landing";
 
 /**
  * This is the router for a logged user
  * */
 const	LoggedRouter = () =>
 {
+	
+
 	return (
 		<BrowserRouter >
 			<Routes>
@@ -72,7 +78,8 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="the-chat"
-					element={<Chat />}
+					// element={<Chat />}
+					element={<Landing />}
 				/>
 				<Route
 					path="*"
