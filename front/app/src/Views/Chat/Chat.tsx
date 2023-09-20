@@ -1,9 +1,8 @@
 import "./assets/index.css";
-import Home  from "../Home/Home";
-
 const	URL = "http://localhost:3000";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
+import Home from "./components/Home"
 
 const   Chat = () =>
 {
@@ -24,10 +23,10 @@ const   Chat = () =>
 
     // console.log(message);
     
-    const   chatMap =  message.map((elem) =>
+    const   chatMap =  message.map((elem, index) =>
     {
         return (
-            <p>
+            <p key={index}>
                 Sender #{elem.idSender}: {elem.content}
             </p>
         );
@@ -35,6 +34,7 @@ const   Chat = () =>
     // console.log(chatMap);
     return (
         <>
+            <Home />
             {chatMap}
         </>
     );
