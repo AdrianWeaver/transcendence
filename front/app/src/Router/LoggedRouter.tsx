@@ -14,6 +14,7 @@ import Settings from "../Views/Settings/Settings";
 import PlayGame from "../Views/PlayGame/PlayGame";
 import GameCanvas from "../Views/GameCanvas/GameCanvas";
 import TestBall from "../Views/TestBall/TestBall";
+import Chat from "../Views/Chat/Chat";
 
 /**
  * This is the router for a logged user
@@ -68,6 +69,10 @@ const	LoggedRouter = () =>
 				<Route
 					path="test-ball"
 					element={<TestBall />}
+				/>
+				<Route
+					path="the-chat"
+					element={<Chat />}
 				/>
 				<Route
 					path="*"
