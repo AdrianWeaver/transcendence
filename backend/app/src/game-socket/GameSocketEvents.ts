@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
@@ -21,15 +22,15 @@ import GameServe from "./Objects/GameServe";
 import { LargeNumberLike } from "crypto";
 import { async } from "rxjs/internal/scheduler/async";
 
-class	NodeAnimationFrame
+export class	NodeAnimationFrame
 {
 	public frameRate: number;
 	public frameNumber: number;
 	public gameActive: boolean;
-	public game: undefined;
+	public game: GameServe | undefined;
 	public requestFrame: (callbackFunction: any) => void;
 	public callbackFunction:
-		((timestamp: number, frame: number) => void) | null;
+		((timestamp: number, frame: number, game: GameServe) => void) | null;
 	public update: (timestamp: number) => void;
 
 	// eslint-disable-next-line max-statements
@@ -56,7 +57,8 @@ class	NodeAnimationFrame
 				console.log("Error: no callback function provided");
 				return ;
 			}
-			this.callbackFunction(timestamp, this.frameNumber);
+			if (this.game)
+				this.callbackFunction(timestamp, this.frameNumber, this.game);
 			if (this.gameActive === true)
 				this.frameNumber++;
 			this.requestFrame(this.update);
@@ -86,62 +88,57 @@ export class GameSocketEvents
 	socketIdUsers: string[] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
-	loop: NodeAnimationFrame;
 	gameInstances: GameServe[] = [];
-	gameServe: GameServe;
-	printPerformance: (timestamp: number, frame: number) => void;
-	update: () => void;
+	printPerformance: (timestamp: number, frame: number, instance: GameServe) => void;
+	update: (instance: GameServe) => void;
 
 	public	constructor()
 	{
 		this.userReady = 0;
-		this.update = () =>
+		this.update = (instance: GameServe) =>
 		{
-			this.gameInstances[0].playerOne.updatePlayerPosition();
-			this.gameInstances[0].playerTwo.updatePlayerPosition();
+			instance.playerOne.updatePlayerPosition();
+			instance.playerTwo.updatePlayerPosition();
 
-			this.gameInstances[0].ball.update();
+			instance.ball.update();
 		};
 
-		this.printPerformance = (timestamp: number, frame: number) =>
+		this.printPerformance = (timestamp: number, frame: number, instance: GameServe) =>
 		{
-			for (const instance of this.gameInstances)
-			{
-				if (this.loop.gameActive === false)
-					return ;
-				this.update();
-				const action = {
-					type: "game-data",
-					payload:
+			if (instance.loop && instance.loop.gameActive === false)
+				return ;
+			this.update(instance);
+			const action = {
+				type: "game-data",
+				payload:
+				{
+					frameNumber: frame,
+					ballPos: {
+						x: instance.ball.pos.x,
+						y: instance.ball.pos.y,
+					},
+					playerOne:
 					{
-						frameNumber: frame,
-						ballPos: {
-							x: instance.ball.pos.x,
-							y: instance.ball.pos.y,
-						},
-						playerOne:
-						{
-							pos: {
-								x: instance.playerOne.pos.x,
-								y: instance.playerOne.pos.y,
-							}
-						},
-						playerTwo:
-						{
-							pos: {
-								x: instance.playerTwo.pos.x,
-								y: instance.playerTwo.pos.y,
-							}
-						},
-						plOneScore: instance.playerOne.score,
-						plTwoScore: instance.playerTwo.score,
-					}
-				};
-				this.server.to(instance.roomName).emit("game-event", action);
-				if (instance.playerOne.score === instance.scoreLimit
-					|| instance.playerTwo.score === instance.scoreLimit)
-					this.loop.gameActive = false;
-			}
+						pos: {
+							x: instance.playerOne.pos.x,
+							y: instance.playerOne.pos.y,
+						}
+					},
+					playerTwo:
+					{
+						pos: {
+							x: instance.playerTwo.pos.x,
+							y: instance.playerTwo.pos.y,
+						}
+					},
+					plOneScore: instance.playerOne.score,
+					plTwoScore: instance.playerTwo.score,
+				}
+			};
+			this.server.to(instance.roomName).emit("game-event", action);
+			if (instance.loop && (instance.playerOne.score === instance.scoreLimit
+				|| instance.playerTwo.score === instance.scoreLimit))
+				instance.loop.gameActive = false;
 		};
 	}
 
@@ -150,15 +147,18 @@ export class GameSocketEvents
 		this.server = server;
 		this.users = 0;
 		this.totalUsers = 0;
-		this.loop = new NodeAnimationFrame();
-		this.loop.callbackFunction = this.printPerformance;
-		const	gameServe = new GameServe("room0");
-		this.gameInstances.push(gameServe);
-		this.gameInstances[0].ball.game = this.gameInstances[0];
-		this.gameInstances[0].board.game = this.gameInstances[0];
-		this.gameInstances[0].net.game = this.gameInstances[0];
-		this.gameInstances[0].board.init();
-		this.loop.update(performance.now());
+		// this.loop = new NodeAnimationFrame();
+		// this.loop.callbackFunction = this.printPerformance;
+		// const	gameServe = new GameServe("room0");
+		// this.gameInstances.push(gameServe);
+		// for (const instance of this.gameInstances)
+		// {
+		// 	instance.ball.game = instance;
+		// 	instance.board.game = instance;
+		// 	instance.net.game = instance;
+		// 	instance.board.init();
+		// 	this.loop.update(performance.now());
+		// }
 	}
 
 	async handleConnection(client: Socket)
@@ -176,8 +176,28 @@ export class GameSocketEvents
 			// We will create each time a new room
 			roomName = "room" + (Math.round(this.totalUsers / 2)).toString();
 			await client.join(roomName);
-			const newRoom = new GameServe(roomName);
-			this.gameInstances.push(newRoom);
+			if (this.totalUsers % 2 !== 0)
+			{
+				const newRoom = new GameServe(roomName);
+				newRoom.ball.game = newRoom;
+				newRoom.board.game = newRoom;
+				newRoom.net.game = newRoom;
+				newRoom.playerOne.socketId = client.id;
+				newRoom.board.init();
+				newRoom.loop = new NodeAnimationFrame();
+				newRoom.loop.game = newRoom;
+				newRoom.loop.callbackFunction = this.printPerformance;
+				newRoom.loop.update(performance.now());
+				this.gameInstances.push(newRoom);
+			}
+			else
+			{
+				for (const instance of this.gameInstances)
+				{
+					if (instance.roomName === roomName)
+						instance.playerTwo.socketId = client.id;
+				}
+			}
 		}
 		else
 		{
@@ -211,15 +231,9 @@ export class GameSocketEvents
 			if (instance.roomName === roomName)
 			{
 				if (roomSize === 1)
-				{
-					instance.playerOne.socketId = client.id;
 					userMessage.type = "player-one";
-				}
 				else if (roomSize === 2)
-				{
-					instance.playerTwo.socketId = client.id;
 					userMessage.type = "player-two";
-				}
 				else
 					userMessage.type = "visitor";
 				client.emit("init-message", userMessage);
@@ -239,6 +253,13 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
+		for (const instance of this.gameInstances)
+		{
+			if (instance.loop && (instance.playerOne.socketId === client.id
+				|| instance.playerTwo.socketId === client.id))
+				instance.loop.gameActive = false;
+		}
+
 		const userIndex = this.socketIdUsers.findIndex((element) =>
 		{
 			return (element === client.id);
@@ -258,7 +279,6 @@ export class GameSocketEvents
 			this.socketIdReady.splice(wasReadyIndex, 1);
 			this.userReady--;
 		}
-		this.loop.gameActive = false;
 
 		const	action = {
 			type: "disconnect",
@@ -267,7 +287,12 @@ export class GameSocketEvents
 				userReadyCount: this.userReady
 			}
 		};
-		this.server.emit("player-info", action);
+		for (const instance of this.gameInstances)
+		{
+			if (instance.playerOne.socketId === client.id
+				|| instance.playerTwo.socketId === client.id)
+				this.server.to(instance.roomName).emit("player-info", action);
+		}
 	}
 
 	@SubscribeMessage("info")
@@ -381,7 +406,12 @@ export class GameSocketEvents
 				if (countReadyInRoom === 2)
 				{
 					this.server.to(userRoom).emit("game-active", action);
-					this.loop.gameActive = true;
+					for (const instance of this.gameInstances)
+					{
+						if (instance.loop && (instance.playerOne.socketId === client.id
+							|| instance.playerTwo.socketId === client.id))
+							instance.loop.gameActive = true;
+					}
 				}
 			}
 		}
@@ -398,21 +428,27 @@ export class GameSocketEvents
 			break ;
 		}
 
-		if (data.type === "arrow-up")
+		for (const instance of this.gameInstances)
 		{
-			if (playerIndex === 1)
-				this.gameServe.actionKeyPress = 38;
-			else if (playerIndex === 2)
-				this.gameServe.actionKeyPress = 87;
+			if (instance.roomName === userRoom)
+			{
+				if (data.type === "arrow-up")
+				{
+					if (playerIndex === 1)
+						instance.actionKeyPress = 38;
+					else if (playerIndex === 2)
+						instance.actionKeyPress = 87;
+				}
+				if (data.type === "arrow-down")
+				{
+					if (playerIndex === 1)
+						instance.actionKeyPress = 40;
+					else if (playerIndex === 2)
+						instance.actionKeyPress = 83;
+				}
+				if (data.type === "stop-key")
+					instance.actionKeyPress = -1;
+			}
 		}
-		if (data.type === "arrow-down")
-		{
-			if (playerIndex === 1)
-				this.gameServe.actionKeyPress = 40;
-			else if (playerIndex === 2)
-				this.gameServe.actionKeyPress = 83;
-		}
-		if (data.type === "stop-key")
-			this.gameServe.actionKeyPress = -1;
 	}
 }
