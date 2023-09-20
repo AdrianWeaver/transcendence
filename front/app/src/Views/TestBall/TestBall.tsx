@@ -48,14 +48,6 @@ const	TestBall = () =>
 		setConnected
 	] = useState(false);
 
-	/* local state */
-
-		// const
-		// [
-		// 	gameOver,
-		// 	setGameOver
-		// ] = useState(false);
-
 	const
 	[
 		gameActive,
