@@ -85,6 +85,8 @@ export class GameSocketEvents
 	server: Server;
 	users: number;
 	totalUsers: number;
+	classicUsers: number;
+	specialUsers: number;
 	socketIdUsers: string[] = [];
 	userReady: number;
 	socketIdReady: string[] = [];
