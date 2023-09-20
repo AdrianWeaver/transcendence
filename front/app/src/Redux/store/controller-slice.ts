@@ -103,6 +103,18 @@ const	controllerSlice = createSlice(
 		setBigWindow(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.window = action.payload.user.chat.window;
+		},
+		setMiniWindow(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.window = action.payload.user.chat.window;
+		},
+		setHiddenWindow(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.window = action.payload.user.chat.window;
+		},
+		setPseudo(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.pseudo = action.payload.user.chat.pseudo;
 		}
 	}
 });

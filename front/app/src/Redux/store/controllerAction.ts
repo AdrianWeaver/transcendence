@@ -229,3 +229,79 @@ export const setBigWindow = ()
 		dispatch(controllerActions.setBigWindow(response));
 	});
 }
+
+export const setMiniWindow = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					window:
+					{
+						bigWindow: false,
+						hiddenWindow: false,
+						miniWindow: true
+					}
+				}
+			}
+		};
+		dispatch(controllerActions.setMiniWindow(response));
+	});
+}
+
+export const setHiddenWindow = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					window:
+					{
+						bigWindow: false,
+						hiddenWindow: true,
+						miniWindow: false
+					}
+				}
+			}
+		};
+		dispatch(controllerActions.setHiddenWindow(response));
+	});
+}
+
+export const setPseudo = (name: string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					pseudo: name
+				}
+			}
+		}
+		dispatch(controllerActions.setPseudo(response));
+	});
+}
