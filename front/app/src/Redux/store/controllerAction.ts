@@ -202,3 +202,30 @@ export const	setRequestHomeLink = (value: boolean)
 		dispatch(controllerActions.setRequestHomeLink(response));
 	});
 };
+
+export const setBigWindow = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					window:
+					{
+						bigWindow: true,
+						hiddenWindow: false,
+						miniWindow: false
+					}
+				}
+			}
+		};
+		dispatch(controllerActions.setBigWindow(response));
+	});
+}

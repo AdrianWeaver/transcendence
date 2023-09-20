@@ -1,10 +1,22 @@
 
+export interface ChatModel
+{
+	"window":
+	{
+		"bigWindow": boolean,
+		"hiddenWindow": boolean,
+		"miniWindow" : boolean,
+	},
+	"pseudo": string,
+}
+
 export interface	UserModel
 {
 	"isLoggedIn": boolean,
 	"username": string,
 	"bearerToken": string,
-	"rememberMe": boolean
+	"rememberMe": boolean,
+	"chat": ChatModel,
 }
 
 export interface	AnonymousUserModel

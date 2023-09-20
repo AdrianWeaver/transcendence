@@ -17,6 +17,16 @@ const	initialControllerState: ControllerModel = {
 		username: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
+		chat:
+		{
+			window:
+			{
+				bigWindow: false,
+				hiddenWindow: false,
+				miniWindow: true,
+			},
+			pseudo: "undefined" 
+		}
 	},
 	registration:
 	{
@@ -90,6 +100,10 @@ const	controllerSlice = createSlice(
 			state.registration.requestHomeLink
 				= action.payload.registration.requestHomeLink;
 		},
+		setBigWindow(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.window = action.payload.user.chat.window;
+		}
 	}
 });
 
