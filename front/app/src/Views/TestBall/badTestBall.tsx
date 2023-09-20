@@ -1,3 +1,5 @@
+/* eslint-disable curly */
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { useEffect, useRef, useState } from "react";
@@ -48,6 +50,8 @@ const	TestBall = () =>
 		setConnected
 	] = useState(false);
 
+	/* local state */
+
 	const
 	[
 		gameActive,
@@ -68,14 +72,32 @@ const	TestBall = () =>
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	const	game = new Game();
-	const	gameRef = useRef<Game>(game);
-	gameRef.current = game;
-	game.board.game = game;
-	game.ball.game = game;
-	game.net.game = game;
+	const gameInstances: Game[] = [];
+	const	game0 = new Game("room0");
+	gameInstances.push(game0);
+	const	gameRef = useRef<Game>(gameInstances[0]);
+	gameRef.current = gameInstances[0];
+	gameInstances[0].board.game = gameInstances[0];
+	gameInstances[0].ball.game = gameInstances[0];
+	gameInstances[0].net.game = gameInstances[0];
 	const	canvasRef = useRef<HTMLCanvasElement>(null);
-	game.board.canvasRef = canvasRef;
+	gameInstances[0].board.canvasRef = canvasRef;
+
+	const	createNewInstance = (roomName: string) =>
+	{
+		const newRoom = new Game(roomName);
+		gameInstances.push(newRoom);
+		for (const instance of gameInstances)
+		{
+			if (instance.roomName === roomName)
+			{
+				instance.board.game = instance;
+				instance.ball.game = instance;
+				instance.net.game = instance;
+				instance.board.canvasRef = canvasRef;
+			}
+		}
+	};
 
 	useEffect(() =>
 	{
@@ -86,7 +108,7 @@ const	TestBall = () =>
 		});
 
 		socketRef.current = socket;
-		game.board.socket = socketRef.current;
+		gameInstances[0].board.socket = socketRef.current;
 
 		const connect = () =>
 		{
@@ -149,12 +171,12 @@ const	TestBall = () =>
 					serverBoardDim.height
 				)
 			);
-			const	ratioWidth = serverBoardDim.width / game.board.dim.width;
-			const	ratioHeight = serverBoardDim.height / game.board.dim.height;
+			const	ratioWidth = serverBoardDim.width / gameInstances[0].board.dim.width;
+			const	ratioHeight = serverBoardDim.height / gameInstances[0].board.dim.height;
 			dispatch(
 				setBoardDimension(
-					game.board.dim.width,
-					game.board.dim.height
+					gameInstances[0].board.dim.width,
+					gameInstances[0].board.dim.height
 				)
 			);
 			dispatch(
@@ -172,15 +194,15 @@ const	TestBall = () =>
 				case "connect":
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
 					dispatch(setReadyPlayerCount(data.payload.userReadyCount));
-					if (game.playerOne.socketId === undefined)
+					if (gameInstances[0].playerOne.socketId === undefined)
 					{
-						game.playerOne.socketId = data.payload.socketId;
+						gameInstances[0].playerOne.socketId = data.payload.socketId;
 						dispatch(setPlOneSocket(data.payload.socketId));
 					}
-					else if (game.playerOne.socketId
-								&& game.playerTwo.socketId === undefined)
+					else if (gameInstances[0].playerOne.socketId
+								&& gameInstances[0].playerTwo.socketId === undefined)
 					{
-						game.playerTwo.socketId = data.payload.socketId;
+						gameInstances[0].playerTwo.socketId = data.payload.socketId;
 						dispatch(setPlTwoSocket(data.payload.socketId));
 					}
 					break ;
@@ -204,6 +226,7 @@ const	TestBall = () =>
 			{
 				case "player-one":
 					text = "You are player one in " + data.payload.roomName;
+					createNewInstance(data.payload.roomName);
 					break ;
 				case "player-two":
 					text = "You are player two in " + data.payload.roomName;
@@ -214,7 +237,7 @@ const	TestBall = () =>
 				default:
 					break ;
 			}
-			game.renderInitMessage(text);
+			gameInstances[0].renderInitMessage(text);
 		};
 
 		const	activateGame = (data: any) =>
@@ -248,18 +271,16 @@ const	TestBall = () =>
 	const	keyHookDown = (e: KeyboardEvent) =>
 	{
 		const	action = {
-			type: ""
+			type: "",
 		};
 		socketRef.current?.emit("game-event", action);
 		switch (e.code)
 		{
 			case "ArrowUp":
-				game.actionKeyPress = 38;
 				action.type = "arrow-up";
 				socketRef.current?.emit("game-event", action);
 				break;
 			case "ArrowDown":
-				game.actionKeyPress = 40;
 				action.type = "arrow-down";
 				socketRef.current?.emit("game-event", action);
 				break;
@@ -270,7 +291,7 @@ const	TestBall = () =>
 
 	const	keyHookReleased = () =>
 	{
-		game.actionKeyPress = -1;
+		// gameInstances[0].actionKeyPress = -1;
 		const	action = {
 			type: ""
 		};
@@ -278,7 +299,7 @@ const	TestBall = () =>
 		socketRef.current?.emit("game-event", action);
 	};
 
-		// this can be used for showing a start and waiting ]
+	// this can be used for showing a start and waiting ]
 	// for all player to be ready before starting the game
 	// client.id checked on backend to avoid cheating
 	const	setReadyAction = () =>
@@ -288,11 +309,9 @@ const	TestBall = () =>
 			const	action = {
 				type: "ready"
 			};
-			console.log("ready action", action);
 			socketRef.current?.emit("game-event", action);
 			setReadyPlayer(true);
 		}
-		// just for understanding the code 
 		else
 			console.log("You are already ready !");
 	};
@@ -303,71 +322,77 @@ const	TestBall = () =>
 		const canvas = canvasRef.current;
 
 		const ctx = canvas?.getContext("2d");
-		game.board.canvas = canvas;
-		game.board.ctx = ctx;
-		game.board.init();
+		for (const instance of gameInstances)
+		{
+			instance.board.canvas = canvas;
+			instance.board.ctx = ctx;
+			instance.board.init();
+		}
 		addEventListener("keydown", keyHookDown);
 		addEventListener("keyup", keyHookReleased);
 
-		const clear = () =>
+		const clear = (instance: Game) =>
 		{
-			if (game.board.ctx)
+			if (instance.board.ctx)
 			{
-				game.board.ctx.fillStyle = "#fff";
-				game.board.ctx?.clearRect(0, 0,
-					game.board.dim.width, game.board.dim.height);
+				instance.board.ctx.fillStyle = "#fff";
+				instance.board.ctx?.clearRect(0, 0,
+					instance.board.dim.width, instance.board.dim.height);
 			}
 		};
 
 		const	render = () =>
 		{
-			clear();
-			game.board.ctx?.beginPath();
-			if (game.board.ctx)
+			for (const instance of gameInstances)
 			{
-				game.board.ctx.fillStyle = "#F5F5DC";
-				game.board.ctx.fillRect(0, 0, game.board.dim.width,
-					game.board.dim.height);
+				clear(instance);
+				instance.board.ctx?.beginPath();
+				if (instance.board.ctx)
+				{
+					instance.board.ctx.fillStyle = "#F5F5DC";
+					instance.board.ctx.fillRect(0, 0, instance.board.dim.width,
+						instance.board.dim.height);
+				}
+				if (gameActive === false)
+				{
+					const border = instance.board.dim.width * 0.01;
+					instance.playerOne.pos.x = border;
+					instance.playerOne.pos.y = instance.board.dim.height / 2;
+					instance.playerOne.racket.defineRacketSize();
+					instance.playerOne.pos.y -= instance.playerOne.racket.dim.height / 2;
+					instance.playerTwo.racket.dim = instance.playerOne.racket.dim;
+					instance.playerTwo.pos.x = instance.board.dim.width - border
+						- instance.playerTwo.racket.dim.width;
+					instance.playerTwo.pos.y = instance.board.dim.height / 2;
+					instance.playerTwo.racket.defineRacketSize();
+					instance.playerTwo.pos.y -= instance.playerTwo.racket.dim.height / 2;
+					instance.playerOne.render();
+					instance.playerTwo.render();
+				}
+				else
+				{
+					instance.playerOne.pos.setCoordinateXYZ(
+						theBoard.playerOne.position.x,
+						theBoard.playerOne.position.y);
+					instance.playerOne.racket.defineRacketSize();
+					instance.playerTwo.pos.setCoordinateXYZ(
+						theBoard.playerTwo.position.x,
+						theBoard.playerTwo.position.y);
+					instance.playerTwo.racket.defineRacketSize();
+					instance.playerOne.render();
+					instance.playerTwo.render();
+					instance.ball.move(theBoard.ball.position.x,
+									theBoard.ball.position.y);
+				}
+				instance.net.render();
+				instance.ball.render();
+				instance.playerOne.renderScore(theBoard.plOneScore);
+				instance.playerTwo.renderScore(theBoard.plTwoScore);
+				if (instance.playerOne.score === instance.scoreLimit
+					|| instance.playerTwo.score === instance.scoreLimit)
+					instance.displayEndMessage();
+				requestId = requestAnimationFrame(render);
 			}
-			if (gameActive === false)
-			{
-				const border = game.board.dim.width * 0.01;
-				game.playerOne.pos.x = border;
-				game.playerOne.pos.y = game.board.dim.height / 2;
-				game.playerOne.racket.defineRacketSize();
-				game.playerOne.pos.y -= game.playerOne.racket.dim.height / 2;
-				game.playerTwo.racket.dim = game.playerOne.racket.dim;
-				game.playerTwo.pos.x = game.board.dim.width - border
-					- game.playerTwo.racket.dim.width;
-				game.playerTwo.pos.y = game.board.dim.height / 2;
-				game.playerTwo.racket.defineRacketSize();
-				game.playerTwo.pos.y -= game.playerTwo.racket.dim.height / 2;
-				game.playerOne.render();
-				game.playerTwo.render();
-			}
-			else
-			{
-				game.playerOne.pos.setCoordinateXYZ(
-					theBoard.playerOne.position.x,
-					theBoard.playerOne.position.y);
-				game.playerOne.racket.defineRacketSize();
-				game.playerTwo.pos.setCoordinateXYZ(
-					theBoard.playerTwo.position.x,
-					theBoard.playerTwo.position.y);
-				game.playerTwo.racket.defineRacketSize();
-				game.playerOne.render();
-				game.playerTwo.render();
-				game.ball.move(theBoard.ball.position.x,
-								theBoard.ball.position.y);
-			}
-			game.net.render();
-			game.ball.render();
-			game.playerOne.renderScore(theBoard.plOneScore);
-			game.playerTwo.renderScore(theBoard.plTwoScore);
-			if (game.playerOne.score === game.scoreLimit
-				|| game.playerTwo.score === game.scoreLimit)
-				game.displayEndMessage();
-			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
 		return (() =>
@@ -386,11 +411,6 @@ const	TestBall = () =>
 		<>
 			< MenuBar />
 			<div style={displayStyle}>
-				FT_TRANSCENDANCE
-			</div>
-
-			{/* This part show the connection to the websocket */}
-			<div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
 
@@ -399,38 +419,15 @@ const	TestBall = () =>
 				number of client connected : {theServer.numberOfUser}<br/>
 				number of client ready : {theServer.readyPlayerCount}
 			</div>
-
-			{/* This part show the frame number */}
-			<div style={displayStyle}>
-				frame number (time server): {theServer.frameNumber} <br/>
-			</div>
-
-			{/* /* This part show more information */ }
-			<div style={displayStyle}>
-				position ball x: {theBoard.ball.position.x} <br />
-				position ball y: {theBoard.ball.position.y} <br />
-				dimension width du server: {theServer.dimension.width} <br />
-				dimension height du server: {theServer.dimension.height} <br />
-				scale to server :
-					scale_width: {theServer.scaleServer.width},
-					scale_height:
-								{theServer.scaleServer.height} <br />
-				dimension width du client : {theBoard.dimension.width} <br />
-				dimension height du client: {theBoard.dimension.height} <br />
-				position du player 1:
-							{JSON.stringify(theBoard.playerOne.position)} <br />
-				position du player 2:
-							{JSON.stringify(theBoard.playerTwo.position)} <br />
-			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
 			<div style={{textAlign: "center"}}>
 				<canvas
-					height={game.board.canvas?.height}
-					width={game.board.canvas?.width}
-					ref={game.board.canvasRef}
+					height={gameInstances[0].board.canvas?.height}
+					width={gameInstances[0].board.canvas?.width}
+					ref={gameInstances[0].board.canvasRef}
 				>
 				</canvas>
 			</div>

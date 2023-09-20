@@ -4,10 +4,12 @@ import Player from "./Player";
 import Board from "./Board";
 import Ball from "./Ball";
 import Net from "./Net";
+import { NodeAnimationFrame } from "../GameSocketEvents";
 
 class GameServe
 {
 	public uuid: number | undefined;
+	public roomName: string;
 	public frameRate: number | undefined;
 	public frameCount: number | undefined;
 	public playerOne: Player;
@@ -19,13 +21,15 @@ class GameServe
 	public actionKeyPress: number;
 	public startDisplayed: boolean;
 	public continueAnimating: boolean;
+	public loop: NodeAnimationFrame | undefined;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
 
-	public constructor()
+	public constructor(roomName: string)
 	{
 		this.uuid = undefined;
+		this.roomName = roomName;
 		this.frameRate = 30;
 		this.frameCount = 0;
 		this.playerOne = new Player();
@@ -37,6 +41,7 @@ class GameServe
 		this.scoreLimit = 7;
 		this.startDisplayed = true;
 		this.continueAnimating = true;
+		this.loop = undefined;
 
 		this.initPlayers = () =>
 		{
