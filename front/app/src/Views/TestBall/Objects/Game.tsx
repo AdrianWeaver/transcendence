@@ -8,6 +8,7 @@ import Net from "./Net";
 class Game
 {
 	public uuid: number | undefined;
+	public roomName: string;
 	public frameRate: number | undefined;
 	public frameCount: number | undefined;
 	public playerOne: Player;
@@ -24,9 +25,10 @@ class Game
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
 
-	public constructor()
+	public constructor(roomName: string)
 	{
 		this.uuid = undefined;
+		this.roomName = roomName;
 		this.frameRate = 30;
 		this.frameCount = 0;
 		this.playerOne = new Player();
@@ -54,7 +56,6 @@ class Game
 		};
 		this.displayEndMessage = () =>
 		{
-			console.log("LOL");
 			if (this.board.ctx)
 			{
 				this.board.ctx.fillStyle = "#000";
