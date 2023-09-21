@@ -2,11 +2,33 @@
 /* eslint-disable max-lines-per-function */
 import MenuBar from "../../Component/MenuBar/MenuBar";
 
-const   GameSetup = () =>
+import { useNavigate } from "react-router-dom";
+
+
+// eslint-disable-next-line max-statements
+const	GameSetup = () =>
 {
+    const	navigate = useNavigate();
+
     const	displayStyle: React.CSSProperties = {
 		textAlign: "center",
 		fontSize: "8px"
+	};
+
+    const	goToClassicGame = () =>
+    {
+        navigate("/test-ball");
+    };
+
+	const	centerButtonsStyle = {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		// height: "100vh"
+	};
+
+	const buttonStyle = {
+		margin: "0 10px"
 	};
 
     return (
@@ -35,6 +57,10 @@ const   GameSetup = () =>
             </ul>
             <br />
             <div>It is now time to choose your mode:</div>
+            <div style={centerButtonsStyle}>
+				<button style={buttonStyle} onClick={goToClassicGame}>Classic mode</button>
+				<button style={buttonStyle}>Special mode</button>
+			</div>
         </body>
         </>
     );
