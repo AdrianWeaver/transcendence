@@ -21,7 +21,7 @@ import { ChatModule } from './chat/chat.module';
 	[
 		AdminsModule,
 		GameSocketModule,
-		ChatModule,
+		//ChatModule,
 	],
 	controllers: [
 		AppController,
