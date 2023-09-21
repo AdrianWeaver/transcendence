@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  backchat:
+    build:
+      dockerfile: Dockerfile
+      context: ./backchat
+      target: development
+    restart: unless-stopped
+    volumes:
+      - ./backchat:/localghost/src/app
+      - /localghost/src/app/node_modules/
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    env_file: ./.env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NODE_ENV: ${NODE_ENV}
+      PORT: 3000
+    ports:
+      - 3000:3000
+      - 9239:9239
+
+  frontchat:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontchat
+    restart: unless-stopped
+    volumes:
+      - ./frontchat:/app
+      - /localghost/src/app/node_modules
+    ports:
+      - 4200:4200
+    links:
+      - backchat
+
+  postgres:
+    image: postgres:15.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: password 
+      POSTGRES_DB: db 
+    ports:
+      - 3500:5432
+
+  # postgres_admin:
+  #   image: dpage/pgadmin4:7.6
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com 
+  #     PGADMIN_DEFAULT_PASSWORD: password
+  #   ports:
+  #     - 5050:80

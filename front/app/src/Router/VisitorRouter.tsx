@@ -11,6 +11,7 @@ import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
+import Chat from "../Views/Chat/Chat";
 
 /**
  * This is unauth router
@@ -53,8 +54,11 @@ const	VisitorRouter = () =>
 					path="/cancel"
 					element={<CancelRegister />}
 				/>
-
 				
+				<Route
+					path="the-chat"
+					element={<Chat />}
+				/>
 				{/* show 404 when route not found */}
 				<Route
 					path="*"

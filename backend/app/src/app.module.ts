@@ -12,6 +12,7 @@ import
 import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
 import { GameSocketModule } from "./game-socket/game-socket.module";
+import { ChatModule } from './chat/chat.module';
 
 
 @Module(
@@ -19,7 +20,8 @@ import { GameSocketModule } from "./game-socket/game-socket.module";
 	imports:
 	[
 		AdminsModule,
-		GameSocketModule
+		GameSocketModule,
+		//ChatModule,
 	],
 	controllers: [
 		AppController,
