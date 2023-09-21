@@ -140,7 +140,16 @@ export class GameSocketEvents
 			this.server.to(instance.roomName).emit("game-event", action);
 			if (instance.loop && (instance.playerOne.score === instance.scoreLimit
 				|| instance.playerTwo.score === instance.scoreLimit))
+			{
+				const	gameActive = {
+					type: "desactivate",
+					payload: {
+						gameActive: false
+					}
+				};
+				this.server.to(instance.roomName).emit("game-active", gameActive);
 				instance.loop.gameActive = false;
+			}
 		};
 	}
 
@@ -387,7 +396,8 @@ export class GameSocketEvents
 				const	action = {
 					type: "ready-player",
 					payload: {
-						userReadyCount: this.userReady
+						userReadyCount: this.userReady,
+						gameActive: true
 					}
 				};
 
