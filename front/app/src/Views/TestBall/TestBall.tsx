@@ -219,7 +219,7 @@ const	TestBall = () =>
 
 		const	activateGame = (data: any) =>
 		{
-			setGameActive(true);
+			setGameActive(data.payload.gameActive);
 		};
 
 		socket.on("connect", connect);
@@ -329,7 +329,9 @@ const	TestBall = () =>
 				game.board.ctx.fillRect(0, 0, game.board.dim.width,
 					game.board.dim.height);
 			}
-			if (gameActive === false)
+			if (gameActive === false
+				|| (game.playerOne.score === game.scoreLimit
+					|| game.playerTwo.score === game.scoreLimit))
 			{
 				const border = game.board.dim.width * 0.01;
 				game.playerOne.pos.x = border;
@@ -342,8 +344,8 @@ const	TestBall = () =>
 				game.playerTwo.pos.y = game.board.dim.height / 2;
 				game.playerTwo.racket.defineRacketSize();
 				game.playerTwo.pos.y -= game.playerTwo.racket.dim.height / 2;
-				game.playerOne.render();
-				game.playerTwo.render();
+				// game.playerOne.render();
+				// game.playerTwo.render();
 			}
 			else
 			{
@@ -366,7 +368,10 @@ const	TestBall = () =>
 			game.playerTwo.renderScore(theBoard.plTwoScore);
 			if (game.playerOne.score === game.scoreLimit
 				|| game.playerTwo.score === game.scoreLimit)
+			{
+				setGameActive(false);
 				game.displayEndMessage();
+			}
 			requestId = requestAnimationFrame(render);
 		};
 		requestId = requestAnimationFrame(render);
