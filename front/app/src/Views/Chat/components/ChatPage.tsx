@@ -3,6 +3,7 @@ import ChatBar from './ChatBar';
 import ChatBody from './ChatBody';
 import ChatFooter from './ChatFooter';
 import { Socket } from 'socket.io-client';
+import RightChatBar from './RightChatBar';
 
 type ChatPageProps =
 {
@@ -28,6 +29,7 @@ const ChatPage = (props: ChatPageProps) =>
         <ChatBody messages={messages} />
         <ChatFooter socket={props.socket} />
       </div>
+      <RightChatBar />
     </div>
   );
 };

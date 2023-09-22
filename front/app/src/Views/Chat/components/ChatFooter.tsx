@@ -21,7 +21,12 @@ const ChatFooter = (props: ChatFooterProps) => {
     }
     setMessage('');
   };
-  return <div className="chat__footer">...</div>;
+  return
+  <div className="chat__footer">
+    <div className="message__status">
+      <p>Someone is typing...</p>
+    </div>
+  </div>;
 };
 
 export default ChatFooter;
