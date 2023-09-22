@@ -137,13 +137,7 @@ const   Chat = () =>
             <div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
-            {/* {chatMap} */}
-            {/* <Home /> */}
-            {
-                (isSigned)
-                ? <ChatPage socket={socketRef.current} />
-                : <Home />
-            }
+            <ChatPage socket={socketRef.current} />
         </>
     );
 };

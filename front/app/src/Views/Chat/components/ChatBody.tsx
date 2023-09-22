@@ -48,9 +48,10 @@ const ChatBody = (props: ChatBodyProps) =>
             </div>
           )
         )}
-
-        <div className="message__status">
-          <p>Someone is typing...</p>
+        <div>
+          <button className="sendMessage__btn" onClick={handleLeaveChat}>
+            SEND
+          </button>
         </div>
       </div>
     </>

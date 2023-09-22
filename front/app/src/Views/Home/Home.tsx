@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import Chat from "../Chat/Chat";
-import { ChatWrapper } from "../Chat/ChatWrapper";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 
 const	Home = () =>
@@ -29,12 +28,7 @@ const	Home = () =>
 	return (
 		<>
 			{header}
-			{
-				(windowChat.bigWindow === false)
-				? body
-				: <></>
-			}
-			<ChatWrapper />
+			{body}
 		</>
 	);
 };
