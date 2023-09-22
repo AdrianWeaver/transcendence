@@ -1,5 +1,13 @@
 FROM debian:buster
+
+WORKDIR /localghost/src/app
+
+# COPY package*.json ./
+
 RUN apt update && apt upgrade -y
+
+# RUN npm install
+
 RUN apt install -y curl htop
 
 RUN groupadd -g 1000 node \
@@ -17,6 +25,6 @@ RUN volta install node@18.17.1
 RUN npm install -g @nestjs/cli
 RUN npm install -g pm2
 RUN npm install -g pm2-monit
-RUN npm install -g eslint
+# RUN npm install -g eslint
 
 CMD [ "/bin/bash" ]

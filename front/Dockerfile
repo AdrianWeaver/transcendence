@@ -1,6 +1,12 @@
 FROM debian:buster
 
+WORKDIR /localghost/src/app
+
 RUN apt update && apt upgrade -y
+
+# COPY package*.json ./
+
+# RUN npm install
 
 RUN apt install -y curl git htop
 
@@ -19,6 +25,6 @@ RUN curl https://get.volta.sh | bash
 RUN volta install node@18.17.1
 
 RUN npm install -g vite
-RUN npm install -g eslint
+# RUN npm install -g eslint
 
 CMD [ "/bin/bash" ]

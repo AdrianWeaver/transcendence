@@ -20,5 +20,5 @@ export const  Landing = () =>
     {
         navigate(controller.previousPage);
     }, 400);
-    return (<>met moi quelque chose de jolie interface, style la page est en train de charger</>);
+    return (<>Chat loading...</>);
 }

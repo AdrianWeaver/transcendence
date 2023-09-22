@@ -13,12 +13,7 @@ const	Home = () =>
 	{
 		savePrevPage("/");
 	});
-
-	const	windowChat = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.window);
-	});
-
+	
 	const header = <MenuBar />;
 
 	const body = 
@@ -29,12 +24,7 @@ const	Home = () =>
 	return (
 		<>
 			{header}
-			{
-				(windowChat.bigWindow === false)
-				? body
-				: <></>
-			}
-			<ChatWrapper />
+			{body}
 		</>
 	);
 };

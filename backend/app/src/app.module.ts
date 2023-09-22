@@ -20,8 +20,8 @@ import { ChatModule } from './chat/chat.module';
 	imports:
 	[
 		AdminsModule,
-		GameSocketModule,
-		//ChatModule,
+		// GameSocketModule,
+		ChatModule,
 	],
 	controllers: [
 		AppController,
