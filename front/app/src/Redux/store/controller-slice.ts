@@ -9,7 +9,7 @@ import	{ NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
-	themeMode: "light",
+	themeMode: "dark",
 	previousPage: "/",
 	user:
 	{
