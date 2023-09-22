@@ -30,6 +30,7 @@ const ChatPage = (props: ChatPageProps) =>
         <ChatBody messages={messages} />
         <ChatFooter socket={props.socket} />
       </div>
+      <RightChatBar />
     </div>
   );
 };
