@@ -22,9 +22,9 @@ RUN curl https://get.volta.sh | bash
 
 RUN volta install node@18.17.1
 
-RUN npm install -g @nestjs/cli
-RUN npm install -g pm2
-RUN npm install -g pm2-monit
+# RUN npm install -g @nestjs/cli
+# RUN npm install -g pm2
+# RUN npm install -g pm2-monit
 # RUN npm install -g eslint
 
 CMD [ "/bin/bash" ]

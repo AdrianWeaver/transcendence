@@ -78,8 +78,8 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="the-chat"
-					// element={<Chat />}
-					element={<Landing />}
+					element={<Chat />}
+					// element={<Landing />}
 				/>
 				<Route
 					path="*"
