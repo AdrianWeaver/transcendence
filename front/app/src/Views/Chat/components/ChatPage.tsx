@@ -25,7 +25,6 @@ const ChatPage = (props: ChatPageProps) =>
   return (
     <div className="chat">
       <ChatBar />
-      {/* <RightChatBar /> */}
       <div className="chat__main">
         <ChatBody messages={messages} />
         <ChatFooter socket={props.socket} />

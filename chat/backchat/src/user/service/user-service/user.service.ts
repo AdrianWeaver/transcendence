@@ -39,14 +39,3 @@ export class UserService {
         }
     }
 }
-
-// @Get(':id')
-// findOne(@Param() params: FindOneParams) {
-//     return 'This action returns a user'; //TEST
-// }
-
-// export class FindOneParams {
-
-//     @IsNumberString()
-//     id: number;
-// }

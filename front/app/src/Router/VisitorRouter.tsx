@@ -27,10 +27,7 @@ const	VisitorRouter = () =>
 					path="/"
 					element={<Home />}
 				/>
-				<Route
-					path="/redux-test-view"
-					element={<ReduxTestView />}
-				/>
+				
 				<Route
 					path="/signin"
 					element={<Signin />}
