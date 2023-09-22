@@ -37,7 +37,7 @@ const ChatBody = (props: ChatBodyProps) =>
 
       <div className="message__container">
         {props.messages.map((message) =>
-          message.name === localStorage.getItem('userName') ? (
+          { return message.name === localStorage.getItem('userName') ? (
             <div className="message__chats" key={message.id}>
               <p className="sender__name">You</p>
               <div className="message__sender">
@@ -51,13 +51,20 @@ const ChatBody = (props: ChatBodyProps) =>
                 <p>{message.text}</p>
               </div>
             </div>
-          )
+          )}
         )}
 
         <div className="message__status">
           <p>Someone is typing...</p>
         </div>
       </div>
+
+      <div>
+          <button className="sendMessage__btn" onClick={handleLeaveChat}>
+            SEND
+          </button>
+      </div>
+
     </>
   );
 };
