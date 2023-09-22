@@ -1,7 +1,6 @@
 
 export const	pagesLinksLogged = [
 	"/",
-	"/redux-test-view",
 	"/play-game",
 	"/starter-pack",
 	"/stats",
@@ -19,9 +18,8 @@ export const	pagesLinksLogged = [
  */
 export const	pagesLogged = [
 	"Accueil",
-	"Redux Test View",
 	"Play The Game",
 	"Starter Pack",
 	"High Score",
-	"The chat"
+	"The Chat"
 ];

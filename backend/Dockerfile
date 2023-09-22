@@ -2,32 +2,25 @@ FROM debian:buster
 
 WORKDIR /localghost/src/app
 
-COPY package*.json ./
+RUN apt update && apt upgrade -y
 
-COPY script.sh ./
+RUN apt install -y curl htop
 
-RUN apt update
-#  && apt upgrade -y
+RUN groupadd -g 1000 node \
+&& useradd -lm -u 1000 -g 1000 node
 
-# RUN npm install
+#  if at school, comment out the following line
+# USER node
 
-# RUN apt install -y curl htop
+ENV VOLTA_HOME "/home/node/.volta"
+ENV PATH "$VOLTA_HOME/bin:$PATH"
+RUN curl https://get.volta.sh | bash
 
-# RUN groupadd -g 1000 node \
-# && useradd -lm -u 1000 -g 1000 node
+RUN volta install node@18.17.1
 
-# #  if at school, comment out the following line
-# # USER node
+RUN npm install -g @nestjs/cli
+RUN npm install -g pm2
+RUN npm install -g pm2-monit
+RUN npm install -g eslint
 
-# ENV VOLTA_HOME "/home/node/.volta"
-# ENV PATH "$VOLTA_HOME/bin:$PATH"
-# RUN curl https://get.volta.sh | bash
-
-# RUN volta install node@18.17.1
-
-# RUN npm install -g @nestjs/cli
-# RUN npm install -g pm2
-# RUN npm install -g pm2-monit
-# RUN npm install -g eslint
-
-CMD [ "/bin/bash", "/localghost/src/app/script.sh" ]
+CMD [ "/bin/bash" ]
