@@ -6,9 +6,13 @@ import {
 	AppBar,
 	Avatar,
 	Box,
+	Card,
+	CardContent,
+	CardMedia,
 	Divider,
 	Fab,
 	Grid,
+	IconButton,
 	List,
 	ListItem,
 	ListItemIcon,
@@ -22,12 +26,75 @@ import {
 	Typography
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
 import { CSSProperties, useState } from "react";
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
-import { current } from "@reduxjs/toolkit";
+
+// please use vector this one is just for testing card
+import	pong from "./assets/pong.jpeg";
+
+// invite
+const	InvitationCard = () =>
+{
+	const theme = useTheme();
+	return (
+		<Card sx={{
+			display: "flex",
+			justifyContent: "flex-start",
+			backgroundColor: theme.palette.background.default,
+			width: "40%",
+		}}>
+			<Box sx={
+				{
+					display: "flex",
+					flexDirection: "column"
+				}
+			}>
+				<CardContent sx={{ flex: "1 0 auto" }}>
+					<Typography component="div" variant="h5">
+						Play Pong with me
+					</Typography>
+					<Typography variant="subtitle1" color="text.secondary" component="div">
+						A slot is reserved between John Wick and you
+					</Typography>
+				</CardContent>
+				<Box sx={
+					{
+						display: "flex",
+						pl: 1,
+						pb: 1
+					}}
+				>
+					{/* <IconButton aria-label="previous">
+						{theme.direction === "rtl" ? <SkipNextIcon /> : <SkipPreviousIcon />}
+					</IconButton> */}
+					<IconButton aria-label="play/pause">
+						<PlayArrowIcon sx={{
+							height: 38,
+							width: 38
+						}} />
+					</IconButton>
+					{/* <IconButton aria-label="next">
+						{theme.direction === "rtl" ? <SkipPreviousIcon /> : <SkipNextIcon />}
+					</IconButton> */}
+				</Box>
+			</Box>
+			<CardMedia
+				component="img"
+				sx={{ width: 200 }}
+				image={pong}
+				alt="Live from space album cover"
+			/>
+		</Card>
+	);
+};
+
+// chat part 
+
+
 interface TabPanelProps
 {
 	children?: React.ReactNode;
@@ -226,8 +293,118 @@ declare module "@mui/material/ListItemText"
 	}
 }
 
+type	MessageItemProps = {
+	key?: number,
+	align?: ListItemTextProps,
+	sender: "me" | "other" | "server",
+	message: string,
+	date: string
+};
+
+const	MessageItem = (props: MessageItemProps) =>
+{
+	let	align: "right" | "center" | "left" | undefined;
+
+	switch (props.sender)
+	{
+		case "me":
+			align = "right";
+			break ;
+		case "other":
+			align = "left";
+			break ;
+		case "server":
+			align = "center";
+			break;
+		default:
+			align = "center";
+			break;
+	}
+	if (props.message === "!play pong" && props.sender === "server")
+		return (
+			<ListItem key={props.key}>
+				<Grid container>
+					<Grid item xs={12}>
+						<ListItemText
+							align={align}
+							color="primary"
+						>
+							<InvitationCard />
+						</ListItemText>
+					</Grid>
+					<Grid item xs={12}>
+						<ListItemText
+							align={align}
+							secondary={props.date}
+						>
+						</ListItemText>
+					</Grid>
+				</Grid>
+			</ListItem>
+		);
+	else
+		return (
+			<ListItem key={props.key}>
+				<Grid container>
+					<Grid item xs={12}>
+						<ListItemText
+							align={align}
+							color="primary"
+							primary={props.message}
+						>
+						</ListItemText>
+					</Grid>
+					<Grid item xs={12}>
+						<ListItemText
+							align={align}
+							secondary={props.date}
+						>
+						</ListItemText>
+					</Grid>
+				</Grid>
+			</ListItem>
+		);
+}
+
 const	MessagesArea = () =>
 {
+	const	FakeJohnWickDiscussMessageArray = [
+		{
+			sender: "server",
+			message: "Vous etes maintenant ami avec John Wick",
+			date: "09:30"
+		},
+		{
+			sender: "me",
+			message: "Hello how are you ?",
+			date: "09:30"
+		},
+		{
+			sender: "other",
+			message: "Hello I'm fine and you",
+			date: "09:30"
+		},
+		{
+			sender: "me",
+			message: "Want you play a pong game with me ?",
+			date: "09:30"
+		},
+		{
+			sender: "other",
+			message: "Shurely, I'm the master of this game ;)",
+			date: "09:30"
+		},
+		{
+			sender: "me",
+			message: "Let me prepare the link",
+			date: "09:30"
+		},
+		{
+			sender: "server",
+			message: "!play pong",
+			date: "09:42"
+		}
+	];
 	return (
 		<>
 			<List
@@ -236,81 +413,19 @@ const	MessagesArea = () =>
 					overflowY: "auto"
 				}}
 			>
-				<ListItem key="0">
-					<Grid container>
-						<Grid item xs={12}>
-							<ListItemText
-								align="center"
-								color="primary"
-								primary="ceci est le debut de la conversation"
-							>
-							</ListItemText>
-						</Grid>
-						<Grid item xs={12}>
-							<ListItemText
-								align="center"
-								secondary="09:30"
-							>
-							</ListItemText>
-						</Grid>
-					</Grid>
-				</ListItem>
-				<ListItem key="1">
-					<Grid container>
-						<Grid item xs={12}>
-							<ListItemText
-								align="right"
-								primary="Hey man, What's up ?"
-							>
-							</ListItemText>
-						</Grid>
-						<Grid item xs={12}>
-							<ListItemText
-								align="right"
-								secondary="09:30"
-							>
-							</ListItemText>
-						</Grid>
-					</Grid>
-				</ListItem>
-				<ListItem key="2">
-					<Grid container>
-						<Grid item xs={12}>
-							<ListItemText
-								// sx={{align: "left"}}
-								align="left"
-								primary="Hey, Iam Good! What about you ?"
-							>
-							</ListItemText>
-						</Grid>
-						<Grid item xs={12}>
-							<ListItemText
-								// sx={{align: "left"}}
-								align="left"
-								secondary="09:31"
-							>
-							</ListItemText>
-						</Grid>
-					</Grid>
-				</ListItem>
-				<ListItem key="3">
-					<Grid container>
-						<Grid item xs={12}>
-							<ListItemText
-								align="right"
-								primary="Cool. i am good, let's catch up!"
-							>
-							</ListItemText>
-						</Grid>
-						<Grid item xs={12}>
-							<ListItemText
-								align="right"
-								secondary="10:30"
-							>
-							</ListItemText>
-						</Grid>
-					</Grid>
-				</ListItem>
+				{
+					FakeJohnWickDiscussMessageArray.map((elem, key) =>
+					{
+						return (
+							<MessageItem
+								key={key}
+								date={elem.date}
+								sender={elem.sender as "me" | "other" | "server"}
+								message={elem.message}
+							/>
+						);
+					})
+				}
 			</List>
 		</>
 	);
