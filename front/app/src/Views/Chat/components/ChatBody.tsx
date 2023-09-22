@@ -1,8 +1,12 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import Home from './ChatHome';
-import { useAppDispatch, useAppSelector } from '../../../Redux/hooks/redux-hooks';
-import { logOffUser } from '../../../Redux/store/controllerAction';
+/* eslint-disable max-len */
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import Home from "./ChatHome";
+import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import { logOffUser } from "../../../Redux/store/controllerAction";
 
 type ChatBodyProps =
 {
@@ -19,7 +23,7 @@ const ChatBody = (props: ChatBodyProps) =>
 	});
   const handleLeaveChat = () =>
   {
-    localStorage.removeItem('userName');
+    localStorage.removeItem("userName");
     navigate(controller.previousPage);
     dispatch(logOffUser());
   };
@@ -34,8 +38,9 @@ const ChatBody = (props: ChatBodyProps) =>
       </header>
 
       <div className="message__container">
-        {props.messages.map((message) =>
-          message.name === localStorage.getItem('userName') ? (
+        {
+        props.messages.map((message) =>
+          message.name === localStorage.getItem("userName") ? (
             <div className="message__chats" key={message.id}>
               <p className="sender__name">You</p>
               <div className="message__sender">

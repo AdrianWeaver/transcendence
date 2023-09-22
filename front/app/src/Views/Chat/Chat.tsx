@@ -11,6 +11,7 @@ import React from 'react';
 import ChatPage from "./components/ChatPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Http } from "@mui/icons-material";
+import MenuBar from "../../Component/MenuBar/MenuBar";
 
 const   Chat = () =>
 {
@@ -130,13 +131,15 @@ const   Chat = () =>
             </>
         );
     }
-    
+    const header = <MenuBar />;
     // console.log(chatMap);
     return (
         <>
+            {header}
             <div style={displayStyle}>
 				<ConnectState connected={connected} />
 			</div>
+           
             <ChatPage socket={socketRef.current} />
         </>
     );
