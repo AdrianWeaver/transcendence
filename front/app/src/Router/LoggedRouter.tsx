@@ -22,6 +22,7 @@ import Chat from "../Views/Chat/Chat";
 import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
 import { setBigWindow } from "../Redux/store/controllerAction";
 import { Landing } from "../Views/Chat/Landing";
+import ChatLayout from "../Views/Chat/ChatLayout";
 
 
 /**
@@ -29,8 +30,6 @@ import { Landing } from "../Views/Chat/Landing";
  * */
 const	LoggedRouter = () =>
 {
-	
-
 	return (
 		<BrowserRouter >
 			<Routes>
@@ -87,6 +86,11 @@ const	LoggedRouter = () =>
 				<Route
 					path="the-chat"
 					element={<Chat />}
+					// element={<Landing />}
+				/>
+				<Route
+					path="the-chat-layout"
+					element={<ChatLayout />}
 				/>
 				<Route
 					path="the-chat-layout"
