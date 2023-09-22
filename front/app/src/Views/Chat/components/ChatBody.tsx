@@ -23,7 +23,7 @@ const ChatBody = (props: ChatBodyProps) =>
 	});
   const handleLeaveChat = () =>
   {
-    localStorage.removeItem("userName");
+    localStorage.removeItem('userName');
     navigate(controller.previousPage);
     dispatch(logOffUser());
   };
