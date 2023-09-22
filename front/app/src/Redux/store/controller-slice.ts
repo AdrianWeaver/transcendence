@@ -9,7 +9,7 @@ import	{ NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
-	themeMode: "dark",
+	themeMode: "light",
 	previousPage: "/",
 	user:
 	{
@@ -25,7 +25,7 @@ const	initialControllerState: ControllerModel = {
 				hiddenWindow: false,
 				miniWindow: true,
 			},
-			pseudo: "undefined" 
+			pseudo: "undefined"
 		}
 	},
 	registration:
