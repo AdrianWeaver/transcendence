@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Home from './ChatHome';
-import { useAppDispatch } from '../../../Redux/hooks/redux-hooks';
+import { useAppDispatch, useAppSelector } from '../../../Redux/hooks/redux-hooks';
 import { logOffUser } from '../../../Redux/store/controllerAction';
 
 type ChatBodyProps =
@@ -11,13 +11,18 @@ type ChatBodyProps =
 
 const ChatBody = (props: ChatBodyProps) =>
 {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const	controller = useAppSelector((state) =>
+	{
+		return (state.controller);
+	});
+
 
   const handleLeaveChat = () =>
   {
     localStorage.removeItem('userName');
-    // navigate('/');
+    navigate(controller.previousPage);
     dispatch(logOffUser());
   };
 

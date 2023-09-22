@@ -177,13 +177,13 @@ install: check_dev_image_build
 	@echo "Installation done\n\n"
 	@make -s -C . all
 clean:
-	rm -rf ./app/node_modules ./app/package-lock.json norm.report ./app/dist
 ifneq ($(shell docker ps --filter "name=backend" -q),)
 	docker kill backend
 endif
 ifneq ($(shell docker ps --all --filter "name=backend" -q),)
 	docker rm backend
 endif
+	rm -rf ./app/node_modules ./app/package-lock.json norm.report ./app/dist
 
 fclean: clean
 ifneq ($(shell docker images -q $(DEV_IMAGE_NAME) 2>/dev/null),)
