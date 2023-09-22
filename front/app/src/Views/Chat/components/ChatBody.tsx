@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Home from './ChatHome';
@@ -30,9 +31,10 @@ const ChatBody = (props: ChatBodyProps) =>
         </button>
       </header>
 
+      {/* <div className="chat__otherSidebar"> */}
       <div className="message__container">
         {props.messages.map((message) =>
-          message.name === localStorage.getItem('userName') ? (
+          { return message.name === localStorage.getItem("userName") ? (
             <div className="message__chats" key={message.id}>
               <p className="sender__name">You</p>
               <div className="message__sender">
@@ -46,13 +48,20 @@ const ChatBody = (props: ChatBodyProps) =>
                 <p>{message.text}</p>
               </div>
             </div>
-          )
+          )}
         )}
 
         <div className="message__status">
           <p>Someone is typing...</p>
         </div>
+
+        <div>
+          <button className="sendMessage__btn" onClick={handleLeaveChat}>
+            SEND
+          </button>
+        </div>
       </div>
+      {/* </div> */}
     </>
   );
 };
