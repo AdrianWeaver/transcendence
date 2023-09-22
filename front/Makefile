@@ -187,9 +187,10 @@ install: check_dev_image_build
 	@clear -x
 	@echo "Installation done\n\n"
 	@make -s -C . all
+
 clean:
 ifneq ($(shell docker ps --filter "name=frontend" -q),)
-	docker kill frontend
+	docker stop frontend
 endif
 ifneq ($(shell docker ps --all --filter "name=frontend" -q),)
 	docker rm frontend

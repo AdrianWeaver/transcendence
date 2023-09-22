@@ -176,9 +176,10 @@ install: check_dev_image_build
 	@clear -x
 	@echo "Installation done\n\n"
 	@make -s -C . all
+
 clean:
 ifneq ($(shell docker ps --filter "name=backend" -q),)
-	docker kill backend
+	docker stop backend
 endif
 ifneq ($(shell docker ps --all --filter "name=backend" -q),)
 	docker rm backend
