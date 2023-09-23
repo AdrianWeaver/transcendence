@@ -87,8 +87,12 @@ const	LoggedRouter = () =>
 				<Route
 					path="the-chat"
 					element={<Chat />}
-					// element={<Landing />}
 				/>
+				<Route
+					path="the-chat-layout"
+					element={<ChatLayout />}
+				/>
+
 				<Route
 					path="*"
 					element={<h1>Error 404: Logged User</h1>}
