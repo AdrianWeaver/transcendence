@@ -25,7 +25,7 @@ const	initialControllerState: ControllerModel = {
 				hiddenWindow: false,
 				miniWindow: true,
 			},
-			pseudo: "undefined" 
+			pseudo: "undefined"
 		}
 	},
 	registration:
