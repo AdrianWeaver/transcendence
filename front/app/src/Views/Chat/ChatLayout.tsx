@@ -25,13 +25,15 @@ import {
 	Toolbar,
 	Typography
 } from "@mui/material";
+const	URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
 
 // please use vector this one is just for testing card
 import	pong from "./assets/pong.jpeg";
@@ -469,6 +471,56 @@ const	ChatLayout = () =>
 		value,
 		setValue
 	] = useState(0);
+
+	const
+	[
+		connected,
+		setConnected
+	] = useState(false);
+
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
+	useEffect(() =>
+    {
+        const socket = io(URL,
+        {
+            autoConnect: false,
+            reconnectionAttempts: 5,
+        });
+
+        socketRef.current = socket;
+
+        const connect = () =>
+		{
+			// const	action = {
+			// 	type: "GET_BOARD_SIZE"
+			// };
+			// socket.emit("info", action);
+			setConnected(true);
+		};
+
+		const disconnect = () =>
+		{
+			// console.log("ws disconnected");
+			setConnected(false);
+		};
+
+		const	connectError = (error: Error) =>
+		{
+			console.error("ws_connect_error", error);
+		};
+        socket.on("connect", connect);
+		socket.on("disconnect", disconnect);
+        socket.on("error", connectError);
+        socket.connect();
+
+        return (() =>
+        {
+            socket.off("connect", connect);
+			socket.off("disconnect", disconnect);
+            socket.off("error", connectError);
+        });
+    }, []);
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
