@@ -9,16 +9,16 @@ class Chat
     public server: Server | undefined;
     public activeMembers: number;
     public memberSocketIds: string[] = [];
-    public createAndJoin: (name: string, client: Socket, mode: string, password: string);
-    public deleteChannel: (name: string);
-    public addUserToChannel: (name: string, id: string);
+    public createAndJoin: (name: string, client: Socket, mode: string, pass: string) => void;
+    public deleteChannel: (name: string) => void;
+    public addUserToChannel: (name: string, id: string) => void;
 
     public constructor ()
     {
         this.server = undefined;
-        this.createAndJoin = (name: string, client: Socket, mode: string, password: string) =>
+        this.createAndJoin = (name: string, client: Socket, mode: string, pass: string) =>
         {
-            const newChan = new Channel(name, client, mode, password);
+            const newChan = new Channel(name, client, mode, pass);
             if (this.server)
             {
                 client.join(newChan.name);
