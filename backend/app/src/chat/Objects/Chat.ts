@@ -2,6 +2,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import Channel from "./Channel";
+import Message from "./Message";
 import User from "./User";
 import { Server, Socket } from "socket.io";
 
@@ -12,6 +13,7 @@ class Chat
     public server: Server | undefined;
     public activeMembers: number;
     public memberSocketIds: string[] = [];
+    public message: Message[];
     public createAndJoin: (name: string, client: Socket, mode: string, pass: string) => void;
     public deleteChannel: (name: string) => void;
     public addUserToChannel: (name: string, id: string) => void;

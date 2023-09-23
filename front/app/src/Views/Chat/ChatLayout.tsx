@@ -231,17 +231,17 @@ const	FriendsList = () =>
 {
 	const	friendListDataFake = [
 		{
-			name: "John Wick",
+			name: "Johanna Courtois",
 			avatar: "https://material-ui.com/static/images/avatar/1.jpg",
 			online: true,
 		},
 		{
-			name: "Alice",
+			name: "Nikola Boratkova",
 			avatar: "https://material-ui.com/static/images/avatar/3.jpg",
 			online: false,
 		},
 		{
-			name: "Cindy Baker",
+			name: "Alexandre Payet",
 			avatar: "https://material-ui.com/static/images/avatar/2.jpg",
 			online: true,
 		}
@@ -371,7 +371,7 @@ const	MessagesArea = () =>
 	const	FakeJohnWickDiscussMessageArray = [
 		{
 			sender: "server",
-			message: "Vous etes maintenant ami avec John Wick",
+			message: "Vous etes maintenant ami avec Johanna Courtois",
 			date: "09:30"
 		},
 		{
@@ -391,12 +391,12 @@ const	MessagesArea = () =>
 		},
 		{
 			sender: "other",
-			message: "Shurely, I'm the master of this game ;)",
+			message: "No, I need to finish ft_transcendence first >.<",
 			date: "09:30"
 		},
 		{
 			sender: "me",
-			message: "Let me prepare the link",
+			message: "No, you are going to play. No discussions. I send you the link",
 			date: "09:30"
 		},
 		{
