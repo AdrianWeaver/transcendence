@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-len */
 import Chat from "./Chat";
 import User from "./User";
 import { Server, Socket } from "socket.io";

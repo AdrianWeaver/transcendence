@@ -1,4 +1,9 @@
+/* eslint-disable max-len */
+/* eslint-disable max-statements */
 import { Server, Socket } from "socket.io";
+import Chat from "./Objects/Chat";
+import User from "./Objects/User";
+import Channel from "./Objects/Channel";
 
 import
 {
@@ -29,42 +34,46 @@ export class ChatSocketEvents
 	{
 		@WebSocketServer()
 		server: Server;
-		users: number;
-		socketIdUsers: string[] = [];
-		update: () => void;
-	
+		chat: Chat;
+
 		public	constructor()
 		{
-			
+			this.chat = new Chat();
 		};
 
 		afterInit(server: any) {
-			
-		}
+
+				}
 
 		handleConnection(client: Socket)
 		{
-			// const searchUser = this.socketIdUsers.find((element) =>
-			// {
-			// 	return (element === client.id);
-			// });
-			// if (searchUser === undefined)
-			// {
-			// 	this.socketIdUsers.push(client.id);
-			// 	this.users += 1;
-			// }
-
-			// const	action = {
-			// 	type: "connect",
-			// 	payload: {
-			// 		numberUsers: this.users,
-			// 		socketId: client.id
-			// 	}
-			// }
+			const searchUser = this.chat.users.find((element) =>
+			{
+				return (element.id === client.id);
+			});
+			if (searchUser === undefined)
+			{
+				const newUser = new User("test", client);
+				this.chat.users.push(newUser);
+				this.chat.memberSocketIds.push(client.id);
+			}
 		}
 
-		handleDisconnect(client: Socket) {
-			
+		handleDisconnect(client: Socket)
+		{
+			const	searchUser = this.chat.users.findIndex((element) =>
+			{
+				return (element.id === client.id);
+			});
+			const	searchUserSocket = this.chat.memberSocketIds.findIndex((element) =>
+			{
+				return (element === client.id);
+			});
+			if (searchUser !== undefined)
+			{
+				this.chat.users.splice(searchUser, 1);
+				this.chat.memberSocketIds.splice(searchUserSocket, 1);
+			}
 		}
 	
 		// @SubscribeMessage("pseudo-message")

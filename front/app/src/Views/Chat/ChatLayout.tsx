@@ -6,6 +6,7 @@ import {
 	AppBar,
 	Avatar,
 	Box,
+	Button,
 	Card,
 	CardContent,
 	CardMedia,
@@ -112,6 +113,9 @@ const	ChannelsList = () =>
 	return (
 		<>
 			channel list here, you can follow FriendsList component
+			<Button variant="contained" color="success">
+				NEW
+			</Button>
 		</>
 	);
 };
@@ -492,18 +496,14 @@ const	ChatLayout = () =>
 
         const connect = () =>
 		{
-			// const	action = {
-			// 	type: "GET_BOARD_SIZE"
-			// };
-			// socket.emit("info", action);
 			setConnected(true);
 		};
 
 		const disconnect = () =>
 		{
-			// console.log("ws disconnected");
 			setConnected(false);
 		};
+
 
 		const	connectError = (error: Error) =>
 		{
@@ -534,6 +534,11 @@ const	ChatLayout = () =>
 	return (
 		<div>
 			<MenuBar />
+
+			<div>
+				connected:{connected}
+			</div>
+
 			<Grid
 				container
 				component={Paper}

@@ -1,3 +1,6 @@
+/* eslint-disable curly */
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-len */
 import Channel from "./Channel";
 import User from "./User";
 import { Server, Socket } from "socket.io";
@@ -24,7 +27,7 @@ class Chat
                 client.join(newChan.name);
                 this.server.to(newChan.name).emit("chan-message", "Welcome to your brand new chat");
             }
-        }
+        };
 
         this.deleteChannel = (name: string) =>
         {
