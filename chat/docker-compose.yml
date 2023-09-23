@@ -1,14 +1,24 @@
 version: "3.8"
 
 services:
-  backchat:
+  server:
     build:
       dockerfile: Dockerfile
-      context: ./backchat
-      target: development
+      context: ../backend
     restart: unless-stopped
     volumes:
-      - ./backchat:/localghost/src/app
+      - ../backend:/localghost/src/app
+      - /localghost/src/app/node_modules
+    ports:
+      - 3001:3001
+
+  chat:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    restart: unless-stopped
+    volumes:
+      - ./:/localghost/src/app
       - /localghost/src/app/node_modules/
     command: npm run start:dev
     depends_on:
@@ -16,24 +26,22 @@ services:
     env_file: ./.env
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      NODE_ENV: ${NODE_ENV}
-      PORT: 3000
     ports:
       - 3000:3000
       - 9239:9239
 
-  # frontchat:
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: ./frontchat
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./frontchat:/app
-  #     - /localghost/src/app/node_modules
-  #   ports:
-  #     - 4200:4200
-  #   links:
-  #     - backchat
+  front:
+    build:
+      dockerfile: Dockerfile
+      context: ../front
+    restart: unless-stopped
+    volumes:
+      - ../front:/app
+      - /localghot/src/app/node_modules
+    ports:
+      - 4200:4200
+    links:
+      - chat
 
   postgres:
     image: postgres:15.4
