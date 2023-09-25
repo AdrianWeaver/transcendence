@@ -3,6 +3,7 @@ import {
 }	from "@nestjs/common";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
+import Channel from "./Objects/Channel";
 
 @Injectable()
 export	class ChatService
@@ -29,6 +30,15 @@ export	class ChatService
 		return (searchUser);
 	}
 
+	public	searchUserIndex(clientId: string)
+	{
+		const	userIndex = this.chat.users.findIndex((element) =>
+		{
+			return (element.id === clientId);
+		});
+		return (userIndex);
+	}
+
 	public	searchSocketIndex(clientId: string)
 	{
 		const	searchSocket = this.chat.memberSocketIds.findIndex((element) =>
@@ -50,12 +60,8 @@ export	class ChatService
 		this.chat.memberSocketIds.splice(userSocket, 1);
 	}
 
-	public	searchUserIndex(clientId: string)
+	public	addNewChannel(newChannel: Channel)
 	{
-		const	userIndex = this.chat.users.findIndex((element) =>
-		{
-			return (element.id === clientId);
-		});
-		return (userIndex);
+		this.chat.channels.push(newChannel);
 	}
 }

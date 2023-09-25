@@ -569,6 +569,9 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current?.emit("create-channel", action);
+		// setChannelName("");
+		// setSelectedMode("");
+		// set
 	};
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>

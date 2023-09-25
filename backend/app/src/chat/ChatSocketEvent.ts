@@ -40,14 +40,10 @@ export class ChatSocketEvents
 
 		public	constructor(private readonly chatService: ChatService)
 		{
-			// this.chat = new Chat();
-			// console.log(chatService.getTest());
-			console.log(this.chatService.getChat());
 		}
 
 		afterInit(server: any)
 		{
-			// chat = this.chatService.getChat();
 		}
 
 		handleConnection(client: Socket)
@@ -67,12 +63,17 @@ export class ChatSocketEvents
 			if (userIndex !== undefined)
 				this.chatService.deleteUser(userIndex, socketIndex);
 		}
-		// @SubscribeMessage("pseudo-message")
-		// handlePseudoMessage(
-		// 	@MessageBody() data: ActionSocket,
-		// 	@ConnectedSocket() client: Socket
-		// )
-		// {
-		// 	chatServe.pseudo = data.payload.chatPseudo;
-		// }
+
+		@SubscribeMessage("create-channel")
+		handleChatCreation(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			const newChannel = new Channel(data.payload.chanName,
+				data.payload.client,
+				data.payload.selectedMode,
+				data.payload.chanPassword);
+			this.chatService.addNewChannel(newChannel);
+		}
 	}

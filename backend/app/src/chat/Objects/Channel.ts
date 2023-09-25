@@ -33,9 +33,9 @@ class Channel
         this.users.push(client.id);
         this.mode = mode;
         if (password !== undefined)
-        	this.password = password;
-		    else
-			    this.password = undefined;
+            this.password = password;
+        else
+            this.password = undefined;
 
         this.isAdmin = (id: string) =>
         {
