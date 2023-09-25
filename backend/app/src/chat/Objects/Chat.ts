@@ -20,7 +20,6 @@ class Chat
     public activeMembers: number;
     public memberSocketIds: string[] = [];
     public message: Message[];
-    public createAndJoin: (name: string, client: Socket, mode: string, pass: string) => void;
     public deleteChannel: (name: string) => void;
     public addUserToChannel: (name: string, id: string) => void;
     public displayMessage: (message: Message) => void;
@@ -28,16 +27,6 @@ class Chat
     public constructor ()
     {
         this.server = undefined;
-        this.createAndJoin = (name: string, client: Socket, mode: string, pass: string) =>
-        {
-            const newChan = new Channel(name, client, mode, pass);
-            if (this.server)
-            {
-                client.join(newChan.name);
-                this.server.to(newChan.name).emit("chan-message", "Welcome to your brand new chat");
-            }
-        };
-
         this.deleteChannel = (name: string) =>
         {
             for (const channel of this.channels)

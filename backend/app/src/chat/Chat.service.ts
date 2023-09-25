@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import {
 	Injectable
 }	from "@nestjs/common";
@@ -91,6 +92,26 @@ export	class ChatService
 			name: newChannel.name,
 		};
 		this.chat.chanMap.push(newElement);
+	}
+
+	public deleteChannel(chanName: string)
+	{
+		const	index = this.chat.channels.findIndex((element) =>
+		{
+			return (element.name === chanName);
+		});
+		this.chat.channels.splice(index, 1);
+		let i: number;
+		i = 0;
+		for (const chanMap of this.chat.chanMap)
+		{
+			if (chanMap.name === chanName)
+			{
+				this.chat.chanMap.splice(i, 1);
+				break ;
+			}
+			i++;
+		}
 	}
 
 	public	searchChannelByName(chanName: string)
