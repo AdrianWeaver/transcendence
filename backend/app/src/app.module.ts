@@ -13,6 +13,7 @@ import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
 import { GameSocketModule } from "./game-socket/game-socket.module";
 import { ChatModule } from './chat/chat.module';
+import { ChatService } from "./chat/Chat.service";
 
 
 @Module(
@@ -31,6 +32,7 @@ import { ChatModule } from './chat/chat.module';
 	providers: [
 		AppService,
 		AnonymousUserService,
+		ChatService,
 		AdminsService
 	],
 })
