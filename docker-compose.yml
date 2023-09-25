@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    restart: unless-stopped
+    command: npm run start:dev
+    volumes:
+      - ./backend/app/:/localghost/src/app
+      - /localghost/src/app/node_modules
+    ports:
+      - 3001:3001
+
+  front:
+    build:
+      dockerfile: Dockerfile
+      context: ./front
+    restart: unless-stopped
+    # command: npm run start
+    volumes:
+      - ./front/app/:/localghost/src/app
+      - /localghost/src/app/node_modules
+    ports:
+      - 4200:4200
+    links:
+      - backend
+
+  # postgres:
+  #   image: postgres:15.4
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: password 
+  #     POSTGRES_DB: db 
+  #   ports:
+  #     - 3500:5432
+
+  # postgres_admin:
+  #   image: dpage/pgadmin4:7.6
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com 
+  #     PGADMIN_DEFAULT_PASSWORD: password
+  #   ports:
+  #     - 5050:80

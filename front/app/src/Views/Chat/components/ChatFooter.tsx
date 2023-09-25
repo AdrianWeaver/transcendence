@@ -1,3 +1,6 @@
+/* eslint-disable max-statements /
+/ eslint-disable max-lines-per-function */
+
 import React, { useState } from 'react';
 import { Socket } from 'socket.io-client';
 
@@ -9,9 +12,11 @@ type ChatFooterProps =
 const ChatFooter = (props: ChatFooterProps) => {
   const [message, setMessage] = useState('');
 
-  const handleSendMessage = (e: any) => {
+  const handleSendMessage = (e: any) =>
+  {
     e.preventDefault();
-    if (message.trim() && localStorage.getItem('userName')) {
+    if (message.trim() && localStorage.getItem('userName'))
+    {
      props.socket?.emit('message', {
         text: message,
         name: localStorage.getItem('userName'),
@@ -22,11 +27,11 @@ const ChatFooter = (props: ChatFooterProps) => {
     setMessage('');
   };
   return
-  <div className="chat__footer">
-    <div className="message__status">
-      <p>Someone is typing...</p>
+    <div className="chat__footer">
+      <div className="message__status">
+        <p>Someone is typing...</p>
+      </div>
     </div>
-  </div>;
 };
 
 export default ChatFooter;
