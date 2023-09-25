@@ -74,6 +74,7 @@ export class ChatSocketEvents
 				data.payload.client,
 				data.payload.selectedMode,
 				data.payload.chanPassword);
+			newChannel.chat = this.chatService.getChat();
 			this.chatService.addNewChannel(newChannel);
 		}
 	}

@@ -21,6 +21,8 @@ export	class ChatService
 		return (this.chat);
 	}
 
+	// search users and sockets
+
 	public	searchUser(clientId: string)
 	{
 		const searchUser = this.chat.users.find((element) =>
@@ -48,6 +50,8 @@ export	class ChatService
 		return (searchSocket);
 	}
 
+	// add and delete a user
+
 	public	pushUser(newUser: User, clientId: string)
 	{
 		this.chat.users.push(newUser);
@@ -60,8 +64,11 @@ export	class ChatService
 		this.chat.memberSocketIds.splice(userSocket, 1);
 	}
 
+	// channel functions
+
 	public	addNewChannel(newChannel: Channel)
 	{
 		this.chat.channels.push(newChannel);
 	}
+
 }
