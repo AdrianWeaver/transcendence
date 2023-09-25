@@ -650,7 +650,10 @@ const	ChatLayout = () =>
 									type="text"
 									placeholder="Channel name"
 									value={channelName}
-									onChange={(e) => setChannelName(e.target.value)}
+									onChange={(e) =>
+									{
+										setChannelName(e.target.value)
+									}}
 								/>
 								<br />
 								<div>

@@ -15,7 +15,7 @@ import
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer
-} from "@nestjs/websockets";
+}	from "@nestjs/websockets";
 
 type	ActionSocket = {
 	type: string,
