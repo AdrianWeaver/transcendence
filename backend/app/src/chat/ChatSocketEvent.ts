@@ -43,7 +43,7 @@ export class ChatSocketEvents
 
 		afterInit(server: any) {
 
-				}
+		}
 
 		handleConnection(client: Socket)
 		{

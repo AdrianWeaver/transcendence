@@ -42,8 +42,8 @@ class Chat
                     this.channels.splice(chanIndex, 1);
                 }
             }
-        }
+        };
     }
-};
+}
 
 export default Chat;

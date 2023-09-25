@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -19,12 +20,19 @@ import {
 	ListItemIcon,
 	ListItemText,
 	ListItemTextProps,
+	MenuItem,
 	Paper,
+	Select,
 	Tab,
 	Tabs,
 	TextField,
 	Toolbar,
-	Typography
+	Typography,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle
 } from "@mui/material";
 const	URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
@@ -113,7 +121,8 @@ const	ChannelsList = () =>
 	return (
 		<>
 			channel list here, you can follow FriendsList component
-			<Button variant="contained" color="success">
+			<br />
+			<Button variant="contained" color="success"> onClick={createNewChannel}
 				NEW
 			</Button>
 		</>
@@ -482,6 +491,32 @@ const	ChatLayout = () =>
 		setConnected
 	] = useState(false);
 
+	const [
+		open,
+		setOpen
+	] = useState(false);
+
+	const [channelName, setChannelName] = useState("");
+	const [chanPassword, setChanPassword] = useState("");
+	const [selectedMode, setSelectedMode] = useState("");
+
+	const handleClickOpen = () =>
+	{
+		setOpen(true);
+	};
+
+	const handleClose = () =>
+	{
+		setOpen(false);
+	};
+
+	const handleSave = () => {
+		// Do something with the collected information (info1 and info2)
+
+		// Close the dialog
+		setOpen(false);
+	};
+
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	useEffect(() =>
@@ -522,6 +557,18 @@ const	ChatLayout = () =>
         });
     }, []);
 
+	const	createNewChannel = () =>
+	{
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: channelName,
+				chanMode: selectedMode,
+				chanPassword: chanPassword,
+			}
+		};
+		socketRef.current?.emit("create-channel", action);
+	};
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
 		setValue(newValue);
@@ -586,7 +633,76 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<ChannelsList />
+						{/* <ChannelsList /> */}
+						<div>
+							channel list here, you can follow FriendsList component
+							<br />
+							<Button onClick={handleClickOpen} variant="contained" color="success">
+								NEW
+							</Button>
+							<Dialog open={open} onClose={handleClose}>
+								<DialogTitle>Enter Information</DialogTitle>
+								<DialogContent>
+								<DialogContentText>
+									Please enter the following information:
+								</DialogContentText>
+								<input
+									type="text"
+									placeholder="Channel name"
+									value={channelName}
+									onChange={(e) => setChannelName(e.target.value)}
+								/>
+								<br />
+								<div>
+									<input
+									type="radio"
+									id="option1"
+									name="answerOption"
+									value="Public"
+									checked={selectedMode === "Public"}
+									onChange={() => setSelectedMode("Public")}
+									/>
+									<label htmlFor="option1">Public</label>
+								</div>
+								<div>
+									<input
+									type="radio"
+									id="option2"
+									name="answerOption"
+									value="Protected"
+									checked={selectedMode === "Protected"}
+									onChange={() => setSelectedMode('Option 2')}
+									/>
+									<label htmlFor="option2">Protected</label>
+								</div>
+								<div>
+									<input
+									type="radio"
+									id="option3"
+									name="answerOption"
+									value="Private"
+									checked={selectedMode === "Private"}
+									onChange={() => setSelectedMode("Private")}
+									/>
+									<label htmlFor="option3">Private</label>
+								</div>
+								<input
+									type="text"
+									placeholder="Password (if protected)"
+									value={chanPassword}
+									onChange={(e) => setChanPassword(e.target.value)}
+								/>
+								</DialogContent>
+								<DialogActions>
+								<Button onClick={handleClose} color="primary">
+									Cancel
+								</Button>
+								<Button onClick={handleSave} color="primary">
+									Save
+								</Button>
+								</DialogActions>
+							</Dialog>
+						</div>
 					</TabPanel>
 					<TabPanel
 						area={false}
