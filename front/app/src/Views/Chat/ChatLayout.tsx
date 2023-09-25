@@ -485,7 +485,7 @@ const	ChatLayout = () =>
 		value,
 		setValue
 	] = useState(0);
-  
+
 	const
 	[
 		connected,
@@ -497,9 +497,25 @@ const	ChatLayout = () =>
 		setOpen
 	] = useState(false);
 
-	const [channelName, setChannelName] = useState("");
-	const [chanPassword, setChanPassword] = useState("");
-	const [selectedMode, setSelectedMode] = useState("");
+	const [
+		channelName,
+		setChannelName
+	] = useState("");
+
+	const [
+		chanPassword,
+		setChanPassword
+	] = useState("");
+
+	const [
+		selectedMode,
+		setSelectedMode
+	] = useState("");
+
+	const [
+		formValid,
+		setFormValid
+	] = useState(false);
 
 	const handleClickOpen = () =>
 	{
@@ -508,11 +524,36 @@ const	ChatLayout = () =>
 
 	const handleClose = () =>
 	{
+		setChannelName("");
+		setSelectedMode("");
+		setChanPassword("");
 		setOpen(false);
 	};
 
 	const handleSave = () => {
-		// Do something with the collected information (info1 and info2)
+		// Check if Channel name is empty
+		if (channelName.trim() === "")
+		{
+			alert("Channel name cannot be empty");
+			return;
+		}
+
+		// Check if at least one radio option is selected
+		if (![
+			"Public",
+			"Protected",
+			"Private"
+			].includes(selectedMode))
+		{
+			alert("Please select a mode (Public, Protected, or Private)");
+			return;
+		}
+
+		if (selectedMode === "Protected" && chanPassword.trim() === "")
+		{
+			alert("There must be a password for a protected channel");
+			return;
+		}
 
 		// Close the dialog
 		setOpen(false);
@@ -569,12 +610,16 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current?.emit("create-channel", action);
+		setChannelName("");
+		setSelectedMode("");
+		setChanPassword("");
 	};
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
 		setValue(newValue);
 	};
+
 	const	handleChangeIndex = (index: number) =>
 	{
 		setValue(index);
@@ -652,7 +697,7 @@ const	ChatLayout = () =>
 									value={channelName}
 									onChange={(e) =>
 									{
-										setChannelName(e.target.value)
+										setChannelName(e.target.value);
 									}}
 								/>
 								<br />
@@ -674,7 +719,7 @@ const	ChatLayout = () =>
 									name="answerOption"
 									value="Protected"
 									checked={selectedMode === "Protected"}
-									onChange={() => setSelectedMode('Option 2')}
+									onChange={() => setSelectedMode('Protected')}
 									/>
 									<label htmlFor="option2">Protected</label>
 								</div>

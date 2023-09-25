@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
@@ -33,28 +34,30 @@ class Channel
         this.users.push(client.id);
         this.mode = mode;
         if (password !== undefined)
-        	this.password = password;
-		    else
-			    this.password = undefined;
+            this.password = password;
+        else
+            this.password = undefined;
 
         this.isAdmin = (id: string) =>
         {
             for (const user of this.admins)
             {
-                if (client.id === user)
+                if (id === user)
                     return (true);
             }
             return (false);
-        }
+        };
+
         this.addAdmin = (id: string) =>
         {
-            this.admins.push(client.id);
-        }
+            this.admins.push(id);
+        };
+
         this.addToBlocked = (id: string) =>
         {
-            this.blocked.push(client.id);
-        }
+            this.blocked.push(id);
+        };
     }
 }
 
-return export Channels;
+export default Channel;
