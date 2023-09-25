@@ -674,9 +674,8 @@ const	ChatLayout = () =>
 			alert("There must be a password for a protected channel");
 			return;
 		}
-
 		// Close the dialog
-		setOpen(false);
+		handleClose();
 		createNewChannel();
 	};
 
@@ -715,7 +714,10 @@ const	ChatLayout = () =>
 
 			if (data.type === "destroy-channel")
 			{
-				setChannels((prevChannels) => prevChannels.filter((channel) => channel.id !== data.payload.chanId));
+				if (data.payload.isAdmin === true)
+					setChannels((prevChannels) => prevChannels.filter((channel) => channel.id !== data.payload.chanId));
+				else
+					alert("You are not the channel's admin !");
 			}
 		};
 
@@ -921,6 +923,7 @@ const	ChatLayout = () =>
 								{channels.map((channel) => {return (
 								<ListItem key={channel.id}>
 									<ListItemText primary={channel.name} />
+									<Button onClick={() => {return joinChannel(channel.id, channel.name)}}>Join</Button>
 									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
 								</ListItem>
 								)})}

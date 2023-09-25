@@ -167,17 +167,20 @@ export class ChatSocketEvents
 			if (data.type === "destroy-channel")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.name);
+				let isAdmin: boolean;
 				if (searchChannel?.isAdmin(client.id) === true)
-				{
-					const	action = {
-						type: "destroy-channel",
-						payload: {
-							name: data.payload.name,
-							chanId: data.payload.id,
-						}
-					};
-					this.server.emit("display-channels", action);
-				}
+					isAdmin = true;
+				else
+					isAdmin = false;
+				const	action = {
+					type: "destroy-channel",
+					payload: {
+						name: data.payload.name,
+						chanId: data.payload.id,
+						isAdmin: isAdmin,
+					}
+				};
+				this.server.emit("display-channels", action);
 			}
 		}
 	}
