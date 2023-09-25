@@ -57,4 +57,4 @@ class Channel
     }
 }
 
-return export Channels;
+export default Channel;
