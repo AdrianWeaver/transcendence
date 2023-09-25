@@ -5,6 +5,20 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 
+export interface MessageRoomModel
+{
+	"roomName": string,
+	// private msg or channel:
+	"privateConv": boolean,
+	"content": string[]
+}
+export	interface ChatUserModel
+{
+	"name": string,
+	"id": string,
+	"avatar": string,
+	"msgRoom": MessageRoomModel[]
+}
 @Injectable()
 export	class ChatService
 {
@@ -73,18 +87,29 @@ export	class ChatService
 
 	public	getAllUsers()
 	{
-		const	users: any = [];
+		const	users: ChatUserModel[] = [];
 
 		this.chat.users.map((element) =>
 		{
-			const user =
-			{
+			const user = {
 				name: element.name,
-				id: element.id
+				id: element.id,
+				avatar: "https://thispersondoesnotexist.com/",
+				msgRoom: []
 			};
 			users.push(user);
-		})
+		});
 		return (users);
 	}
+
+	public	sendMessageToUser(user: User)
+	{
+		this.searchUserIndex(user.id);
+	}
+
+	// public	sentMessageToChannel(channel: Channel)
+	// {
+
+	// }
 
 }

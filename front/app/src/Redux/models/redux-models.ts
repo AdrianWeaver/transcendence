@@ -1,3 +1,18 @@
+export interface MessageRoomModel
+{
+	"roomName": string,
+	// private msg or channel:
+	"privateConv": boolean,
+	"content": string[]
+}
+
+export	interface ChatUserModel
+{
+	"name": string,
+	"id": string,
+	"avatar": string,
+	"msgRoom": MessageRoomModel[]
+}
 
 export interface ChatModel
 {
@@ -8,6 +23,9 @@ export interface ChatModel
 		"miniWindow" : boolean,
 	},
 	"pseudo": string,
+	"connected": boolean,
+	"users": ChatUserModel[],
+	"activeConversationId": string
 }
 
 export interface	UserModel
