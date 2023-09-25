@@ -554,6 +554,8 @@ const a11yProps = (index: any) =>
 
 const	ChatLayout = () =>
 {
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	chatConnected = useAppSelector((state) =>
@@ -593,9 +595,9 @@ const	ChatLayout = () =>
 	] = useState("");
 
 	const [
-		formValid,
-		setFormValid
-	] = useState(false);
+		channels,
+		setChannels
+	] = useState([]);
 
 	const handleClickOpen = () =>
 	{
@@ -616,6 +618,39 @@ const	ChatLayout = () =>
 		setArrayListUser
 	] = useState([]);
 	const handleSave = () => {
+	const	createNewChannel = () =>
+	{
+		// const	newChannel = { id: channels.length + 1,
+		// 	name: channelName };
+		// setChannels((prevChannels) => [...prevChannels, newChannel]);
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: channelName,
+				chanMode: selectedMode,
+				chanPassword: chanPassword,
+			}
+		};
+		socketRef.current?.emit("channel-info", action);
+		setChannelName("");
+		setSelectedMode("");
+		setChanPassword("");
+	};
+
+	const	removeChannel = (chanId: number, chanName: string) =>
+	{
+		const	action = {
+			type: "destroy-channel",
+			payload: {
+				name: chanName,
+				id: chanId,
+			}
+		};
+		socketRef.current?.emit("channel-info", action);
+	};
+
+	const handleSave = () =>
+	{
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
@@ -642,9 +677,8 @@ const	ChatLayout = () =>
 
 		// Close the dialog
 		setOpen(false);
+		createNewChannel();
 	};
-
-	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	useEffect(() =>
     {
@@ -670,6 +704,20 @@ const	ChatLayout = () =>
 			setConnected(false);
 		};
 
+		const	updateChannels = (data: any) =>
+		{
+			if(data.type === "add-new-channel")
+			{
+				const	newChannel = { id: channels.length + 1,
+					name: data.payload };
+				setChannels((prevChannels) => [...prevChannels, newChannel]);
+			}
+
+			if (data.type === "destroy-channel")
+			{
+				setChannels((prevChannels) => prevChannels.filter((channel) => channel.id !== data.payload.chanId));
+			}
+		};
 
 		const	connectError = (error: Error) =>
 		{
@@ -703,6 +751,8 @@ const	ChatLayout = () =>
         socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
 		socket.connect();
+		socket.on("display-channels", updateChannels);
+        socket.connect();
 
         return (() =>
         {
@@ -711,24 +761,9 @@ const	ChatLayout = () =>
             socket.off("error", connectError);
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
+			socket.off("display-channels", updateChannels);
         });
     }, []);
-
-	const	createNewChannel = () =>
-	{
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: channelName,
-				chanMode: selectedMode,
-				chanPassword: chanPassword,
-			}
-		};
-		socketRef.current?.emit("create-channel", action);
-		setChannelName("");
-		setSelectedMode("");
-		setChanPassword("");
-	};
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
@@ -820,68 +855,76 @@ const	ChatLayout = () =>
 							<Dialog open={open} onClose={handleClose}>
 								<DialogTitle>Enter Information</DialogTitle>
 								<DialogContent>
-								<DialogContentText>
-									Please enter the following information:
-								</DialogContentText>
-								<input
-									type="text"
-									placeholder="Channel name"
-									value={channelName}
-									onChange={(e) =>
-									{
-										setChannelName(e.target.value);
-									}}
-								/>
-								<br />
-								<div>
+									<DialogContentText>
+										Please enter the following information:
+									</DialogContentText>
 									<input
-									type="radio"
-									id="option1"
-									name="answerOption"
-									value="Public"
-									checked={selectedMode === "Public"}
-									onChange={() => setSelectedMode("Public")}
+										type="text"
+										placeholder="Channel name"
+										value={channelName}
+										onChange={(e) =>
+										{
+											setChannelName(e.target.value);
+										}}
 									/>
-									<label htmlFor="option1">Public</label>
-								</div>
-								<div>
+									<br />
+									<div>
+										<input
+										type="radio"
+										id="option1"
+										name="answerOption"
+										value="Public"
+										checked={selectedMode === "Public"}
+										onChange={() => setSelectedMode("Public")}
+										/>
+										<label htmlFor="option1">Public</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option2"
+										name="answerOption"
+										value="Protected"
+										checked={selectedMode === "Protected"}
+										onChange={() => setSelectedMode('Protected')}
+										/>
+										<label htmlFor="option2">Protected</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option3"
+										name="answerOption"
+										value="Private"
+										checked={selectedMode === "Private"}
+										onChange={() => setSelectedMode("Private")}
+										/>
+										<label htmlFor="option3">Private</label>
+									</div>
 									<input
-									type="radio"
-									id="option2"
-									name="answerOption"
-									value="Protected"
-									checked={selectedMode === "Protected"}
-									onChange={() => setSelectedMode('Protected')}
+										type="text"
+										placeholder="Password (if protected)"
+										value={chanPassword}
+										onChange={(e) => setChanPassword(e.target.value)}
 									/>
-									<label htmlFor="option2">Protected</label>
-								</div>
-								<div>
-									<input
-									type="radio"
-									id="option3"
-									name="answerOption"
-									value="Private"
-									checked={selectedMode === "Private"}
-									onChange={() => setSelectedMode("Private")}
-									/>
-									<label htmlFor="option3">Private</label>
-								</div>
-								<input
-									type="text"
-									placeholder="Password (if protected)"
-									value={chanPassword}
-									onChange={(e) => setChanPassword(e.target.value)}
-								/>
 								</DialogContent>
 								<DialogActions>
-								<Button onClick={handleClose} color="primary">
-									Cancel
-								</Button>
-								<Button onClick={handleSave} color="primary">
-									Save
-								</Button>
+									<Button onClick={handleClose} color="primary">
+										Cancel
+									</Button>
+									<Button onClick={handleSave} color="primary">
+										Save
+									</Button>
 								</DialogActions>
 							</Dialog>
+							<List>
+								{channels.map((channel) => {return (
+								<ListItem key={channel.id}>
+									<ListItemText primary={channel.name} />
+									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
+								</ListItem>
+								)})}
+							</List>
 						</div>
 					</TabPanel>
 					<TabPanel

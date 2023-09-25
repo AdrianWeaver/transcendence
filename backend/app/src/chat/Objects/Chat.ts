@@ -9,6 +9,7 @@ import { Server, Socket } from "socket.io";
 class Chat
 {
     public channels: Channel[] = [];
+    public chanMap: {id: number, name: string};
     public users: User[] = [];
     public server: Server | undefined;
     public activeMembers: number;

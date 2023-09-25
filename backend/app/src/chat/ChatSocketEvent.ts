@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -64,26 +65,6 @@ export class ChatSocketEvents
 				this.chatService.deleteUser(userIndex, socketIndex);
 		}
 
-		@SubscribeMessage("create-channel")
-		handleChatCreation(
-			@MessageBody() data: ActionSocket,
-			@ConnectedSocket() client: Socket
-		)
-		{
-			const newChannel = new Channel(data.payload.chanName,
-				data.payload.client,
-				data.payload.selectedMode,
-				data.payload.chanPassword);
-			newChannel.chat = this.chatService.getChat();
-			this.chatService.addNewChannel(newChannel);
-			// client.join(data.payload.chanName);
-			// const action = {
-			// 	type:
-			// 	payload:
-			// };
-			// this.server.to(data.payload.chanName).emit("", action);
-		}
-
 		@SubscribeMessage("display-conversation")
 		handleDisplayConversationWindow(
 			@MessageBody() data: ActionSocket,
@@ -124,7 +105,7 @@ export class ChatSocketEvents
 								roomName: data.payload.chanName,
 								privateConv: data.payload.privateConv,
 								messageContent: data.payload.content,
-							}					
+							}
 						]
 					}
 				};
@@ -160,5 +141,43 @@ export class ChatSocketEvents
 			// 	default:
 			// 		break;
 			// }
+		}
+
+		@SubscribeMessage("channel-info")
+		handleChatCreation(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "create-channel")
+			{
+				const newChannel = new Channel(data.payload.chanName,
+					client,
+					data.payload.selectedMode,
+					data.payload.chanPassword);
+				newChannel.chat = this.chatService.getChat();
+				this.chatService.addNewChannel(newChannel);
+				const	action = {
+					type: "add-new-channel",
+					payload: newChannel.name
+				};
+				this.server.emit("display-channels", action);
+			}
+
+			if (data.type === "destroy-channel")
+			{
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.name);
+				if (searchChannel?.isAdmin(client.id) === true)
+				{
+					const	action = {
+						type: "destroy-channel",
+						payload: {
+							name: data.payload.name,
+							chanId: data.payload.id,
+						}
+					};
+					this.server.emit("display-channels", action);
+				}
+			}
 		}
 	}
