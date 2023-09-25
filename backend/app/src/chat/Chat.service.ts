@@ -16,9 +16,16 @@ export	class ChatService
 		this.chat = new Chat();
 	}
 
+	// getters
+
 	public	getChat(): Chat
 	{
 		return (this.chat);
+	}
+
+	public getChannels(): Channel[]
+	{
+		return (this.chat.channels);
 	}
 
 	// search users and sockets
@@ -71,4 +78,12 @@ export	class ChatService
 		this.chat.channels.push(newChannel);
 	}
 
+	public	searchChannelByName(chanName: string)
+	{
+		const	searchChannel = this.chat.channels.find((element) =>
+		{
+			return (element.name === chanName);
+		});
+		return (searchChannel);
+	}
 }
