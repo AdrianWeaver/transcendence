@@ -534,21 +534,16 @@ const	ChatLayout = () =>
 
 	const	createNewChannel = () =>
 	{
-		// const	newChannel = { id: channels.length + 1,
-		// 	name: channelName };
-		// setChannels((prevChannels) => [...prevChannels, newChannel]);
 		const action = {
 			type: "create-channel",
 			payload: {
 				chanName: channelName,
 				chanMode: selectedMode,
 				chanPassword: chanPassword,
+				chanId: channels.length + 1,
 			}
 		};
 		socketRef.current?.emit("channel-info", action);
-		setChannelName("");
-		setSelectedMode("");
-		setChanPassword("");
 	};
 
 	const	removeChannel = (chanId: number, chanName: string) =>
@@ -574,9 +569,9 @@ const	ChatLayout = () =>
 
 		// Check if at least one radio option is selected
 		if (![
-			"Public",
-			"Protected",
-			"Private"
+			"public",
+			"protected",
+			"private"
 			].includes(selectedMode))
 		{
 			alert("Please select a mode (Public, Protected, or Private)");
@@ -589,8 +584,19 @@ const	ChatLayout = () =>
 			return;
 		}
 		// Close the dialog
-		handleClose();
 		createNewChannel();
+		handleClose();
+	};
+
+	const	joinChannel = (chanName: string) =>
+	{
+		const	action = {
+			type: "asked-join",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
 	};
 
 	useEffect(() =>
@@ -615,6 +621,12 @@ const	ChatLayout = () =>
 
 		const	updateChannels = (data: any) =>
 		{
+			if (data.type === "init-channels")
+			{
+				if (data.payload.channels !== undefined)
+					setChannels(data.payload.channels);
+			}
+
 			if(data.type === "add-new-channel")
 			{
 				const	newChannel = { id: channels.length + 1,
@@ -624,10 +636,16 @@ const	ChatLayout = () =>
 
 			if (data.type === "destroy-channel")
 			{
-				if (data.payload.isAdmin === true)
+				if (data.payload.message === "")
 					setChannels((prevChannels) => prevChannels.filter((channel) => channel.id !== data.payload.chanId));
 				else
-					alert("You are not the channel's admin !");
+					alert(data.payload.message);
+			}
+
+			if (data.type === "asked-join")
+			{
+				if (data.payload.message !== "")
+					alert(data.payload.message);
 			}
 		};
 
@@ -741,9 +759,9 @@ const	ChatLayout = () =>
 										type="radio"
 										id="option1"
 										name="answerOption"
-										value="Public"
-										checked={selectedMode === "Public"}
-										onChange={() => setSelectedMode("Public")}
+										value="public"
+										checked={selectedMode === "public"}
+										onChange={() => setSelectedMode("public")}
 										/>
 										<label htmlFor="option1">Public</label>
 									</div>
@@ -752,9 +770,9 @@ const	ChatLayout = () =>
 										type="radio"
 										id="option2"
 										name="answerOption"
-										value="Protected"
-										checked={selectedMode === "Protected"}
-										onChange={() => setSelectedMode('Protected')}
+										value="protected"
+										checked={selectedMode === "protected"}
+										onChange={() => setSelectedMode('protected')}
 										/>
 										<label htmlFor="option2">Protected</label>
 									</div>
@@ -763,9 +781,9 @@ const	ChatLayout = () =>
 										type="radio"
 										id="option3"
 										name="answerOption"
-										value="Private"
-										checked={selectedMode === "Private"}
-										onChange={() => setSelectedMode("Private")}
+										value="private"
+										checked={selectedMode === "private"}
+										onChange={() => setSelectedMode("private")}
 										/>
 										<label htmlFor="option3">Private</label>
 									</div>
@@ -789,7 +807,7 @@ const	ChatLayout = () =>
 								{channels.map((channel) => {return (
 								<ListItem key={channel.id}>
 									<ListItemText primary={channel.name} />
-									<Button onClick={() => {return joinChannel(channel.id, channel.name)}}>Join</Button>
+									<Button onClick={() => {return joinChannel(channel.name)}}>Join</Button>
 									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
 								</ListItem>
 								)})}

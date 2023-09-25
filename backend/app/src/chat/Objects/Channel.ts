@@ -10,7 +10,7 @@ class Channel
 {
     public admin: string | undefined;
     public admins: string[] = [];
-    public blocked: string[] = [];
+    public banned: string[] = [];
     public name: string;
     public users: string[] = [];
     public mode: string;
@@ -19,8 +19,9 @@ class Channel
     public password: string | undefined;
 
     public isAdmin: (id: string) => boolean;
+    public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
-    public addToBlocked: (id: string) => void;
+    public addToBanned: (id: string) => void;
 
     public constructor(name: string, client: Socket, mode: string, password: string)
     {
@@ -48,14 +49,24 @@ class Channel
             return (false);
         };
 
+        this.isBanned = (id: string) =>
+        {
+            for (const user of this.banned)
+            {
+                if (id === user)
+                    return (true);
+            }
+            return (false);
+        }
+
         this.addAdmin = (id: string) =>
         {
             this.admins.push(id);
         };
 
-        this.addToBlocked = (id: string) =>
+        this.addToBanned = (id: string) =>
         {
-            this.blocked.push(id);
+            this.banned.push(id);
         };
     }
 }

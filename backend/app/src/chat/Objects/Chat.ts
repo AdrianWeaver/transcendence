@@ -6,10 +6,15 @@ import Message from "./Message";
 import User from "./User";
 import { Server, Socket } from "socket.io";
 
+type ChanMapModel = {
+    id: number,
+    name: string
+};
+
 class Chat
 {
     public channels: Channel[] = [];
-    public chanMap: {id: number, name: string};
+    public chanMap: Array<ChanMapModel> = [];
     public users: User[] = [];
     public server: Server | undefined;
     public activeMembers: number;

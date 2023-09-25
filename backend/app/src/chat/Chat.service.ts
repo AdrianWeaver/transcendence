@@ -5,6 +5,11 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 
+type ChanMapModel = {
+    id: number,
+    name: string
+};
+
 @Injectable()
 export	class ChatService
 {
@@ -26,6 +31,11 @@ export	class ChatService
 	public getChannels(): Channel[]
 	{
 		return (this.chat.channels);
+	}
+
+	public getChanMap(): ChanMapModel[]
+	{
+		return (this.chat.chanMap);
 	}
 
 	// search users and sockets
@@ -73,9 +83,14 @@ export	class ChatService
 
 	// channel functions
 
-	public	addNewChannel(newChannel: Channel)
+	public	addNewChannel(newChannel: Channel, chanId: number)
 	{
 		this.chat.channels.push(newChannel);
+		const newElement: ChanMapModel = {
+			id: chanId,
+			name: newChannel.name,
+		};
+		this.chat.chanMap.push(newElement);
 	}
 
 	public	searchChannelByName(chanName: string)
