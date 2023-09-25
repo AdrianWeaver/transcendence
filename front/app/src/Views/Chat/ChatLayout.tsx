@@ -534,7 +534,7 @@ const	ChatLayout = () =>
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
-			alert('Channel name cannot be empty');
+			alert("Channel name cannot be empty");
 			return;
 		}
 
@@ -697,7 +697,7 @@ const	ChatLayout = () =>
 									value={channelName}
 									onChange={(e) =>
 									{
-										setChannelName(e.target.value)
+										setChannelName(e.target.value);
 									}}
 								/>
 								<br />
