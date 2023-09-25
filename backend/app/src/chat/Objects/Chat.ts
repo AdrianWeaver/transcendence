@@ -17,7 +17,7 @@ class Chat
     public createAndJoin: (name: string, client: Socket, mode: string, pass: string) => void;
     public deleteChannel: (name: string) => void;
     public addUserToChannel: (name: string, id: string) => void;
-    public displayMessage: (message: Message) => void; //?
+    public displayMessage: (message: Message) => void;
 
     public constructor ()
     {

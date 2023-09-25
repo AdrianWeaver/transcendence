@@ -36,46 +36,36 @@ export class ChatSocketEvents
 	{
 		@WebSocketServer()
 		server: Server;
-		chat: Chat;
+		// chat: Chat;
 
 		public	constructor(private readonly chatService: ChatService)
 		{
-			this.chat = new Chat();
-			console.log(chatService.getTest());
+			// this.chat = new Chat();
+			// console.log(chatService.getTest());
+			console.log(this.chatService.getChat());
 		}
 
-		afterInit(server: any) {
+		afterInit(server: any)
+		{
+			// chat = this.chatService.getChat();
 		}
 
 		handleConnection(client: Socket)
 		{
-			const searchUser = this.chat.users.find((element) =>
-			{
-				return (element.id === client.id);
-			});
+			const searchUser = this.chatService.searchUser(client.id);
 			if (searchUser === undefined)
 			{
 				const newUser = new User("test", client);
-				this.chat.users.push(newUser);
-				this.chat.memberSocketIds.push(client.id);
+				this.chatService.pushUser(newUser, client.id);
 			}
 		}
 
 		handleDisconnect(client: Socket)
 		{
-			const	searchUser = this.chat.users.findIndex((element) =>
-			{
-				return (element.id === client.id);
-			});
-			const	searchUserSocket = this.chat.memberSocketIds.findIndex((element) =>
-			{
-				return (element === client.id);
-			});
-			if (searchUser !== undefined)
-			{
-				this.chat.users.splice(searchUser, 1);
-				this.chat.memberSocketIds.splice(searchUserSocket, 1);
-			}
+			const	userIndex = this.chatService.searchUserIndex(client.id);
+			const	socketIndex = this.chatService.searchSocketIndex(client.id);
+			if (userIndex !== undefined)
+				this.chatService.deleteUser(userIndex, socketIndex);
 		}
 		// @SubscribeMessage("pseudo-message")
 		// handlePseudoMessage(
