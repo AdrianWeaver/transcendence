@@ -16,6 +16,7 @@ import
 	WebSocketGateway,
 	WebSocketServer
 }	from "@nestjs/websockets";
+import { ChatService } from "./Chat.service";
 
 type	ActionSocket = {
 	type: string,
@@ -36,10 +37,11 @@ export class ChatSocketEvents
 		server: Server;
 		chat: Chat;
 
-		public	constructor()
+		public	constructor(private readonly chatService: ChatService)
 		{
 			this.chat = new Chat();
-		};
+			console.log(chatService.getTest());
+		}
 
 		afterInit(server: any) {
 
