@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
@@ -54,6 +55,13 @@ export class ChatSocketEvents
 			{
 				const newUser = new User("test", client);
 				this.chatService.pushUser(newUser, client.id);
+				const	action = {
+					type: "init-channels",
+					payload: {
+						channels: this.chatService.getChanMap(),
+					}
+				};
+				client.emit("display-channels", action);
 			}
 		}
 
@@ -156,7 +164,7 @@ export class ChatSocketEvents
 					data.payload.selectedMode,
 					data.payload.chanPassword);
 				newChannel.chat = this.chatService.getChat();
-				this.chatService.addNewChannel(newChannel);
+				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
 					type: "add-new-channel",
 					payload: newChannel.name
@@ -177,10 +185,38 @@ export class ChatSocketEvents
 					payload: {
 						name: data.payload.name,
 						chanId: data.payload.id,
-						isAdmin: isAdmin,
+						message: ""
 					}
 				};
+				if (isAdmin === true)
+					this.server.emit("display-channels", action);
+				else
+				{
+					action.payload.message = "You are not the channel's admin !";
+					client.emit("display-channels", action);
+				}
+			}
+
+			if (data.type === "asked-join")
+			{
+				const 	action = {
+					type: "asked-join",
+					payload: {
+						message: "",
+					}
+				};
+
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (searchChannel)
+				{
+					if (searchChannel.mode === "private")
+						action.payload.message = "This channel is private";
+					if (searchChannel.isBanned(client.id) === true)
+						action.payload.message = "You have been banned from this channel";
+				}
 				this.server.emit("display-channels", action);
+				if (action.payload.message === "")
+					client.join(data.payload.chanName);
 			}
 		}
 	}
