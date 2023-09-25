@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 import { Server, Socket } from "socket.io";
@@ -42,7 +43,6 @@ export class ChatSocketEvents
 		};
 
 		afterInit(server: any) {
-
 		}
 
 		handleConnection(client: Socket)
@@ -75,7 +75,6 @@ export class ChatSocketEvents
 				this.chat.memberSocketIds.splice(searchUserSocket, 1);
 			}
 		}
-	
 		// @SubscribeMessage("pseudo-message")
 		// handlePseudoMessage(
 		// 	@MessageBody() data: ActionSocket,
@@ -85,4 +84,3 @@ export class ChatSocketEvents
 		// 	chatServe.pseudo = data.payload.chatPseudo;
 		// }
 	}
-

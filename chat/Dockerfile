@@ -6,7 +6,7 @@ FROM node:20.3.0 AS development
 
 WORKDIR /localghost/src/app
 
-COPY    package*.json ./
+COPY    ./package*.json ./
 
 RUN npm install
 
@@ -23,8 +23,6 @@ EXPOSE 3000
 
 FROM node:20.3.0 AS production
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /localghost/src/app
 

@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import Chat from "./Chat";
@@ -19,7 +20,7 @@ class Channel
     public isAdmin: (id: string) => boolean;
     public addAdmin: (id: string) => void;
     public addToBlocked: (id: string) => void;
-    
+
     public constructor(name: string, client: Socket, mode: string, password: string)
     {
         this.name = name;
@@ -33,9 +34,8 @@ class Channel
         this.mode = mode;
         if (password !== undefined)
         	this.password = password;
-		else
-			this.password = undefined;
-    
+		    else
+			    this.password = undefined;
 
         this.isAdmin = (id: string) =>
         {
@@ -57,4 +57,4 @@ class Channel
     }
 }
 
-export default Channel;
+return export Channels;

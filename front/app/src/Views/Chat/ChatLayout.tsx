@@ -34,6 +34,7 @@ import {
 	DialogContentText,
 	DialogTitle
 } from "@mui/material";
+
 const	URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -484,7 +485,7 @@ const	ChatLayout = () =>
 		value,
 		setValue
 	] = useState(0);
-
+  
 	const
 	[
 		connected,
@@ -569,6 +570,7 @@ const	ChatLayout = () =>
 		};
 		socketRef.current?.emit("create-channel", action);
 	};
+
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
 		setValue(newValue);
@@ -581,11 +583,9 @@ const	ChatLayout = () =>
 	return (
 		<div>
 			<MenuBar />
-
 			<div>
 				connected:{connected}
 			</div>
-
 			<Grid
 				container
 				component={Paper}
