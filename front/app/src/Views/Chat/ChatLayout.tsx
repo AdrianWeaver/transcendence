@@ -574,6 +574,14 @@ const	ChatLayout = () =>
         const connect = () =>
 		{
 			setConnected(true);
+			const	action = 
+			{
+				type: "get-user-list"
+			}
+			// setTimeout(() =>
+			// {
+			// 	socket.emit("info", action);
+			// }, 1000);
 		};
 
 		const disconnect = () =>
@@ -586,16 +594,24 @@ const	ChatLayout = () =>
 		{
 			console.error("ws_connect_error", error);
 		};
+
+		const	serverInfo = (data: any) =>
+		{
+			console.log("information from server: ",data);
+		};
+
         socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
         socket.on("error", connectError);
-        socket.connect();
+        socket.on("info", serverInfo);
+		socket.connect();
 
         return (() =>
         {
             socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
             socket.off("error", connectError);
+			socket.off("info", serverInfo);
         });
     }, []);
 

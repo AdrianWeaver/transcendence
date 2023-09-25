@@ -71,4 +71,20 @@ export	class ChatService
 		this.chat.channels.push(newChannel);
 	}
 
+	public	getAllUsers()
+	{
+		const	users: any = [];
+
+		this.chat.users.map((element) =>
+		{
+			const user =
+			{
+				name: element.name,
+				id: element.id
+			};
+			users.push(user);
+		})
+		return (users);
+	}
+
 }

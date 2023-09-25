@@ -77,4 +77,23 @@ export class ChatSocketEvents
 			newChannel.chat = this.chatService.getChat();
 			this.chatService.addNewChannel(newChannel);
 		}
+
+		@SubscribeMessage("info")
+		handleInformation(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			console.log(data);
+			console.log(this.chatService.getAllUsers());
+			// switch (data.type)
+			// {
+			// 	case "get-user-list":
+			// 		client.emit("info", this.chatService.getAllUsers());
+			// 		// console.log(this.chatService.getAllUsers());
+			// 		break;
+			// 	default:
+			// 		break;
+			// }
+		}
 	}
