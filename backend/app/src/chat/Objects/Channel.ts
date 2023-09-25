@@ -57,7 +57,7 @@ class Channel
                     return (true);
             }
             return (false);
-        }
+        };
 
         this.addAdmin = (id: string) =>
         {

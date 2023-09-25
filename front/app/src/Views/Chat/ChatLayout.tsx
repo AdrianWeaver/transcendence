@@ -719,15 +719,13 @@ const	ChatLayout = () =>
 
 			if(data.type === "add-new-channel")
 			{
-				const	newChannel = { id: channels.length + 1,
-					name: data.payload };
-				setChannels((prevChannels) => [...prevChannels, newChannel]);
+				setChannels(data.payload);
 			}
 
 			if (data.type === "destroy-channel")
 			{
 				if (data.payload.message === "")
-					setChannels((prevChannels) => prevChannels.filter((channel) => channel.id !== data.payload.chanId));
+					setChannels(data.payload.chanMap);
 				else
 					alert(data.payload.message);
 			}
@@ -809,7 +807,22 @@ const	ChatLayout = () =>
 		console.log("refresh the list of user");
 	};
 
+	const customButtonStyle = {
+		// padding: "4px 8px",
+		fontSize: "12px",
+		margin: "0 8px",
+	};
 
+	const listItemStyle = {
+		display: "flex",
+		justifyContent: "space-between",
+		alignItems: "center",
+		padding: "8px",
+	};
+
+	const listItemTextStyle = {
+		flexGrow: 1,
+	};
 
 	return (
 		<div>
@@ -848,12 +861,12 @@ const	ChatLayout = () =>
 							<Tab
 								label="Channels"
 								{...a11yProps(0)}
-								style={{fontSize: "8px"}}
+								style={{fontSize: "15px"}}
 							/>
 							<Tab
-								label="Direct Message"
+								label="Users"
 								{...a11yProps(1)}
-								style={{fontSize: "8px"}}
+								style={{fontSize: "15px"}}
 							/>
 						</Tabs>
 					</Toolbar>
@@ -882,9 +895,16 @@ const	ChatLayout = () =>
 										type="text"
 										placeholder="Channel name"
 										value={channelName}
-										onChange={(e) =>
-										{
-											setChannelName(e.target.value);
+										onChange={(e) => {
+											const inputValue = e.target.value;
+											if (inputValue.length <= 8)
+											{
+												setChannelName(inputValue);
+											}
+											else
+											{
+												setChannelName(inputValue.slice(0, 8));
+											}
 										}}
 									/>
 									<br />
@@ -938,9 +958,9 @@ const	ChatLayout = () =>
 								</DialogActions>
 							</Dialog>
 							<List>
-								{channels.map((channel) => {return (
-								<ListItem key={channel.id}>
-									<ListItemText primary={channel.name} />
+								{channels.map((channel: any) => {return (
+								<ListItem style={listItemStyle} key={channel.id}>
+									<ListItemText style={listItemTextStyle} primary={channel.name} />
 									<Button onClick={() => {return joinChannel(channel.name)}}>Join</Button>
 									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
 								</ListItem>

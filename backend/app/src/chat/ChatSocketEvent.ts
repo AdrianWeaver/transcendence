@@ -167,7 +167,7 @@ export class ChatSocketEvents
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
 					type: "add-new-channel",
-					payload: newChannel.name
+					payload: this.chatService.getChanMap(),
 				};
 				this.server.emit("display-channels", action);
 			}
@@ -183,13 +183,15 @@ export class ChatSocketEvents
 				const	action = {
 					type: "destroy-channel",
 					payload: {
-						name: data.payload.name,
-						chanId: data.payload.id,
-						message: ""
+						chanMap: this.chatService.getChanMap(),
+						message: "",
 					}
 				};
 				if (isAdmin === true)
+				{
+					this.chatService.deleteChannel(data.payload.name);
 					this.server.emit("display-channels", action);
+				}
 				else
 				{
 					action.payload.message = "You are not the channel's admin !";
