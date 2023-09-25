@@ -33,29 +33,28 @@ class Channel
         this.users.push(client.id);
         this.mode = mode;
         if (password !== undefined)
-            this.password = password;
-		else
-			this.password = undefined;
-
+        	this.password = password;
+		    else
+			    this.password = undefined;
 
         this.isAdmin = (id: string) =>
         {
             for (const user of this.admins)
-
+            {
                 if (client.id === user)
                     return (true);
-
+            }
             return (false);
-        };
+        }
         this.addAdmin = (id: string) =>
         {
             this.admins.push(client.id);
-        };
+        }
         this.addToBlocked = (id: string) =>
         {
             this.blocked.push(client.id);
-        };
+        }
     }
 }
 
-export default Channel;
+return export Channels;

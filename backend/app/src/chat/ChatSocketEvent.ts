@@ -40,10 +40,9 @@ export class ChatSocketEvents
 		public	constructor()
 		{
 			this.chat = new Chat();
-		}
+		};
 
-		afterInit(server: any)
-		{
+		afterInit(server: any) {
 		}
 
 		handleConnection(client: Socket)

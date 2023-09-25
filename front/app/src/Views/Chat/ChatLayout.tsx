@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -6,6 +7,7 @@ import {
 	AppBar,
 	Avatar,
 	Box,
+	Button,
 	Card,
 	CardContent,
 	CardMedia,
@@ -18,20 +20,30 @@ import {
 	ListItemIcon,
 	ListItemText,
 	ListItemTextProps,
+	MenuItem,
 	Paper,
+	Select,
 	Tab,
 	Tabs,
 	TextField,
 	Toolbar,
-	Typography
+	Typography,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle
 } from "@mui/material";
+
+const	URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
 
 // please use vector this one is just for testing card
 import	pong from "./assets/pong.jpeg";
@@ -110,6 +122,10 @@ const	ChannelsList = () =>
 	return (
 		<>
 			channel list here, you can follow FriendsList component
+			<br />
+			<Button variant="contained" color="success"> onClick={createNewChannel}
+				NEW
+			</Button>
 		</>
 	);
 };
@@ -231,17 +247,17 @@ const	FriendsList = () =>
 {
 	const	friendListDataFake = [
 		{
-			name: "Johanna Courtois",
+			name: "John Wick",
 			avatar: "https://material-ui.com/static/images/avatar/1.jpg",
 			online: true,
 		},
 		{
-			name: "Nikola Boratkova",
+			name: "Alice",
 			avatar: "https://material-ui.com/static/images/avatar/3.jpg",
 			online: false,
 		},
 		{
-			name: "Alexandre Payet",
+			name: "Cindy Baker",
 			avatar: "https://material-ui.com/static/images/avatar/2.jpg",
 			online: true,
 		}
@@ -371,7 +387,7 @@ const	MessagesArea = () =>
 	const	FakeJohnWickDiscussMessageArray = [
 		{
 			sender: "server",
-			message: "Vous etes maintenant ami avec Johanna Courtois",
+			message: "Vous etes maintenant ami avec John Wick",
 			date: "09:30"
 		},
 		{
@@ -391,12 +407,12 @@ const	MessagesArea = () =>
 		},
 		{
 			sender: "other",
-			message: "No, I need to finish ft_transcendence first >.<",
+			message: "Shurely, I'm the master of this game ;)",
 			date: "09:30"
 		},
 		{
 			sender: "me",
-			message: "No, you are going to play. No discussions. I send you the link",
+			message: "Let me prepare the link",
 			date: "09:30"
 		},
 		{
@@ -469,6 +485,91 @@ const	ChatLayout = () =>
 		value,
 		setValue
 	] = useState(0);
+  
+	const
+	[
+		connected,
+		setConnected
+	] = useState(false);
+
+	const [
+		open,
+		setOpen
+	] = useState(false);
+
+	const [channelName, setChannelName] = useState("");
+	const [chanPassword, setChanPassword] = useState("");
+	const [selectedMode, setSelectedMode] = useState("");
+
+	const handleClickOpen = () =>
+	{
+		setOpen(true);
+	};
+
+	const handleClose = () =>
+	{
+		setOpen(false);
+	};
+
+	const handleSave = () => {
+		// Do something with the collected information (info1 and info2)
+
+		// Close the dialog
+		setOpen(false);
+	};
+
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
+	useEffect(() =>
+    {
+        const socket = io(URL,
+        {
+            autoConnect: false,
+            reconnectionAttempts: 5,
+        });
+
+        socketRef.current = socket;
+
+        const connect = () =>
+		{
+			setConnected(true);
+		};
+
+		const disconnect = () =>
+		{
+			setConnected(false);
+		};
+
+
+		const	connectError = (error: Error) =>
+		{
+			console.error("ws_connect_error", error);
+		};
+        socket.on("connect", connect);
+		socket.on("disconnect", disconnect);
+        socket.on("error", connectError);
+        socket.connect();
+
+        return (() =>
+        {
+            socket.off("connect", connect);
+			socket.off("disconnect", disconnect);
+            socket.off("error", connectError);
+        });
+    }, []);
+
+	const	createNewChannel = () =>
+	{
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: channelName,
+				chanMode: selectedMode,
+				chanPassword: chanPassword,
+			}
+		};
+		socketRef.current?.emit("create-channel", action);
+	};
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
@@ -482,6 +583,9 @@ const	ChatLayout = () =>
 	return (
 		<div>
 			<MenuBar />
+			<div>
+				connected:{connected}
+			</div>
 			<Grid
 				container
 				component={Paper}
@@ -529,7 +633,76 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<ChannelsList />
+						{/* <ChannelsList /> */}
+						<div>
+							channel list here, you can follow FriendsList component
+							<br />
+							<Button onClick={handleClickOpen} variant="contained" color="success">
+								NEW
+							</Button>
+							<Dialog open={open} onClose={handleClose}>
+								<DialogTitle>Enter Information</DialogTitle>
+								<DialogContent>
+								<DialogContentText>
+									Please enter the following information:
+								</DialogContentText>
+								<input
+									type="text"
+									placeholder="Channel name"
+									value={channelName}
+									onChange={(e) => setChannelName(e.target.value)}
+								/>
+								<br />
+								<div>
+									<input
+									type="radio"
+									id="option1"
+									name="answerOption"
+									value="Public"
+									checked={selectedMode === "Public"}
+									onChange={() => setSelectedMode("Public")}
+									/>
+									<label htmlFor="option1">Public</label>
+								</div>
+								<div>
+									<input
+									type="radio"
+									id="option2"
+									name="answerOption"
+									value="Protected"
+									checked={selectedMode === "Protected"}
+									onChange={() => setSelectedMode('Option 2')}
+									/>
+									<label htmlFor="option2">Protected</label>
+								</div>
+								<div>
+									<input
+									type="radio"
+									id="option3"
+									name="answerOption"
+									value="Private"
+									checked={selectedMode === "Private"}
+									onChange={() => setSelectedMode("Private")}
+									/>
+									<label htmlFor="option3">Private</label>
+								</div>
+								<input
+									type="text"
+									placeholder="Password (if protected)"
+									value={chanPassword}
+									onChange={(e) => setChanPassword(e.target.value)}
+								/>
+								</DialogContent>
+								<DialogActions>
+								<Button onClick={handleClose} color="primary">
+									Cancel
+								</Button>
+								<Button onClick={handleSave} color="primary">
+									Save
+								</Button>
+								</DialogActions>
+							</Dialog>
+						</div>
 					</TabPanel>
 					<TabPanel
 						area={false}

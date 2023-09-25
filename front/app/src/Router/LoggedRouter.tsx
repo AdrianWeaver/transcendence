@@ -86,16 +86,11 @@ const	LoggedRouter = () =>
 				<Route
 					path="the-chat"
 					element={<Chat />}
-					// element={<Landing />}
 				/>
 				<Route
 					path="the-chat-layout"
 					element={<ChatLayout />}
-				/>
-				<Route
-					path="the-chat-layout"
-					element={<ChatLayout />}
-				/>
+        />
 
 				<Route
 					path="*"
