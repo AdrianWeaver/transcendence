@@ -1,3 +1,5 @@
+/* eslint-disable max-statements */
+/* eslint-disable max-len */
 
 import
 {
@@ -9,7 +11,7 @@ import	{ NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
-	themeMode: "dark",
+	themeMode: "light",
 	previousPage: "/",
 	user:
 	{
@@ -25,7 +27,24 @@ const	initialControllerState: ControllerModel = {
 				hiddenWindow: false,
 				miniWindow: true,
 			},
-			pseudo: "undefined"
+			pseudo: "undefined",
+			connected: false,
+			users:
+			[
+			{
+				name: "undefined",
+				id: "undefined",
+				avatar: "undefined",
+				msgRoom: [
+				{
+					roomName: "undefined",
+					privateConv: true,
+					content: []
+				}
+				]
+			}
+			],
+			activeConversationId: "undefined"
 		}
 	},
 	registration:
@@ -115,6 +134,29 @@ const	controllerSlice = createSlice(
 		setPseudo(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.pseudo = action.payload.user.chat.pseudo;
+		},
+		setChatConnected(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.connected = action.payload.user.chat.connected;
+		},
+		setChatUsers(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.users = action.payload.user.chat.users;
+		},
+		setActiveConversationId(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.activeConversationId = action.payload.user.chat.activeConversationId;
+		},
+		setMessageRoom(state, action: PayloadAction<ControllerModel>)
+		{
+			let	i;
+
+			i = 0;
+			while (state.user.chat.users.length - 1)
+			{
+				state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
+				i++;
+			}
 		}
 	}
 });

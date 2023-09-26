@@ -47,6 +47,9 @@ import { Socket, io } from "socket.io-client";
 
 // please use vector this one is just for testing card
 import	pong from "./assets/pong.jpeg";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
+import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 // invite
 const	InvitationCard = () =>
@@ -243,25 +246,40 @@ const	FriendItem = (props: FriendItemProps) =>
 	);
 };
 
-const	FriendsList = () =>
+type FriendsListProps = {
+	arrayListUsers: []
+};
+
+const	FriendsList = (props: FriendsListProps) =>
 {
-	const	friendListDataFake = [
-		{
-			name: "John Wick",
-			avatar: "https://material-ui.com/static/images/avatar/1.jpg",
-			online: true,
-		},
-		{
-			name: "Alice",
-			avatar: "https://material-ui.com/static/images/avatar/3.jpg",
-			online: false,
-		},
-		{
-			name: "Cindy Baker",
-			avatar: "https://material-ui.com/static/images/avatar/2.jpg",
-			online: true,
-		}
-	];
+	const	socketTest = useRef<SocketIOClient.Socket | null>(null);
+	let	friendList: any[];
+	const	dispatch = useAppDispatch();
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.users);
+	});
+
+	const	sendMsg = (id:string) =>
+	{
+		const action = {
+			type: "sending-message"
+		};
+		console.log("sendMsg function called with id ", id);
+		// socketTest.current?.emit("send-message", action);
+	};
+
+	const	displayConversationWindow = (id: string) =>
+	{
+		const	action = {
+			type: "display-conversation",
+			payload:
+			{
+				id: id
+			}
+		};
+		socketTest.current?.emit("display-conversation", action);
+	};
 
 	return (
 		<>
@@ -283,15 +301,33 @@ const	FriendsList = () =>
 			<Divider />
 			<List>
 				{
-					friendListDataFake.map((elem, index) =>
+					users.map((elem, index) =>
 					{
+						// return (
+						// 	<FriendItem
+						// 		name={elem.name}
+						// 		avatar={elem.avatar}
+						// 		key={index}
+						// 		online={elem.online}
+						// 	/>
+						// );
 						return (
-							<FriendItem
-								name={elem.name}
-								avatar={elem.avatar}
-								key={index}
-								online={elem.online}
-							/>
+							<>
+								<div onClick={() =>
+									{
+										displayConversationWindow(elem.id);
+										dispatch(setActiveConversationId(elem.id));
+										//sendMsg(elem.id);
+									}}>
+									<FriendItem
+										name={elem.name + ": " + elem.id}
+										avatar={elem.avatar}
+										// avatar=""
+										key={index}
+										online={true}
+									/>
+								</div>
+							</>
 						);
 					})
 				}
@@ -380,47 +416,85 @@ const	MessageItem = (props: MessageItemProps) =>
 				</Grid>
 			</ListItem>
 		);
-}
+};
 
 const	MessagesArea = () =>
 {
-	const	FakeJohnWickDiscussMessageArray = [
-		{
-			sender: "server",
-			message: "Vous etes maintenant ami avec John Wick",
-			date: "09:30"
-		},
-		{
-			sender: "me",
-			message: "Hello how are you ?",
-			date: "09:30"
-		},
-		{
-			sender: "other",
-			message: "Hello I'm fine and you",
-			date: "09:30"
-		},
-		{
-			sender: "me",
-			message: "Want you play a pong game with me ?",
-			date: "09:30"
-		},
-		{
-			sender: "other",
-			message: "Shurely, I'm the master of this game ;)",
-			date: "09:30"
-		},
-		{
-			sender: "me",
-			message: "Let me prepare the link",
-			date: "09:30"
-		},
-		{
-			sender: "server",
-			message: "!play pong",
-			date: "09:42"
-		}
-	];
+	let	displayMessageArray;
+
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.users);
+	});
+
+	const	activeId = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.activeConversationId);
+	});
+	const	userActiveIndex = users.findIndex((elem) =>
+	{
+		return (elem.id === activeId);
+	});
+	if (userActiveIndex === -1)
+	{
+		displayMessageArray = [
+			{
+				sender: "server",
+				message: "Ce client n'existe pas",
+				date: "09:30"
+			},
+		];
+	}
+	else
+	{
+		displayMessageArray = [
+			{
+				sender: "server",
+				message: "Vous discutez avec " + users[userActiveIndex].name + "[" + users[userActiveIndex].id + "]",
+				date: "09:30"
+			},
+		];
+	}
+	// const	conversationArea = [
+
+	// ];
+	// const	FakeJohnWickDiscussMessageArray = [
+	// 	{
+	// 		sender: "server",
+	// 		message: "Vous etes maintenant ami avec John Wick",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "me",
+	// 		message: "Hello how are you ?",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "other",
+	// 		message: "Hello I'm fine and you",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "me",
+	// 		message: "Want you play a pong game with me ?",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "other",
+	// 		message: "Shurely, I'm the master of this game ;)",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "me",
+	// 		message: "Let me prepare the link",
+	// 		date: "09:30"
+	// 	},
+	// 	{
+	// 		sender: "server",
+	// 		message: "!play pong",
+	// 		date: "09:42"
+	// 	}
+	// ];
 	return (
 		<>
 			<List
@@ -430,7 +504,8 @@ const	MessagesArea = () =>
 				}}
 			>
 				{
-					FakeJohnWickDiscussMessageArray.map((elem, key) =>
+					// FakeJohnWickDiscussMessageArray.map((elem, key) =>
+					displayMessageArray.map((elem, key) =>
 					{
 						return (
 							<MessageItem
@@ -480,6 +555,11 @@ const a11yProps = (index: any) =>
 const	ChatLayout = () =>
 {
 	const	style = useTheme();
+	const	dispatch = useAppDispatch();
+	const	chatConnected = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.connected);
+	});
 	const
 	[
 		value,
@@ -530,6 +610,11 @@ const	ChatLayout = () =>
 		setOpen(false);
 	};
 
+	const
+	[
+		arrayListUser,
+		setArrayListUser
+	] = useState([]);
 	const handleSave = () => {
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
@@ -574,6 +659,10 @@ const	ChatLayout = () =>
         const connect = () =>
 		{
 			setConnected(true);
+			// setTimeout(() =>
+			// {
+			// 	socket.emit("info", action);
+			// }, 1000);
 		};
 
 		const disconnect = () =>
@@ -586,16 +675,42 @@ const	ChatLayout = () =>
 		{
 			console.error("ws_connect_error", error);
 		};
+
+		const	serverInfo = (data: any) =>
+		{
+			dispatch(setChatUsers(data.payload.arrayListUsers));
+			console.log("information from server: ", data);
+			// setArrayListUser(data.payload.arrayListUser);
+		};
+
+		const	sendMessageToUser = (data: any) =>
+		{
+			const	msgRoom: MessageRoomModel[] = [
+				{
+					roomName: data.payload.msgRoom.roomName,
+					privateConv: data.payload.msgRoom.privateConv,
+					content: data.payload.msgRoom.messageContent
+				}
+			];
+			dispatch(setMessageRoom(msgRoom, data.payload.sender));
+			// dispatch(setMessageContent(data.payload.messageContent));
+			console.log("test send Message: ", data);
+		};
+
         socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
         socket.on("error", connectError);
-        socket.connect();
+        socket.on("info", serverInfo);
+		socket.on("send-message", sendMessageToUser);
+		socket.connect();
 
         return (() =>
         {
             socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
             socket.off("error", connectError);
+			socket.off("info", serverInfo);
+			socket.off("sending-message", sendMessageToUser);
         });
     }, []);
 
@@ -625,11 +740,28 @@ const	ChatLayout = () =>
 		setValue(index);
 	};
 
+	const	refreshListUser = () =>
+	{
+		// if (chatConnected === false)
+			// {
+				const	action = {
+					type: "get-user-list"
+				};
+				socketRef.current?.emit("info", action);
+			// 	console.log("request data from server", connected);
+			// 	dispatch(setChatConnected(true));
+			// }
+		console.log("refresh the list of user");
+	};
+
+
+
 	return (
 		<div>
 			<MenuBar />
 			<div>
 				connected:{connected}
+				<button onClick={refreshListUser}>click to refresh</button>
 			</div>
 			<Grid
 				container
@@ -759,7 +891,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<FriendsList />
+						<FriendsList arrayListUsers={arrayListUser}/>
 					</TabPanel>
 				</Grid>
 				{/* left side of the screen  */}

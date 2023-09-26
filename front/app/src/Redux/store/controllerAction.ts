@@ -1,10 +1,15 @@
+/* eslint-disable max-statements */
+/* eslint-disable semi */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-len */
+/* eslint-disable max-lines-per-function */
 // eslint-disable-next-line max-len
 // https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
 import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ControllerModel } from "../models/redux-models";
+import { CanvasModel, ChatUserModel, ControllerModel, MessageRoomModel } from "../models/redux-models";
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -228,7 +233,7 @@ export const setBigWindow = ()
 		};
 		dispatch(controllerActions.setBigWindow(response));
 	});
-}
+};
 
 export const setMiniWindow = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -255,7 +260,7 @@ export const setMiniWindow = ()
 		};
 		dispatch(controllerActions.setMiniWindow(response));
 	});
-}
+};
 
 export const setHiddenWindow = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -282,7 +287,7 @@ export const setHiddenWindow = ()
 		};
 		dispatch(controllerActions.setHiddenWindow(response));
 	});
-}
+};
 
 export const setPseudo = (name: string)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -301,7 +306,104 @@ export const setPseudo = (name: string)
 					pseudo: name
 				}
 			}
-		}
+		};
 		dispatch(controllerActions.setPseudo(response));
 	});
-}
+};
+
+export const setChatConnected = (connected: boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					connected: connected
+				}
+			}
+		};
+		dispatch(controllerActions.setChatConnected(response));
+	});
+};
+
+	export const setChatUsers = (users: ChatUserModel[])
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					users: users
+				}
+			}
+		};
+		dispatch(controllerActions.setChatUsers(response));
+	});
+};
+
+export const setActiveConversationId = (activeConversationId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					activeConversationId: activeConversationId
+				}
+			}
+		};
+		dispatch(controllerActions.setActiveConversationId(response));
+	});
+};
+
+export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		console.log(prevState);
+		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+		{
+			return (elem.id === clientId);
+		});
+		if (userIndex !== -1)
+			prevState.controller.user.chat.users[userIndex].msgRoom = room;
+		else
+			console.log("Id not found");
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					users: prevState.controller.user.chat.users
+				}
+			}
+		};
+		dispatch(controllerActions.setMessageRoom(response));
+	});
+};

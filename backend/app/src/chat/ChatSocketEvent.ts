@@ -76,5 +76,89 @@ export class ChatSocketEvents
 				data.payload.chanPassword);
 			newChannel.chat = this.chatService.getChat();
 			this.chatService.addNewChannel(newChannel);
+			// client.join(data.payload.chanName);
+			// const action = {
+			// 	type:
+			// 	payload:
+			// };
+			// this.server.to(data.payload.chanName).emit("", action);
+		}
+
+		@SubscribeMessage("display-conversation")
+		handleDisplayConversationWindow(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			client.join(data.payload.id);
+			if (data.type === "display-conversation")
+			{
+				const action = {
+					type: "conversation",
+					payload:
+					{
+						sender: client.id,
+						conversationId: data.payload.id
+					}
+				};
+				this.server.to(data.payload.chanName).emit("display-conversation", action);
+			}
+		}
+
+		@SubscribeMessage("sending-message")
+		handleSendingMessageToUser(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "send-message")
+			{
+				client.join(data.payload.chanName);
+				const action = {
+					type: "message-to-send",
+					payload:
+					{
+						sender: client.id,
+						msgRoom:[
+							{
+								roomName: data.payload.chanName,
+								privateConv: data.payload.privateConv,
+								messageContent: data.payload.content,
+							}					
+						]
+					}
+				};
+				this.server.to(data.payload.chanName).emit("sending-message", action);
+			}
+		}
+
+		@SubscribeMessage("info")
+		handleInformation(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "get-user-list")
+			{
+				console.log(data);
+				const action = {
+					type: "sending-list-user",
+					payload:
+					{
+						arrayListUsers: this.chatService.getAllUsers(),
+					}
+				};
+				client.emit("info", action);
+			}	// console.log(data);
+			// console.log(this.chatService.getAllUsers());
+			// switch (data.type)
+			// {
+			// 	case "get-user-list":
+			// 		client.emit("info", this.chatService.getAllUsers());
+			// 		// console.log(this.chatService.getAllUsers());
+			// 		break;
+			// 	default:
+			// 		break;
+			// }
 		}
 	}
