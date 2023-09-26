@@ -37,11 +37,11 @@ const	initialControllerState: ControllerModel = {
 				avatar: "undefined",
 				msgRoom: [
 				{
+					id: "undefined",
 					roomName: "undefined",
 					privateConv: true,
 					content: [
 						{
-							index: -1,
 							sender: "undefined",
 							message: "undefined",
 							date: "undefined"

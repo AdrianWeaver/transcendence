@@ -49,7 +49,7 @@ import { Socket, io } from "socket.io-client";
 import	pong from "./assets/pong.jpeg";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
-import { MessageRoomModel } from "../../Redux/models/redux-models";
+import { MessageModel, MessageRoomModel } from "../../Redux/models/redux-models";
 
 // invite
 const	InvitationCard = () =>
@@ -422,6 +422,15 @@ const	MessagesArea = () =>
 {
 	let	displayMessageArray;
 
+	displayMessageArray = [
+		{
+			index: 0,
+			sender: "server",
+			message: "Initialize",
+			date: "09:30"
+		},
+	];
+
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -435,6 +444,10 @@ const	MessagesArea = () =>
 	{
 		return (elem.id === activeId);
 	});
+	// const	msgRoom = useAppSelector((state) =>
+	// {
+	// 	return (state.controller.user.chat.users[userActiveIndex].msgRoom);
+	// });
 	if (userActiveIndex === -1)
 	{
 		displayMessageArray = [
@@ -447,10 +460,29 @@ const	MessagesArea = () =>
 	}
 	else
 	{
-		// displayMessageArray = useAppSelector((state) =>
-		// {
+		const	msgRoom = users[userActiveIndex].msgRoom;
+		let		i;
 
-		// });
+		i = 0;
+		while (msgRoom.length)
+		{
+			if (msgRoom[i].id === activeId)
+			{
+				displayMessageArray = msgRoom[i].content;
+				break ;
+			}
+			i++;
+		}
+		if (i === msgRoom.length)
+		{
+			displayMessageArray = [
+				{
+					sender: "server",
+					message: "Aucune conversation active",
+					date: "09:30"
+				},
+			];
+		}
 	}
 	// const	conversationArea = [
 

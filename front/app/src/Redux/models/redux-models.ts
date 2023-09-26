@@ -1,6 +1,5 @@
 export interface MessageModel
 {
-	index: number,
 	sender: string,
 	message: string,
 	date: string
@@ -8,6 +7,7 @@ export interface MessageModel
 
 export interface MessageRoomModel
 {
+	"id": string,
 	"roomName": string,
 	// private msg or channel:
 	"privateConv": boolean,
