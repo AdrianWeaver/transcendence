@@ -161,8 +161,9 @@ export class ChatSocketEvents
 			{
 				const newChannel = new Channel(data.payload.chanName,
 					client,
-					data.payload.selectedMode,
+					data.payload.chanMode,
 					data.payload.chanPassword);
+				console.log("test: " + data.payload.chanMode);
 				newChannel.chat = this.chatService.getChat();
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
@@ -216,9 +217,23 @@ export class ChatSocketEvents
 					if (searchChannel.isBanned(client.id) === true)
 						action.payload.message = "You have been banned from this channel";
 				}
-				this.server.emit("display-channels", action);
+				client.emit("display-channels", action);
 				if (action.payload.message === "")
 					client.join(data.payload.chanName);
+			}
+
+			if(data.type === "password-for-protected")
+			{
+				const	action = {
+					type: "protected-password",
+					payload: {
+						correct: ""
+					}
+				};
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel?.password === data.payload.password)
+					action.payload.correct = "true";
+				client.emit("display-channels", action);
 			}
 		}
 	}

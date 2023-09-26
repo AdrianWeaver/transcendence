@@ -24,7 +24,8 @@ export	interface ChatUserModel
 
 type ChanMapModel = {
     id: number,
-    name: string
+    name: string,
+	mode: string
 };
 
 @Injectable()
@@ -106,6 +107,8 @@ export	class ChatService
 		const newElement: ChanMapModel = {
 			id: chanId,
 			name: newChannel.name,
+			mode: newChannel.mode
+
 		};
 		this.chat.chanMap.push(newElement);
 	}

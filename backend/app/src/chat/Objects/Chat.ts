@@ -8,7 +8,8 @@ import { Server, Socket } from "socket.io";
 
 type ChanMapModel = {
     id: number,
-    name: string
+    name: string,
+    mode: string
 };
 
 class Chat

@@ -589,6 +589,12 @@ const	ChatLayout = () =>
 		setChanPassword
 	] = useState("");
 
+	// for when we try to access a protected channel
+	const [
+		userPassword,
+		setUserPassword
+	] = useState("");
+
 	const [
 		selectedMode,
 		setSelectedMode
@@ -598,6 +604,11 @@ const	ChatLayout = () =>
 		channels,
 		setChannels
 	] = useState([]);
+
+	const [
+		openPasswordDialog,
+		setOpenPasswordDialog
+	] = useState(false);
 
 	const handleClickOpen = () =>
 	{
@@ -617,6 +628,11 @@ const	ChatLayout = () =>
 		arrayListUser,
 		setArrayListUser
 	] = useState([]);
+
+	const [
+		joiningChannelName,
+		setJoiningChannelName
+	] = useState("");
 
 	const	createNewChannel = () =>
 	{
@@ -734,6 +750,18 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
+				alert ("Successfully joined channel !");
+			}
+
+			if (data.type === "protected-password")
+			{
+				if (data.payload.correct === "true")
+				{
+					joinChannel(joiningChannelName);
+					setOpenPasswordDialog(false);
+				}
+				else
+					alert("Your password is incorrect !");
 			}
 		};
 
@@ -781,6 +809,24 @@ const	ChatLayout = () =>
 			socket.off("display-channels", updateChannels);
         });
     }, []);
+
+	const handlePasswordSubmit = (password: string) =>
+	{
+		const	action = {
+			type: "password-for-protected",
+			payload: {
+				password: password,
+				chanName: joiningChannelName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+		// if (password === chanPassword)
+		// 	alert(`Joining ${joiningChannelName}`);
+		// else
+		// 	alert('Incorrect password. Please try again.');
+		// Close the password dialog.
+		// setOpenPasswordDialog(false);
+	};
 
 	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
@@ -879,8 +925,6 @@ const	ChatLayout = () =>
 					>
 						{/* <ChannelsList /> */}
 						<div>
-							channel list here, you can follow FriendsList component
-							<br />
 							<Button onClick={handleClickOpen} variant="contained" color="success">
 								NEW
 							</Button>
@@ -960,8 +1004,47 @@ const	ChatLayout = () =>
 								{channels.map((channel: any) => {return (
 								<ListItem style={listItemStyle} key={channel.id}>
 									<ListItemText style={listItemTextStyle} primary={channel.name} />
-									<Button onClick={() => {return joinChannel(channel.name)}}>Join</Button>
+									<Button onClick={() =>
+										{
+											console.log("name: " + channel.name);
+											console.log("test: " + channel.mode);
+											if (channel.mode === "protected")
+											{
+												setJoiningChannelName(channel.name);
+												setOpenPasswordDialog(true);
+											}
+											else
+												joinChannel(channel.name);
+										}}>Join</Button>
 									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
+									<Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
+										<DialogTitle>Enter Password</DialogTitle>
+											<DialogContent>
+												<TextField
+												label="Password"
+												type="password"
+												fullWidth
+												variant="outlined"
+												value={userPassword}
+												onChange={(e) => setUserPassword(e.target.value)}
+												/>
+											</DialogContent>
+											<DialogActions>
+												<Button onClick={() => setOpenPasswordDialog(false)} color="primary">
+													Cancel
+												</Button>
+												<Button
+													onClick={() =>
+													{
+														const password = userPassword;
+														handlePasswordSubmit(userPassword);
+													}}
+													color="primary"
+													>
+													Submit
+												</Button>
+											</DialogActions>
+									</Dialog>
 								</ListItem>
 								)})}
 							</List>
