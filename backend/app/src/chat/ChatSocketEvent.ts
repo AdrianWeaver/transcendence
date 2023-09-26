@@ -163,7 +163,6 @@ export class ChatSocketEvents
 					client,
 					data.payload.chanMode,
 					data.payload.chanPassword);
-				console.log("test: " + data.payload.chanMode);
 				newChannel.chat = this.chatService.getChat();
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {

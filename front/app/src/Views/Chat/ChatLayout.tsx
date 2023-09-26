@@ -750,7 +750,8 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
-				alert ("Successfully joined channel !");
+				else
+					alert ("Successfully joined channel !");
 			}
 
 			if (data.type === "protected-password")
@@ -759,9 +760,10 @@ const	ChatLayout = () =>
 				{
 					joinChannel(joiningChannelName);
 					setOpenPasswordDialog(false);
+					setUserPassword("");
 				}
 				else
-					alert("Your password is incorrect !");
+					alert("Incorrect password, try again !");
 			}
 		};
 
@@ -1006,8 +1008,6 @@ const	ChatLayout = () =>
 									<ListItemText style={listItemTextStyle} primary={channel.name} />
 									<Button onClick={() =>
 										{
-											console.log("name: " + channel.name);
-											console.log("test: " + channel.mode);
 											if (channel.mode === "protected")
 											{
 												setJoiningChannelName(channel.name);
