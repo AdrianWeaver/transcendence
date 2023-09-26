@@ -1,19 +1,17 @@
-/*
-	export interface messageModel
-	{
-		sender: string,
-		message: string, 
-		date: string
-	}
-*/
+export interface MessageModel
+{
+	sender: string,
+	message: string,
+	date: string
+}
 
 export interface MessageRoomModel
 {
+	"id": string,
 	"roomName": string,
 	// private msg or channel:
 	"privateConv": boolean,
-	// "content": messageModel[],
-	"content": string[]
+	"content": MessageModel[],
 }
 
 export	interface ChatUserModel

@@ -1,4 +1,5 @@
 /* eslint-disable max-statements */
+/* eslint-disable max-len */
 import {
 	Injectable
 }	from "@nestjs/common";
