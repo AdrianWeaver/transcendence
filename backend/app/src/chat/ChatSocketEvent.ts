@@ -110,6 +110,7 @@ export class ChatSocketEvents
 						sender: client.id,
 						msgRoom: [
 							{
+								id: data.payload.id,
 								roomName: data.payload.chanName,
 								privateConv: data.payload.privateConv,
 								messageContent: data.payload.content,
@@ -156,6 +157,11 @@ export class ChatSocketEvents
 			// 	default:
 			// 		break;
 			// }
+
+			if (data.type === "sent-message")
+			{
+				
+			}
 		}
 
 		@SubscribeMessage("channel-info")

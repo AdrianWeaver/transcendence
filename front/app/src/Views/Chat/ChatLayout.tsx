@@ -391,16 +391,15 @@ const MessageItem = (props: MessageItemProps) => {
 		);
 };
 
-const MessagesArea = () => {
+const MessagesArea = (text: any) => {
 	let displayMessageArray;
 
 	displayMessageArray = [
-		{
-			index: 0,
-			sender: "server",
-			message: "Initialize",
-			date: "09:30"
-		},
+	{
+		sender: "server",
+		message: "Not initiliazed",
+		date: "09:30"
+	},
 	];
 
 	const users = useAppSelector((state) => {
@@ -438,10 +437,11 @@ const MessagesArea = () => {
 			displayMessageArray = [
 				{
 					sender: "server",
-					message: "Aucune conversation active",
+					message: "conversation vide" + activeId,
 					date: "09:30"
 				},
 			];
+			console.log("ALors ? ", text);
 		}
 	}
 	return (
@@ -484,6 +484,13 @@ const SendingArea = () =>
 	const handleSendClick = () =>
 	{
 		console.log("Text typed:", text);
+		const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+		const action = {
+			type: "test",
+			payload: "Hello-world"
+		};
+		socketRef.current.emit("info", action);
+		MessagesArea(text);
 	};
 
 	return (
@@ -518,6 +525,7 @@ const a11yProps = (index: any) => {
 const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+	let	uniqueId: string;
 
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
@@ -820,6 +828,30 @@ const	ChatLayout = () =>
 		flexGrow: 1,
 	};
 
+	const
+	[
+		text,
+		setText
+	] = useState("");
+	const handleTextChange = (e: any) =>
+	{
+		setText(e.target.value);
+	};
+
+	const handleSendClick = () =>
+	{
+		console.log("Text typed:", text);
+		const action = {
+			type: "sent-message",
+			payload: {
+				message: text,
+			}
+		};
+		socketRef.current.emit("info", action);
+		setText("");
+		MessagesArea(text);
+	};
+
 	return (
 		<div>
 			<MenuBar />
@@ -1041,7 +1073,21 @@ const	ChatLayout = () =>
 						// style={{padding: '20px'}}
 						sx={{ padding: "20px" }}
 					>
-						<SendingArea />
+						{/* <SendingArea /> */}
+						<Grid item xs={11}>
+							<TextField
+							id="outlined-basic-email"
+							label="Type Something"
+							fullWidth
+							value={text}
+							onChange={handleTextChange}
+							/>
+						</Grid>
+						<Grid xs={1} sx={{ alignItems: "right" }}>
+							<Fab color="primary" aria-label="add" onClick={handleSendClick}>
+							<SendIcon />
+							</Fab>
+						</Grid>
 					</Grid>
 				</Grid>
 			</Grid>

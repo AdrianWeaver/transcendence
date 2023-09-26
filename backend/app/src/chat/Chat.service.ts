@@ -7,6 +7,12 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 
+export interface MessageModel
+{
+	sender: string,
+	message: string,
+	date: string
+}
 export interface MessageRoomModel
 {
 	"roomName": string,

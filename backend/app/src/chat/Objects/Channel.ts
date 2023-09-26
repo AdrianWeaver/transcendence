@@ -6,6 +6,13 @@ import Chat from "./Chat";
 import User from "./User";
 import { Server, Socket } from "socket.io";
 
+export interface MessageModel
+{
+	sender: string,
+	message: string,
+	date: string
+}
+
 class Channel
 {
     public admin: string | undefined;
@@ -17,7 +24,7 @@ class Channel
     public members: number;
     public chat: Chat | undefined;
     public password: string | undefined;
-
+    public messages: MessageModel[] = [];
     public isAdmin: (id: string) => boolean;
     public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
