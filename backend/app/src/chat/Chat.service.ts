@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-len */
 import {
 	Injectable
@@ -20,6 +21,14 @@ export	interface ChatUserModel
 	"avatar": string,
 	"msgRoom": MessageRoomModel[]
 }
+
+
+type ChanMapModel = {
+    id: number,
+    name: string,
+	mode: string
+};
+
 @Injectable()
 export	class ChatService
 {
@@ -31,9 +40,21 @@ export	class ChatService
 		this.chat = new Chat();
 	}
 
+	// getters
+
 	public	getChat(): Chat
 	{
 		return (this.chat);
+	}
+
+	public getChannels(): Channel[]
+	{
+		return (this.chat.channels);
+	}
+
+	public getChanMap(): ChanMapModel[]
+	{
+		return (this.chat.chanMap);
 	}
 
 	// search users and sockets
@@ -81,9 +102,16 @@ export	class ChatService
 
 	// channel functions
 
-	public	addNewChannel(newChannel: Channel)
+	public	addNewChannel(newChannel: Channel, chanId: number)
 	{
 		this.chat.channels.push(newChannel);
+		const newElement: ChanMapModel = {
+			id: chanId,
+			name: newChannel.name,
+			mode: newChannel.mode
+
+		};
+		this.chat.chanMap.push(newElement);
 	}
 
 	public	getAllUsers()
@@ -113,4 +141,32 @@ export	class ChatService
 
 	// }
 
+	public deleteChannel(chanName: string)
+	{
+		const	index = this.chat.channels.findIndex((element) =>
+		{
+			return (element.name === chanName);
+		});
+		this.chat.channels.splice(index, 1);
+		let i: number;
+		i = 0;
+		for (const chanMap of this.chat.chanMap)
+		{
+			if (chanMap.name === chanName)
+			{
+				this.chat.chanMap.splice(i, 1);
+				break ;
+			}
+			i++;
+		}
+	}
+
+	public	searchChannelByName(chanName: string)
+	{
+		const	searchChannel = this.chat.channels.find((element) =>
+		{
+			return (element.name === chanName);
+		});
+		return (searchChannel);
+	}
 }

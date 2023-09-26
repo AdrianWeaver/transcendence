@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
@@ -54,6 +55,13 @@ export class ChatSocketEvents
 			{
 				const newUser = new User("test", client);
 				this.chatService.pushUser(newUser, client.id);
+				const	action = {
+					type: "init-channels",
+					payload: {
+						channels: this.chatService.getChanMap(),
+					}
+				};
+				client.emit("display-channels", action);
 			}
 		}
 
@@ -63,26 +71,6 @@ export class ChatSocketEvents
 			const	socketIndex = this.chatService.searchSocketIndex(client.id);
 			if (userIndex !== undefined)
 				this.chatService.deleteUser(userIndex, socketIndex);
-		}
-
-		@SubscribeMessage("create-channel")
-		handleChatCreation(
-			@MessageBody() data: ActionSocket,
-			@ConnectedSocket() client: Socket
-		)
-		{
-			const newChannel = new Channel(data.payload.chanName,
-				data.payload.client,
-				data.payload.selectedMode,
-				data.payload.chanPassword);
-			newChannel.chat = this.chatService.getChat();
-			this.chatService.addNewChannel(newChannel);
-			// client.join(data.payload.chanName);
-			// const action = {
-			// 	type:
-			// 	payload:
-			// };
-			// this.server.to(data.payload.chanName).emit("", action);
 		}
 
 		@SubscribeMessage("display-conversation")
@@ -168,5 +156,90 @@ export class ChatSocketEvents
 			// 	default:
 			// 		break;
 			// }
+		}
+
+		@SubscribeMessage("channel-info")
+		handleChatCreation(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "create-channel")
+			{
+				const newChannel = new Channel(data.payload.chanName,
+					client,
+					data.payload.chanMode,
+					data.payload.chanPassword);
+				newChannel.chat = this.chatService.getChat();
+				this.chatService.addNewChannel(newChannel, data.payload.chanId);
+				const	action = {
+					type: "add-new-channel",
+					payload: this.chatService.getChanMap(),
+				};
+				this.server.emit("display-channels", action);
+			}
+
+			if (data.type === "destroy-channel")
+			{
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.name);
+				let isAdmin: boolean;
+				if (searchChannel?.isAdmin(client.id) === true)
+					isAdmin = true;
+				else
+					isAdmin = false;
+				const	action = {
+					type: "destroy-channel",
+					payload: {
+						chanMap: this.chatService.getChanMap(),
+						message: "",
+					}
+				};
+				if (isAdmin === true)
+				{
+					this.chatService.deleteChannel(data.payload.name);
+					this.server.emit("display-channels", action);
+				}
+				else
+				{
+					action.payload.message = "You are not the channel's admin !";
+					client.emit("display-channels", action);
+				}
+			}
+
+			if (data.type === "asked-join")
+			{
+				const 	action = {
+					type: "asked-join",
+					payload: {
+						message: "",
+					}
+				};
+
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (searchChannel)
+				{
+					if (searchChannel.mode === "private")
+						action.payload.message = "This channel is private";
+					if (searchChannel.isBanned(client.id) === true)
+						action.payload.message = "You have been banned from this channel";
+				}
+				client.emit("display-channels", action);
+				if (action.payload.message === "")
+					client.join(data.payload.chanName);
+			}
+
+			if(data.type === "password-for-protected")
+			{
+				const	action = {
+					type: "protected-password",
+					payload: {
+						correct: ""
+					}
+				};
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel?.password === data.payload.password)
+					action.payload.correct = "true";
+				client.emit("display-channels", action);
+			}
 		}
 	}

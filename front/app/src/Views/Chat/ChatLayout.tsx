@@ -515,10 +515,14 @@ const a11yProps = (index: any) => {
 	);
 };
 
-const ChatLayout = () => {
-	const style = useTheme();
-	const dispatch = useAppDispatch();
-	const chatConnected = useAppSelector((state) => {
+const	ChatLayout = () =>
+{
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+
+	const	style = useTheme();
+	const	dispatch = useAppDispatch();
+	const	chatConnected = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.connected);
 	});
 	const
@@ -548,14 +552,25 @@ const ChatLayout = () => {
 		setChanPassword
 	] = useState("");
 
+	// for when we try to access a protected channel
+	const [
+		userPassword,
+		setUserPassword
+	] = useState("");
+
 	const [
 		selectedMode,
 		setSelectedMode
 	] = useState("");
 
 	const [
-		formValid,
-		setFormValid
+		channels,
+		setChannels
+	] = useState([]);
+
+	const [
+		openPasswordDialog,
+		setOpenPasswordDialog
 	] = useState(false);
 
 	const handleClickOpen = () => {
@@ -570,23 +585,57 @@ const ChatLayout = () => {
 	};
 
 	const
-		[
-			arrayListUser,
-			setArrayListUser
-		] = useState([]);
-	const handleSave = () => {
+	[
+		arrayListUser,
+		setArrayListUser
+	] = useState([]);
+
+	const [
+		joiningChannelName,
+		setJoiningChannelName
+	] = useState("");
+
+	const	createNewChannel = () =>
+	{
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: channelName,
+				chanMode: selectedMode,
+				chanPassword: chanPassword,
+				chanId: channels.length + 1,
+			}
+		};
+		socketRef.current?.emit("channel-info", action);
+	};
+
+	const	removeChannel = (chanId: number, chanName: string) =>
+	{
+		const	action = {
+			type: "destroy-channel",
+			payload: {
+				name: chanName,
+				id: chanId,
+			}
+		};
+		socketRef.current?.emit("channel-info", action);
+	};
+
+	const handleSave = () =>
+	{
 		// Check if Channel name is empty
 		if (channelName.trim() === "") {
 			alert("Channel name cannot be empty");
 			return;
-		}
+	}
 
 		// Check if at least one radio option is selected
 		if (![
-			"Public",
-			"Protected",
-			"Private"
-		].includes(selectedMode)) {
+			"public",
+			"protected",
+			"private"
+			].includes(selectedMode))
+		{
 			alert("Please select a mode (Public, Protected, or Private)");
 			return;
 		}
@@ -595,12 +644,21 @@ const ChatLayout = () => {
 			alert("There must be a password for a protected channel");
 			return;
 		}
-
 		// Close the dialog
-		setOpen(false);
+		createNewChannel();
+		handleClose();
 	};
 
-	const socketRef = useRef<SocketIOClient.Socket | null>(null);
+	const	joinChannel = (chanName: string) =>
+	{
+		const	action = {
+			type: "asked-join",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
 
 	useEffect(() => {
 		const socket = io(URL,
@@ -623,6 +681,47 @@ const ChatLayout = () => {
 			setConnected(false);
 		};
 
+		const	updateChannels = (data: any) =>
+		{
+			if (data.type === "init-channels")
+			{
+				if (data.payload.channels !== undefined)
+					setChannels(data.payload.channels);
+			}
+
+			if(data.type === "add-new-channel")
+			{
+				setChannels(data.payload);
+			}
+
+			if (data.type === "destroy-channel")
+			{
+				if (data.payload.message === "")
+					setChannels(data.payload.chanMap);
+				else
+					alert(data.payload.message);
+			}
+
+			if (data.type === "asked-join")
+			{
+				if (data.payload.message !== "")
+					alert(data.payload.message);
+				else
+					alert ("Successfully joined channel !");
+			}
+
+			if (data.type === "protected-password")
+			{
+				if (data.payload.correct === "true")
+				{
+					joinChannel(joiningChannelName);
+					setOpenPasswordDialog(false);
+					setUserPassword("");
+				}
+				else
+					alert("Incorrect password, try again !");
+			}
+		};
 
 		const connectError = (error: Error) => {
 			console.error("ws_connect_error", error);
@@ -652,7 +751,8 @@ const ChatLayout = () => {
 		socket.on("error", connectError);
 		socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
-		socket.connect();
+		socket.on("display-channels", updateChannels);
+        socket.connect();
 
 		return (() => {
 			socket.off("connect", connect);
@@ -660,22 +760,26 @@ const ChatLayout = () => {
 			socket.off("error", connectError);
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
-		});
-	}, []);
+			socket.off("display-channels", updateChannels);
+        });
+    }, []);
 
-	const createNewChannel = () => {
-		const action = {
-			type: "create-channel",
+	const handlePasswordSubmit = (password: string) =>
+	{
+		const	action = {
+			type: "password-for-protected",
 			payload: {
-				chanName: channelName,
-				chanMode: selectedMode,
-				chanPassword: chanPassword,
+				password: password,
+				chanName: joiningChannelName,
 			}
 		};
-		socketRef.current?.emit("create-channel", action);
-		setChannelName("");
-		setSelectedMode("");
-		setChanPassword("");
+		socketRef.current.emit("channel-info", action);
+		// if (password === chanPassword)
+		// 	alert(`Joining ${joiningChannelName}`);
+		// else
+		// 	alert('Incorrect password. Please try again.');
+		// Close the password dialog.
+		// setOpenPasswordDialog(false);
 	};
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -697,6 +801,23 @@ const ChatLayout = () => {
 		// 	dispatch(setChatConnected(true));
 		// }
 		console.log("refresh the list of user");
+	};
+
+	const customButtonStyle = {
+		// padding: "4px 8px",
+		fontSize: "12px",
+		margin: "0 8px",
+	};
+
+	const listItemStyle = {
+		display: "flex",
+		justifyContent: "space-between",
+		alignItems: "center",
+		padding: "8px",
+	};
+
+	const listItemTextStyle = {
+		flexGrow: 1,
 	};
 
 	return (
@@ -736,12 +857,12 @@ const ChatLayout = () => {
 							<Tab
 								label="Channels"
 								{...a11yProps(0)}
-								style={{ fontSize: "8px" }}
+								style={{fontSize: "15px"}}
 							/>
 							<Tab
-								label="Direct Message"
+								label="Users"
 								{...a11yProps(1)}
-								style={{ fontSize: "8px" }}
+								style={{fontSize: "15px"}}
 							/>
 						</Tabs>
 					</Toolbar>
@@ -755,8 +876,6 @@ const ChatLayout = () => {
 					>
 						{/* <ChannelsList /> */}
 						<div>
-							channel list here, you can follow FriendsList component
-							<br />
 							<Button onClick={handleClickOpen} variant="contained" color="success">
 								NEW
 							</Button>
@@ -771,40 +890,48 @@ const ChatLayout = () => {
 										placeholder="Channel name"
 										value={channelName}
 										onChange={(e) => {
-											setChannelName(e.target.value);
+											const inputValue = e.target.value;
+											if (inputValue.length <= 8)
+											{
+												setChannelName(inputValue);
+											}
+											else
+											{
+												setChannelName(inputValue.slice(0, 8));
+											}
 										}}
 									/>
 									<br />
 									<div>
 										<input
-											type="radio"
-											id="option1"
-											name="answerOption"
-											value="Public"
-											checked={selectedMode === "Public"}
-											onChange={() => setSelectedMode("Public")}
+										type="radio"
+										id="option1"
+										name="answerOption"
+										value="public"
+										checked={selectedMode === "public"}
+										onChange={() => setSelectedMode("public")}
 										/>
 										<label htmlFor="option1">Public</label>
 									</div>
 									<div>
 										<input
-											type="radio"
-											id="option2"
-											name="answerOption"
-											value="Protected"
-											checked={selectedMode === "Protected"}
-											onChange={() => setSelectedMode('Protected')}
+										type="radio"
+										id="option2"
+										name="answerOption"
+										value="protected"
+										checked={selectedMode === "protected"}
+										onChange={() => setSelectedMode('protected')}
 										/>
 										<label htmlFor="option2">Protected</label>
 									</div>
 									<div>
 										<input
-											type="radio"
-											id="option3"
-											name="answerOption"
-											value="Private"
-											checked={selectedMode === "Private"}
-											onChange={() => setSelectedMode("Private")}
+										type="radio"
+										id="option3"
+										name="answerOption"
+										value="private"
+										checked={selectedMode === "private"}
+										onChange={() => setSelectedMode("private")}
 										/>
 										<label htmlFor="option3">Private</label>
 									</div>
@@ -824,6 +951,52 @@ const ChatLayout = () => {
 									</Button>
 								</DialogActions>
 							</Dialog>
+							<List>
+								{channels.map((channel: any) => {return (
+								<ListItem style={listItemStyle} key={channel.id}>
+									<ListItemText style={listItemTextStyle} primary={channel.name} />
+									<Button onClick={() =>
+										{
+											if (channel.mode === "protected")
+											{
+												setJoiningChannelName(channel.name);
+												setOpenPasswordDialog(true);
+											}
+											else
+												joinChannel(channel.name);
+										}}>Join</Button>
+									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
+									<Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
+										<DialogTitle>Enter Password</DialogTitle>
+											<DialogContent>
+												<TextField
+												label="Password"
+												type="password"
+												fullWidth
+												variant="outlined"
+												value={userPassword}
+												onChange={(e) => setUserPassword(e.target.value)}
+												/>
+											</DialogContent>
+											<DialogActions>
+												<Button onClick={() => setOpenPasswordDialog(false)} color="primary">
+													Cancel
+												</Button>
+												<Button
+													onClick={() =>
+													{
+														const password = userPassword;
+														handlePasswordSubmit(userPassword);
+													}}
+													color="primary"
+													>
+													Submit
+												</Button>
+											</DialogActions>
+									</Dialog>
+								</ListItem>
+								)})}
+							</List>
 						</div>
 					</TabPanel>
 					<TabPanel
