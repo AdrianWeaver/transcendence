@@ -617,7 +617,7 @@ const	ChatLayout = () =>
 		arrayListUser,
 		setArrayListUser
 	] = useState([]);
-	const handleSave = () => {
+
 	const	createNewChannel = () =>
 	{
 		const action = {
@@ -768,7 +768,6 @@ const	ChatLayout = () =>
         socket.on("error", connectError);
         socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
-		socket.connect();
 		socket.on("display-channels", updateChannels);
         socket.connect();
 

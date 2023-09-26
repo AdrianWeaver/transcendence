@@ -21,6 +21,7 @@ export	interface ChatUserModel
 	"msgRoom": MessageRoomModel[]
 }
 
+
 type ChanMapModel = {
     id: number,
     name: string
