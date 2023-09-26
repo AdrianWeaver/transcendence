@@ -37,9 +37,16 @@ const	initialControllerState: ControllerModel = {
 				avatar: "undefined",
 				msgRoom: [
 				{
+					id: "undefined",
 					roomName: "undefined",
 					privateConv: true,
-					content: []
+					content: [
+						{
+							sender: "undefined",
+							message: "undefined",
+							date: "undefined"
+						}
+					]
 				}
 				]
 			}
@@ -155,6 +162,40 @@ const	controllerSlice = createSlice(
 			while (state.user.chat.users.length - 1)
 			{
 				state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
+				i++;
+			}
+		},
+		setMessage(state, action: PayloadAction<ControllerModel>)
+		{
+			let	i;
+			let	j;
+
+			i = 0;
+			while (state.user.chat.users.length - 1)
+			{
+				j = 0;
+				while (state.user.chat.users[i].msgRoom.length - 1)
+				{
+					state.user.chat.users[i].msgRoom[j] = action.payload.user.chat.users[i].msgRoom[j];
+					j++;
+				}
+				i++;
+			}
+		},
+		addMessage(state, action: PayloadAction<ControllerModel>)
+		{
+			let	i;
+			let	j;
+
+			i = 0;
+			while (state.user.chat.users.length - 1)
+			{
+				j = 0;
+				while (state.user.chat.users[i].msgRoom.length - 1)
+				{
+					state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
+					j++;
+				}
 				i++;
 			}
 		}

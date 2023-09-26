@@ -35,7 +35,7 @@ import {
 	DialogTitle
 } from "@mui/material";
 
-const	URL = "http://localhost:3000";
+const URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import MenuBar from "../../Component/MenuBar/MenuBar";
@@ -46,14 +46,13 @@ import { Outlet } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
 
 // please use vector this one is just for testing card
-import	pong from "./assets/pong.jpeg";
+import pong from "./assets/pong.jpeg";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
-import { MessageRoomModel } from "../../Redux/models/redux-models";
+import { addMessage, setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
+import { MessageModel, MessageRoomModel } from "../../Redux/models/redux-models";
 
 // invite
-const	InvitationCard = () =>
-{
+const InvitationCard = () => {
 	const theme = useTheme();
 	return (
 		<Card sx={{
@@ -108,10 +107,7 @@ const	InvitationCard = () =>
 };
 
 // chat part 
-
-
-interface TabPanelProps
-{
+interface TabPanelProps {
 	children?: React.ReactNode;
 	dir?: string;
 	index: number;
@@ -120,8 +116,7 @@ interface TabPanelProps
 	area?: boolean;
 }
 
-const	ChannelsList = () =>
-{
+const ChannelsList = () => {
 	return (
 		<>
 			channel list here, you can follow FriendsList component
@@ -133,10 +128,9 @@ const	ChannelsList = () =>
 	);
 };
 
-const TabPanel = (props: TabPanelProps) =>
-{
-	const	{ children, value, index, ...other } = props;
-	let		animationSettings;
+const TabPanel = (props: TabPanelProps) => {
+	const { children, value, index, ...other } = props;
+	let animationSettings;
 
 	// this is a switch I added to change animation type on left | right view
 	if (props.area === false)
@@ -156,20 +150,20 @@ const TabPanel = (props: TabPanelProps) =>
 	return (
 		<motion.div
 			initial={
-			{
-				opacity: 0,
-				scale: animationSettings.scale
-			}}
+				{
+					opacity: 0,
+					scale: animationSettings.scale
+				}}
 			animate={{
 				opacity: value === index ? 1 : 0,
 				scale: value === index ? 1 : animationSettings.scale
 			}}
 			transition={
-			{
-				duration: animationSettings.duration,
-				type: animationSettings.type,
-				stiffness: 80,
-			}}
+				{
+					duration: animationSettings.duration,
+					type: animationSettings.type,
+					stiffness: 80,
+				}}
 			style={{ display: value === index ? "block" : "none" }}
 		>
 			<Typography
@@ -187,9 +181,8 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 // can be used to display the list of friends
-const	CurrentlyTalkingFriend = () =>
-{
-	const	currentlyTalkingFriendDataFake = {
+const CurrentlyTalkingFriend = () => {
+	const currentlyTalkingFriendDataFake = {
 		name: "John Wick",
 		avatar: "https://material-ui.com/static/images/avatar/1.jpg",
 	};
@@ -219,9 +212,8 @@ type FriendItemProps = {
 	online?: boolean;
 	key?: number;
 };
-const	FriendItem = (props: FriendItemProps) =>
-{
-	const status = props.online ? "online" : "";
+const FriendItem = (props: FriendItemProps) => {
+	const status = props.online ? "online 💚" : "🔴";
 
 	return (
 		<ListItem
@@ -239,7 +231,7 @@ const	FriendItem = (props: FriendItemProps) =>
 			</ListItemText>
 			<ListItemText
 				secondary={status}
-				sx={{align: "right"}}
+				sx={{ align: "right" }}
 			>
 			</ListItemText>
 		</ListItem>
@@ -250,18 +242,15 @@ type FriendsListProps = {
 	arrayListUsers: []
 };
 
-const	FriendsList = (props: FriendsListProps) =>
-{
-	const	socketTest = useRef<SocketIOClient.Socket | null>(null);
-	let	friendList: any[];
-	const	dispatch = useAppDispatch();
-	const	users = useAppSelector((state) =>
-	{
+const FriendsList = (props: FriendsListProps) => {
+	const socketTest = useRef<SocketIOClient.Socket | null>(null);
+	let friendList: any[];
+	const dispatch = useAppDispatch();
+	const users = useAppSelector((state) => {
 		return (state.controller.user.chat.users);
 	});
 
-	const	sendMsg = (id:string) =>
-	{
+	const sendMsg = (id: string) => {
 		const action = {
 			type: "sending-message"
 		};
@@ -269,9 +258,8 @@ const	FriendsList = (props: FriendsListProps) =>
 		// socketTest.current?.emit("send-message", action);
 	};
 
-	const	displayConversationWindow = (id: string) =>
-	{
-		const	action = {
+	const displayConversationWindow = (id: string) => {
+		const action = {
 			type: "display-conversation",
 			payload:
 			{
@@ -289,7 +277,7 @@ const	FriendsList = (props: FriendsListProps) =>
 				item
 				xs={12}
 				// style={{padding: '10px'}}
-				sx={{padding: "10px"}}
+				sx={{ padding: "10px" }}
 			>
 				<TextField
 					id="outlined-basic-email"
@@ -301,28 +289,16 @@ const	FriendsList = (props: FriendsListProps) =>
 			<Divider />
 			<List>
 				{
-					users.map((elem, index) =>
-					{
-						// return (
-						// 	<FriendItem
-						// 		name={elem.name}
-						// 		avatar={elem.avatar}
-						// 		key={index}
-						// 		online={elem.online}
-						// 	/>
-						// );
+					users.map((elem, index) => {
 						return (
 							<>
-								<div onClick={() =>
-									{
-										displayConversationWindow(elem.id);
-										dispatch(setActiveConversationId(elem.id));
-										//sendMsg(elem.id);
-									}}>
+								<div onClick={() => {
+									displayConversationWindow(elem.id);
+									dispatch(setActiveConversationId(elem.id));
+								}}>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
 										avatar={elem.avatar}
-										// avatar=""
 										key={index}
 										online={true}
 									/>
@@ -339,13 +315,12 @@ const	FriendsList = (props: FriendsListProps) =>
 // the next line interface is here to remove the typeScript errordeclare module '@mui/material/ListItemText'
 declare module "@mui/material/ListItemText"
 {
-	interface ListItemTextProps
-	{
+	interface ListItemTextProps {
 		align?: "left" | "center" | "right";
 	}
 }
 
-type	MessageItemProps = {
+type MessageItemProps = {
 	key?: number,
 	align?: ListItemTextProps,
 	sender: "me" | "other" | "server",
@@ -353,18 +328,16 @@ type	MessageItemProps = {
 	date: string
 };
 
-const	MessageItem = (props: MessageItemProps) =>
-{
-	let	align: "right" | "center" | "left" | undefined;
+const MessageItem = (props: MessageItemProps) => {
+	let align: "right" | "center" | "left" | undefined;
 
-	switch (props.sender)
-	{
+	switch (props.sender) {
 		case "me":
 			align = "right";
-			break ;
+			break;
 		case "other":
 			align = "left";
-			break ;
+			break;
 		case "server":
 			align = "center";
 			break;
@@ -418,25 +391,29 @@ const	MessageItem = (props: MessageItemProps) =>
 		);
 };
 
-const	MessagesArea = () =>
-{
-	let	displayMessageArray;
+const MessagesArea = () => {
+	let displayMessageArray;
 
-	const	users = useAppSelector((state) =>
-	{
+	displayMessageArray = [
+		{
+			index: 0,
+			sender: "server",
+			message: "Initialize",
+			date: "09:30"
+		},
+	];
+
+	const users = useAppSelector((state) => {
 		return (state.controller.user.chat.users);
 	});
 
-	const	activeId = useAppSelector((state) =>
-	{
+	const activeId = useAppSelector((state) => {
 		return (state.controller.user.chat.activeConversationId);
 	});
-	const	userActiveIndex = users.findIndex((elem) =>
-	{
+	const userActiveIndex = users.findIndex((elem) => {
 		return (elem.id === activeId);
 	});
-	if (userActiveIndex === -1)
-	{
+	if (userActiveIndex === -1) {
 		displayMessageArray = [
 			{
 				sender: "server",
@@ -445,56 +422,28 @@ const	MessagesArea = () =>
 			},
 		];
 	}
-	else
-	{
-		displayMessageArray = [
-			{
-				sender: "server",
-				message: "Vous discutez avec " + users[userActiveIndex].name + "[" + users[userActiveIndex].id + "]",
-				date: "09:30"
-			},
-		];
-	}
-	// const	conversationArea = [
+	else {
+		const msgRoom = users[userActiveIndex].msgRoom;
+		let i;
 
-	// ];
-	// const	FakeJohnWickDiscussMessageArray = [
-	// 	{
-	// 		sender: "server",
-	// 		message: "Vous etes maintenant ami avec John Wick",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "me",
-	// 		message: "Hello how are you ?",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "other",
-	// 		message: "Hello I'm fine and you",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "me",
-	// 		message: "Want you play a pong game with me ?",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "other",
-	// 		message: "Shurely, I'm the master of this game ;)",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "me",
-	// 		message: "Let me prepare the link",
-	// 		date: "09:30"
-	// 	},
-	// 	{
-	// 		sender: "server",
-	// 		message: "!play pong",
-	// 		date: "09:42"
-	// 	}
-	// ];
+		i = 0;
+		while (msgRoom.length) {
+			if (msgRoom[i].id === activeId) {
+				displayMessageArray = msgRoom[i].content;
+				break;
+			}
+			i++;
+		}
+		if (i === msgRoom.length) {
+			displayMessageArray = [
+				{
+					sender: "server",
+					message: "Aucune conversation active",
+					date: "09:30"
+				},
+			];
+		}
+	}
 	return (
 		<>
 			<List
@@ -504,9 +453,7 @@ const	MessagesArea = () =>
 				}}
 			>
 				{
-					// FakeJohnWickDiscussMessageArray.map((elem, key) =>
-					displayMessageArray.map((elem, key) =>
-					{
+					displayMessageArray.map((elem, key) => {
 						return (
 							<MessageItem
 								key={key}
@@ -522,28 +469,44 @@ const	MessagesArea = () =>
 	);
 };
 
-const	SendingArea = () =>
+const SendingArea = () =>
 {
+	const
+	[
+		text,
+		setText
+	] = useState("");
+	const handleTextChange = (e: any) =>
+	{
+		setText(e.target.value);
+	};
+
+	const handleSendClick = () =>
+	{
+		console.log("Text typed:", text);
+	};
+
 	return (
 		<>
-			<Grid item xs={11}>
-				<TextField id="outlined-basic-email" label="Type Something" fullWidth />
-			</Grid>
-			<Grid
-				xs={1}
-				sx={{alignItems: "right"}}
-				// align="right"
-			>
-				<Fab color="primary" aria-label="add">
-					<SendIcon />
-				</Fab>
-			</Grid>
+		<Grid item xs={11}>
+			<TextField
+			id="outlined-basic-email"
+			label="Type Something"
+			fullWidth
+			value={text}
+			onChange={handleTextChange}
+			/>
+		</Grid>
+		<Grid xs={1} sx={{ alignItems: "right" }}>
+			<Fab color="primary" aria-label="add" onClick={handleSendClick}>
+			<SendIcon />
+			</Fab>
+		</Grid>
 		</>
 	);
 };
 
-const a11yProps = (index: any) =>
-{
+const a11yProps = (index: any) => {
 	return (
 		{
 			id: `action-tab-${index}`,
@@ -552,25 +515,23 @@ const a11yProps = (index: any) =>
 	);
 };
 
-const	ChatLayout = () =>
-{
-	const	style = useTheme();
-	const	dispatch = useAppDispatch();
-	const	chatConnected = useAppSelector((state) =>
-	{
+const ChatLayout = () => {
+	const style = useTheme();
+	const dispatch = useAppDispatch();
+	const chatConnected = useAppSelector((state) => {
 		return (state.controller.user.chat.connected);
 	});
 	const
-	[
-		value,
-		setValue
-	] = useState(0);
+		[
+			value,
+			setValue
+		] = useState(0);
 
 	const
-	[
-		connected,
-		setConnected
-	] = useState(false);
+		[
+			connected,
+			setConnected
+		] = useState(false);
 
 	const [
 		open,
@@ -597,13 +558,11 @@ const	ChatLayout = () =>
 		setFormValid
 	] = useState(false);
 
-	const handleClickOpen = () =>
-	{
+	const handleClickOpen = () => {
 		setOpen(true);
 	};
 
-	const handleClose = () =>
-	{
+	const handleClose = () => {
 		setChannelName("");
 		setSelectedMode("");
 		setChanPassword("");
@@ -611,14 +570,13 @@ const	ChatLayout = () =>
 	};
 
 	const
-	[
-		arrayListUser,
-		setArrayListUser
-	] = useState([]);
+		[
+			arrayListUser,
+			setArrayListUser
+		] = useState([]);
 	const handleSave = () => {
 		// Check if Channel name is empty
-		if (channelName.trim() === "")
-		{
+		if (channelName.trim() === "") {
 			alert("Channel name cannot be empty");
 			return;
 		}
@@ -628,14 +586,12 @@ const	ChatLayout = () =>
 			"Public",
 			"Protected",
 			"Private"
-			].includes(selectedMode))
-		{
+		].includes(selectedMode)) {
 			alert("Please select a mode (Public, Protected, or Private)");
 			return;
 		}
 
-		if (selectedMode === "Protected" && chanPassword.trim() === "")
-		{
+		if (selectedMode === "Protected" && chanPassword.trim() === "") {
 			alert("There must be a password for a protected channel");
 			return;
 		}
@@ -644,20 +600,18 @@ const	ChatLayout = () =>
 		setOpen(false);
 	};
 
-	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+	const socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	useEffect(() =>
-    {
-        const socket = io(URL,
-        {
-            autoConnect: false,
-            reconnectionAttempts: 5,
-        });
+	useEffect(() => {
+		const socket = io(URL,
+			{
+				autoConnect: false,
+				reconnectionAttempts: 5,
+			});
 
-        socketRef.current = socket;
+		socketRef.current = socket;
 
-        const connect = () =>
-		{
+		const connect = () => {
 			setConnected(true);
 			// setTimeout(() =>
 			// {
@@ -665,27 +619,23 @@ const	ChatLayout = () =>
 			// }, 1000);
 		};
 
-		const disconnect = () =>
-		{
+		const disconnect = () => {
 			setConnected(false);
 		};
 
 
-		const	connectError = (error: Error) =>
-		{
+		const connectError = (error: Error) => {
 			console.error("ws_connect_error", error);
 		};
 
-		const	serverInfo = (data: any) =>
-		{
+		const serverInfo = (data: any) => {
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			console.log("information from server: ", data);
 			// setArrayListUser(data.payload.arrayListUser);
 		};
 
-		const	sendMessageToUser = (data: any) =>
-		{
-			const	msgRoom: MessageRoomModel[] = [
+		const sendMessageToUser = (data: any) => {
+			const msgRoom: MessageRoomModel[] = [
 				{
 					roomName: data.payload.msgRoom.roomName,
 					privateConv: data.payload.msgRoom.privateConv,
@@ -697,25 +647,23 @@ const	ChatLayout = () =>
 			console.log("test send Message: ", data);
 		};
 
-        socket.on("connect", connect);
+		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
-        socket.on("error", connectError);
-        socket.on("info", serverInfo);
+		socket.on("error", connectError);
+		socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
 		socket.connect();
 
-        return (() =>
-        {
-            socket.off("connect", connect);
+		return (() => {
+			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
-            socket.off("error", connectError);
+			socket.off("error", connectError);
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
-        });
-    }, []);
+		});
+	}, []);
 
-	const	createNewChannel = () =>
-	{
+	const createNewChannel = () => {
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -730,31 +678,26 @@ const	ChatLayout = () =>
 		setChanPassword("");
 	};
 
-	const	handleChange = (event: React.SyntheticEvent, newValue: number) =>
-	{
+	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
 
-	const	handleChangeIndex = (index: number) =>
-	{
+	const handleChangeIndex = (index: number) => {
 		setValue(index);
 	};
 
-	const	refreshListUser = () =>
-	{
+	const refreshListUser = () => {
 		// if (chatConnected === false)
-			// {
-				const	action = {
-					type: "get-user-list"
-				};
-				socketRef.current?.emit("info", action);
-			// 	console.log("request data from server", connected);
-			// 	dispatch(setChatConnected(true));
-			// }
+		// {
+		const action = {
+			type: "get-user-list"
+		};
+		socketRef.current?.emit("info", action);
+		// 	console.log("request data from server", connected);
+		// 	dispatch(setChatConnected(true));
+		// }
 		console.log("refresh the list of user");
 	};
-
-
 
 	return (
 		<div>
@@ -774,13 +717,13 @@ const	ChatLayout = () =>
 				<Grid
 					item
 					xs={3}
-					sx={{borderRight: "1px solid #e0e0e0"}}
+					sx={{ borderRight: "1px solid #e0e0e0" }}
 				>
 					<Toolbar
 						style={
-						{
-							backgroundColor: style.palette.primary.main,
-						}}
+							{
+								backgroundColor: style.palette.primary.main,
+							}}
 					>
 						<Tabs
 							value={value}
@@ -793,12 +736,12 @@ const	ChatLayout = () =>
 							<Tab
 								label="Channels"
 								{...a11yProps(0)}
-								style={{fontSize: "8px"}}
+								style={{ fontSize: "8px" }}
 							/>
 							<Tab
 								label="Direct Message"
 								{...a11yProps(1)}
-								style={{fontSize: "8px"}}
+								style={{ fontSize: "8px" }}
 							/>
 						</Tabs>
 					</Toolbar>
@@ -820,66 +763,65 @@ const	ChatLayout = () =>
 							<Dialog open={open} onClose={handleClose}>
 								<DialogTitle>Enter Information</DialogTitle>
 								<DialogContent>
-								<DialogContentText>
-									Please enter the following information:
-								</DialogContentText>
-								<input
-									type="text"
-									placeholder="Channel name"
-									value={channelName}
-									onChange={(e) =>
-									{
-										setChannelName(e.target.value);
-									}}
-								/>
-								<br />
-								<div>
+									<DialogContentText>
+										Please enter the following information:
+									</DialogContentText>
 									<input
-									type="radio"
-									id="option1"
-									name="answerOption"
-									value="Public"
-									checked={selectedMode === "Public"}
-									onChange={() => setSelectedMode("Public")}
+										type="text"
+										placeholder="Channel name"
+										value={channelName}
+										onChange={(e) => {
+											setChannelName(e.target.value);
+										}}
 									/>
-									<label htmlFor="option1">Public</label>
-								</div>
-								<div>
+									<br />
+									<div>
+										<input
+											type="radio"
+											id="option1"
+											name="answerOption"
+											value="Public"
+											checked={selectedMode === "Public"}
+											onChange={() => setSelectedMode("Public")}
+										/>
+										<label htmlFor="option1">Public</label>
+									</div>
+									<div>
+										<input
+											type="radio"
+											id="option2"
+											name="answerOption"
+											value="Protected"
+											checked={selectedMode === "Protected"}
+											onChange={() => setSelectedMode('Protected')}
+										/>
+										<label htmlFor="option2">Protected</label>
+									</div>
+									<div>
+										<input
+											type="radio"
+											id="option3"
+											name="answerOption"
+											value="Private"
+											checked={selectedMode === "Private"}
+											onChange={() => setSelectedMode("Private")}
+										/>
+										<label htmlFor="option3">Private</label>
+									</div>
 									<input
-									type="radio"
-									id="option2"
-									name="answerOption"
-									value="Protected"
-									checked={selectedMode === "Protected"}
-									onChange={() => setSelectedMode('Protected')}
+										type="text"
+										placeholder="Password (if protected)"
+										value={chanPassword}
+										onChange={(e) => setChanPassword(e.target.value)}
 									/>
-									<label htmlFor="option2">Protected</label>
-								</div>
-								<div>
-									<input
-									type="radio"
-									id="option3"
-									name="answerOption"
-									value="Private"
-									checked={selectedMode === "Private"}
-									onChange={() => setSelectedMode("Private")}
-									/>
-									<label htmlFor="option3">Private</label>
-								</div>
-								<input
-									type="text"
-									placeholder="Password (if protected)"
-									value={chanPassword}
-									onChange={(e) => setChanPassword(e.target.value)}
-								/>
 								</DialogContent>
 								<DialogActions>
-								<Button onClick={handleClose} color="primary">
-									Cancel
-								</Button>
-								<Button onClick={handleSave} color="primary">
-									Save
-								</Button>
+									<Button onClick={handleClose} color="primary">
+										Cancel
+									</Button>
+									<Button onClick={handleSave} color="primary">
+										Save
+									</Button>
 								</DialogActions>
 							</Dialog>
 						</div>
@@ -891,7 +833,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<FriendsList arrayListUsers={arrayListUser}/>
+						<FriendsList arrayListUsers={arrayListUser} />
 					</TabPanel>
 				</Grid>
 				{/* left side of the screen  */}
@@ -924,7 +866,7 @@ const	ChatLayout = () =>
 					<Grid
 						container
 						// style={{padding: '20px'}}
-						sx={{padding: "20px"}}
+						sx={{ padding: "20px" }}
 					>
 						<SendingArea />
 					</Grid>

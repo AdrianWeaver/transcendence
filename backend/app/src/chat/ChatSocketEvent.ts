@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -119,12 +120,12 @@ export class ChatSocketEvents
 					payload:
 					{
 						sender: client.id,
-						msgRoom:[
+						msgRoom: [
 							{
 								roomName: data.payload.chanName,
 								privateConv: data.payload.privateConv,
 								messageContent: data.payload.content,
-							}					
+							}
 						]
 					}
 				};
@@ -141,11 +142,18 @@ export class ChatSocketEvents
 			if (data.type === "get-user-list")
 			{
 				console.log(data);
+				const copyUsers = this.chatService.getAllUsers();
+				const	searchUser = copyUsers.findIndex((elem) =>
+				{
+					return (client.id === elem.id);
+				});
+				copyUsers.splice(searchUser, 1);
 				const action = {
 					type: "sending-list-user",
 					payload:
 					{
-						arrayListUsers: this.chatService.getAllUsers(),
+						// arrayListUsers: this.chatService.getAllUsers(),
+						arrayListUsers: copyUsers
 					}
 				};
 				client.emit("info", action);
