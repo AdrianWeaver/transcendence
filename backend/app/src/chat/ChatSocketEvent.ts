@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -119,12 +120,12 @@ export class ChatSocketEvents
 					payload:
 					{
 						sender: client.id,
-						msgRoom:[
+						msgRoom: [
 							{
 								roomName: data.payload.chanName,
 								privateConv: data.payload.privateConv,
 								messageContent: data.payload.content,
-							}					
+							}
 						]
 					}
 				};

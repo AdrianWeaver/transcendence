@@ -9,7 +9,7 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ChatUserModel, ControllerModel, MessageRoomModel } from "../models/redux-models";
+import { CanvasModel, ChatUserModel, ControllerModel, MessageModel, MessageRoomModel } from "../models/redux-models";
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -400,10 +400,52 @@ export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
 				chat:
 				{
 					...prevState.controller.user.chat,
-					users: prevState.controller.user.chat.users
+					users: prevState.controller.user.chat.users,
 				}
 			}
 		};
 		dispatch(controllerActions.setMessageRoom(response));
+	});
+};
+
+export const setMessage = (message: MessageModel[], clientId: string, msgIndex: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		console.log(prevState);
+		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+		{
+			return (elem.id === clientId);
+		});
+		if (userIndex === -1)
+			console.log("Id not found");
+		else
+		{
+			const response: ControllerModel = {
+				...prevState.controller,
+				user:
+				{
+					...prevState.controller.user,
+					chat:
+					{
+						...prevState.controller.user.chat,
+						users: [
+						{
+							...prevState.controller.user.chat.users[userIndex],
+							msgRoom: [
+								{
+									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
+									content: message
+								}
+							]
+						}
+						]
+					}
+				}
+			};
+			dispatch(controllerActions.setMessage(response));
+		}
 	});
 };
