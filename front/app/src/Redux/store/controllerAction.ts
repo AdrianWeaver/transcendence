@@ -449,3 +449,50 @@ export const setMessage = (message: MessageModel[], clientId: string, msgIndex: 
 		}
 	});
 };
+
+export const addMessage = (clientId: string, msgIndex: number, text: string, index: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		console.log(prevState);
+		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+		{
+			return (elem.id === clientId);
+		});
+		if (userIndex === -1)
+			console.log("Id not found");
+		else
+		{
+			const response: ControllerModel = {
+				...prevState.controller,
+				user:
+				{
+					...prevState.controller.user,
+					chat:
+					{
+						...prevState.controller.user.chat,
+						users: [
+						{
+							...prevState.controller.user.chat.users[userIndex],
+							msgRoom: [
+								{
+									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
+									content: [
+									{
+										...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex].content[index],
+										message: text
+									}
+									]
+								}
+							]
+						}
+						]
+					}
+				}
+			};
+			dispatch(controllerActions.addMessage(response));
+		}
+	});
+};

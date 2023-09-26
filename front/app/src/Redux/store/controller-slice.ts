@@ -181,6 +181,23 @@ const	controllerSlice = createSlice(
 				}
 				i++;
 			}
+		},
+		addMessage(state, action: PayloadAction<ControllerModel>)
+		{
+			let	i;
+			let	j;
+
+			i = 0;
+			while (state.user.chat.users.length - 1)
+			{
+				j = 0;
+				while (state.user.chat.users[i].msgRoom.length - 1)
+				{
+					state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
+					j++;
+				}
+				i++;
+			}
 		}
 	}
 });
