@@ -447,13 +447,10 @@ const	MessagesArea = () =>
 	}
 	else
 	{
-		displayMessageArray = [
-			{
-				sender: "server",
-				message: "Vous discutez avec " + users[userActiveIndex].name + "[" + users[userActiveIndex].id + "]",
-				date: "09:30"
-			},
-		];
+		// displayMessageArray = useAppSelector((state) =>
+		// {
+
+		// });
 	}
 	// const	conversationArea = [
 
