@@ -7,6 +7,13 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 
+// export interface MessageModel
+// {
+// 	sender: string,
+// 	message: string,
+// 	date: string
+// }
+
 export interface MessageRoomModel
 {
 	"roomName": string,
@@ -22,8 +29,15 @@ export	interface ChatUserModel
 	"msgRoom": MessageRoomModel[]
 }
 
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	id: number
+}
 
-type ChanMapModel = {
+type ChanMapModel =
+{
     id: number,
     name: string,
 	mode: string
