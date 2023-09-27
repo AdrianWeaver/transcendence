@@ -26,6 +26,13 @@ type	ActionSocket = {
 	payload?: any
 };
 
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	id: number
+}
+
 @WebSocketGateway(
 {
 	cors:
@@ -160,12 +167,28 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	id = channel.messages.length + 1;
+				const newMessage: MessageModel = {
+					sender: client.id,
+					message: data.payload.message,
+					id: id
+				};
+				channel.addNewMessage(newMessage);
+				const	action = {
+					type: "update-messages",
+					payload: {
+						messages: channel.messages,
+					}
+				};
+				client.emit("update-messages", action);
 			}
 		}
 
 		@SubscribeMessage("channel-info")
-		handleChatCreation(
+		handleChannels(
 			@MessageBody() data: ActionSocket,
 			@ConnectedSocket() client: Socket
 		)

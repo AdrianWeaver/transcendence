@@ -49,7 +49,8 @@ import { Socket, io } from "socket.io-client";
 import pong from "./assets/pong.jpeg";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { addMessage, setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
-import { MessageModel, MessageRoomModel } from "../../Redux/models/redux-models";
+import { MessageRoomModel } from "../../Redux/models/redux-models";
+import { DataArraySharp } from "@mui/icons-material";
 
 // invite
 const InvitationCard = () => {
@@ -105,6 +106,13 @@ const InvitationCard = () => {
 		</Card>
 	);
 };
+
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	id: number
+}
 
 // chat part 
 interface TabPanelProps {
@@ -409,10 +417,12 @@ const MessagesArea = (text: any) => {
 	const activeId = useAppSelector((state) => {
 		return (state.controller.user.chat.activeConversationId);
 	});
-	const userActiveIndex = users.findIndex((elem) => {
+	const userActiveIndex = users.findIndex((elem) =>
+	{
 		return (elem.id === activeId);
 	});
-	if (userActiveIndex === -1) {
+	if (userActiveIndex === -1)
+	{
 		displayMessageArray = [
 			{
 				sender: "server",
@@ -437,7 +447,7 @@ const MessagesArea = (text: any) => {
 			displayMessageArray = [
 				{
 					sender: "server",
-					message: "conversation vide" + activeId,
+					message: "conversation vide " + activeId,
 					date: "09:30"
 				},
 			];
@@ -469,49 +479,49 @@ const MessagesArea = (text: any) => {
 	);
 };
 
-const SendingArea = () =>
-{
-	const
-	[
-		text,
-		setText
-	] = useState("");
-	const handleTextChange = (e: any) =>
-	{
-		setText(e.target.value);
-	};
+// const SendingArea = () =>
+// {
+// 	const
+// 	[
+// 		text,
+// 		setText
+// 	] = useState("");
+// 	const handleTextChange = (e: any) =>
+// 	{
+// 		setText(e.target.value);
+// 	};
 
-	const handleSendClick = () =>
-	{
-		console.log("Text typed:", text);
-		const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-		const action = {
-			type: "test",
-			payload: "Hello-world"
-		};
-		socketRef.current.emit("info", action);
-		MessagesArea(text);
-	};
+// 	const handleSendClick = () =>
+// 	{
+// 		console.log("Text typed:", text);
+// 		const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+// 		const action = {
+// 			type: "test",
+// 			payload: "Hello-world"
+// 		};
+// 		socketRef.current.emit("info", action);
+// 		MessagesArea(text);
+// 	};
 
-	return (
-		<>
-		<Grid item xs={11}>
-			<TextField
-			id="outlined-basic-email"
-			label="Type Something"
-			fullWidth
-			value={text}
-			onChange={handleTextChange}
-			/>
-		</Grid>
-		<Grid xs={1} sx={{ alignItems: "right" }}>
-			<Fab color="primary" aria-label="add" onClick={handleSendClick}>
-			<SendIcon />
-			</Fab>
-		</Grid>
-		</>
-	);
-};
+// 	return (
+// 		<>
+// 		<Grid item xs={11}>
+// 			<TextField
+// 			id="outlined-basic-email"
+// 			label="Type Something"
+// 			fullWidth
+// 			value={text}
+// 			onChange={handleTextChange}
+// 			/>
+// 		</Grid>
+// 		<Grid xs={1} sx={{ alignItems: "right" }}>
+// 			<Fab color="primary" aria-label="add" onClick={handleSendClick}>
+// 			<SendIcon />
+// 			</Fab>
+// 		</Grid>
+// 		</>
+// 	);
+// };
 
 const a11yProps = (index: any) => {
 	return (
@@ -577,9 +587,19 @@ const	ChatLayout = () =>
 	] = useState([]);
 
 	const [
+		chanMessages,
+		setChanMessages
+	] = useState([]);
+
+	const [
 		openPasswordDialog,
 		setOpenPasswordDialog
 	] = useState(false);
+
+	const [
+		currentChannel,
+		setCurrentChannel
+	] = useState("");
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -632,10 +652,11 @@ const	ChatLayout = () =>
 	const handleSave = () =>
 	{
 		// Check if Channel name is empty
-		if (channelName.trim() === "") {
+		if (channelName.trim() === "")
+		{
 			alert("Channel name cannot be empty");
 			return;
-	}
+		}
 
 		// Check if at least one radio option is selected
 		if (![
@@ -648,7 +669,8 @@ const	ChatLayout = () =>
 			return;
 		}
 
-		if (selectedMode === "Protected" && chanPassword.trim() === "") {
+		if (selectedMode === "Protected" && chanPassword.trim() === "")
+		{
 			alert("There must be a password for a protected channel");
 			return;
 		}
@@ -754,12 +776,19 @@ const	ChatLayout = () =>
 			console.log("test send Message: ", data);
 		};
 
+		const	updateMessages = (data: any) =>
+		{
+			setChanMessages(data.payload.messages);
+			console.log("payload: " + data.payload.messages);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
+		socket.on("update-messages", updateMessages);
         socket.connect();
 
 		return (() => {
@@ -769,6 +798,7 @@ const	ChatLayout = () =>
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
+			socket.off("update-messages", updateMessages);
         });
     }, []);
 
@@ -794,7 +824,8 @@ const	ChatLayout = () =>
 		setValue(newValue);
 	};
 
-	const handleChangeIndex = (index: number) => {
+	const handleChangeIndex = (index: number) =>
+	{
 		setValue(index);
 	};
 
@@ -833,6 +864,7 @@ const	ChatLayout = () =>
 		text,
 		setText
 	] = useState("");
+
 	const handleTextChange = (e: any) =>
 	{
 		setText(e.target.value);
@@ -844,12 +876,13 @@ const	ChatLayout = () =>
 		const action = {
 			type: "sent-message",
 			payload: {
+				chanName: currentChannel,
 				message: text,
 			}
 		};
 		socketRef.current.emit("info", action);
 		setText("");
-		MessagesArea(text);
+		// MessagesArea(text);
 	};
 
 	return (
@@ -924,13 +957,9 @@ const	ChatLayout = () =>
 										onChange={(e) => {
 											const inputValue = e.target.value;
 											if (inputValue.length <= 8)
-											{
 												setChannelName(inputValue);
-											}
 											else
-											{
 												setChannelName(inputValue.slice(0, 8));
-											}
 										}}
 									/>
 									<br />
@@ -986,7 +1015,12 @@ const	ChatLayout = () =>
 							<List>
 								{channels.map((channel: any) => {return (
 								<ListItem style={listItemStyle} key={channel.id}>
-									<ListItemText style={listItemTextStyle} primary={channel.name} />
+									<ListItemText style={listItemTextStyle}
+										primary={channel.name}
+										onClick={() =>
+										{
+											setCurrentChannel(channel.name);
+										}} />
 									<Button onClick={() =>
 										{
 											if (channel.mode === "protected")
@@ -997,34 +1031,48 @@ const	ChatLayout = () =>
 											else
 												joinChannel(channel.name);
 										}}>Join</Button>
-									<Button onClick={() => {return removeChannel(channel.id, channel.name)}}>Remove</Button>
-									<Dialog open={openPasswordDialog} onClose={() => setOpenPasswordDialog(false)}>
-										<DialogTitle>Enter Password</DialogTitle>
-											<DialogContent>
-												<TextField
+									<Button onClick={() =>
+										{
+											return removeChannel(channel.id, channel.name)
+										}}
+									>
+										Remove
+									</Button>
+									<Dialog open={openPasswordDialog} onClose={() =>
+										{
+											setOpenPasswordDialog(false);
+										}}>
+										<DialogTitle>
+											Enter Password
+										</DialogTitle>
+										<DialogContent>
+											<TextField
 												label="Password"
 												type="password"
 												fullWidth
 												variant="outlined"
 												value={userPassword}
-												onChange={(e) => setUserPassword(e.target.value)}
-												/>
-											</DialogContent>
-											<DialogActions>
-												<Button onClick={() => setOpenPasswordDialog(false)} color="primary">
-													Cancel
-												</Button>
-												<Button
-													onClick={() =>
-													{
-														const password = userPassword;
-														handlePasswordSubmit(userPassword);
-													}}
-													color="primary"
-													>
-													Submit
-												</Button>
-											</DialogActions>
+												onChange={(e) =>
+												{
+													setUserPassword(e.target.value);
+												}}
+											/>
+										</DialogContent>
+										<DialogActions>
+											<Button onClick={() => setOpenPasswordDialog(false)} color="primary">
+												Cancel
+											</Button>
+											<Button
+												onClick={() =>
+												{
+													const password = userPassword;
+													handlePasswordSubmit(userPassword);
+												}}
+												color="primary"
+												>
+												Submit
+											</Button>
+										</DialogActions>
 									</Dialog>
 								</ListItem>
 								)})}
@@ -1051,8 +1099,34 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						{/* // Just a placeholder */}
-						<Outlet />
+						<List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							>
+							{chanMessages.map((message: MessageModel, index) =>
+							{
+								console.log(message.id + " " + message.message);
+								let	sender: "me"| "other" | "server";
+
+								if ("monid" === message.sender)
+									sender = "me";
+								else
+									sender = "other";
+								return (
+									// <ListItem key={message.id}>
+									// 	<ListItemText primary={message.message} />
+									// </ListItem>
+									<MessageItem
+										key={index}
+										sender={sender}
+										date={message.sender}
+										message={message.message}
+									/>
+								);
+							})}
+						</List>
 					</TabPanel>
 
 					{/* when value == 1 */}

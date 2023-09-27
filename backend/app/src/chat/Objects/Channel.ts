@@ -6,11 +6,11 @@ import Chat from "./Chat";
 import User from "./User";
 import { Server, Socket } from "socket.io";
 
-export interface MessageModel
+type MessageModel =
 {
 	sender: string,
 	message: string,
-	date: string
+	id: number
 }
 
 class Channel
@@ -29,6 +29,7 @@ class Channel
     public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
     public addToBanned: (id: string) => void;
+    public addNewMessage: (message: MessageModel) => void;
 
     public constructor(name: string, client: Socket, mode: string, password: string)
     {
@@ -74,6 +75,11 @@ class Channel
         this.addToBanned = (id: string) =>
         {
             this.banned.push(id);
+        };
+
+        this.addNewMessage = (message: MessageModel) =>
+        {
+            this.messages.push(message);
         };
     }
 }
