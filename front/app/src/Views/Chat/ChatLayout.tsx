@@ -44,6 +44,7 @@ import { CSSProperties, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
+import { socket, connect, disconnect } from "./socket.service";
 
 // please use vector this one is just for testing card
 import pong from "./assets/pong.jpeg";
@@ -255,7 +256,8 @@ const FriendsList = (props: FriendsListProps) => {
 	const socketTest = useRef<SocketIOClient.Socket | null>(null);
 	let friendList: any[];
 	const dispatch = useAppDispatch();
-	const users = useAppSelector((state) => {
+	const users = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.users);
 	});
 
@@ -411,11 +413,13 @@ const MessagesArea = (text: any) => {
 	},
 	];
 
-	const users = useAppSelector((state) => {
+	const users = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.users);
 	});
 
-	const activeId = useAppSelector((state) => {
+	const activeId = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.activeConversationId);
 	});
 
@@ -525,7 +529,8 @@ const MessagesArea = (text: any) => {
 // 	);
 // };
 
-const a11yProps = (index: any) => {
+const a11yProps = (index: any) =>
+{
 	return (
 		{
 			id: `action-tab-${index}`,
@@ -546,9 +551,11 @@ const	ChatLayout = () =>
 		return (state.controller.user.chat.connected);
 	});
 
-	const	currChan = useAppSelector((state) => {
+	const	currentChannel = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.currentChannel);
 	});
+	const currentChannelRef = useRef(currentChannel);
 
 	const
 	[
@@ -602,11 +609,6 @@ const	ChatLayout = () =>
 		openPasswordDialog,
 		setOpenPasswordDialog
 	] = useState(false);
-
-	// const [
-	// 	currentChannel,
-	// 	setCurrentChannel
-	// ] = useState("");
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -697,7 +699,8 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
-	useEffect(() => {
+	useEffect(() =>
+	{
 		const socket = io(URL,
 			{
 				autoConnect: false,
@@ -706,7 +709,8 @@ const	ChatLayout = () =>
 
 		socketRef.current = socket;
 
-		const connect = () => {
+		const connect = () =>
+		{
 			setConnected(true);
 			// setTimeout(() =>
 			// {
@@ -714,7 +718,8 @@ const	ChatLayout = () =>
 			// }, 1000);
 		};
 
-		const disconnect = () => {
+		const disconnect = () =>
+		{
 			setConnected(false);
 		};
 
@@ -745,7 +750,10 @@ const	ChatLayout = () =>
 				if (data.payload.message !== "")
 					alert(data.payload.message);
 				else
+				{
+					setChanMessages(data.payload.messages);
 					alert ("Successfully joined channel !");
+				}
 			}
 
 			if (data.type === "protected-password")
@@ -761,11 +769,13 @@ const	ChatLayout = () =>
 			}
 		};
 
-		const connectError = (error: Error) => {
+		const connectError = (error: Error) =>
+		{
 			console.error("ws_connect_error", error);
 		};
 
-		const serverInfo = (data: any) => {
+		const serverInfo = (data: any) =>
+		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			console.log("information from server: ", data);
 			// setArrayListUser(data.payload.arrayListUser);
@@ -787,9 +797,12 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			// if (data.payload.chanName === currentChannel)
-			if (data.payload.chanName === currChan)
+			console.log("got to update messages");
+			console.log("currentChannel: " + currentChannelRef.current);
+			console.log("messages: ", data.payload.messages);
+			if (data.payload.chanName === currentChannelRef.current)
 			{
+				console.log("I am here");
 				setChanMessages(data.payload.messages);
 				console.log("Messages were set.");
 			}
@@ -797,13 +810,14 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
-			console.log("checking data: ", data);
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					// setCurrentChannel(data.payload.chanName);
+					// console.log("test received from server: " + data.payload.chanName);
+					console.log("test channel info: " + currentChannelRef.current);
+					setChanMessages(data.payload.chanMessages);
 				}
 				else
 					alert(data.payload.isInside);
@@ -816,21 +830,29 @@ const	ChatLayout = () =>
 		socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
-		socket.on("update-messages", updateMessages);
 		socket.on("channel-info", channelInfo);
+		socket.on("update-messages", updateMessages);
+
         socket.connect();
 
-		return (() => {
+		return (() =>
+		{
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
-			socket.off("update-messages", updateMessages);
 			socket.off("channel-info", channelInfo);
+			socket.off("update-messages", updateMessages);
         });
     }, []);
+
+	useEffect(() =>
+	{
+		currentChannelRef.current = currentChannel;
+		console.log("current re: " + currentChannelRef.current);
+	}, [currentChannel]);
 
 	const handlePasswordSubmit = (password: string) =>
 	{
@@ -842,15 +864,10 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
-		// if (password === chanPassword)
-		// 	alert(`Joining ${joiningChannelName}`);
-		// else
-		// 	alert('Incorrect password. Please try again.');
-		// Close the password dialog.
-		// setOpenPasswordDialog(false);
 	};
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleChange = (event: React.SyntheticEvent, newValue: number) =>
+	{
 		setValue(newValue);
 	};
 
@@ -905,7 +922,7 @@ const	ChatLayout = () =>
 		const action = {
 			type: "sent-message",
 			payload: {
-				chanName: currChan,
+				chanName: currentChannel,
 				message: text,
 			}
 		};
@@ -1057,7 +1074,7 @@ const	ChatLayout = () =>
 								<ListItem style={listItemStyle} key={channel.id}>
 									<ListItemText
 										style={
-											channel.name === currChan
+											channel.name === currentChannel
 											? { color: "red" }
 											: listItemTextStyle
 										}
@@ -1079,7 +1096,7 @@ const	ChatLayout = () =>
 										}}>Join</Button>
 									<Button onClick={() =>
 										{
-											return removeChannel(channel.id, channel.name)
+											return removeChannel(channel.id, channel.name);
 										}}
 									>
 										Remove

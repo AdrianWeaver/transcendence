@@ -53,6 +53,13 @@ const	initialControllerState: ControllerModel = {
 			],
 			activeConversationId: "undefined",
 			currentChannel: "undefined",
+			chanMessages: [
+				{
+					sender: "undefined",
+					message: "undefined",
+					mode: "undefined",
+				}
+			]
 		},
 	},
 	registration:

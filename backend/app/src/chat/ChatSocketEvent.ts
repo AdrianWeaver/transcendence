@@ -241,14 +241,14 @@ export class ChatSocketEvents
 
 			if (data.type === "asked-join")
 			{
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
 					type: "asked-join",
 					payload: {
 						message: "",
+						messages: searchChannel?.messages,
 					}
 				};
-
-				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (searchChannel)
 				{
 					if (searchChannel.mode === "private")
@@ -262,8 +262,8 @@ export class ChatSocketEvents
 					client.join(data.payload.chanName);
 					if (searchChannel)
 					{
-					searchChannel.members++;
-					searchChannel?.users.push(client.id);
+						searchChannel.members++;
+						searchChannel?.users.push(client.id);
 					}
 				}
 			}
@@ -290,6 +290,7 @@ export class ChatSocketEvents
 					payload: {
 						chanName: data.payload.chanName,
 						isInside: "",
+						chanMessages: channel?.messages,
 					}
 				};
 				if (channel?.isMember(client.id) === false)

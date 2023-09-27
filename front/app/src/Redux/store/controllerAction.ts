@@ -9,7 +9,14 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ChatUserModel, ControllerModel, MessageModel, MessageRoomModel } from "../models/redux-models";
+import { CanvasModel, ChatUserModel, ControllerModel, MessageModelInterface, MessageRoomModel } from "../models/redux-models";
+
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	mode: string
+}
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -430,7 +437,7 @@ export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
 	});
 };
 
-export const setMessage = (message: MessageModel[], clientId: string, msgIndex: number)
+export const setMessage = (message: MessageModelInterface[], clientId: string, msgIndex: number)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>

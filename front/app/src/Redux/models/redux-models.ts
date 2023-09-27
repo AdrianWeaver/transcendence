@@ -1,8 +1,15 @@
-export interface MessageModel
+export interface MessageModelInterface
 {
 	sender: string,
 	message: string,
 	date: string
+}
+
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	mode: string
 }
 
 export interface MessageRoomModel
@@ -34,7 +41,8 @@ export interface ChatModel
 	"connected": boolean,
 	"users": ChatUserModel[],
 	"activeConversationId": string,
-	"currentChannel": string
+	"currentChannel": string,
+	"chanMessages": MessageModel[],
 }
 
 export interface	UserModel
