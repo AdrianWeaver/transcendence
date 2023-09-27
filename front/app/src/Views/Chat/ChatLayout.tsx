@@ -779,8 +779,8 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			setChanMessages(data.payload.messages);
-			console.log("payload: " + data.payload.messages);
+			if (data.payload.chanName === currentChannel)
+				setChanMessages(data.payload.messages);
 		};
 
 		socket.on("connect", connect);
@@ -1016,12 +1016,17 @@ const	ChatLayout = () =>
 							<List>
 								{channels.map((channel: any) => {return (
 								<ListItem style={listItemStyle} key={channel.id}>
-									<ListItemText style={listItemTextStyle}
+									<ListItemText
+										style={
+											channel.name === currentChannel
+											? { color: "red" }
+											: listItemTextStyle
+										}
 										primary={channel.name}
-										onClick={() =>
-										{
+										onClick={() => {
 											setCurrentChannel(channel.name);
-										}} />
+										}}
+									/>
 									<Button onClick={() =>
 										{
 											if (channel.mode === "protected")

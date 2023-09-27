@@ -182,6 +182,7 @@ export class ChatSocketEvents
 					type: "update-messages",
 					payload: {
 						messages: channel.messages,
+						chanName: channel.name,
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
