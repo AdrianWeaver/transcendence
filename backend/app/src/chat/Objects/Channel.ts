@@ -15,6 +15,7 @@ type MessageModel =
 
 class Channel
 {
+    public owner: string;
     public admin: string | undefined;
     public admins: string[] = [];
     public banned: string[] = [];
@@ -25,6 +26,7 @@ class Channel
     public chat: Chat | undefined;
     public password: string | undefined;
     public messages: MessageModel[] = [];
+    public isOwner: (id: string) => boolean;
     public isAdmin: (id: string) => boolean;
     public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
@@ -54,6 +56,13 @@ class Channel
                 if (id === user)
                     return (true);
             }
+            return (false);
+        };
+
+        this.isOwner = (id: string) =>
+        {
+            if (id === this.owner)
+                return (true);
             return (false);
         };
 

@@ -544,16 +544,16 @@ const	ChatLayout = () =>
 		return (state.controller.user.chat.connected);
 	});
 	const
-		[
-			value,
-			setValue
-		] = useState(0);
+	[
+		value,
+		setValue
+	] = useState(0);
 
 	const
-		[
-			connected,
-			setConnected
-		] = useState(false);
+	[
+		connected,
+		setConnected
+	] = useState(false);
 
 	const [
 		open,
@@ -717,6 +717,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.channels !== undefined)
 					setChannels(data.payload.channels);
+				uniqueId = data.payload.uniqueId;
 			}
 
 			if(data.type === "add-new-channel")
@@ -1108,9 +1109,9 @@ const	ChatLayout = () =>
 							{chanMessages.map((message: MessageModel, index) =>
 							{
 								console.log(message.id + " " + message.message);
-								let	sender: "me"| "other" | "server";
+								let	sender: "me" | "other" | "server";
 
-								if ("monid" === message.sender)
+								if (uniqueId === message.sender)
 									sender = "me";
 								else
 									sender = "other";

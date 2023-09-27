@@ -66,6 +66,7 @@ export class ChatSocketEvents
 					type: "init-channels",
 					payload: {
 						channels: this.chatService.getChanMap(),
+						uniqueId: client.id,
 					}
 				};
 				client.emit("display-channels", action);
@@ -183,7 +184,7 @@ export class ChatSocketEvents
 						messages: channel.messages,
 					}
 				};
-				client.emit("update-messages", action);
+				this.server.to(channel.name).emit("update-messages", action);
 			}
 		}
 
