@@ -201,6 +201,9 @@ export class ChatSocketEvents
 					data.payload.chanMode,
 					data.payload.chanPassword);
 				newChannel.chat = this.chatService.getChat();
+				newChannel.owner = client.id;
+				newChannel.addAdmin(client.id);
+				client.join(newChannel.name);
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
 					type: "add-new-channel",
