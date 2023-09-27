@@ -168,6 +168,7 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
+				console.log(data.payload.message);
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
@@ -202,8 +203,6 @@ export class ChatSocketEvents
 					data.payload.chanMode,
 					data.payload.chanPassword);
 				newChannel.chat = this.chatService.getChat();
-				newChannel.owner = client.id;
-				newChannel.addAdmin(client.id);
 				client.join(newChannel.name);
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
@@ -259,7 +258,14 @@ export class ChatSocketEvents
 				}
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
+				{
 					client.join(data.payload.chanName);
+					if (searchChannel)
+					{
+					searchChannel.members++;
+					searchChannel?.users.push(client.id);
+					}
+				}
 			}
 
 			if(data.type === "password-for-protected")
@@ -274,6 +280,21 @@ export class ChatSocketEvents
 				if (channel?.password === data.payload.password)
 					action.payload.correct = "true";
 				client.emit("display-channels", action);
+			}
+
+			if (data.type === "did-I-join")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				const	action = {
+					type: "confirm-is-inside-channel",
+					payload: {
+						chanName: data.payload.chanName,
+						isInside: "",
+					}
+				};
+				if (channel?.isMember(client.id) === false)
+					action.payload.isInside = "You must first join the channel";
+				client.emit("channel-info", action);
 			}
 		}
 	}

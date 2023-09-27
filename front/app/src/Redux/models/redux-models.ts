@@ -33,7 +33,8 @@ export interface ChatModel
 	"pseudo": string,
 	"connected": boolean,
 	"users": ChatUserModel[],
-	"activeConversationId": string
+	"activeConversationId": string,
+	"currentChannel": string
 }
 
 export interface	UserModel

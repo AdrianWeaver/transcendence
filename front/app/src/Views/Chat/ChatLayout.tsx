@@ -48,9 +48,10 @@ import { Socket, io } from "socket.io-client";
 // please use vector this one is just for testing card
 import pong from "./assets/pong.jpeg";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { addMessage, setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
+import { addMessage, setActiveConversationId, setCurrentChannel, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
 import { DataArraySharp } from "@mui/icons-material";
+import { current } from "@reduxjs/toolkit";
 
 // invite
 const InvitationCard = () => {
@@ -417,6 +418,7 @@ const MessagesArea = (text: any) => {
 	const activeId = useAppSelector((state) => {
 		return (state.controller.user.chat.activeConversationId);
 	});
+
 	const userActiveIndex = users.findIndex((elem) =>
 	{
 		return (elem.id === activeId);
@@ -543,6 +545,11 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.connected);
 	});
+
+	const	currChan = useAppSelector((state) => {
+		return (state.controller.user.chat.currentChannel);
+	});
+
 	const
 	[
 		value,
@@ -596,10 +603,10 @@ const	ChatLayout = () =>
 		setOpenPasswordDialog
 	] = useState(false);
 
-	const [
-		currentChannel,
-		setCurrentChannel
-	] = useState("");
+	// const [
+	// 	currentChannel,
+	// 	setCurrentChannel
+	// ] = useState("");
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -767,6 +774,7 @@ const	ChatLayout = () =>
 		const sendMessageToUser = (data: any) => {
 			const msgRoom: MessageRoomModel[] = [
 				{
+					id: data.payload.msgRoom.id,
 					roomName: data.payload.msgRoom.roomName,
 					privateConv: data.payload.msgRoom.privateConv,
 					content: data.payload.msgRoom.messageContent
@@ -779,8 +787,27 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			if (data.payload.chanName === currentChannel)
+			// if (data.payload.chanName === currentChannel)
+			if (data.payload.chanName === currChan)
+			{
 				setChanMessages(data.payload.messages);
+				console.log("Messages were set.");
+			}
+		};
+
+		const	channelInfo = (data: any) =>
+		{
+			console.log("checking data: ", data);
+			if (data.type === "confirm-is-inside-channel")
+			{
+				if (data.payload.isInside === "")
+				{
+					dispatch(setCurrentChannel(data.payload.chanName));
+					// setCurrentChannel(data.payload.chanName);
+				}
+				else
+					alert(data.payload.isInside);
+			}
 		};
 
 		socket.on("connect", connect);
@@ -790,6 +817,7 @@ const	ChatLayout = () =>
 		socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
 		socket.on("update-messages", updateMessages);
+		socket.on("channel-info", channelInfo);
         socket.connect();
 
 		return (() => {
@@ -800,6 +828,7 @@ const	ChatLayout = () =>
 			socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
 			socket.off("update-messages", updateMessages);
+			socket.off("channel-info", channelInfo);
         });
     }, []);
 
@@ -873,17 +902,27 @@ const	ChatLayout = () =>
 
 	const handleSendClick = () =>
 	{
-		console.log("Text typed:", text);
 		const action = {
 			type: "sent-message",
 			payload: {
-				chanName: currentChannel,
+				chanName: currChan,
 				message: text,
 			}
 		};
 		socketRef.current.emit("info", action);
 		setText("");
 		// MessagesArea(text);
+	};
+
+	const	goToChannel = (chanName: string) =>
+	{
+		const	action = {
+			type: "did-I-join",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
 	};
 
 	return (
@@ -1018,13 +1057,14 @@ const	ChatLayout = () =>
 								<ListItem style={listItemStyle} key={channel.id}>
 									<ListItemText
 										style={
-											channel.name === currentChannel
+											channel.name === currChan
 											? { color: "red" }
 											: listItemTextStyle
 										}
 										primary={channel.name}
-										onClick={() => {
-											setCurrentChannel(channel.name);
+										onClick={() =>
+										{
+											return (goToChannel(channel.name));
 										}}
 									/>
 									<Button onClick={() =>
@@ -1113,7 +1153,6 @@ const	ChatLayout = () =>
 							>
 							{chanMessages.map((message: MessageModel, index) =>
 							{
-								console.log(message.id + " " + message.message);
 								let	sender: "me" | "other" | "server";
 
 								if (uniqueId === message.sender)

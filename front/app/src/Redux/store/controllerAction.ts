@@ -377,6 +377,28 @@ export const setActiveConversationId = (activeConversationId: string)
 	});
 };
 
+export const setCurrentChannel = (currentChannel: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					currentChannel: currentChannel
+				}
+			}
+		};
+		dispatch(controllerActions.setCurrentChannel(response));
+	});
+};
+
 export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {

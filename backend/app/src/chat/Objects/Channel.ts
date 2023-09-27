@@ -26,6 +26,7 @@ class Channel
     public chat: Chat | undefined;
     public password: string | undefined;
     public messages: MessageModel[] = [];
+    public isMember: (id: string) => boolean;
     public isOwner: (id: string) => boolean;
     public isAdmin: (id: string) => boolean;
     public isBanned: (id: string) => boolean;
@@ -40,6 +41,7 @@ class Channel
         this.mode = mode;
         this.chat = undefined;
         this.members++;
+        this.owner = client.id;
         if (this.members === 1)
             this.admins.push(client.id);
         this.users.push(client.id);
@@ -71,6 +73,16 @@ class Channel
             for (const user of this.banned)
             {
                 if (id === user)
+                    return (true);
+            }
+            return (false);
+        };
+
+        this.isMember = (id: string) =>
+        {
+            for (const user of this.users)
+            {
+                if (user === id)
                     return (true);
             }
             return (false);
