@@ -168,7 +168,6 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				console.log(data.payload.message);
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
@@ -252,6 +251,10 @@ export class ChatSocketEvents
 				};
 				if (searchChannel === undefined)
 					return ;
+				if (searchChannel.isMember(client.id) === true)
+				{
+					action.payload.message = "You are already in this channel.";
+				}
 				if (searchChannel.mode === "private")
 					action.payload.message = "This channel is private";
 				if (searchChannel.isBanned(client.id) === true)
@@ -263,17 +266,21 @@ export class ChatSocketEvents
 					const id = searchChannel.messages.length + 1;
 					const messageText = "Welcome to the channel, " + client.id + " !";
 					const newMessage: MessageModel = {
-						sender: "server",
+						sender: client.id,
 						message: messageText,
 						id: id
 					};
-					searchChannel?.addNewMessage(newMessage);
+					searchChannel.addNewMessage(newMessage);
 					const	messageAction = {
 						type: "new-message",
 						payload: {
 							messagse: searchChannel?.messages,
+							socketId: client.id,
 						}
 					};
+					// const room = this.server.sockets.adapter.rooms.get(searchChannel.name);
+					// if (room)
+					// 	console.log("room members: " + room.size);
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);

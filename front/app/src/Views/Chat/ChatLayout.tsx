@@ -796,9 +796,9 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("LOL");
 			if (data.payload.chanName === currentChannelRef.current)
 			{
+				setChanMessages([]);
 				setChanMessages(data.payload.messages);
 			}
 		};
