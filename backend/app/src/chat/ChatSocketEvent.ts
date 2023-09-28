@@ -33,6 +33,12 @@ type MessageModel =
 	id: number
 }
 
+type	MembersModel =
+{
+	id: number,
+	name: string
+}
+
 @WebSocketGateway(
 {
 	cors:
@@ -343,6 +349,29 @@ export class ChatSocketEvents
 				this.server.to(data.payload.chanName).emit("update-messages", action);
 				action.payload.message = "You have been removed from " + data.payload.chanName;
 				client.emit("left-message", action);
+			}
+
+			if (data.type === "member-list")
+			{
+				const channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	memberList: MembersModel[] = [];
+				for(const user of channel.users)
+				{
+					const newMember: MembersModel = {
+						id: memberList.length + 1,
+						name: user,
+					};
+					memberList.push(newMember);
+				}
+				const	action = {
+					type: "display-members",
+					payload: {
+						memberList: memberList,
+					}
+				};
+				client.emit("channel-info", action);
 			}
 		}
 	}

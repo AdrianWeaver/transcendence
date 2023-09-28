@@ -116,6 +116,12 @@ type MessageModel =
 	id: number
 }
 
+type MembersModel =
+{
+	id: number,
+	name:string
+}
+
 // chat part 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -610,6 +616,11 @@ const	ChatLayout = () =>
 		setOpenPasswordDialog
 	] = useState(false);
 
+	const [
+		channelMembers,
+		setChannelMembers
+	] = useState<MembersModel[]>([]);
+
 	const handleClickOpen = () => {
 		setOpen(true);
 	};
@@ -743,7 +754,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message === "")
 					setChannels(data.payload.chanMap);
-				else
+				elsethis
 					alert(data.payload.message);
 			}
 
@@ -820,6 +831,12 @@ const	ChatLayout = () =>
 				}
 				else
 					alert(data.payload.isInside);
+			}
+
+			if (data.type === "display-members")
+			{
+				setChannelMembers(data.payload.memberList);
+				console.log("members: " + data.payload.memberList);
 			}
 		};
 
@@ -1010,6 +1027,32 @@ const	ChatLayout = () =>
 		handleDialogClose();
 	};
 
+	// END OF OPTIONS NEXT TO CHANNEL NAME
+
+	// SHOW MEMBERS FUNCTIONS:
+	const [
+		membersOpen,
+		setMembersOpen
+	] = useState(false);
+
+	const handleMembersClickOpen = (chanName: string) =>
+	{
+		setMembersOpen(true);
+		const	action = {
+			type: "member-list",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
+	const handleMembersClose = () =>
+	{
+		setMembersOpen(false);
+	};
+
+	// END OF MEMBERS
 	return (
 		<div>
 			<MenuBar />
@@ -1175,6 +1218,27 @@ const	ChatLayout = () =>
 											}}>
 												Remove
 											</Button>
+											<Button onClick={() =>
+											{
+												return handleMembersClickOpen(channel.name);
+											}}>Members</Button>
+											<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
+												<DialogTitle>Channel Members</DialogTitle>
+												<DialogContent>
+												<ul>
+													{channelMembers.map((member) =>
+													{
+														return (
+															<li key={member.id}>{member.name}</li>);
+													})}
+												</ul>
+												</DialogContent>
+												<DialogActions>
+												<Button onClick={handleMembersClose} color="primary">
+													Close
+												</Button>
+												</DialogActions>
+											</Dialog>
 										</DialogContent>
 										<DialogActions>
 										<Button onClick={handleDialogClose} color="primary">
