@@ -631,6 +631,7 @@ const	ChatLayout = () =>
 		joiningChannelName,
 		setJoiningChannelName
 	] = useState("");
+	const joiningChannelNameRef = useRef(joiningChannelName);
 
 	const	createNewChannel = () =>
 	{
@@ -760,7 +761,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.correct === "true")
 				{
-					joinChannel(joiningChannelName);
+					joinChannel(joiningChannelNameRef.current);
 					setOpenPasswordDialog(false);
 					setUserPassword("");
 				}
@@ -801,7 +802,6 @@ const	ChatLayout = () =>
 			console.log("current payload: " + data.payload.chanName);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				console.log("lol");
 				setChanMessages(data.payload.messages);
 			}
 		};
@@ -849,8 +849,8 @@ const	ChatLayout = () =>
 	useEffect(() =>
 	{
 		currentChannelRef.current = currentChannel;
-		console.log("current re: " + currentChannelRef.current);
-	}, [currentChannel]);
+		joiningChannelNameRef.current = joiningChannelName;
+	}, [currentChannel, joiningChannelName]);
 
 	const handlePasswordSubmit = (password: string) =>
 	{
