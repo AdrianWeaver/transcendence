@@ -940,6 +940,44 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
+	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
+
+	const [
+		isDialogOpen,
+		setIsDialogOpen
+	] = useState(false);
+
+	const [
+		channelAction,
+		setChannelAction
+	] = useState("");
+
+	const handleDialogOpen = () => {
+		setIsDialogOpen(true);
+	};
+
+	const handleDialogClose = () => {
+		setIsDialogOpen(false);
+	};
+
+	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
+	{
+		if (chanMode === "protected")
+		{
+			setJoiningChannelName(chanName);
+			setOpenPasswordDialog(true);
+		}
+		else
+			joinChannel(chanName);
+		handleDialogClose();
+	};
+
+	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
+	{
+		removeChannel(chanId, chanName);
+		handleDialogClose();
+	};
+
 	return (
 		<div>
 			<MenuBar />
@@ -1082,23 +1120,20 @@ const	ChatLayout = () =>
 											return (goToChannel(channel.name));
 										}}
 									/>
-									<Button onClick={() =>
-										{
-											if (channel.mode === "protected")
-											{
-												setJoiningChannelName(channel.name);
-												setOpenPasswordDialog(true);
-											}
-											else
-												joinChannel(channel.name);
-										}}>Join</Button>
-									<Button onClick={() =>
-										{
-											return removeChannel(channel.id, channel.name);
-										}}
-									>
-										Remove
-									</Button>
+									<Button onClick={handleDialogOpen}>Options</Button>
+									{/* Dialog component */}
+									<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+										<DialogTitle>Choose an Action</DialogTitle>
+										<DialogContent>
+										<Button onClick={() => {return handleJoinButtonClick(channel.mode, channel.name)}}>Join</Button>
+										<Button onClick={() => {return handleRemoveButtonClick(channel.id, channel.name)}}>Remove</Button>
+										</DialogContent>
+										<DialogActions>
+										<Button onClick={handleDialogClose} color="primary">
+											Cancel
+										</Button>
+										</DialogActions>
+									</Dialog>
 									<Dialog open={openPasswordDialog} onClose={() =>
 										{
 											setOpenPasswordDialog(false);
