@@ -171,6 +171,8 @@ export class ChatSocketEvents
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
+				if (data.payload.message.trim().length === 0)
+					return ;
 				const	id = channel.messages.length + 1;
 				const newMessage: MessageModel = {
 					sender: client.id,
