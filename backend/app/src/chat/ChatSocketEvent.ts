@@ -247,6 +247,7 @@ export class ChatSocketEvents
 					payload: {
 						message: "",
 						messages: searchChannel?.messages,
+						chanName: data.payload.chanName,
 					}
 				};
 				if (searchChannel === undefined)
