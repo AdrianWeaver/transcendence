@@ -252,9 +252,7 @@ export class ChatSocketEvents
 				if (searchChannel === undefined)
 					return ;
 				if (searchChannel.isMember(client.id) === true)
-				{
 					action.payload.message = "You are already in this channel.";
-				}
 				if (searchChannel.mode === "private")
 					action.payload.message = "This channel is private";
 				if (searchChannel.isBanned(client.id) === true)
@@ -266,7 +264,7 @@ export class ChatSocketEvents
 					const id = searchChannel.messages.length + 1;
 					const messageText = "Welcome to the channel, " + client.id + " !";
 					const newMessage: MessageModel = {
-						sender: client.id,
+						sender: "server",
 						message: messageText,
 						id: id
 					};
@@ -274,7 +272,8 @@ export class ChatSocketEvents
 					const	messageAction = {
 						type: "new-message",
 						payload: {
-							messagse: searchChannel?.messages,
+							messages: searchChannel.messages,
+							chanName: searchChannel.name,
 							socketId: client.id,
 						}
 					};

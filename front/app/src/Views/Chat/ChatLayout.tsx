@@ -751,6 +751,7 @@ const	ChatLayout = () =>
 					alert(data.payload.message);
 				else
 				{
+					setChanMessages([]);
 					alert ("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
@@ -796,9 +797,11 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
+			console.log("current ref: " + currentChannelRef.current);
+			console.log("current payload: " + data.payload.chanName);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setChanMessages([]);
+				console.log("lol");
 				setChanMessages(data.payload.messages);
 			}
 		};
