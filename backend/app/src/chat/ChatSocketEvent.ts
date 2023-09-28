@@ -249,22 +249,33 @@ export class ChatSocketEvents
 						messages: searchChannel?.messages,
 					}
 				};
-				if (searchChannel)
-				{
-					if (searchChannel.mode === "private")
-						action.payload.message = "This channel is private";
-					if (searchChannel.isBanned(client.id) === true)
-						action.payload.message = "You have been banned from this channel";
-				}
+				if (searchChannel === undefined)
+					return ;
+				if (searchChannel.mode === "private")
+					action.payload.message = "This channel is private";
+				if (searchChannel.isBanned(client.id) === true)
+					action.payload.message = "You have been banned from this channel";
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
 				{
 					client.join(data.payload.chanName);
-					if (searchChannel)
-					{
-						searchChannel.members++;
-						searchChannel?.users.push(client.id);
-					}
+					const id = searchChannel.messages.length + 1;
+					const messageText = "Welcome to the channel, " + client.id + " !";
+					const newMessage: MessageModel = {
+						sender: "server",
+						message: messageText,
+						id: id
+					};
+					searchChannel?.addNewMessage(newMessage);
+					const	messageAction = {
+						type: "new-message",
+						payload: {
+							messagse: searchChannel?.messages,
+						}
+					};
+					this.server.to(searchChannel.name).emit("update-messages", messageAction);
+					searchChannel.members++;
+					searchChannel?.users.push(client.id);
 				}
 			}
 

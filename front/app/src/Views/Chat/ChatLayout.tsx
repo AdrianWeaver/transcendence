@@ -797,14 +797,9 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("got to update messages");
-			console.log("currentChannel: " + currentChannelRef.current);
-			console.log("messages: ", data.payload.messages);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				console.log("I am here");
 				setChanMessages(data.payload.messages);
-				console.log("Messages were set.");
 			}
 		};
 
