@@ -317,5 +317,32 @@ export class ChatSocketEvents
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);
 			}
+
+			if (data.type === "leave-channel")
+			{
+				const channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				channel.leaveChannel(client);
+				const message = client.id + "has left this channel.";
+				const id = channel.messages.length + 1;
+				const newMessage: MessageModel = {
+					sender: "server",
+					message: message,
+					id: id
+				};
+				channel.addNewMessage(newMessage);
+				const	action = {
+					type: "left-channel",
+					payload: {
+						chanName: data.payload.chanName,
+						message: message,
+						messages: channel.messages,
+					}
+				};
+				this.server.to(data.payload.chanName).emit("update-messages", action);
+				action.payload.message = "You have been removed from " + data.payload.chanName;
+				client.emit("left-message", action);
+			}
 		}
 	}

@@ -33,6 +33,7 @@ class Channel
     public addAdmin: (id: string) => void;
     public addToBanned: (id: string) => void;
     public addNewMessage: (message: MessageModel) => void;
+    public leaveChannel: (client: Socket) => void;
 
     public constructor(name: string, client: Socket, mode: string, password: string)
     {
@@ -101,6 +102,17 @@ class Channel
         this.addNewMessage = (message: MessageModel) =>
         {
             this.messages.push(message);
+        };
+
+        this.leaveChannel = (client: Socket) =>
+        {
+            client.leave(this.name);
+            this.members--;
+            const index = this.users.findIndex((element) =>
+            {
+                return (element === client.id);
+            });
+            this.users.splice(index, 1);
         };
     }
 }
