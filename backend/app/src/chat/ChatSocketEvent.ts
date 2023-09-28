@@ -168,6 +168,7 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
+				console.log(data.payload.message);
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
@@ -182,6 +183,7 @@ export class ChatSocketEvents
 					type: "update-messages",
 					payload: {
 						messages: channel.messages,
+						chanName: channel.name,
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
@@ -201,6 +203,7 @@ export class ChatSocketEvents
 					data.payload.chanMode,
 					data.payload.chanPassword);
 				newChannel.chat = this.chatService.getChat();
+				client.join(newChannel.name);
 				this.chatService.addNewChannel(newChannel, data.payload.chanId);
 				const	action = {
 					type: "add-new-channel",
@@ -238,24 +241,42 @@ export class ChatSocketEvents
 
 			if (data.type === "asked-join")
 			{
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
 					type: "asked-join",
 					payload: {
 						message: "",
+						messages: searchChannel?.messages,
 					}
 				};
-
-				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
-				if (searchChannel)
-				{
-					if (searchChannel.mode === "private")
-						action.payload.message = "This channel is private";
-					if (searchChannel.isBanned(client.id) === true)
-						action.payload.message = "You have been banned from this channel";
-				}
+				if (searchChannel === undefined)
+					return ;
+				if (searchChannel.mode === "private")
+					action.payload.message = "This channel is private";
+				if (searchChannel.isBanned(client.id) === true)
+					action.payload.message = "You have been banned from this channel";
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
+				{
 					client.join(data.payload.chanName);
+					const id = searchChannel.messages.length + 1;
+					const messageText = "Welcome to the channel, " + client.id + " !";
+					const newMessage: MessageModel = {
+						sender: "server",
+						message: messageText,
+						id: id
+					};
+					searchChannel?.addNewMessage(newMessage);
+					const	messageAction = {
+						type: "new-message",
+						payload: {
+							messagse: searchChannel?.messages,
+						}
+					};
+					this.server.to(searchChannel.name).emit("update-messages", messageAction);
+					searchChannel.members++;
+					searchChannel?.users.push(client.id);
+				}
 			}
 
 			if(data.type === "password-for-protected")
@@ -270,6 +291,22 @@ export class ChatSocketEvents
 				if (channel?.password === data.payload.password)
 					action.payload.correct = "true";
 				client.emit("display-channels", action);
+			}
+
+			if (data.type === "did-I-join")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				const	action = {
+					type: "confirm-is-inside-channel",
+					payload: {
+						chanName: data.payload.chanName,
+						isInside: "",
+						chanMessages: channel?.messages,
+					}
+				};
+				if (channel?.isMember(client.id) === false)
+					action.payload.isInside = "You must first join the channel";
+				client.emit("channel-info", action);
 			}
 		}
 	}

@@ -44,13 +44,15 @@ import { CSSProperties, useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
+import { socket, connect, disconnect } from "./socket.service";
 
 // please use vector this one is just for testing card
 import pong from "./assets/pong.jpeg";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { addMessage, setActiveConversationId, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
+import { addMessage, setActiveConversationId, setCurrentChannel, setChatConnected, setChatUsers, setMessageRoom } from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
 import { DataArraySharp } from "@mui/icons-material";
+import { current } from "@reduxjs/toolkit";
 
 // invite
 const InvitationCard = () => {
@@ -254,7 +256,8 @@ const FriendsList = (props: FriendsListProps) => {
 	const socketTest = useRef<SocketIOClient.Socket | null>(null);
 	let friendList: any[];
 	const dispatch = useAppDispatch();
-	const users = useAppSelector((state) => {
+	const users = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.users);
 	});
 
@@ -410,13 +413,16 @@ const MessagesArea = (text: any) => {
 	},
 	];
 
-	const users = useAppSelector((state) => {
+	const users = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.users);
 	});
 
-	const activeId = useAppSelector((state) => {
+	const activeId = useAppSelector((state) =>
+	{
 		return (state.controller.user.chat.activeConversationId);
 	});
+
 	const userActiveIndex = users.findIndex((elem) =>
 	{
 		return (elem.id === activeId);
@@ -523,7 +529,8 @@ const MessagesArea = (text: any) => {
 // 	);
 // };
 
-const a11yProps = (index: any) => {
+const a11yProps = (index: any) =>
+{
 	return (
 		{
 			id: `action-tab-${index}`,
@@ -543,6 +550,13 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.connected);
 	});
+
+	const	currentChannel = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentChannel);
+	});
+	const currentChannelRef = useRef(currentChannel);
+
 	const
 	[
 		value,
@@ -595,11 +609,6 @@ const	ChatLayout = () =>
 		openPasswordDialog,
 		setOpenPasswordDialog
 	] = useState(false);
-
-	const [
-		currentChannel,
-		setCurrentChannel
-	] = useState("");
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -690,7 +699,8 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
-	useEffect(() => {
+	useEffect(() =>
+	{
 		const socket = io(URL,
 			{
 				autoConnect: false,
@@ -699,7 +709,8 @@ const	ChatLayout = () =>
 
 		socketRef.current = socket;
 
-		const connect = () => {
+		const connect = () =>
+		{
 			setConnected(true);
 			// setTimeout(() =>
 			// {
@@ -707,7 +718,8 @@ const	ChatLayout = () =>
 			// }, 1000);
 		};
 
-		const disconnect = () => {
+		const disconnect = () =>
+		{
 			setConnected(false);
 		};
 
@@ -738,7 +750,10 @@ const	ChatLayout = () =>
 				if (data.payload.message !== "")
 					alert(data.payload.message);
 				else
+				{
+					setChanMessages(data.payload.messages);
 					alert ("Successfully joined channel !");
+				}
 			}
 
 			if (data.type === "protected-password")
@@ -754,11 +769,13 @@ const	ChatLayout = () =>
 			}
 		};
 
-		const connectError = (error: Error) => {
+		const connectError = (error: Error) =>
+		{
 			console.error("ws_connect_error", error);
 		};
 
-		const serverInfo = (data: any) => {
+		const serverInfo = (data: any) =>
+		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			console.log("information from server: ", data);
 			// setArrayListUser(data.payload.arrayListUser);
@@ -767,6 +784,7 @@ const	ChatLayout = () =>
 		const sendMessageToUser = (data: any) => {
 			const msgRoom: MessageRoomModel[] = [
 				{
+					id: data.payload.msgRoom.id,
 					roomName: data.payload.msgRoom.roomName,
 					privateConv: data.payload.msgRoom.privateConv,
 					content: data.payload.msgRoom.messageContent
@@ -779,8 +797,26 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			setChanMessages(data.payload.messages);
-			console.log("payload: " + data.payload.messages);
+			if (data.payload.chanName === currentChannelRef.current)
+			{
+				setChanMessages(data.payload.messages);
+			}
+		};
+
+		const	channelInfo = (data: any) =>
+		{
+			if (data.type === "confirm-is-inside-channel")
+			{
+				if (data.payload.isInside === "")
+				{
+					dispatch(setCurrentChannel(data.payload.chanName));
+					// console.log("test received from server: " + data.payload.chanName);
+					console.log("test channel info: " + currentChannelRef.current);
+					setChanMessages(data.payload.chanMessages);
+				}
+				else
+					alert(data.payload.isInside);
+			}
 		};
 
 		socket.on("connect", connect);
@@ -789,19 +825,29 @@ const	ChatLayout = () =>
 		socket.on("info", serverInfo);
 		socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
+		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
+
         socket.connect();
 
-		return (() => {
+		return (() =>
+		{
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
 			socket.off("info", serverInfo);
 			socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
+			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
         });
     }, []);
+
+	useEffect(() =>
+	{
+		currentChannelRef.current = currentChannel;
+		console.log("current re: " + currentChannelRef.current);
+	}, [currentChannel]);
 
 	const handlePasswordSubmit = (password: string) =>
 	{
@@ -813,15 +859,10 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
-		// if (password === chanPassword)
-		// 	alert(`Joining ${joiningChannelName}`);
-		// else
-		// 	alert('Incorrect password. Please try again.');
-		// Close the password dialog.
-		// setOpenPasswordDialog(false);
 	};
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleChange = (event: React.SyntheticEvent, newValue: number) =>
+	{
 		setValue(newValue);
 	};
 
@@ -873,7 +914,6 @@ const	ChatLayout = () =>
 
 	const handleSendClick = () =>
 	{
-		console.log("Text typed:", text);
 		const action = {
 			type: "sent-message",
 			payload: {
@@ -884,6 +924,17 @@ const	ChatLayout = () =>
 		socketRef.current.emit("info", action);
 		setText("");
 		// MessagesArea(text);
+	};
+
+	const	goToChannel = (chanName: string) =>
+	{
+		const	action = {
+			type: "did-I-join",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
 	};
 
 	return (
@@ -1016,12 +1067,18 @@ const	ChatLayout = () =>
 							<List>
 								{channels.map((channel: any) => {return (
 								<ListItem style={listItemStyle} key={channel.id}>
-									<ListItemText style={listItemTextStyle}
+									<ListItemText
+										style={
+											channel.name === currentChannel
+											? { color: "red" }
+											: listItemTextStyle
+										}
 										primary={channel.name}
 										onClick={() =>
 										{
-											setCurrentChannel(channel.name);
-										}} />
+											return (goToChannel(channel.name));
+										}}
+									/>
 									<Button onClick={() =>
 										{
 											if (channel.mode === "protected")
@@ -1034,7 +1091,7 @@ const	ChatLayout = () =>
 										}}>Join</Button>
 									<Button onClick={() =>
 										{
-											return removeChannel(channel.id, channel.name)
+											return removeChannel(channel.id, channel.name);
 										}}
 									>
 										Remove
@@ -1108,7 +1165,6 @@ const	ChatLayout = () =>
 							>
 							{chanMessages.map((message: MessageModel, index) =>
 							{
-								console.log(message.id + " " + message.message);
 								let	sender: "me" | "other" | "server";
 
 								if (uniqueId === message.sender)

@@ -51,8 +51,16 @@ const	initialControllerState: ControllerModel = {
 				]
 			}
 			],
-			activeConversationId: "undefined"
-		}
+			activeConversationId: "undefined",
+			currentChannel: "undefined",
+			chanMessages: [
+				{
+					sender: "undefined",
+					message: "undefined",
+					mode: "undefined",
+				}
+			]
+		},
 	},
 	registration:
 	{
@@ -66,7 +74,8 @@ const	initialControllerState: ControllerModel = {
 	{
 		height: window.innerHeight,
 		width: window.innerWidth
-	}
+	},
+
 };
 
 const	controllerSlice = createSlice(
@@ -153,6 +162,10 @@ const	controllerSlice = createSlice(
 		setActiveConversationId(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.activeConversationId = action.payload.user.chat.activeConversationId;
+		},
+		setCurrentChannel(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.currentChannel = action.payload.user.chat.currentChannel;
 		},
 		setMessageRoom(state, action: PayloadAction<ControllerModel>)
 		{
