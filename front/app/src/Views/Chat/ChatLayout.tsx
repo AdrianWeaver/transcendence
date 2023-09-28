@@ -603,7 +603,7 @@ const	ChatLayout = () =>
 	const [
 		chanMessages,
 		setChanMessages
-	] = useState([]);
+	] = useState<MessageModel[]>([]);
 
 	const [
 		openPasswordDialog,
@@ -631,6 +631,8 @@ const	ChatLayout = () =>
 		joiningChannelName,
 		setJoiningChannelName
 	] = useState("");
+
+	const joiningChannelNameRef = useRef(joiningChannelName);
 
 	const	createNewChannel = () =>
 	{
@@ -751,8 +753,8 @@ const	ChatLayout = () =>
 					alert(data.payload.message);
 				else
 				{
-					setChanMessages(data.payload.messages);
-					alert ("Successfully joined channel !");
+					setChanMessages([]);
+					alert ("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
 
@@ -760,7 +762,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.correct === "true")
 				{
-					joinChannel(joiningChannelName);
+					joinChannel(joiningChannelNameRef.current);
 					setOpenPasswordDialog(false);
 					setUserPassword("");
 				}
@@ -797,6 +799,8 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
+			console.log("current ref: " + currentChannelRef.current);
+			console.log("current payload: " + data.payload.chanName);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				setChanMessages(data.payload.messages);
@@ -819,6 +823,15 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	leftChannelMessage = (data: any) =>
+		{
+			if (data.type === "left-channel")
+			{
+				setChanMessages([]);
+				alert(data.payload.message);
+			}
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -827,6 +840,7 @@ const	ChatLayout = () =>
 		socket.on("display-channels", updateChannels);
 		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
+		socket.on("left-message", leftChannelMessage);
 
         socket.connect();
 
@@ -840,14 +854,18 @@ const	ChatLayout = () =>
 			socket.off("display-channels", updateChannels);
 			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
+			socket.on("left-message", leftChannelMessage);
         });
     }, []);
 
 	useEffect(() =>
 	{
 		currentChannelRef.current = currentChannel;
-		console.log("current re: " + currentChannelRef.current);
-	}, [currentChannel]);
+		joiningChannelNameRef.current = joiningChannelName;
+	}, [
+		currentChannel,
+		joiningChannelName
+	]);
 
 	const handlePasswordSubmit = (password: string) =>
 	{
@@ -935,6 +953,61 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
+	};
+
+	const	leaveChannel = (chanName: string) =>
+	{
+		const	action = {
+			type: "leave-channel",
+			payload: {
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
+	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
+
+	const [
+		isDialogOpen,
+		setIsDialogOpen
+	] = useState(false);
+
+	const [
+		channelAction,
+		setChannelAction
+	] = useState("");
+
+	const handleDialogOpen = () => {
+		setIsDialogOpen(true);
+	};
+
+	const handleDialogClose = () => {
+		setIsDialogOpen(false);
+	};
+
+	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
+	{
+		if (chanMode === "protected")
+		{
+			setJoiningChannelName(chanName);
+			setOpenPasswordDialog(true);
+		}
+		else
+			joinChannel(chanName);
+		handleDialogClose();
+	};
+
+	const handleLeaveButtonClick = (chanId: number, chanName: string) =>
+	{
+		leaveChannel(chanName);
+		handleDialogClose();
+	};
+
+	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
+	{
+		removeChannel(chanId, chanName);
+		handleDialogClose();
 	};
 
 	return (
@@ -1079,23 +1152,36 @@ const	ChatLayout = () =>
 											return (goToChannel(channel.name));
 										}}
 									/>
-									<Button onClick={() =>
-										{
-											if (channel.mode === "protected")
+									<Button onClick={handleDialogOpen}>Options</Button>
+									{/* Dialog component */}
+									<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+										<DialogTitle>Choose an Action</DialogTitle>
+										<DialogContent>
+											<Button onClick={() =>
 											{
-												setJoiningChannelName(channel.name);
-												setOpenPasswordDialog(true);
-											}
-											else
-												joinChannel(channel.name);
-										}}>Join</Button>
-									<Button onClick={() =>
-										{
-											return removeChannel(channel.id, channel.name);
-										}}
-									>
-										Remove
-									</Button>
+												return handleJoinButtonClick(channel.mode, channel.name);
+											}}>
+												Join
+											</Button>
+											<Button onClick={() =>
+											{
+												return handleLeaveButtonClick(channel.id, channel.name);
+											}}>
+												Leave
+											</Button>
+											<Button onClick={() =>
+											{
+												return handleRemoveButtonClick(channel.id, channel.name);
+											}}>
+												Remove
+											</Button>
+										</DialogContent>
+										<DialogActions>
+										<Button onClick={handleDialogClose} color="primary">
+											Cancel
+										</Button>
+										</DialogActions>
+									</Dialog>
 									<Dialog open={openPasswordDialog} onClose={() =>
 										{
 											setOpenPasswordDialog(false);
