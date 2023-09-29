@@ -239,11 +239,9 @@ export class ChatSocketEvents
 		{
 			if (data.type === "create-channel")
 			{
-				// const	isCreated = this.chatService.searchChannelByName(data.payload.chanName);
-				// if (isCreated === undefined)
-				// {
 					let kind;
-					console.log(" TEST 245 event ", data.payload);
+					let	alreadyCreated;
+					alreadyCreated = false;
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
@@ -251,11 +249,16 @@ export class ChatSocketEvents
 					{
 						chanName = this.chatService.createPrivateConvName(client.id, data.payload.activeId);
 						const chanName1 = this.chatService.createPrivateConvName(data.payload.activeId, client.id);
-						searchConv = this.chatService.searchPrivateConvByUsers(chanName, data.payload.activeId, client.id);
-						if (searchConv === undefined)
-							searchConv = this.chatService.searchPrivateConvByUsers(chanName1, data.payload.activeId, client.id);
-						if (searchConv === undefined)
-							searchConv = this.chatService.searchPrivateConvByName(chanName);
+						if (this.chatService.searchPrivateConvByName(chanName) || this.chatService.searchPrivateConvByName(chanName1))
+							alreadyCreated = true;
+						else
+						{
+							searchConv = this.chatService.searchPrivateConvByUsers(chanName, data.payload.activeId, client.id);
+							if (searchConv === undefined)
+								searchConv = this.chatService.searchPrivateConvByUsers(chanName1, data.payload.activeId, client.id);
+							if (searchConv === undefined)
+								searchConv = this.chatService.searchPrivateConvByName(chanName);
+						}
 						kind = "privateMessage";
 					}
 					else
@@ -268,7 +271,6 @@ export class ChatSocketEvents
 					console.log(" searchUser ", searchUser);
 					if (kind === "channel")
 					{
-						console.log(" is chan ? " + searchConv);
 						const newChannel = new Channel(chanName,
 						client,
 						data.payload.chanMode,
@@ -290,7 +292,8 @@ export class ChatSocketEvents
 					}
 					if (kind === "privateMessage")
 					{
-						if (searchConv === undefined)
+						console.log("searchConv ", searchConv, " alreadyCreated ", alreadyCreated);
+						if (searchConv === undefined && alreadyCreated === false)
 						{
 							const newPrivateMsg = new Channel(chanName,
 							client,
@@ -315,22 +318,7 @@ export class ChatSocketEvents
 							}
 						};
 						this.server.emit("display-channels", action);
-						// newChannel?.addAdmin(client.id);
 					}
-				// }
-				// else
-				// {
-				// 	const	action = {
-				// 		type: "add-new-channel",
-				// 		payload:
-				// 		{
-				// 			chanMap: this.chatService.getChanMap(),
-				// 			kind: "undefined",
-				// 			privateMessageMap: this.chatService.getPrivateMessageMap()
-				// 		}
-				// 	};
-				// 	this.server.emit("display-channels", action);
-				// }
 			}
 			if (data.type === "destroy-channel")
 			{

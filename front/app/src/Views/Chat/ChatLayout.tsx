@@ -597,8 +597,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message === "")
 					setChannels(data.payload.chanMap);
-				else if (data.payload.kind === "privateMessage")
-				if (data.payload.privateMessage !== undefined)
+				else if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
 				else
 					alert(data.payload.message);
