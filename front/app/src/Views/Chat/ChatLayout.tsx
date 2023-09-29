@@ -301,7 +301,7 @@ const MessagesArea = () =>
 		}
 		if (i === msgRoom.length)
 		{
-			dispatch(setKindOfConversation("privateMessage"));
+			//dispatch(setKindOfConversation("privateMessage"));
 			dispatch(setActiveConversationId(activeId));
 			displayMessageArray = [
 				{
@@ -510,6 +510,8 @@ const	ChatLayout = () =>
 	const handleSave = () =>
 	{
 		console.log("layout 469: ", kindOfConv);
+		setKindOfConversation("channel");
+		dispatch(setKindOfConversation("channel"));
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
@@ -544,6 +546,8 @@ const	ChatLayout = () =>
 			type: "asked-join",
 			payload: {
 				chanName: chanName,
+				activeId: activeId,
+				kind: kindOfConv
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -1209,6 +1213,13 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
+													<Button onClick={() =>
+														{
+															setKindOfConversation("privateMessage");
+															return handleJoinButtonClick(channel.mode, channel.name);
+														}}>
+															Talk
+														</Button>
 														<Button onClick={() =>
 														{
 															return handleRemoveButtonClick(channel.id, channel.name);
