@@ -59,7 +59,8 @@ const	initialControllerState: ControllerModel = {
 					message: "undefined",
 					mode: "undefined",
 				}
-			]
+			],
+			kindOfConversation: "undefined"
 		},
 	},
 	registration:
@@ -166,6 +167,10 @@ const	controllerSlice = createSlice(
 		setCurrentChannel(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.currentChannel = action.payload.user.chat.currentChannel;
+		},
+		setKindOfConversation(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.kindOfConversation = action.payload.user.chat.kindOfConversation;
 		},
 		setMessageRoom(state, action: PayloadAction<ControllerModel>)
 		{
