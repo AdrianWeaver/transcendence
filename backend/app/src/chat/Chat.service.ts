@@ -114,6 +114,15 @@ export	class ChatService
 		this.chat.memberSocketIds.splice(userSocket, 1);
 	}
 
+	public	getUserByName(userName: string)
+	{
+		const	searchUser = this.chat.users.find((element) =>
+		{
+			return (element.id === userName);
+		});
+		return (searchUser);
+	}
+
 	// channel functions
 
 	public	addNewChannel(newChannel: Channel, chanId: number)

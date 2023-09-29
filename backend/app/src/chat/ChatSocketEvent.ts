@@ -39,6 +39,12 @@ type	MembersModel =
 	name: string
 }
 
+type	FriendsModel =
+{
+	id: number,
+	name: string
+}
+
 @WebSocketGateway(
 {
 	cors:
@@ -291,6 +297,7 @@ export class ChatSocketEvents
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);
+					searchChannel.sockets.push(client);
 				}
 			}
 
@@ -330,6 +337,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				channel.leaveChannel(client);
+				client.leave(channel.name);
 				const message = client.id + "has left this channel.";
 				const id = channel.messages.length + 1;
 				const newMessage: MessageModel = {
@@ -351,11 +359,53 @@ export class ChatSocketEvents
 				client.emit("left-message", action);
 			}
 
+			if (data.type === "kick-member" || data.type === "ban-member")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	targetClient = channel.findClientById(data.payload.userName);
+				if (targetClient === undefined)
+					return ;
+				channel.leaveChannel(targetClient);
+				targetClient.leave(channel.name);
+				const id = channel.messages.length + 1;
+				let message: string;
+				if (data.type === "kick-member")
+					message = data.payload.userName + " has been kicked.";
+				else
+				{
+					message = data.payload.userName + " has been banned.";
+					channel.addToBanned(data.payload.userName);
+				}
+				const newMessage: MessageModel = {
+					sender: "server",
+					message: message,
+					id: id
+				};
+				channel.addNewMessage(newMessage);
+				const	action = {
+					type: "left-channel",
+					payload: {
+						message: message,
+						messages: channel.messages,
+						chanName: channel.name,
+					}
+				};
+				this.server.to(channel.name).emit("update-messages", action);
+				if (data.type === "kick-member")
+					action.payload.message = "You have been kicked from " + channel.name;
+				else
+					action.payload.message = "You have been banned from " + channel.name;
+				targetClient.emit("left-message", action);
+			}
+
 			if (data.type === "member-list")
 			{
 				const channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
+				const	isAdmin = channel.isAdmin(client.id);
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
@@ -369,9 +419,52 @@ export class ChatSocketEvents
 					type: "display-members",
 					payload: {
 						memberList: memberList,
+						isAdmin: isAdmin,
 					}
 				};
 				client.emit("channel-info", action);
+			}
+		}
+
+		@SubscribeMessage("user-info")
+		handleUsers(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "add-friend")
+			{
+				const	userMe = this.chatService.getUserByName(client.id);
+				if (userMe === undefined)
+					return ;
+				const	id = userMe?.friends.length + 1;
+				const newMember: FriendsModel = {
+					id: id,
+					name: data.payload.friendName,
+				};
+				userMe?.friends.push(newMember);
+				const	action = {
+					type: "add-friend",
+					payload: {
+						friendList: userMe?.friends,
+						newFriend: data.payload.friendName,
+					}
+				};
+				client.emit("user-info", action);
+			}
+
+			if (data.type === "block-user")
+			{
+				const	userMe = this.chatService.getUserByName(client.id);
+				userMe?.friends.push(data.payload.blockedName);
+				const	action = {
+					type: "block-user",
+					payload: {
+						blockedList: userMe?.blocked,
+						newBlocked: data.payload.blockedName,
+					}
+				};
+				client.emit("user-info", action);
 			}
 		}
 	}
