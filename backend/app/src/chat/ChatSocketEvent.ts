@@ -39,6 +39,12 @@ type	MembersModel =
 	name: string
 }
 
+type	FriendsModel =
+{
+	id: number,
+	name: string
+}
+
 @WebSocketGateway(
 {
 	cors:
@@ -429,7 +435,14 @@ export class ChatSocketEvents
 			if (data.type === "add-friend")
 			{
 				const	userMe = this.chatService.getUserByName(client.id);
-				userMe?.friends.push(data.payload.friendName);
+				if (userMe === undefined)
+					return ;
+				const	id = userMe?.friends.length + 1;
+				const newMember: FriendsModel = {
+					id: id,
+					name: data.payload.friendName,
+				};
+				userMe?.friends.push(newMember);
 				const	action = {
 					type: "add-friend",
 					payload: {

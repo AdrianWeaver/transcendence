@@ -6,6 +6,11 @@ import Chat from "./Chat";
 import Channel from "./Channel";
 import { Socket } from "socket.io";
 
+type	FriendsModel = {
+	id: number,
+	name: string
+};
+
 class User
 {
     public name: string;
@@ -14,7 +19,7 @@ class User
     public chat: Chat | undefined;
     public channels: Channel[] = [];
 	public blocked: string[] = [];
-	public friends: string[] = [];
+	public friends: FriendsModel[] = [];
 	public unlockChannel: (password: string, chanName: string) => void;
 	public joinChannel: (chanName: string) => void;
 	public leaveChannel: (chanName: string) => void;

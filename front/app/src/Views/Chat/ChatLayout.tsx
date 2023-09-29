@@ -959,6 +959,11 @@ const	ChatLayout = () =>
 								{...a11yProps(1)}
 								style={{fontSize: "15px"}}
 							/>
+							<Tab
+								label="Friends"
+								{...a11yProps(2)}
+								style={{fontSize: "15px"}}
+							/>
 						</Tabs>
 					</Toolbar>
 					{/* right side of the screen  */}
@@ -1224,6 +1229,34 @@ const	ChatLayout = () =>
 						style={style}
 					>
 						<FriendsList arrayListUsers={arrayListUser} />
+					</TabPanel>
+					<TabPanel
+						area={false}
+						value={value}
+						index={2}
+						dir={style.direction}
+						style={style}
+					>
+						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
+						<List>
+							{
+								friendList.map((friend: any) =>
+								{
+									return (
+										<ListItem style={listItemStyle} key={friend.id}>
+											<ListItemText
+												style={listItemTextStyle}
+												primary={friend.name}
+												// onClick={() =>
+												// {
+												// 	return (goToChannel(channel.name));
+												// }}
+											/>
+										</ListItem>
+									);
+								})
+							}
+						</List>
 					</TabPanel>
 				</Grid>
 				<Grid item xs={9}>
