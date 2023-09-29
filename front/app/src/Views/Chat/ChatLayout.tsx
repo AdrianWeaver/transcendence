@@ -484,7 +484,8 @@ const	ChatLayout = () =>
 				chanMode: selectedMode,
 				chanPassword: chanPassword,
 				chanId: channels.length + 1,
-				activeId: activeId
+				activeId: activeId,
+				kind: kindOfConv
 			}
 		};
 		dispatch(setNumberOfChannels(channels.length));

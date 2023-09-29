@@ -123,16 +123,28 @@ export	class ChatService
 
 	// channel functions
 
-	public	addNewChannel(newChannel: Channel, chanId: number)
+	public	addNewChannel(newChannel: Channel, chanId: number, kind: string)
 	{
-		this.chat.channels.push(newChannel);
-		const newElement: ChanMapModel = {
-			id: chanId,
-			name: newChannel.name,
-			mode: newChannel.mode
-
-		};
-		this.chat.chanMap.push(newElement);
+		if (kind === "channel")
+		{
+			this.chat.channels.push(newChannel);
+			const newElement: ChanMapModel = {
+				id: chanId,
+				name: newChannel.name,
+				mode: newChannel.mode
+			};
+			this.chat.chanMap.push(newElement);
+		}
+		else if (kind === "privateMessage")
+		{
+			this.chat.privateMessage.push(newChannel);
+			const newElement: ChanMapModel = {
+				id: chanId,
+				name: newChannel.name,
+				mode: "undefined"
+			};
+			this.chat.privateMessageMap.push(newElement);
+		}
 	}
 
 	public	getAllUsers()
