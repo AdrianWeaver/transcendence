@@ -843,6 +843,18 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
+	const	banUserFromChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "ban-member",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
 	// END OF KICK AND BAN FUNCTIONS
 
 	return (
@@ -1056,7 +1068,7 @@ const	ChatLayout = () =>
 																							</Button>
 																							<Button onClick={() =>
 																							{
-																								kickUserFromChannel(member.name, channel.name);
+																								banUserFromChannel(member.name, channel.name);
 																							}}>
 																								Ban
 																							</Button>

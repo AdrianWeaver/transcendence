@@ -353,7 +353,7 @@ export class ChatSocketEvents
 				client.emit("left-message", action);
 			}
 
-			if (data.type === "kick-member")
+			if (data.type === "kick-member" || data.type === "ban-member")
 			{
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
@@ -364,8 +364,14 @@ export class ChatSocketEvents
 				channel.leaveChannel(targetClient);
 				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
-				// let message: string;
-				const message = data.payload.userName + " has been kicked.";
+				let message: string;
+				if (data.type === "kick-member")
+					message = data.payload.userName + " has been kicked.";
+				else
+				{
+					message = data.payload.userName + " has been banned.";
+					channel.addToBanned(data.payload.userName);
+				}
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: message,
@@ -381,7 +387,10 @@ export class ChatSocketEvents
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
-				action.payload.message = "You have been kicked from " + channel.name;
+				if (data.type === "kick-member")
+					action.payload.message = "You have been kicked from " + channel.name;
+				else
+					action.payload.message = "You have been banned from " + channel.name;
 				targetClient.emit("left-message", action);
 			}
 
