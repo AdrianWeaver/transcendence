@@ -607,6 +607,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
+
 				else
 				{
 					setChanMessages([]);
@@ -674,8 +675,6 @@ const	ChatLayout = () =>
 					// console.log("test received from server: " + data.payload.chanName);
 					console.log("test channel info: " + currentChannelRef.current);
 					setChanMessages(data.payload.chanMessages);
-					if (data.payload.welcome !== "")
-						alert(data.payload.welcome);
 				}
 				else
 					alert(data.payload.isInside);
