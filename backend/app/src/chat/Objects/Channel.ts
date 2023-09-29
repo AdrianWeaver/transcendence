@@ -15,6 +15,7 @@ type MessageModel =
 
 class Channel
 {
+    public kind: string;
     public owner: string;
     public admin: string | undefined;
     public admins: string[] = [];
@@ -35,8 +36,9 @@ class Channel
     public addNewMessage: (message: MessageModel) => void;
     public leaveChannel: (client: Socket) => void;
 
-    public constructor(name: string, client: Socket, mode: string, password: string)
+    public constructor(name: string, client: Socket, mode: string, password: string, kind: string)
     {
+        this.kind = kind;
         this.name = name;
         this.members = 0;
         this.mode = mode;

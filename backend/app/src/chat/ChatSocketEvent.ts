@@ -73,6 +73,7 @@ export class ChatSocketEvents
 					payload: {
 						channels: this.chatService.getChanMap(),
 						uniqueId: client.id,
+						privateMessage: this.chatService.getPrivateMessageMap()
 					}
 				};
 				client.emit("display-channels", action);
@@ -93,20 +94,51 @@ export class ChatSocketEvents
 			@ConnectedSocket() client: Socket
 		)
 		{
-			client.join(data.payload.id);
-			if (data.type === "display-conversation")
-			{
-				const action = {
-					type: "conversation",
-					payload:
+				if (data.type === "display-conversation")
+				{
+					const chanName = this.chatService.createPrivateConvName(client.id, data.payload.id);
+					const chanName1 = this.chatService.createPrivateConvName(data.payload.id, client.id);
+					// const kind = "privateMessage";
+					const searchConv = this.chatService.searchPrivateConvByUsers(chanName, data.payload.id, client.id);
+					const searchConv1 = this.chatService.searchPrivateConvByUsers(chanName1, data.payload.id, client.id);
+					if (searchConv !== undefined)
 					{
-						sender: client.id,
-						conversationId: data.payload.id
+						const action = {
+							type: "conversation",
+							payload:
+							{
+								sender: client.id,
+								conversationId: searchConv
+							}
+						};
+						this.server.to(data.payload.chanName).emit("display-conversation", action);
 					}
-				};
-				this.server.to(data.payload.chanName).emit("display-conversation", action);
+					else if (searchConv1 !== undefined)
+					{
+						const action = {
+							type: "conversation",
+							payload:
+							{
+								sender: client.id,
+								conversationId: searchConv1
+							}
+						};
+						this.server.to(data.payload.chanName).emit("display-conversation", action);
+					}
+					else
+					{
+						const action = {
+							type: "conversation",
+							payload:
+							{
+								sender: client.id,
+								conversationId: chanName
+							}
+						};
+						this.server.to(data.payload.chanName).emit("display-conversation", action);
+					}
+				}
 			}
-		}
 
 		@SubscribeMessage("sending-message")
 		handleSendingMessageToUser(
@@ -156,11 +188,13 @@ export class ChatSocketEvents
 					payload:
 					{
 						// arrayListUsers: this.chatService.getAllUsers(),
-						arrayListUsers: copyUsers
+						arrayListUsers: copyUsers,
+						kind: "privateMessage"
 					}
 				};
 				client.emit("info", action);
-			}	// console.log(data);
+			}
+			// console.log(data);
 			// console.log(this.chatService.getAllUsers());
 			// switch (data.type)
 			// {
@@ -205,33 +239,116 @@ export class ChatSocketEvents
 		{
 			if (data.type === "create-channel")
 			{
-				const newChannel = new Channel(data.payload.chanName,
-					client,
-					data.payload.chanMode,
-					data.payload.chanPassword);
-				newChannel.chat = this.chatService.getChat();
-				client.join(newChannel.name);
-				this.chatService.addNewChannel(newChannel, data.payload.chanId);
-				const	action = {
-					type: "add-new-channel",
-					payload: this.chatService.getChanMap(),
-				};
-				this.server.emit("display-channels", action);
+				const	isCreated = this.chatService.searchChannelByName(data.payload.chanName);
+				if (isCreated === undefined)
+				{
+					console.log(" TEST ", data.payload);
+					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
+					let		chanName;
+					let		kind;
+					let		searchConv;
+					if (searchUser > -1)
+					{
+						chanName = this.chatService.createPrivateConvName(client.id, data.payload.activeId);
+						kind = "privateMessage";
+						searchConv = this.chatService.searchPrivateConvByName(chanName);
+					}
+					else
+					{
+						chanName = data.payload.chanName;
+						kind = "channel";
+					}
+					// TEST
+					console.log("socketEvent ", chanName);
+					console.log(" searchUser ", searchUser);
+					if (searchConv === undefined)
+					{
+						if (kind === "channel")
+						{
+							const newChannel = new Channel(chanName,
+							client,
+							data.payload.chanMode,
+							data.payload.chanPassword,
+							kind);
+							newChannel.chat = this.chatService.getChat();
+							client.join(newChannel.name);
+							this.chatService.addNewChannel(newChannel, data.payload.chanId);
+							const	action = {
+								type: "add-new-channel",
+								payload:
+								{
+									chanMap: this.chatService.getChanMap(),
+									kind: kind,
+									privateMessageMap: this.chatService.getPrivateMessageMap()
+								}
+							};
+							this.server.emit("display-channels", action);
+						}
+						if (kind === "privateMessage")
+						{
+							const newPrivateMsg = new Channel(chanName,
+							client,
+							"",
+							"",
+							kind);
+							newPrivateMsg.chat = this.chatService.getChat();
+							newPrivateMsg?.users.push(data.payload.activeId);
+							newPrivateMsg?.users.push(client.id);
+							newPrivateMsg?.addAdmin(data.payload.activeId);
+							client.join(newPrivateMsg.name);
+							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex);
+							const	action = {
+								type: "add-new-channel",
+								payload:
+								{
+									chanMap: this.chatService.getChanMap(),
+									kind: kind,
+									privateMessageMap: this.chatService.getPrivateMessageMap()
+								}
+							};
+							this.server.emit("display-channels", action);
+							// newChannel?.addAdmin(client.id);
+						}
+					}
+					else
+					{
+						const	action = {
+							type: "add-new-channel",
+							payload:
+							{
+								chanMap: this.chatService.getChanMap(),
+								kind: kind,
+								privateMessageMap: this.chatService.getPrivateMessageMap()
+							}
+						};
+						this.server.emit("display-channels", action);
+					}
+				}
 			}
-
 			if (data.type === "destroy-channel")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.name);
 				let isAdmin: boolean;
-				if (searchChannel?.isAdmin(client.id) === true)
+				if (searchChannel?.kind === "privateMessage")
 					isAdmin = true;
 				else
-					isAdmin = false;
+				{
+					if (searchChannel?.isAdmin(client.id) === true)
+						isAdmin = true;
+					else
+						isAdmin = false;
+				}
+				let	msg;
+				if (data.payload.kind === "channel")
+					msg = "";
+				else if (data.payload.kind === "privateMessage")
+					msg = "privateMessage";
 				const	action = {
 					type: "destroy-channel",
 					payload: {
 						chanMap: this.chatService.getChanMap(),
-						message: "",
+						message: msg,
+						privateMessageMap: this.chatService.getPrivateMessageMap()
 					}
 				};
 				if (isAdmin === true)
@@ -310,7 +427,10 @@ export class ChatSocketEvents
 
 			if (data.type === "did-I-join")
 			{
-				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				let	channel;
+				channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
 				const	action = {
 					type: "confirm-is-inside-channel",
 					payload: {
@@ -319,6 +439,8 @@ export class ChatSocketEvents
 						chanMessages: channel?.messages,
 					}
 				};
+				// if (channel?.kind === "privateMessage")
+				// 	channel?.isMember(client.id) === true;
 				if (channel?.isMember(client.id) === false)
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);

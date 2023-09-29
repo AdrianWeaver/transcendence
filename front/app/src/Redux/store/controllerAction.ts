@@ -428,6 +428,28 @@ export const setKindOfConversation = (kindOfConversation: string)
 	});
 };
 
+export const setNumberOfChannels = (numberOfChannels: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prevState = getState();
+		const response: ControllerModel = {
+			...prevState.controller,
+			user:
+			{
+				...prevState.controller.user,
+				chat:
+				{
+					...prevState.controller.user.chat,
+					numberOfChannels: numberOfChannels
+				}
+			}
+		};
+		dispatch(controllerActions.setNumberOfChannels(response));
+	});
+};
+
 export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
