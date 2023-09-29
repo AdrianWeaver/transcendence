@@ -419,4 +419,39 @@ export class ChatSocketEvents
 				client.emit("channel-info", action);
 			}
 		}
+
+		@SubscribeMessage("user-info")
+		handleUsers(
+			@MessageBody() data: ActionSocket,
+			@ConnectedSocket() client: Socket
+		)
+		{
+			if (data.type === "add-friend")
+			{
+				const	userMe = this.chatService.getUserByName(client.id);
+				userMe?.friends.push(data.payload.friendName);
+				const	action = {
+					type: "add-friend",
+					payload: {
+						friendList: userMe?.friends,
+						newFriend: data.payload.friendName,
+					}
+				};
+				client.emit("user-info", action);
+			}
+
+			if (data.type === "block-user")
+			{
+				const	userMe = this.chatService.getUserByName(client.id);
+				userMe?.friends.push(data.payload.blockedName);
+				const	action = {
+					type: "block-user",
+					payload: {
+						blockedList: userMe?.blocked,
+						newBlocked: data.payload.blockedName,
+					}
+				};
+				client.emit("user-info", action);
+			}
+		}
 	}

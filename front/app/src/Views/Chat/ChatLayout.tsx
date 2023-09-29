@@ -314,7 +314,6 @@ const a11yProps = (index: any) =>
 const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-	let	uniqueId: string;
 
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
@@ -393,6 +392,21 @@ const	ChatLayout = () =>
 		isChannelAdmin,
 		setIsChannelAdmin
 	] = useState(false);
+
+	const [
+		uniqueId,
+		setUniqueId
+	] = useState("");
+
+	const [
+		friendList,
+		setFriendList
+	] = useState<string[]>([]);
+
+	const [
+		blockedList,
+		setBlockedList
+	] = useState<string[]>([]);
 
 	// END OF USE STATEs
 
@@ -516,7 +530,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.channels !== undefined)
 					setChannels(data.payload.channels);
-				uniqueId = data.payload.uniqueId;
+				setUniqueId(data.payload.uniqueId);
 			}
 
 			if(data.type === "add-new-channel")
@@ -615,9 +629,29 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "left-channel")
 			{
-				setChanMessages([]);
-				setCurrentChannel("");
+				if (currentChannelRef.current === data.payload.chanName)
+				{
+					setChanMessages([]);
+					dispatch(setCurrentChannel("undefined"));
+				}
 				alert(data.payload.message);
+			}
+		};
+
+		const	userInfo = (data: any) =>
+		{
+			if (data.type === "add-friend")
+			{
+				setFriendList(data.payload.friendList);
+				const	alertMessage = data.payload.newFriend + " has been added to Friends.";
+				alert(alertMessage);
+			}
+
+			if (data.type === "block-user")
+			{
+				setBlockedList(data.payload.blockedList);
+				const	alertMessage = "You have blocked " + data.payload.newBlocked + ".";
+				alert(alertMessage);
 			}
 		};
 
@@ -630,6 +664,7 @@ const	ChatLayout = () =>
 		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
 		socket.on("left-message", leftChannelMessage);
+		socket.on("user-info", userInfo);
 
         socket.connect();
 
@@ -644,6 +679,7 @@ const	ChatLayout = () =>
 			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
 			socket.on("left-message", leftChannelMessage);
+			socket.off("user-info", userInfo);
         });
     }, []);
 
@@ -829,7 +865,7 @@ const	ChatLayout = () =>
 
 	// END OF MEMBERS
 
-	// KICK AND BAN FUNCTIONS
+	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK)
 
 	const	kickUserFromChannel = (userName: string, chanName: string) =>
 	{
@@ -855,7 +891,29 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
-	// END OF KICK AND BAN FUNCTIONS
+	const	addUserToFriends = (userName: string) =>
+	{
+		const	action = {
+			type: "add-friend",
+			payload: {
+				friendName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	const	addUserToBlocked = (userName: string) =>
+	{
+		const	action = {
+			type: "block-user",
+			payload: {
+				blockedName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	// END OF MEMBERS FUNCTIONS
 
 	return (
 		<div>
@@ -1053,29 +1111,45 @@ const	ChatLayout = () =>
 															</DialogTitle>
 															<DialogContent>
 																<ul>
+																{
+																	channelMembers.map((member) =>
 																	{
-																		channelMembers.map((member) =>
-																		{
-																			return (<li key={member.id}>
-																						{member.name}
-																						{isChannelAdmin && member.name !== uniqueId && (
-																						<div>
-																							<Button onClick={() =>
-																							{
-																								kickUserFromChannel(member.name, channel.name);
-																							}}>
-																								Kick
-																							</Button>
-																							<Button onClick={() =>
-																							{
-																								banUserFromChannel(member.name, channel.name);
-																							}}>
-																								Ban
-																							</Button>
-																						</div>)}
-																					</li>);
-																		})
-																	}
+																		return (<li key={member.id}>
+																				{member.name}
+																				{isChannelAdmin && member.name !== uniqueId && (
+																				<>
+																					<Button onClick={() =>
+																					{
+																						kickUserFromChannel(member.name, channel.name);
+																						handleMembersClose();
+																					}}>
+																						Kick
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						banUserFromChannel(member.name, channel.name);
+																					}}>
+																						Ban
+																					</Button>
+																				</>)}
+																				{member.name !== uniqueId && (
+																				<>
+																					<Button onClick={() =>
+																					{
+																						addUserToFriends(member.name);
+																					}}>
+																						Add friend
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						addUserToBlocked(member.name);
+																					}}>
+																						Block
+																					</Button>
+																				</>)}
+																			</li>);
+																	})
+																}
 																</ul>
 															</DialogContent>
 															<DialogActions>

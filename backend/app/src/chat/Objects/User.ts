@@ -14,6 +14,7 @@ class User
     public chat: Chat | undefined;
     public channels: Channel[] = [];
 	public blocked: string[] = [];
+	public friends: string[] = [];
 	public unlockChannel: (password: string, chanName: string) => void;
 	public joinChannel: (chanName: string) => void;
 	public leaveChannel: (chanName: string) => void;
