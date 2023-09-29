@@ -329,6 +329,8 @@ const	ChatLayout = () =>
 	});
 	const currentChannelRef = useRef(currentChannel);
 
+	// USE STATES
+
 	const
 	[
 		value,
@@ -387,6 +389,13 @@ const	ChatLayout = () =>
 		setChannelMembers
 	] = useState<MembersModel[]>([]);
 
+	const [
+		isChannelAdmin,
+		setIsChannelAdmin
+	] = useState(false);
+
+	// END OF USE STATEs
+
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -441,14 +450,12 @@ const	ChatLayout = () =>
 
 	const handleSave = () =>
 	{
-		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
 			alert("Channel name cannot be empty");
 			return;
 		}
 
-		// Check if at least one radio option is selected
 		if (![
 			"public",
 			"protected",
@@ -464,7 +471,6 @@ const	ChatLayout = () =>
 			alert("There must be a password for a protected channel");
 			return;
 		}
-		// Close the dialog
 		createNewChannel();
 		handleClose();
 	};
@@ -579,8 +585,6 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("current ref: " + currentChannelRef.current);
-			console.log("current payload: " + data.payload.chanName);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				setChanMessages(data.payload.messages);
@@ -594,8 +598,6 @@ const	ChatLayout = () =>
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					// console.log("test received from server: " + data.payload.chanName);
-					console.log("test channel info: " + currentChannelRef.current);
 					setChanMessages(data.payload.chanMessages);
 				}
 				else
@@ -605,7 +607,7 @@ const	ChatLayout = () =>
 			if (data.type === "display-members")
 			{
 				setChannelMembers(data.payload.memberList);
-				console.log("members: " + data.payload.memberList);
+				setIsChannelAdmin(data.payload.isAdmin);
 			}
 		};
 
@@ -614,6 +616,7 @@ const	ChatLayout = () =>
 			if (data.type === "left-channel")
 			{
 				setChanMessages([]);
+				setCurrentChannel("");
 				alert(data.payload.message);
 			}
 		};
@@ -825,6 +828,23 @@ const	ChatLayout = () =>
 	};
 
 	// END OF MEMBERS
+
+	// KICK AND BAN FUNCTIONS
+
+	const	kickUserFromChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "kick-member",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
+	// END OF KICK AND BAN FUNCTIONS
+
 	return (
 		<div>
 			<MenuBar />
@@ -973,7 +993,7 @@ const	ChatLayout = () =>
 											<ListItem style={listItemStyle} key={channel.id}>
 												<ListItemText
 													style={
-														channel.name === currentChannel
+														channel.name === currentChannelRef.current
 														? { color: "red" }
 														: listItemTextStyle
 													}
@@ -1012,7 +1032,9 @@ const	ChatLayout = () =>
 														<Button onClick={() =>
 														{
 															return handleMembersClickOpen(channel.name);
-														}}>Members</Button>
+														}}>
+															Members
+														</Button>
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogTitle>
 																Channel Members
@@ -1022,7 +1044,24 @@ const	ChatLayout = () =>
 																	{
 																		channelMembers.map((member) =>
 																		{
-																			return (<li key={member.id}>{member.name}</li>);
+																			return (<li key={member.id}>
+																						{member.name}
+																						{isChannelAdmin && member.name !== uniqueId && (
+																						<div>
+																							<Button onClick={() =>
+																							{
+																								kickUserFromChannel(member.name, channel.name);
+																							}}>
+																								Kick
+																							</Button>
+																							<Button onClick={() =>
+																							{
+																								kickUserFromChannel(member.name, channel.name);
+																							}}>
+																								Ban
+																							</Button>
+																						</div>)}
+																					</li>);
 																		})
 																	}
 																</ul>

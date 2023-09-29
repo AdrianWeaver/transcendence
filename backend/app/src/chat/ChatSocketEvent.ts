@@ -291,6 +291,7 @@ export class ChatSocketEvents
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);
+					searchChannel.sockets.push(client);
 				}
 			}
 
@@ -330,6 +331,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				channel.leaveChannel(client);
+				client.leave(channel.name);
 				const message = client.id + "has left this channel.";
 				const id = channel.messages.length + 1;
 				const newMessage: MessageModel = {
@@ -351,11 +353,44 @@ export class ChatSocketEvents
 				client.emit("left-message", action);
 			}
 
+			if (data.type === "kick-member")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	targetClient = channel.findClientById(data.payload.userName);
+				if (targetClient === undefined)
+					return ;
+				channel.leaveChannel(targetClient);
+				targetClient.leave(channel.name);
+				const id = channel.messages.length + 1;
+				// let message: string;
+				const message = data.payload.userName + " has been kicked.";
+				const newMessage: MessageModel = {
+					sender: "server",
+					message: message,
+					id: id
+				};
+				channel.addNewMessage(newMessage);
+				const	action = {
+					type: "left-channel",
+					payload: {
+						message: message,
+						messages: channel.messages,
+						chanName: channel.name,
+					}
+				};
+				this.server.to(channel.name).emit("update-messages", action);
+				action.payload.message = "You have been kicked from " + channel.name;
+				targetClient.emit("left-message", action);
+			}
+
 			if (data.type === "member-list")
 			{
 				const channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
+				const	isAdmin = channel.isAdmin(client.id);
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
@@ -369,6 +404,7 @@ export class ChatSocketEvents
 					type: "display-members",
 					payload: {
 						memberList: memberList,
+						isAdmin: isAdmin,
 					}
 				};
 				client.emit("channel-info", action);
