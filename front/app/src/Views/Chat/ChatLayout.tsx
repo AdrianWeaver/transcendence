@@ -601,7 +601,13 @@ const	ChatLayout = () =>
 		{
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setChanMessages(data.payload.messages);
+				// we will filter messages from blocked users if any
+				const	tmpMessages = data.payload.messages;
+				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
+				{
+					return (!blockedList.includes(message.sender));
+				});
+				setChanMessages(filteredMessages);
 			}
 		};
 
