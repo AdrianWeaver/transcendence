@@ -456,11 +456,15 @@ export class ChatSocketEvents
 			if (data.type === "block-user")
 			{
 				const	userMe = this.chatService.getUserByName(client.id);
-				userMe?.blocked.push(data.payload.blockedName);
+				if (userMe === undefined)
+					return ;
+				console.log("blocked: " + data.payload.blockedName);
+				userMe.blocked.push(data.payload.blockedName);
+				console.log("blocked members: " + userMe.blocked);
 				const	action = {
 					type: "block-user",
 					payload: {
-						blockedList: userMe?.blocked,
+						blockedList: userMe.blocked,
 						newBlocked: data.payload.blockedName,
 					}
 				};

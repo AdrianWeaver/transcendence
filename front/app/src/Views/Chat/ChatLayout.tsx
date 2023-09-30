@@ -440,6 +440,7 @@ const	ChatLayout = () =>
 	] = useState("");
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
+	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
@@ -610,7 +611,7 @@ const	ChatLayout = () =>
 				const	tmpMessages = data.payload.messages;
 				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
 				{
-					return (!blockedList.includes(message.sender));
+					return (!blockedListRef.current.includes(message.sender));
 				});
 				setChanMessages(filteredMessages);
 			}
@@ -706,6 +707,7 @@ const	ChatLayout = () =>
 	{
 		currentChannelRef.current = currentChannel;
 		joiningChannelNameRef.current = joiningChannelName;
+		blockedListRef.current = blockedList;
 
 		if (isMuted === true)
 		{
@@ -717,7 +719,8 @@ const	ChatLayout = () =>
 	}, [
 		currentChannel,
 		joiningChannelName,
-		isMuted
+		isMuted,
+		blockedList
 	]);
 
 	const handlePasswordSubmit = (password: string) =>
