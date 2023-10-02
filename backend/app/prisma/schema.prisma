@@ -30,4 +30,23 @@ model User {
   email   String   @unique @db.VarChar(255)
   post    Post[]
   profile Profile?
+
+  connection  ChannelConnection @relation()
+}
+
+model Channel {
+  id        Int      @id @default(autoincrement())
+  name      String
+  post      Post[]
+  profile   Profile?
+  password  String
+  connection  ChannelConnection @relation()
+}
+
+model ChannelConnection {
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id]) // onDelete: NoAction, onUpdate: NoAction)
+  channelId    Int
+  channel   Channel  @relation(fields: [channelId], references: [id]) //, onDelete: NoAction, onUpdate: NoAction)
+  @@id([userId, channelId], name: "connectionId")
 }
