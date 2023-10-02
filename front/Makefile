@@ -188,14 +188,14 @@ install: check_dev_image_build
 	@echo "Installation done\n\n"
 	@make -s -C . all
 clean:
-	rm -rf ./app/node_modules ./app/package-lock.json norm.report
 ifneq ($(shell docker ps --filter "name=frontend" -q),)
-	docker kill frontend
+	docker stop frontend
 endif
 ifneq ($(shell docker ps --all --filter "name=frontend" -q),)
 	docker rm frontend
 endif
-
+	rm -rf ./app/node_modules ./app/package-lock.json norm.report
+	
 fclean: clean
 ifneq ($(shell docker images -q $(DEV_IMAGE_NAME) 2>/dev/null),)
 	docker rmi dev_front

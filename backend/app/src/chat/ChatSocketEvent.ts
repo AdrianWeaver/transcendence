@@ -151,7 +151,6 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
-				console.log(data);
 				const copyUsers = this.chatService.getAllUsers();
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
@@ -172,15 +171,22 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				let	channel;
+				let	channel, kind;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
+				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
-				if (channel === undefined)
-					return ;
+					if (channel === undefined)
+						return ;
+					else
+						kind = "privateMessage";
+				}
+				else
+					kind = "channel";
 				if (data.payload.message.trim().length === 0)
 					return ;
-				const	id = channel.messages.length + 1;
+				const	id = channel.messages.length;
+
 				const newMessage: MessageModel = {
 					sender: client.id,
 					message: data.payload.message,
@@ -192,6 +198,7 @@ export class ChatSocketEvents
 					payload: {
 						messages: channel.messages,
 						chanName: channel.name,
+						kind: kind
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
@@ -212,7 +219,7 @@ export class ChatSocketEvents
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
-					if (searchUser > -1)
+					if (searchUser > -1 && data.payload.kind !== "channel")
 					{
 						chanName = this.chatService.createPrivateConvName(client.id, data.payload.activeId);
 						const chanName1 = this.chatService.createPrivateConvName(data.payload.activeId, client.id);
@@ -233,9 +240,6 @@ export class ChatSocketEvents
 						chanName = data.payload.chanName;
 						kind = "channel";
 					}
-					// TEST
-					console.log("socketEvent ", chanName);
-					console.log(" searchUser ", searchUser);
 					if (kind === "channel")
 					{
 						const newChannel = new Channel(chanName,
@@ -251,15 +255,14 @@ export class ChatSocketEvents
 							payload:
 							{
 								chanMap: this.chatService.getChanMap(),
-								kind: kind,
-								privateMessageMap: this.chatService.getPrivateMessageMap()
+								kind: "channel",
+								privateMessageMap: undefined
 							}
 						};
 						this.server.emit("display-channels", action);
 					}
-					if (kind === "privateMessage")
+					else if (kind === "privateMessage")
 					{
-						console.log("searchConv ", searchConv, " alreadyCreated ", alreadyCreated);
 						if (searchConv === undefined && alreadyCreated === false)
 						{
 							const newPrivateMsg = new Channel(chanName,
@@ -269,7 +272,7 @@ export class ChatSocketEvents
 							kind);
 							newPrivateMsg.chat = this.chatService.getChat();
 							newPrivateMsg?.users.push(data.payload.activeId);
-							newPrivateMsg?.users.push(client.id);
+							// newPrivateMsg?.users.push(client.id);
 							newPrivateMsg?.addAdmin(data.payload.activeId);
 							newPrivateMsg?.addAdmin(client.id);
 							client.join(newPrivateMsg.name);
@@ -279,8 +282,8 @@ export class ChatSocketEvents
 							type: "add-new-channel",
 							payload:
 							{
-								chanMap: this.chatService.getChanMap(),
-								kind: kind,
+								chanMap: undefined,
+								kind: "privateMessage",
 								privateMessageMap: this.chatService.getPrivateMessageMap()
 							}
 						};
@@ -326,12 +329,9 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join")
+			if (data.type === "asked-join" && data.payload.kind === "channel")
 			{
-				let	searchChannel;
-				searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
-				if (searchChannel === undefined)
-					searchChannel = this.chatService.searchPrivateConvByName(data.payload.chanName);
+				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
 					type: "asked-join",
 					payload: {
@@ -342,26 +342,19 @@ export class ChatSocketEvents
 				};
 				if (searchChannel === undefined)
 					return ;
-				if (data.payload.kind === "channel")
-				{
-					if (searchChannel.isMember(client.id) === true)
-						action.payload.message = "You are already in this channel.";
-					if (searchChannel.mode === "private")
-						action.payload.message = "This channel is private";
-					if (searchChannel.isBanned(client.id) === true)
-						action.payload.message = "You have been banned from this channel";
-				}
+
+				if (searchChannel.isMember(client.id) === true)
+					action.payload.message = "You are already in this channel.";
+				if (searchChannel.mode === "private")
+					action.payload.message = "This channel is private";
+				if (searchChannel.isBanned(client.id) === true)
+					action.payload.message = "You have been banned from this channel";
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
 				{
 					client.join(data.payload.chanName);
 					const id = searchChannel.messages.length + 1;
-					let messageText;
-					messageText = "";
-					if (data.payload.kind === "channel")
-						messageText = "Welcome to the channel, " + client.id + " !";
-					else if (data.payload.kind === "privateMessage")
-						messageText = "Conversation between " + client.id + " & " + data.payload.activeId;
+					const	messageText = "Welcome to the channel, " + client.id + " !";
 					const newMessage: MessageModel = {
 						sender: "server",
 						message: messageText,
@@ -380,6 +373,7 @@ export class ChatSocketEvents
 					// if (room)
 					// 	console.log("room members: " + room.size);
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
+
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);
 					searchChannel.sockets.push(client);
@@ -412,10 +406,9 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 						isInside: "",
 						chanMessages: channel?.messages,
+						kind: data.payload.kind
 					}
 				};
-				if (channel?.kind === "privateMessage")
-					channel?.isMember(client.id) === true;
 				if (channel?.isMember(client.id) === false)
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);

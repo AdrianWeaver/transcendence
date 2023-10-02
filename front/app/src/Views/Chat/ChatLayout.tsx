@@ -53,7 +53,7 @@ import {
 	setCurrentChannel,
 	setChatUsers,
 	setMessageRoom,
-	setKindOfConversation,
+	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
@@ -141,31 +141,18 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 type FriendsListProps = {
-	arrayListUsers: [],
+	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
 };
 
 const FriendsList = (props: FriendsListProps) =>
 {
-	// const	socketTest = useRef<SocketIOClient.Socket | null>(null);
-	let		friendList: any[];
 	const	dispatch = useAppDispatch();
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
 	});
-	const	kindOfConv = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.kindOfConversation);
-	});
-	const sendMsg = (id: string) =>
-	{
-		const action = {
-			type: "sending-message"
-		};
-		console.log("sendMsg function called with id ", id);
-		// socketTest.current?.emit("send-message", action);
-	};
+
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
@@ -173,9 +160,6 @@ const FriendsList = (props: FriendsListProps) =>
 
 	const	createNewConv = (activeId: string) =>
 	{
-		// TEST
-		console.log(" friend chatLayout 433: ", kindOfConv);
-		console.log(" friend activeId: ", activeId);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -186,13 +170,10 @@ const FriendsList = (props: FriendsListProps) =>
 				activeId: activeId
 			}
 		};
-		console.log(" friend 2 chatLayout 433: ", kindOfConv);
-		console.log(" friend 2 chanName: ", action.payload.chanName);
 		props.socketRef.current.emit("channel-info", action);
 	};
 	const displayConversationWindow = (id: string) =>
 	{
-		console.log("layout 189 ", id, " ", numberOfChannels);
 		const action = {
 			type: "display-conversation",
 			payload:
@@ -232,9 +213,8 @@ const FriendsList = (props: FriendsListProps) =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
-									dispatch(setKindOfConversation("privateMessage"));
+									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
-									console.log("dispatched");
 								}}>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
@@ -307,7 +287,7 @@ const MessagesArea = () =>
 		}
 		if (i === msgRoom.length)
 		{
-			//dispatch(setKindOfConversation("privateMessage"));
+			// dispatch(setKindOfConversation("privateMessage"));
 			dispatch(setActiveConversationId(activeId));
 			displayMessageArray = [
 				{
@@ -440,6 +420,11 @@ const	ChatLayout = () =>
 	] = useState<MessageModel[]>([]);
 
 	const [
+		privMessages,
+		setPrivMessages
+	] = useState<MessageModel[]>([]);
+
+	const [
 		openPasswordDialog,
 		setOpenPasswordDialog
 	] = useState(false);
@@ -457,6 +442,11 @@ const	ChatLayout = () =>
 	const [
 		uniqueId,
 		setUniqueId
+	] = useState("");
+
+	const [
+		kindOfConversation,
+		setKindOfConversation
 	] = useState("");
 
 	const [
@@ -521,20 +511,11 @@ const	ChatLayout = () =>
 		setJoiningChannelName
 	] = useState("");
 
-	// const
-	// [
-	// 	kindOfConversation,
-	// 	setKindOfConversation
-	// ] = useState("");
-
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
-		// TEST
-		console.log("chatLayout 433: ", kindOfConv);
-		console.log(" activeId: ", activeId);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -542,13 +523,12 @@ const	ChatLayout = () =>
 				chanMode: selectedMode,
 				chanPassword: chanPassword,
 				chanId: channels.length + 1,
+				pmIndex: privateMessage.length + 1,
 				activeId: activeId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		dispatch(setNumberOfChannels(channels.length));
-		console.log(" 2 chatLayout 433: ", kindOfConv);
-		console.log(" 2 chanName: ", action.payload.chanName);
 		socketRef.current?.emit("channel-info", action);
 	};
 
@@ -559,7 +539,7 @@ const	ChatLayout = () =>
 			payload: {
 				name: chanName,
 				id: chanId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		socketRef.current?.emit("channel-info", action);
@@ -567,9 +547,8 @@ const	ChatLayout = () =>
 
 	const handleSave = () =>
 	{
-		console.log("layout 469: ", kindOfConv);
 		setKindOfConversation("channel");
-		dispatch(setKindOfConversation("channel"));
+		// dispatch(setKindOfConversation("channel"));
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
@@ -592,6 +571,7 @@ const	ChatLayout = () =>
 			alert("There must be a password for a protected channel");
 			return;
 		}
+		setKindOfConversation("channel");
 		createNewChannel();
 		handleClose();
 	};
@@ -603,7 +583,7 @@ const	ChatLayout = () =>
 			payload: {
 				chanName: chanName,
 				activeId: activeId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -646,19 +626,20 @@ const	ChatLayout = () =>
 
 			if(data.type === "add-new-channel")
 			{
-				if (data.payload.chanMap !== undefined && data.payload.chanMap.length)
+				if (data.payload.kind === "channel")
 					setChannels(data.payload.chanMap);
-				if (data.payload.privateMessageMap !== undefined)
+				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
-				dispatch(setKindOfConversation(data.payload.kind));
+				setKindOfConversation(data.payload.kind);
+				// dispatch(setKindOfConversation(data.payload.kind));
 			}
 
 			if (data.type === "destroy-channel")
 			{
-				if (data.payload.message === "")
-					setChannels(data.payload.chanMap);
-				else if (data.payload.privateMessage !== undefined)
+				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
+				else if (data.payload.message === "")
+					setChannels(data.payload.chanMap);
 				else
 					alert(data.payload.message);
 			}
@@ -697,7 +678,7 @@ const	ChatLayout = () =>
 		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			console.log("information from server: ", data);
-			// setArrayListUser(data.payload.arrayListUser);
+			setArrayListUser(data.payload.arrayListUser);
 		};
 
 		const sendMessageToUser = (data: any) =>
@@ -717,15 +698,21 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
+			const	kind = data.payload.kind;
+			setKindOfConversation(kind);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
+				setKindOfConversation(data.payload.kind);
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
 				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
 				{
 					return (!blockedListRef.current.includes(message.sender));
 				});
-				setChanMessages(filteredMessages);
+				if (data.payload.kind === "channel")
+					setChanMessages(filteredMessages);
+				else if (data.payload.kind === "privateMessage")
+					setPrivMessages(filteredMessages);
 			}
 		};
 
@@ -736,7 +723,10 @@ const	ChatLayout = () =>
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					setChanMessages(data.payload.chanMessages);
+					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+						setChanMessages(data.payload.chanMessages);
+					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+						setPrivMessages(data.payload.chanMessages);
 				}
 				else
 					alert(data.payload.isInside);
@@ -754,7 +744,10 @@ const	ChatLayout = () =>
 			{
 				if (currentChannelRef.current === data.payload.chanName)
 				{
-					setChanMessages([]);
+					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+						setChanMessages([]);
+					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
 				}
 				alert(data.payload.message);
@@ -823,7 +816,11 @@ const	ChatLayout = () =>
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
         });
-    }, []);
+    }, [
+		// dispatch,
+		// joinChannel,
+		// kindOfConversation
+	]);
 
 	useEffect(() =>
 	{
@@ -926,14 +923,13 @@ const	ChatLayout = () =>
 		// MessagesArea(text);
 	};
 
-	const	goToChannel = (chanName: string) =>
+	const	goToChannel = (chanName: string, kind: string) =>
 	{
-		console.log("LAYOUT 815 ", activeId);
 		const	action = {
 			type: "did-I-join",
 			payload: {
 				chanName: chanName,
-				kind: kindOfConv,
+				kind: kind,
 				userId: activeId
 			}
 		};
@@ -1198,6 +1194,7 @@ const	ChatLayout = () =>
 										value={channelName}
 										onChange={(e) =>
 										{
+											setKindOfConversation("channel");
 											const inputValue = e.target.value;
 											if (inputValue.length <= 8)
 												setChannelName(inputValue);
@@ -1283,7 +1280,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("channel");
-														return (goToChannel(channel.name));
+														return (goToChannel(channel.name, "channel"));
 													}}
 												/>
 												<Button onClick={() =>
@@ -1498,6 +1495,7 @@ const	ChatLayout = () =>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
+										// setKindOfConversation("privateMessage");
 										return (
 											<ListItem style={listItemStyle} key={channel.id}>
 												<ListItemText
@@ -1510,37 +1508,9 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name));
+														return (goToChannel(channel.name, "privateMessage"));
 													}}
 												/>
-												<Button onClick={handleDialogOpen}>
-													Options
-												</Button>
-												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
-													<DialogTitle>
-														Choose an Action
-													</DialogTitle>
-													<DialogContent>
-													<Button onClick={() =>
-														{
-															setKindOfConversation("privateMessage");
-															return handleJoinButtonClick(channel.mode, channel.name);
-														}}>
-															Talk
-														</Button>
-														<Button onClick={() =>
-														{
-															return handleRemoveButtonClick(channel.id, channel.name);
-														}}>
-															Remove
-														</Button>
-													</DialogContent>
-													<DialogActions>
-													<Button onClick={handleDialogClose} color="primary">
-														Cancel
-													</Button>
-													</DialogActions>
-												</Dialog>
 											</ListItem>
 										);
 									})
@@ -1585,18 +1555,20 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<List
+						{/* <List
 							sx={{
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							>
+							> */}
 							{chanMessages.map((message: MessageModel, index) =>
 							{
 								let	sender: "me" | "other" | "server";
 
 								if (uniqueId === message.sender)
 									sender = "me";
+								else if (message.sender === "server")
+									sender = "server";
 								else
 									sender = "other";
 								return (
@@ -1611,9 +1583,8 @@ const	ChatLayout = () =>
 									/>
 								);
 							})}
-						</List>
+						{/* </List> */}
 					</TabPanel>
-
 					{/* when value == 1 */}
 					<TabPanel
 						area={true}
@@ -1622,7 +1593,36 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<MessagesArea/>
+						{/* <List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							> */}
+						{/* <MessagesArea/> */}
+						{privMessages.map((message: MessageModel, index) =>
+							{
+								let	sender: "me" | "other" | "server";
+
+								if (uniqueId === message.sender)
+									sender = "me";
+								else if (message.sender === "server")
+									sender = "server";
+								else
+									sender = "other";
+								return (
+									// <ListItem key={message.id}>
+									// 	<ListItemText primary={message.message} />
+									// </ListItem>
+									<MessageItem
+										key={index}
+										sender={sender}
+										date={message.sender}
+										message={message.message}
+									/>
+								);
+							})}
+							{/* </List> */}
 					</TabPanel>
 
 					<Divider />
