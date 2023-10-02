@@ -433,10 +433,10 @@ const	ChatLayout = () =>
 		setChanMessages
 	] = useState<MessageModel[]>([]);
 
-	// const [
-	// 	privMessages,
-	// 	setPrivMessages
-	// ] = useState<MessageModel[]>([]);
+	const [
+		privMessages,
+		setPrivMessages
+	] = useState<MessageModel[]>([]);
 
 	const [
 		openPasswordDialog,
@@ -649,6 +649,7 @@ const	ChatLayout = () =>
 				else
 				{
 					setChanMessages([]);
+					setPrivMessages([]);
 					alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
@@ -704,6 +705,7 @@ const	ChatLayout = () =>
 					return (!blockedListRef.current.includes(message.sender));
 				});
 				setChanMessages(filteredMessages);
+				setPrivMessages(filteredMessages);
 			}
 		};
 
@@ -715,6 +717,7 @@ const	ChatLayout = () =>
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
 					setChanMessages(data.payload.chanMessages);
+					setPrivMessages(data.payload.chanMessages);
 				}
 				else
 					alert(data.payload.isInside);
@@ -733,6 +736,7 @@ const	ChatLayout = () =>
 				if (currentChannelRef.current === data.payload.chanName)
 				{
 					setChanMessages([]);
+					setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
 				}
 				alert(data.payload.message);
@@ -1395,34 +1399,6 @@ const	ChatLayout = () =>
 														return (goToChannel(channel.name));
 													}}
 												/>
-												<Button onClick={handleDialogOpen}>
-													Options
-												</Button>
-												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
-													<DialogTitle>
-														Choose an Action
-													</DialogTitle>
-													<DialogContent>
-													<Button onClick={() =>
-														{
-															setKindOfConversation("privateMessage");
-															return handleJoinButtonClick(channel.mode, channel.name);
-														}}>
-															Talk
-														</Button>
-														<Button onClick={() =>
-														{
-															return handleRemoveButtonClick(channel.id, channel.name);
-														}}>
-															Remove
-														</Button>
-													</DialogContent>
-													<DialogActions>
-													<Button onClick={handleDialogClose} color="primary">
-														Cancel
-													</Button>
-													</DialogActions>
-												</Dialog>
 											</ListItem>
 										);
 									})
@@ -1495,7 +1471,6 @@ const	ChatLayout = () =>
 							})}
 						</List>
 					</TabPanel>
-
 					{/* when value == 1 */}
 					<TabPanel
 						area={true}
@@ -1505,7 +1480,7 @@ const	ChatLayout = () =>
 						style={style}
 					>
 						{/* <MessagesArea/> */}
-						{chanMessages.map((message: MessageModel, index) =>
+						{privMessages.map((message: MessageModel, index) =>
 							{
 								let	sender: "me" | "other" | "server";
 

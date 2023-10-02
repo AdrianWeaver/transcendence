@@ -354,6 +354,7 @@ export class ChatSocketEvents
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
 				{
+					console.log("DISPLAY CHANNELS 357 ", data.payload.chanName);
 					client.join(data.payload.chanName);
 					const id = searchChannel.messages.length + 1;
 					let messageText;
@@ -414,8 +415,6 @@ export class ChatSocketEvents
 						chanMessages: channel?.messages,
 					}
 				};
-				if (channel?.kind === "privateMessage")
-					channel?.isMember(client.id) === true;
 				if (channel?.isMember(client.id) === false)
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);
