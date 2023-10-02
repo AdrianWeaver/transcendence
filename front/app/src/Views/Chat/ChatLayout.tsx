@@ -786,7 +786,11 @@ const	ChatLayout = () =>
 
 			if (data.type === "invite-member")
 			{
-				console.log("INVITE");
+				alert(data.payload.message);
+			}
+
+			if (data.type === "make-admin")
+			{
 				alert(data.payload.message);
 			}
 		};
@@ -1104,6 +1108,20 @@ const	ChatLayout = () =>
 		// setChannelToInvite("");
 	};
 
+	// END OF INVITE
+
+	const	makeAdmin = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "make-admin",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
 	return (
 		<div>
 			<MenuBar />
@@ -1335,6 +1353,12 @@ const	ChatLayout = () =>
 																						muteUserInChannel(member.name, buttonSelection.name);
 																					}}>
 																						Mute
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						makeAdmin(member.name, buttonSelection.name);
+																					}}>
+																						Make admin
 																					</Button>
 																				</>)}
 																				{member.name !== uniqueId && (

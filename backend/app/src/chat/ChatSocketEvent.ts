@@ -583,9 +583,6 @@ export class ChatSocketEvents
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
-				// const	targetClient = channel.findClientById(data.payload.userName);
-				// if (targetClient === undefined)
-				// 	return ;
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
 				if (targetClient === undefined)
 					return ;
@@ -601,6 +598,11 @@ export class ChatSocketEvents
 					action.payload.message = targetClient.id + " is already in the channel.";
 					client.emit("user-info", action);
 				}
+				if (channel.isMember(client.id) === false)
+				{
+					action.payload.message = "You are not in the channel " + channel.name;
+					client.emit("user-info", action);
+				}
 				else if (channel.isBanned(targetClient.id) === true)
 				{
 					action.payload.message = targetClient.id + " has been banned from this channel.";
@@ -608,7 +610,6 @@ export class ChatSocketEvents
 				}
 				else
 				{
-					console.log("LOL");
 					action.payload.message = "You have been added to the channel " + data.payload.chanName
 						+ " by " + client.id;
 					targetClient.emit("user-info", action);
@@ -638,6 +639,51 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 				}
+			}
+
+			if (data.type === "make-admin")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
+				if (targetClient === undefined)
+					return ;
+				const	action = {
+					type: "make-admin",
+					payload: {
+						message: "",
+					}
+				};
+
+				if (channel.isAdmin(targetClient.id) === true)
+				{
+					action.payload.message = targetClient.id + " is already an admin.";
+					client.emit("user-info", action);
+				}
+				else
+				{
+					action.payload.message = client.id + " has made you an admin of the channel " + channel.name;
+					targetClient.emit("user-info", action);
+					channel.addAdmin(targetClient.id);
+				}
+
+				const id = channel.messages.length + 1;
+					const newMessage: MessageModel = {
+						sender: "server",
+						message: targetClient.id + " is now an admin.",
+						id: id,
+					};
+					channel.addNewMessage(newMessage);
+					const	messageAction = {
+						type: "new-message",
+						payload: {
+							messages: channel.messages,
+							chanName: channel.name,
+							socketId: client.id,
+						}
+					};
+					this.server.to(channel.name).emit("update-messages", messageAction);
 			}
 		}
 	}
