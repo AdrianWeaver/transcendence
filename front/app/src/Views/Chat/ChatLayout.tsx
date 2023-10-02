@@ -483,6 +483,16 @@ const	ChatLayout = () =>
 		mode: "",
 	});
 
+	const [
+		inviteDialogOpen,
+		setInviteDialogOpen
+	] = useState(false);
+
+	const [
+		channelToInvite,
+		setChannelToInvite
+	] = useState("");
+
 	// END OF USE STATEs
 
 	const handleClickOpen = () =>
@@ -769,10 +779,15 @@ const	ChatLayout = () =>
 
 			if (data.type === "set-is-muted")
 			{
-				console.log("LOL");
 				setIsMuted(true);
 				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
 				alert(message);
+			}
+
+			if (data.type === "invite-member")
+			{
+				console.log("INVITE");
+				alert(data.payload.message);
 			}
 		};
 
@@ -1072,6 +1087,23 @@ const	ChatLayout = () =>
 
 	// END OF MEMBERS FUNCTIONS
 
+	// INVITE
+
+	const	inviteUserToChannel = (userName: string) =>
+	{
+		console.log("member: " + userName);
+		console.log("chanel : " + channelToInvite);
+		const	action = {
+			type: "invite-member",
+			payload: {
+				chanName: channelToInvite,
+				userName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+		// setChannelToInvite("");
+	};
+
 	return (
 		<div>
 			<MenuBar />
@@ -1319,6 +1351,47 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setInviteDialogOpen(true);
+																						// inviteUserToChannel(member.name);
+																					}}>
+																						Invite
+																					</Button>
+																					<Dialog open={inviteDialogOpen} onClose={() =>
+																						{
+																							setInviteDialogOpen(false);
+																						}}
+																						maxWidth="sm" fullWidth>
+																						<DialogTitle>Invite User to Channel</DialogTitle>
+																						<DialogContent>
+																							<TextField
+																							label="Channel Name"
+																							variant="outlined"
+																							fullWidth
+																							value={channelToInvite}
+																							onChange={(e) =>
+																							{
+																								console.log("target value " + e.target.value);
+																								setChannelToInvite(e.target.value);
+																							}}/>
+																						</DialogContent>
+																						<DialogActions>
+																							<Button onClick={() =>
+																								{
+																									inviteUserToChannel(member.name);
+																									setInviteDialogOpen(false);
+																								}} color="primary">
+																								Invite
+																							</Button>
+																							<Button onClick={() =>
+																							{
+																								setInviteDialogOpen(false);
+																							}} color="primary">
+																							Cancel
+																							</Button>
+																						</DialogActions>
+																					</Dialog>
 																				</>)}
 																			</li>);
 																	})

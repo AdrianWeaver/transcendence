@@ -577,5 +577,67 @@ export class ChatSocketEvents
 				};
 				targetClient.emit("user-info", action);
 			}
+
+			if (data.type === "invite-member")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				// const	targetClient = channel.findClientById(data.payload.userName);
+				// if (targetClient === undefined)
+				// 	return ;
+				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
+				if (targetClient === undefined)
+					return ;
+				const	action = {
+					type: "invite-member",
+					payload: {
+						message: "",
+					}
+				};
+
+				if (channel.isMember(targetClient.id) === true)
+				{
+					action.payload.message = targetClient.id + " is already in the channel.";
+					client.emit("user-info", action);
+				}
+				else if (channel.isBanned(targetClient.id) === true)
+				{
+					action.payload.message = targetClient.id + " has been banned from this channel.";
+					client.emit("user-info", action);
+				}
+				else
+				{
+					console.log("LOL");
+					action.payload.message = "You have been added to the channel " + data.payload.chanName
+						+ " by " + client.id;
+					targetClient.emit("user-info", action);
+					action.payload.message = targetClient.id + " has been successfully added to the channel "
+						+ data.payload.chanName;
+					client.emit("user-info", action);
+
+					targetClient.join(channel.name);
+					channel.members++;
+					channel.sockets.push(targetClient);
+					channel.users.push(targetClient.id);
+
+					const id = channel.messages.length + 1;
+					const newMessage: MessageModel = {
+						sender: "server",
+						message: targetClient.id + " has been added by " + client.id,
+						id: id,
+					};
+					channel.addNewMessage(newMessage);
+					const	messageAction = {
+						type: "new-message",
+						payload: {
+							messages: channel.messages,
+							chanName: channel.name,
+							socketId: client.id,
+						}
+					};
+					this.server.to(channel.name).emit("update-messages", messageAction);
+				}
+			}
 		}
 	}
