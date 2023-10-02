@@ -167,9 +167,6 @@ const FriendsList = (props: FriendsListProps) =>
 
 	const	createNewConv = (activeId: string) =>
 	{
-		// TEST
-		console.log(" friend chatLayout 433: ", kindOfConv);
-		console.log(" friend activeId: ", activeId);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -180,13 +177,10 @@ const FriendsList = (props: FriendsListProps) =>
 				activeId: activeId
 			}
 		};
-		console.log(" friend 2 chatLayout 433: ", kindOfConv);
-		console.log(" friend 2 chanName: ", action.payload.chanName);
 		props.socketRef.current.emit("channel-info", action);
 	};
 	const displayConversationWindow = (id: string) =>
 	{
-		console.log("layout 189 ", id, " ", numberOfChannels);
 		const action = {
 			type: "display-conversation",
 			payload:
@@ -1443,12 +1437,12 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<List
+						{/* <List
 							sx={{
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							>
+							> */}
 							{chanMessages.map((message: MessageModel, index) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1469,7 +1463,7 @@ const	ChatLayout = () =>
 									/>
 								);
 							})}
-						</List>
+						{/* </List> */}
 					</TabPanel>
 					{/* when value == 1 */}
 					<TabPanel
@@ -1479,6 +1473,12 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
+						{/* <List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							> */}
 						{/* <MessagesArea/> */}
 						{privMessages.map((message: MessageModel, index) =>
 							{
@@ -1500,6 +1500,7 @@ const	ChatLayout = () =>
 									/>
 								);
 							})}
+							{/* </List> */}
 					</TabPanel>
 
 					<Divider />
