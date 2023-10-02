@@ -22,6 +22,7 @@ class Channel
     public banned: string[] = [];
     public name: string;
     public users: string[] = [];
+    public sockets: Socket[] = [];
     public mode: string;
     public members: number;
     public chat: Chat | undefined;
@@ -35,6 +36,7 @@ class Channel
     public addToBanned: (id: string) => void;
     public addNewMessage: (message: MessageModel) => void;
     public leaveChannel: (client: Socket) => void;
+    public findClientById: (socketId: string) => Socket | undefined;
 
     public constructor(name: string, client: Socket, mode: string, password: string, kind: string)
     {
@@ -48,6 +50,7 @@ class Channel
         if (this.members === 1)
             this.admins.push(client.id);
         this.users.push(client.id);
+        this.sockets.push(client);
         this.mode = mode;
         if (password !== undefined)
             this.password = password;
@@ -108,13 +111,22 @@ class Channel
 
         this.leaveChannel = (client: Socket) =>
         {
-            client.leave(this.name);
             this.members--;
             const index = this.users.findIndex((element) =>
             {
                 return (element === client.id);
             });
             this.users.splice(index, 1);
+        };
+
+        this.findClientById = (socketId: string) =>
+        {
+            for (const client of this.sockets)
+            {
+                if (client.id === socketId)
+                    return (client);
+            }
+            return (undefined);
         };
     }
 }

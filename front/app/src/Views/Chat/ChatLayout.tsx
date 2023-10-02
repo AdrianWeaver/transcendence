@@ -351,7 +351,6 @@ const a11yProps = (index: any) =>
 const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-	let	uniqueId: string;
 
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
@@ -368,6 +367,7 @@ const	ChatLayout = () =>
 		return (state.controller.user.chat.currentChannel);
 	});
 	const currentChannelRef = useRef(currentChannel);
+
 	const	kindOfConv = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.kindOfConversation);
@@ -376,6 +376,9 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.activeConversationId);
 	});
+
+	// USE STATES
+
 	const
 	[
 		value,
@@ -440,6 +443,33 @@ const	ChatLayout = () =>
 		setChannelMembers
 	] = useState<MembersModel[]>([]);
 
+	const [
+		isChannelAdmin,
+		setIsChannelAdmin
+	] = useState(false);
+
+	const [
+		uniqueId,
+		setUniqueId
+	] = useState("");
+
+	const [
+		friendList,
+		setFriendList
+	] = useState<string[]>([]);
+
+	const [
+		blockedList,
+		setBlockedList
+	] = useState<string[]>([]);
+
+	const [
+		isMuted,
+		setIsMuted
+	] = useState(false);
+
+	// END OF USE STATEs
+
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -471,6 +501,7 @@ const	ChatLayout = () =>
 	// ] = useState("");
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
+	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
@@ -519,7 +550,6 @@ const	ChatLayout = () =>
 			return;
 		}
 
-		// Check if at least one radio option is selected
 		if (![
 			"public",
 			"protected",
@@ -535,7 +565,6 @@ const	ChatLayout = () =>
 			alert("There must be a password for a protected channel");
 			return;
 		}
-		// Close the dialog
 		createNewChannel();
 		handleClose();
 	};
@@ -585,7 +614,7 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
-				uniqueId = data.payload.uniqueId;
+				setUniqueId(data.payload.uniqueId);
 			}
 
 			if(data.type === "add-new-channel")
@@ -661,11 +690,15 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("current ref: " + currentChannelRef.current);
-			console.log("current payload: " + data.payload.chanName);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setChanMessages(data.payload.messages);
+				// we will filter messages from blocked users if any
+				const	tmpMessages = data.payload.messages;
+				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
+				{
+					return (!blockedListRef.current.includes(message.sender));
+				});
+				setChanMessages(filteredMessages);
 			}
 		};
 
@@ -676,8 +709,6 @@ const	ChatLayout = () =>
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					// console.log("test received from server: " + data.payload.chanName);
-					console.log("test channel info: " + currentChannelRef.current);
 					setChanMessages(data.payload.chanMessages);
 				}
 				else
@@ -686,7 +717,7 @@ const	ChatLayout = () =>
 			if (data.type === "display-members")
 			{
 				setChannelMembers(data.payload.memberList);
-				console.log("members: " + data.payload.memberList);
+				setIsChannelAdmin(data.payload.isAdmin);
 			}
 		};
 
@@ -694,8 +725,37 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "left-channel")
 			{
-				setChanMessages([]);
+				if (currentChannelRef.current === data.payload.chanName)
+				{
+					setChanMessages([]);
+					dispatch(setCurrentChannel("undefined"));
+				}
 				alert(data.payload.message);
+			}
+		};
+
+		const	userInfo = (data: any) =>
+		{
+			if (data.type === "add-friend")
+			{
+				setFriendList(data.payload.friendList);
+				const	alertMessage = data.payload.newFriend + " has been added to Friends.";
+				alert(alertMessage);
+			}
+
+			if (data.type === "block-user")
+			{
+				setBlockedList(data.payload.blockedList);
+				const	alertMessage = "You have blocked " + data.payload.newBlocked + ".";
+				alert(alertMessage);
+			}
+
+			if (data.type === "set-is-muted")
+			{
+				console.log("LOL");
+				setIsMuted(true);
+				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
+				alert(message);
 			}
 		};
 
@@ -709,6 +769,7 @@ const	ChatLayout = () =>
 		socket.on("update-messages", updateMessages);
 		socket.on("left-message", leftChannelMessage);
 		socket.on("get-user-list", updateChannels);
+		socket.on("user-info", userInfo);
 
         socket.connect();
 
@@ -724,6 +785,7 @@ const	ChatLayout = () =>
 			socket.off("update-messages", updateMessages);
 			socket.on("left-message", leftChannelMessage);
 			socket.off("get-user-list", updateChannels);
+			socket.off("user-info", userInfo);
         });
     }, []);
 
@@ -731,9 +793,20 @@ const	ChatLayout = () =>
 	{
 		currentChannelRef.current = currentChannel;
 		joiningChannelNameRef.current = joiningChannelName;
+		blockedListRef.current = blockedList;
+
+		if (isMuted === true)
+		{
+			setTimeout(() =>
+			{
+				setIsMuted(false);
+			}, 60000);
+		}
 	}, [
 		currentChannel,
-		joiningChannelName
+		joiningChannelName,
+		isMuted,
+		blockedList
 	]);
 
 	const handlePasswordSubmit = (password: string) =>
@@ -797,7 +870,10 @@ const	ChatLayout = () =>
 
 	const handleTextChange = (e: any) =>
 	{
-		setText(e.target.value);
+		if (isMuted === true)
+			alert("You are muted for the moment being.");
+		else
+			setText(e.target.value);
 	};
 
 	const handleSendClick = () =>
@@ -911,6 +987,69 @@ const	ChatLayout = () =>
 	};
 
 	// END OF MEMBERS
+
+	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
+
+	const	kickUserFromChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "kick-member",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
+	const	banUserFromChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "ban-member",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
+	const	addUserToFriends = (userName: string) =>
+	{
+		const	action = {
+			type: "add-friend",
+			payload: {
+				friendName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	const	addUserToBlocked = (userName: string) =>
+	{
+		const	action = {
+			type: "block-user",
+			payload: {
+				blockedName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	const	muteUserInChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "mute-user",
+			payload: {
+				chanName: chanName,
+				userName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	// END OF MEMBERS FUNCTIONS
+
 	return (
 		<div>
 			<MenuBar />
@@ -953,6 +1092,11 @@ const	ChatLayout = () =>
 							<Tab
 								label="Users"
 								{...a11yProps(1)}
+								style={{fontSize: "15px"}}
+							/>
+							<Tab
+								label="Friends"
+								{...a11yProps(2)}
 								style={{fontSize: "15px"}}
 							/>
 						</Tabs>
@@ -1059,7 +1203,7 @@ const	ChatLayout = () =>
 											<ListItem style={listItemStyle} key={channel.id}>
 												<ListItemText
 													style={
-														channel.name === currentChannel
+														channel.name === currentChannelRef.current
 														? { color: "red" }
 														: listItemTextStyle
 													}
@@ -1099,19 +1243,60 @@ const	ChatLayout = () =>
 														<Button onClick={() =>
 														{
 															return handleMembersClickOpen(channel.name);
-														}}>Members</Button>
+														}}>
+															Members
+														</Button>
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogTitle>
 																Channel Members
 															</DialogTitle>
 															<DialogContent>
 																<ul>
+																{
+																	channelMembers.map((member) =>
 																	{
-																		channelMembers.map((member) =>
-																		{
-																			return (<li key={member.id}>{member.name}</li>);
-																		})
-																	}
+																		return (<li key={member.id}>
+																				{member.name}
+																				{isChannelAdmin && member.name !== uniqueId && (
+																				<>
+																					<Button onClick={() =>
+																					{
+																						kickUserFromChannel(member.name, channel.name);
+																						handleMembersClose();
+																					}}>
+																						Kick
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						banUserFromChannel(member.name, channel.name);
+																					}}>
+																						Ban
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						muteUserInChannel(member.name, channel.name);
+																					}}>
+																						Mute
+																					</Button>
+																				</>)}
+																				{member.name !== uniqueId && (
+																				<>
+																					<Button onClick={() =>
+																					{
+																						addUserToFriends(member.name);
+																					}}>
+																						Add friend
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						addUserToBlocked(member.name);
+																					}}>
+																						Block
+																					</Button>
+																				</>)}
+																			</li>);
+																	})
+																}
 																</ul>
 															</DialogContent>
 															<DialogActions>
@@ -1239,6 +1424,34 @@ const	ChatLayout = () =>
 								}
 							</List>
 						{/* ////////////////// */}
+					</TabPanel>
+					<TabPanel
+						area={false}
+						value={value}
+						index={2}
+						dir={style.direction}
+						style={style}
+					>
+						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
+						<List>
+							{
+								friendList.map((friend: any) =>
+								{
+									return (
+										<ListItem style={listItemStyle} key={friend.id}>
+											<ListItemText
+												style={listItemTextStyle}
+												primary={friend.name}
+												// onClick={() =>
+												// {
+												// 	return (goToChannel(channel.name));
+												// }}
+											/>
+										</ListItem>
+									);
+								})
+							}
+						</List>
 					</TabPanel>
 				</Grid>
 				<Grid item xs={9}>
