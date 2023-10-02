@@ -641,7 +641,6 @@ const	ChatLayout = () =>
 				else
 				{
 					setChanMessages([]);
-					setPrivMessages([]);
 					alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
