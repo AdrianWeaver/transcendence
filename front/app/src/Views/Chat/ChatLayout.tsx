@@ -79,15 +79,15 @@ interface TabPanelProps {
 	index: number;
 	value: number;
 	style?: CSSProperties;
-	area?: boolean;
+	area?: string;
 }
 
 const TabPanel = (props: TabPanelProps) =>
 {
-	const { children, value, index, ...other } = props;
-	let animationSettings;
+	const	{ children, value, index, ...other } = props;
+	let		animationSettings;
 
-	if (props.area === false)
+	if (props.area === "false")
 		animationSettings = {
 			type: "spring",
 			duration: 0.3,
@@ -1103,7 +1103,7 @@ const	ChatLayout = () =>
 					</Toolbar>
 					{/* right side of the screen  */}
 					<TabPanel
-						area={false}
+						area="false"
 						value={value}
 						index={0}
 						dir={style.direction}
@@ -1364,7 +1364,7 @@ const	ChatLayout = () =>
 						</div>
 					</TabPanel>
 					<TabPanel
-						area={false}
+			area="false"
 						value={value}
 						index={1}
 						dir={style.direction}
@@ -1426,7 +1426,7 @@ const	ChatLayout = () =>
 						{/* ////////////////// */}
 					</TabPanel>
 					<TabPanel
-						area={false}
+						area="false"
 						value={value}
 						index={2}
 						dir={style.direction}
@@ -1456,7 +1456,7 @@ const	ChatLayout = () =>
 				</Grid>
 				<Grid item xs={9}>
 					<TabPanel
-						area={true}
+						area="true"
 						value={value}
 						index={0}
 						dir={style.direction}
@@ -1493,7 +1493,7 @@ const	ChatLayout = () =>
 
 					{/* when value == 1 */}
 					<TabPanel
-						area={true}
+						area="true"
 						value={value}
 						index={1}
 						dir={style.direction}

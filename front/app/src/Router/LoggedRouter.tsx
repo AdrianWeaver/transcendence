@@ -85,8 +85,9 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="the-chat"
-					element={<Chat />}
+					element={<ChatLayout />}
 				/>
+				{/* this route must be removed if no problem  */}
 				<Route
 					path="the-chat-layout"
 					element={<ChatLayout />}
