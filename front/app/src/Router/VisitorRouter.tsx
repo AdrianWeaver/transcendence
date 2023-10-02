@@ -54,11 +54,6 @@ const	VisitorRouter = () =>
 					path="/cancel"
 					element={<CancelRegister />}
 				/>
-				
-				<Route
-					path="the-chat"
-					element={<Chat />}
-				/>
 				{/* show 404 when route not found */}
 				<Route
 					path="*"

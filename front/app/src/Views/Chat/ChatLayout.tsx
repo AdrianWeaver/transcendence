@@ -301,7 +301,6 @@ const MessagesArea = () =>
 		}
 		if (i === msgRoom.length)
 		{
-			//dispatch(setKindOfConversation("privateMessage"));
 			dispatch(setActiveConversationId(activeId));
 			displayMessageArray = [
 				{
@@ -493,12 +492,6 @@ const	ChatLayout = () =>
 		joiningChannelName,
 		setJoiningChannelName
 	] = useState("");
-
-	// const
-	// [
-	// 	kindOfConversation,
-	// 	setKindOfConversation
-	// ] = useState("");
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
@@ -1364,7 +1357,7 @@ const	ChatLayout = () =>
 						</div>
 					</TabPanel>
 					<TabPanel
-			area="false"
+						area="false"
 						value={value}
 						index={1}
 						dir={style.direction}
