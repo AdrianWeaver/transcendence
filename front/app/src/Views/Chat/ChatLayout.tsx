@@ -141,25 +141,12 @@ type FriendsListProps = {
 
 const FriendsList = (props: FriendsListProps) =>
 {
-	// const	socketTest = useRef<SocketIOClient.Socket | null>(null);
-	let		friendList: any[];
 	const	dispatch = useAppDispatch();
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
 	});
-	const	kindOfConv = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.kindOfConversation);
-	});
-	const sendMsg = (id: string) =>
-	{
-		const action = {
-			type: "sending-message"
-		};
-		console.log("sendMsg function called with id ", id);
-		// socketTest.current?.emit("send-message", action);
-	};
+
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
@@ -502,7 +489,6 @@ const	ChatLayout = () =>
 
 	const	createNewChannel = () =>
 	{
-		console.log("create chanel ?", kindOfConversation);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -559,14 +545,12 @@ const	ChatLayout = () =>
 			return;
 		}
 		setKindOfConversation("channel");
-		console.log("Channel ", kindOfConversation);
 		createNewChannel();
 		handleClose();
 	};
 
 	const	joinChannel = (chanName: string) =>
 	{
-		console.log("JOIN CHANNEL ", kindOfConversation);
 		const	action = {
 			type: "asked-join",
 			payload: {
@@ -615,7 +599,6 @@ const	ChatLayout = () =>
 
 			if(data.type === "add-new-channel")
 			{
-				console.log("add new channel ", data.payload);
 				if (data.payload.kind === "channel")
 					setChannels(data.payload.chanMap);
 				if (data.payload.kind === "privateMessage")
@@ -690,7 +673,6 @@ const	ChatLayout = () =>
 		{
 			const	kind = data.payload.kind;
 			setKindOfConversation(kind);
-			console.log(" kindOfConversation ", kindOfConversation, " ", kind);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				setKindOfConversation(data.payload.kind);
@@ -713,7 +695,6 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.isInside === "")
 				{
-					console.log("is inside ", kindOfConversation, " ", data.payload);
 					dispatch(setCurrentChannel(data.payload.chanName));
 					if (data.payload.kind === "channel" || kindOfConversation === "channel")
 						setChanMessages(data.payload.chanMessages);
@@ -734,7 +715,6 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "left-channel")
 			{
-				console.log("is inside ", kindOfConversation, " ", data.payload);
 				if (currentChannelRef.current === data.payload.chanName)
 				{
 					if (data.payload.kind === "channel" || kindOfConversation === "channel")

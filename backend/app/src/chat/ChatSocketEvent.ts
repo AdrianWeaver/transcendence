@@ -151,8 +151,6 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
-				// TEST
-				console.log(data);
 				const copyUsers = this.chatService.getAllUsers();
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
@@ -178,8 +176,6 @@ export class ChatSocketEvents
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
-					// TEST
-					console.log("channel undefined ");
 					if (channel === undefined)
 						return ;
 					else
@@ -356,7 +352,6 @@ export class ChatSocketEvents
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
 				{
-					console.log("KIND ????", data.payload.kind);
 					client.join(data.payload.chanName);
 					const id = searchChannel.messages.length + 1;
 					const	messageText = "Welcome to the channel, " + client.id + " !";
@@ -401,7 +396,6 @@ export class ChatSocketEvents
 
 			if (data.type === "did-I-join")
 			{
-				console.log("did i join ", data.payload.kind);
 				let	channel;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
