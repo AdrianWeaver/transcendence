@@ -53,7 +53,7 @@ import {
 	setCurrentChannel,
 	setChatUsers,
 	setMessageRoom,
-	setKindOfConversation,
+	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
@@ -220,7 +220,7 @@ const FriendsList = (props: FriendsListProps) =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
-									dispatch(setKindOfConversation("privateMessage"));
+									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
 									console.log("dispatched");
 								}}>
@@ -453,6 +453,11 @@ const	ChatLayout = () =>
 	] = useState("");
 
 	const [
+		kindOfConversation,
+		setKindOfConversation
+	] = useState("");
+
+	const [
 		friendList,
 		setFriendList
 	] = useState<string[]>([]);
@@ -493,20 +498,12 @@ const	ChatLayout = () =>
 		setJoiningChannelName
 	] = useState("");
 
-	// const
-	// [
-	// 	kindOfConversation,
-	// 	setKindOfConversation
-	// ] = useState("");
-
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
-		// TEST
-		console.log("chatLayout 433: ", kindOfConv);
-		console.log(" activeId: ", activeId);
+		console.log("Layout 512 createNewChannel ", kindOfConversation);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -514,12 +511,13 @@ const	ChatLayout = () =>
 				chanMode: selectedMode,
 				chanPassword: chanPassword,
 				chanId: channels.length + 1,
+				pmIndex: privateMessage.length + 1,
 				activeId: activeId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		dispatch(setNumberOfChannels(channels.length));
-		console.log(" 2 chatLayout 433: ", kindOfConv);
+		console.log(" 2 chatLayout 526: ", kindOfConversation);
 		console.log(" 2 chanName: ", action.payload.chanName);
 		socketRef.current?.emit("channel-info", action);
 	};
@@ -531,7 +529,7 @@ const	ChatLayout = () =>
 			payload: {
 				name: chanName,
 				id: chanId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		socketRef.current?.emit("channel-info", action);
@@ -539,9 +537,8 @@ const	ChatLayout = () =>
 
 	const handleSave = () =>
 	{
-		console.log("layout 469: ", kindOfConv);
 		setKindOfConversation("channel");
-		dispatch(setKindOfConversation("channel"));
+		// dispatch(setKindOfConversation("channel"));
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
@@ -564,6 +561,9 @@ const	ChatLayout = () =>
 			alert("There must be a password for a protected channel");
 			return;
 		}
+		setKindOfConversation("channel");
+		// dispatch(setKindOfConversation("channel"));
+		console.log("Channel ", kindOfConversation);
 		createNewChannel();
 		handleClose();
 	};
@@ -575,7 +575,7 @@ const	ChatLayout = () =>
 			payload: {
 				chanName: chanName,
 				activeId: activeId,
-				kind: kindOfConv
+				kind: kindOfConversation
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -622,7 +622,8 @@ const	ChatLayout = () =>
 					setChannels(data.payload.chanMap);
 				if (data.payload.privateMessageMap !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
-				dispatch(setKindOfConversation(data.payload.kind));
+				setKindOfConversation(data.payload.kind);
+				// dispatch(setKindOfConversation(data.payload.kind));
 			}
 
 			if (data.type === "destroy-channel")
@@ -690,6 +691,9 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
+			console.log("chanName = ", data.payload.chanName, " current ", currentChannelRef.current, " kind ", data.payload.kind);
+			setKindOfConversation(data.payload.kind);
+			console.log(" kindOfConversation ", kindOfConversation);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				// we will filter messages from blocked users if any
@@ -698,8 +702,11 @@ const	ChatLayout = () =>
 				{
 					return (!blockedListRef.current.includes(message.sender));
 				});
-				setChanMessages(filteredMessages);
-				setPrivMessages(filteredMessages);
+				console.log(" filtered message ", filteredMessages, " kind ? ", kindOfConversation);
+				if (data.payload.kind === "channel")
+					setChanMessages(filteredMessages);
+				else if (data.payload.kind === "privateMessage")
+					setPrivMessages(filteredMessages);
 			}
 		};
 
@@ -895,12 +902,12 @@ const	ChatLayout = () =>
 
 	const	goToChannel = (chanName: string) =>
 	{
-		console.log("LAYOUT 815 ", activeId);
+		console.log("LAYOUT 905 ", activeId, " kind ? ", kindOfConversation);
 		const	action = {
 			type: "did-I-join",
 			payload: {
 				chanName: chanName,
-				kind: kindOfConv,
+				kind: kindOfConversation,
 				userId: activeId
 			}
 		};
@@ -1129,6 +1136,7 @@ const	ChatLayout = () =>
 										value={channelName}
 										onChange={(e) =>
 										{
+											setKindOfConversation("channel");
 											const inputValue = e.target.value;
 											if (inputValue.length <= 8)
 												setChannelName(inputValue);
@@ -1378,6 +1386,7 @@ const	ChatLayout = () =>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
+										// setKindOfConversation("privateMessage");
 										return (
 											<ListItem style={listItemStyle} key={channel.id}>
 												<ListItemText
@@ -1449,6 +1458,8 @@ const	ChatLayout = () =>
 
 								if (uniqueId === message.sender)
 									sender = "me";
+								else if (message.sender === "server")
+									sender = "server";
 								else
 									sender = "other";
 								return (
@@ -1486,6 +1497,8 @@ const	ChatLayout = () =>
 
 								if (uniqueId === message.sender)
 									sender = "me";
+								else if (message.sender === "server")
+									sender = "server";
 								else
 									sender = "other";
 								return (

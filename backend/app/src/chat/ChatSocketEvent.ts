@@ -172,39 +172,35 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				let	channel;
+				let	channel, kind;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
-					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
-				if (channel === undefined)
-					return ;
-				if (data.payload.message.trim().length === 0)
-					return ;
-				if (channel.messages.length === 0)
 				{
-					const	msg = "Conversation between " + client.id + " & " + data.payload.activeId;
-					const firstMsg: MessageModel = {
-						sender: "server",
-						message: msg,
-						id: 1
-					};
-					channel.addNewMessage(firstMsg);
+					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
+					console.log("channel undefined ");
+					if (channel === undefined)
+						return ;
+					else
+						kind = "privateMessage";
 				}
 				else
-				{
-					const	id = channel.messages.length + 1;
-					const newMessage: MessageModel = {
-						sender: client.id,
-						message: data.payload.message,
-						id: id
-					};
-					channel.addNewMessage(newMessage);
-				}
+					kind = "channel";
+				if (data.payload.message.trim().length === 0)
+					return ;
+				const	id = channel.messages.length;
+
+				const newMessage: MessageModel = {
+					sender: client.id,
+					message: data.payload.message,
+					id: id
+				};
+				channel.addNewMessage(newMessage);
 				const	action = {
 					type: "update-messages",
 					payload: {
 						messages: channel.messages,
 						chanName: channel.name,
+						kind: kind
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
@@ -262,12 +258,12 @@ export class ChatSocketEvents
 							{
 								chanMap: this.chatService.getChanMap(),
 								kind: kind,
-								privateMessageMap: this.chatService.getPrivateMessageMap()
+								privateMessageMap: undefined
 							}
 						};
 						this.server.emit("display-channels", action);
 					}
-					if (kind === "privateMessage")
+					else if (kind === "privateMessage")
 					{
 						if (searchConv === undefined && alreadyCreated === false)
 						{
@@ -278,7 +274,7 @@ export class ChatSocketEvents
 							kind);
 							newPrivateMsg.chat = this.chatService.getChat();
 							newPrivateMsg?.users.push(data.payload.activeId);
-							newPrivateMsg?.users.push(client.id);
+							// newPrivateMsg?.users.push(client.id);
 							newPrivateMsg?.addAdmin(data.payload.activeId);
 							newPrivateMsg?.addAdmin(client.id);
 							client.join(newPrivateMsg.name);
@@ -288,7 +284,7 @@ export class ChatSocketEvents
 							type: "add-new-channel",
 							payload:
 							{
-								chanMap: this.chatService.getChanMap(),
+								chanMap: undefined,
 								kind: kind,
 								privateMessageMap: this.chatService.getPrivateMessageMap()
 							}
