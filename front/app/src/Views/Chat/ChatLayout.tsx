@@ -72,6 +72,12 @@ type MembersModel =
 	name:string
 }
 
+type ChanMapModel = {
+    id: number,
+    name: string,
+    mode: string
+};
+
 // chat part 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -458,6 +464,25 @@ const	ChatLayout = () =>
 		setIsMuted
 	] = useState(false);
 
+	const [
+		buttonSelection,
+		setButtonSelection
+	] = useState<ChanMapModel>({
+		id: 0,
+		name: "",
+		mode: "",
+	});
+
+	const [
+		inviteDialogOpen,
+		setInviteDialogOpen
+	] = useState(false);
+
+	const [
+		channelToInvite,
+		setChannelToInvite
+	] = useState("");
+
 	// END OF USE STATEs
 
 	const handleClickOpen = () =>
@@ -472,6 +497,8 @@ const	ChatLayout = () =>
 		setChanPassword("");
 		setOpen(false);
 	};
+
+
 
 	const
 	[
@@ -745,10 +772,19 @@ const	ChatLayout = () =>
 
 			if (data.type === "set-is-muted")
 			{
-				console.log("LOL");
 				setIsMuted(true);
 				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
 				alert(message);
+			}
+
+			if (data.type === "invite-member")
+			{
+				alert(data.payload.message);
+			}
+
+			if (data.type === "make-admin")
+			{
+				alert(data.payload.message);
 			}
 		};
 
@@ -931,6 +967,11 @@ const	ChatLayout = () =>
 	const handleDialogClose = () =>
 	{
 		setIsDialogOpen(false);
+		setButtonSelection({
+			id: 0,
+			name: "",
+			mode: "",
+		});
 	};
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
@@ -1045,6 +1086,37 @@ const	ChatLayout = () =>
 	};
 
 	// END OF MEMBERS FUNCTIONS
+
+	// INVITE
+
+	const	inviteUserToChannel = (userName: string) =>
+	{
+		console.log("member: " + userName);
+		console.log("chanel : " + channelToInvite);
+		const	action = {
+			type: "invite-member",
+			payload: {
+				chanName: channelToInvite,
+				userName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+		// setChannelToInvite("");
+	};
+
+	// END OF INVITE
+
+	const	makeAdmin = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "make-admin",
+			payload: {
+				userName: userName,
+				chanName: chanName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
 
 	return (
 		<div>
@@ -1211,7 +1283,11 @@ const	ChatLayout = () =>
 														return (goToChannel(channel.name, "channel"));
 													}}
 												/>
-												<Button onClick={handleDialogOpen}>
+												<Button onClick={() =>
+												{
+													handleDialogOpen();
+													setButtonSelection(channel);
+												}}>
 													Options
 												</Button>
 												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
@@ -1221,25 +1297,25 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(channel.mode, channel.name);
+															return handleJoinButtonClick(buttonSelection.mode, buttonSelection.name);
 														}}>
 															Join
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleLeaveButtonClick(channel.id, channel.name);
+															return handleLeaveButtonClick(buttonSelection.id, buttonSelection.name);
 														}}>
 															Leave
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(channel.id, channel.name);
+															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
 														}}>
 															Remove
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(channel.name);
+															return handleMembersClickOpen(buttonSelection.name);
 														}}>
 															Members
 														</Button>
@@ -1258,22 +1334,28 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						kickUserFromChannel(member.name, channel.name);
+																						kickUserFromChannel(member.name, buttonSelection.name);
 																						handleMembersClose();
 																					}}>
 																						Kick
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						banUserFromChannel(member.name, channel.name);
+																						banUserFromChannel(member.name, buttonSelection.name);
 																					}}>
 																						Ban
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						muteUserInChannel(member.name, channel.name);
+																						muteUserInChannel(member.name, buttonSelection.name);
 																					}}>
 																						Mute
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						makeAdmin(member.name, buttonSelection.name);
+																					}}>
+																						Make admin
 																					</Button>
 																				</>)}
 																				{member.name !== uniqueId && (
@@ -1290,6 +1372,47 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setInviteDialogOpen(true);
+																						// inviteUserToChannel(member.name);
+																					}}>
+																						Invite
+																					</Button>
+																					<Dialog open={inviteDialogOpen} onClose={() =>
+																						{
+																							setInviteDialogOpen(false);
+																						}}
+																						maxWidth="sm" fullWidth>
+																						<DialogTitle>Invite User to Channel</DialogTitle>
+																						<DialogContent>
+																							<TextField
+																							label="Channel Name"
+																							variant="outlined"
+																							fullWidth
+																							value={channelToInvite}
+																							onChange={(e) =>
+																							{
+																								console.log("target value " + e.target.value);
+																								setChannelToInvite(e.target.value);
+																							}}/>
+																						</DialogContent>
+																						<DialogActions>
+																							<Button onClick={() =>
+																								{
+																									inviteUserToChannel(member.name);
+																									setInviteDialogOpen(false);
+																								}} color="primary">
+																								Invite
+																							</Button>
+																							<Button onClick={() =>
+																							{
+																								setInviteDialogOpen(false);
+																							}} color="primary">
+																							Cancel
+																							</Button>
+																						</DialogActions>
+																					</Dialog>
 																				</>)}
 																			</li>);
 																	})

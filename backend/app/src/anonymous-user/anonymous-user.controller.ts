@@ -72,7 +72,8 @@ export class AnonymousUserController
 	@Post("verify-token")
 	@UseGuards(AuthorizationGuard)
 	verifyToken()
-	: AnonymousUserVerifyTokenResModel				// login or clear, cause user already have an uuid
+	// login or clear, cause user already have an uuid
+	: AnonymousUserVerifyTokenResModel
 	// but seams to be an error, user are trigger without
 	// normal procedure
 	// (We are inside register, see display anonymous connect)
