@@ -16,6 +16,7 @@ import storage from "redux-persist/lib/storage";
 import	serverSlice from "./server-slice";
 import	anonymousUserSlice from "./anonymousUser-slice";
 import	gameEngineSlice from "./gameEngine-slice";
+import	chatSlice from "./chat-slice";
 
 // import
 
@@ -47,6 +48,7 @@ export const	store = configureStore(
 		server: serverSlice.reducer,
 		anonymousUser: persistedAnonymousUserReducer,
 		gameEngine: gameEngineSlice.reducer,
+		chat: chatSlice.reducer
 	},
 	middleware: (getDefaultMiddleware) =>
 	{

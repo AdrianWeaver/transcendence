@@ -24,7 +24,7 @@ type MessageItemProps = {
 	align?: ListItemTextProps,
 	sender: "me" | "other" | "server",
 	message: string,
-	date: string
+	date?: string
 };
 
 const MessageItem = (props: MessageItemProps) => {

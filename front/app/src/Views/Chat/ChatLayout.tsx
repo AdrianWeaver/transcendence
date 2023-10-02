@@ -26,9 +26,11 @@ import {
 	DialogTitle
 } from "@mui/material";
 
+import MessagesArea from "./components/MessagesArea";
 import MessageItem from "./components/MessageItem";
-import CurrentlyTalkingFriend from "./components/CurrentlyTalkingFriend";
-import FriendItem from "./components/FriendItem";
+import FriendsList from "./components/FriendsList";
+import TabPanel from "./components/TabPanel";
+
 
 const URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
@@ -36,12 +38,10 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
 import
 {
-	CSSProperties,
 	useState,
 	useEffect,
 	useRef
 }	from "react";
-import { motion } from "framer-motion";
 import { io } from "socket.io-client";
 
 import {
@@ -49,7 +49,6 @@ import {
 	useAppSelector
 } from "../../Redux/hooks/redux-hooks";
 import {
-	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
 	setMessageRoom,
@@ -57,13 +56,14 @@ import {
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
-import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
+import ToolbarMenu from "./components/ToolbarMenu";
 
 type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	date?: string
 }
 
 type MembersModel =
@@ -71,281 +71,6 @@ type MembersModel =
 	id: number,
 	name:string
 }
-
-// chat part 
-interface TabPanelProps {
-	children?: React.ReactNode;
-	dir?: string;
-	index: number;
-	value: number;
-	style?: CSSProperties;
-	area?: string;
-}
-
-const TabPanel = (props: TabPanelProps) =>
-{
-	const	{ children, value, index, ...other } = props;
-	let		animationSettings;
-
-	if (props.area === "false")
-		animationSettings = {
-			type: "spring",
-			duration: 0.3,
-			scale: 0.6,
-			stiffness: 0
-		};
-	else
-		animationSettings = {
-			type: "sidebar",
-			duration: 0.5,
-			scale: 0.85,
-			stiffness: 80,
-		};
-	return (
-		<motion.div
-			initial={
-				{
-					opacity: 0,
-					scale: animationSettings.scale
-				}}
-			animate={{
-				opacity: value === index ? 1 : 0,
-				scale: value === index ? 1 : animationSettings.scale
-			}}
-			transition={
-				{
-					duration: animationSettings.duration,
-					type: animationSettings.type,
-					stiffness: 80,
-				}}
-			style={{ display: value === index ? "block" : "none" }}
-		>
-			<Typography
-				component="div"
-				role="tabpanel"
-				hidden={value !== index}
-				id={`action-tabpanel-${index}`}
-				aria-labelledby={`action-tab-${index}`}
-				{...other}
-			>
-				<Box sx={{ p: 3 }}>{children}</Box>
-			</Typography>
-		</motion.div>
-	);
-};
-
-type FriendsListProps = {
-	arrayListUsers: [],
-	socketRef: React.MutableRefObject<SocketIOClient.Socket>
-};
-
-const FriendsList = (props: FriendsListProps) =>
-{
-	// const	socketTest = useRef<SocketIOClient.Socket | null>(null);
-	let		friendList: any[];
-	const	dispatch = useAppDispatch();
-	const	users = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.users);
-	});
-	const	kindOfConv = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.kindOfConversation);
-	});
-	const sendMsg = (id: string) =>
-	{
-		const action = {
-			type: "sending-message"
-		};
-		console.log("sendMsg function called with id ", id);
-		// socketTest.current?.emit("send-message", action);
-	};
-	const	numberOfChannels = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.numberOfChannels);
-	});
-
-	const	createNewConv = (activeId: string) =>
-	{
-		// TEST
-		console.log(" friend chatLayout 433: ", kindOfConv);
-		console.log(" friend activeId: ", activeId);
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: "undefined",
-				chanMode: "undefined",
-				chanPassword: "undefined",
-				chanId: numberOfChannels + 1,
-				activeId: activeId
-			}
-		};
-		console.log(" friend 2 chatLayout 433: ", kindOfConv);
-		console.log(" friend 2 chanName: ", action.payload.chanName);
-		props.socketRef.current.emit("channel-info", action);
-	};
-	const displayConversationWindow = (id: string) =>
-	{
-		console.log("layout 189 ", id, " ", numberOfChannels);
-		const action = {
-			type: "display-conversation",
-			payload:
-			{
-				id: id,
-				index: numberOfChannels + 1
-			}
-		};
-		props.socketRef.current?.emit("display-conversation", action);
-	};
-
-	return (
-		<>
-			<CurrentlyTalkingFriend />
-			<Divider />
-			<Grid
-				item
-				xs={12}
-				// style={{padding: '10px'}}
-				sx={{ padding: "10px" }}
-			>
-				<TextField
-					id="outlined-basic-email"
-					label="Search"
-					variant="outlined"
-					fullWidth
-				/>
-			</Grid>
-			<Divider />
-			<List>
-				{
-					users.map((elem, index) =>
-					{
-						return (
-							<>
-								<div onClick={() =>
-								{
-									displayConversationWindow(elem.id);
-									dispatch(setActiveConversationId(elem.id));
-									dispatch(setKindOfConversation("privateMessage"));
-									createNewConv(elem.id);
-									console.log("dispatched");
-								}}>
-									<FriendItem
-										name={elem.name + ": " + elem.id}
-										avatar={elem.avatar}
-										key={index}
-										online={true}
-									/>
-								</div>
-							</>
-						);
-					})
-				}
-			</List>
-		</>
-	);
-};
-
-
-const MessagesArea = () =>
-{
-	let displayMessageArray;
-
-	displayMessageArray = [
-	{
-		sender: "server",
-		message: "Not initiliazed",
-		date: "09:30"
-	},
-	];
-	const	dispatch = useAppDispatch();
-
-	const users = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.users);
-	});
-
-	const activeId = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.activeConversationId);
-	});
-
-	const userActiveIndex = users.findIndex((elem) =>
-	{
-		return (elem.id === activeId);
-	});
-	if (userActiveIndex === -1)
-	{
-		displayMessageArray = [
-			{
-				sender: "server",
-				message: "Ce client n'existe pas",
-				date: "09:30"
-			},
-		];
-	}
-	else
-	{
-		const msgRoom = users[userActiveIndex].msgRoom;
-		let i;
-
-		i = 0;
-		while (msgRoom.length)
-		{
-			if (msgRoom[i].id === activeId)
-			{
-				displayMessageArray = msgRoom[i].content;
-				break;
-			}
-			i++;
-		}
-		if (i === msgRoom.length)
-		{
-			dispatch(setActiveConversationId(activeId));
-			displayMessageArray = [
-				{
-					sender: "server",
-					message: "Conversation with " + activeId,
-					date: "09:30"
-				},
-			];
-		}
-	}
-	return (
-		<>
-			<List
-				sx={{
-					height: "70vh",
-					overflowY: "auto"
-				}}
-			>
-				{
-					displayMessageArray.map((elem, key) =>
-					{
-						return (
-							<MessageItem
-								key={key}
-								date={elem.date}
-								sender={elem.sender as "me" | "other" | "server"}
-								message={elem.message}
-							/>
-						);
-					})
-				}
-			</List>
-		</>
-	);
-};
-
-const a11yProps = (index: any) =>
-{
-	return (
-		{
-			id: `action-tab-${index}`,
-			"aria-controls": `action-tabpanel-${index}`,
-		}
-	);
-};
 
 const	ChatLayout = () =>
 {
@@ -378,11 +103,10 @@ const	ChatLayout = () =>
 
 	// USE STATES
 
-	const
-	[
-		value,
-		setValue
-	] = useState(0);
+	const activeViewValue = useAppSelector((state) =>
+	{
+		return (state.chat.toolbarActiveView);
+	});
 
 	const
 	[
@@ -498,7 +222,6 @@ const	ChatLayout = () =>
 
 	const	createNewChannel = () =>
 	{
-		// TEST
 		console.log("chatLayout 433: ", kindOfConv);
 		console.log(" activeId: ", activeId);
 		const action = {
@@ -677,7 +400,6 @@ const	ChatLayout = () =>
 				}
 			];
 			dispatch(setMessageRoom(msgRoom, data.payload.sender));
-			// dispatch(setMessageContent(data.payload.messageContent));
 			console.log("test send Message: ", data);
 		};
 
@@ -814,15 +536,15 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) =>
-	{
-		setValue(newValue);
-	};
+	// const handleChange = (event: React.SyntheticEvent, newValue: number) =>
+	// {
+	// 	setValue(newValue);
+	// };
 
-	const handleChangeIndex = (index: number) =>
-	{
-		setValue(index);
-	};
+	// const handleChangeIndex = (index: number) =>
+	// {
+	// 	setValue(index);
+	// };
 
 	const refreshListUser = () =>
 	{
@@ -1063,41 +785,11 @@ const	ChatLayout = () =>
 					xs={3}
 					sx={{ borderRight: "1px solid #e0e0e0" }}
 				>
-					<Toolbar
-						style={
-							{
-								backgroundColor: style.palette.primary.main,
-							}}
-					>
-						<Tabs
-							value={value}
-							onChange={handleChange}
-							indicatorColor="primary"
-							textColor="secondary"
-							variant="scrollable"
-							aria-label="action tabs"
-						>
-							<Tab
-								label="Channels"
-								{...a11yProps(0)}
-								style={{fontSize: "15px"}}
-							/>
-							<Tab
-								label="Users"
-								{...a11yProps(1)}
-								style={{fontSize: "15px"}}
-							/>
-							<Tab
-								label="Friends"
-								{...a11yProps(2)}
-								style={{fontSize: "15px"}}
-							/>
-						</Tabs>
-					</Toolbar>
+					<ToolbarMenu/>
 					{/* right side of the screen  */}
 					<TabPanel
 						area="false"
-						value={value}
+						value={activeViewValue}
 						index={0}
 						dir={style.direction}
 						style={style}
@@ -1358,7 +1050,7 @@ const	ChatLayout = () =>
 					</TabPanel>
 					<TabPanel
 						area="false"
-						value={value}
+						value={activeViewValue}
 						index={1}
 						dir={style.direction}
 						style={style}
@@ -1420,7 +1112,7 @@ const	ChatLayout = () =>
 					</TabPanel>
 					<TabPanel
 						area="false"
-						value={value}
+						value={activeViewValue}
 						index={2}
 						dir={style.direction}
 						style={style}
@@ -1450,7 +1142,7 @@ const	ChatLayout = () =>
 				<Grid item xs={9}>
 					<TabPanel
 						area="true"
-						value={value}
+						value={activeViewValue}
 						index={0}
 						dir={style.direction}
 						style={style}
@@ -1487,7 +1179,7 @@ const	ChatLayout = () =>
 					{/* when value == 1 */}
 					<TabPanel
 						area="true"
-						value={value}
+						value={activeViewValue}
 						index={1}
 						dir={style.direction}
 						style={style}

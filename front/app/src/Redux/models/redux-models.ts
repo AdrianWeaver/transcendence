@@ -1,3 +1,10 @@
+
+
+export interface ChatStateModel
+{
+	"toolbarActiveView": number
+}
+
 export interface MessageModelInterface
 {
 	sender: string,
