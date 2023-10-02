@@ -433,6 +433,11 @@ const	ChatLayout = () =>
 		setChanMessages
 	] = useState<MessageModel[]>([]);
 
+	// const [
+	// 	privMessages,
+	// 	setPrivMessages
+	// ] = useState<MessageModel[]>([]);
+
 	const [
 		openPasswordDialog,
 		setOpenPasswordDialog
@@ -1499,7 +1504,27 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<MessagesArea/>
+						{/* <MessagesArea/> */}
+						{chanMessages.map((message: MessageModel, index) =>
+							{
+								let	sender: "me" | "other" | "server";
+
+								if (uniqueId === message.sender)
+									sender = "me";
+								else
+									sender = "other";
+								return (
+									// <ListItem key={message.id}>
+									// 	<ListItemText primary={message.message} />
+									// </ListItem>
+									<MessageItem
+										key={index}
+										sender={sender}
+										date={message.sender}
+										message={message.message}
+									/>
+								);
+							})}
 					</TabPanel>
 
 					<Divider />
