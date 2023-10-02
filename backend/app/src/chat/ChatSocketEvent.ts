@@ -151,6 +151,7 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
+				// TEST
 				console.log(data);
 				const copyUsers = this.chatService.getAllUsers();
 				const	searchUser = copyUsers.findIndex((elem) =>
@@ -177,6 +178,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
+					// TEST
 					console.log("channel undefined ");
 					if (channel === undefined)
 						return ;
@@ -221,7 +223,7 @@ export class ChatSocketEvents
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
-					if (searchUser > -1)
+					if (searchUser > -1 && data.payload.kind !== "channel")
 					{
 						chanName = this.chatService.createPrivateConvName(client.id, data.payload.activeId);
 						const chanName1 = this.chatService.createPrivateConvName(data.payload.activeId, client.id);
@@ -257,7 +259,7 @@ export class ChatSocketEvents
 							payload:
 							{
 								chanMap: this.chatService.getChanMap(),
-								kind: kind,
+								kind: "channel",
 								privateMessageMap: undefined
 							}
 						};
@@ -285,7 +287,7 @@ export class ChatSocketEvents
 							payload:
 							{
 								chanMap: undefined,
-								kind: kind,
+								kind: "privateMessage",
 								privateMessageMap: this.chatService.getPrivateMessageMap()
 							}
 						};

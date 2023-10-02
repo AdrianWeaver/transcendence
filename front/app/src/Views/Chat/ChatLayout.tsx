@@ -135,7 +135,7 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 type FriendsListProps = {
-	arrayListUsers: [],
+	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
 };
 
@@ -222,7 +222,6 @@ const FriendsList = (props: FriendsListProps) =>
 									dispatch(setActiveConversationId(elem.id));
 									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
-									console.log("dispatched");
 								}}>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
@@ -295,7 +294,7 @@ const MessagesArea = () =>
 		}
 		if (i === msgRoom.length)
 		{
-			//dispatch(setKindOfConversation("privateMessage"));
+			// dispatch(setKindOfConversation("privateMessage"));
 			dispatch(setActiveConversationId(activeId));
 			displayMessageArray = [
 				{
@@ -503,7 +502,7 @@ const	ChatLayout = () =>
 
 	const	createNewChannel = () =>
 	{
-		console.log("Layout 512 createNewChannel ", kindOfConversation);
+		console.log("create chanel ?", kindOfConversation);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -517,8 +516,6 @@ const	ChatLayout = () =>
 			}
 		};
 		dispatch(setNumberOfChannels(channels.length));
-		console.log(" 2 chatLayout 526: ", kindOfConversation);
-		console.log(" 2 chanName: ", action.payload.chanName);
 		socketRef.current?.emit("channel-info", action);
 	};
 
@@ -562,7 +559,6 @@ const	ChatLayout = () =>
 			return;
 		}
 		setKindOfConversation("channel");
-		// dispatch(setKindOfConversation("channel"));
 		console.log("Channel ", kindOfConversation);
 		createNewChannel();
 		handleClose();
@@ -618,9 +614,10 @@ const	ChatLayout = () =>
 
 			if(data.type === "add-new-channel")
 			{
-				if (data.payload.chanMap !== undefined && data.payload.chanMap.length)
+				console.log("add new channel ", data.payload);
+				if (data.payload.kind === "channel")
 					setChannels(data.payload.chanMap);
-				if (data.payload.privateMessageMap !== undefined)
+				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
 				// dispatch(setKindOfConversation(data.payload.kind));
@@ -671,7 +668,7 @@ const	ChatLayout = () =>
 		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			console.log("information from server: ", data);
-			// setArrayListUser(data.payload.arrayListUser);
+			setArrayListUser(data.payload.arrayListUser);
 		};
 
 		const sendMessageToUser = (data: any) =>
@@ -691,18 +688,18 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("chanName = ", data.payload.chanName, " current ", currentChannelRef.current, " kind ", data.payload.kind);
-			setKindOfConversation(data.payload.kind);
-			console.log(" kindOfConversation ", kindOfConversation);
+			const	kind = data.payload.kind;
+			setKindOfConversation(kind);
+			console.log(" kindOfConversation ", kindOfConversation, " ", kind);
 			if (data.payload.chanName === currentChannelRef.current)
 			{
+				setKindOfConversation(data.payload.kind);
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
 				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
 				{
 					return (!blockedListRef.current.includes(message.sender));
 				});
-				console.log(" filtered message ", filteredMessages, " kind ? ", kindOfConversation);
 				if (data.payload.kind === "channel")
 					setChanMessages(filteredMessages);
 				else if (data.payload.kind === "privateMessage")
