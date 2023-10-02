@@ -52,9 +52,12 @@ import {
 	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
-	setMessageRoom
+	setMessageRoom,
+	setKindOfConversation,
+	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
+import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
 
 type MessageModel =
 {
@@ -132,19 +135,23 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 type FriendsListProps = {
-	arrayListUsers: []
+	arrayListUsers: [],
+	socketRef: React.MutableRefObject<SocketIOClient.Socket>
 };
 
 const FriendsList = (props: FriendsListProps) =>
 {
-	const	socketTest = useRef<SocketIOClient.Socket | null>(null);
+	// const	socketTest = useRef<SocketIOClient.Socket | null>(null);
 	let		friendList: any[];
 	const	dispatch = useAppDispatch();
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
 	});
-
+	const	kindOfConv = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.kindOfConversation);
+	});
 	const sendMsg = (id: string) =>
 	{
 		const action = {
@@ -153,17 +160,42 @@ const FriendsList = (props: FriendsListProps) =>
 		console.log("sendMsg function called with id ", id);
 		// socketTest.current?.emit("send-message", action);
 	};
+	const	numberOfChannels = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.numberOfChannels);
+	});
 
+	const	createNewConv = (activeId: string) =>
+	{
+		// TEST
+		console.log(" friend chatLayout 433: ", kindOfConv);
+		console.log(" friend activeId: ", activeId);
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: "undefined",
+				chanMode: "undefined",
+				chanPassword: "undefined",
+				chanId: numberOfChannels + 1,
+				activeId: activeId
+			}
+		};
+		console.log(" friend 2 chatLayout 433: ", kindOfConv);
+		console.log(" friend 2 chanName: ", action.payload.chanName);
+		props.socketRef.current.emit("channel-info", action);
+	};
 	const displayConversationWindow = (id: string) =>
 	{
+		console.log("layout 189 ", id, " ", numberOfChannels);
 		const action = {
 			type: "display-conversation",
 			payload:
 			{
-				id: id
+				id: id,
+				index: numberOfChannels + 1
 			}
 		};
-		socketTest.current?.emit("display-conversation", action);
+		props.socketRef.current?.emit("display-conversation", action);
 	};
 
 	return (
@@ -194,6 +226,9 @@ const FriendsList = (props: FriendsListProps) =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
+									dispatch(setKindOfConversation("privateMessage"));
+									createNewConv(elem.id);
+									console.log("dispatched");
 								}}>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
@@ -212,7 +247,7 @@ const FriendsList = (props: FriendsListProps) =>
 };
 
 
-const MessagesArea = (text: any) =>
+const MessagesArea = () =>
 {
 	let displayMessageArray;
 
@@ -223,6 +258,7 @@ const MessagesArea = (text: any) =>
 		date: "09:30"
 	},
 	];
+	const	dispatch = useAppDispatch();
 
 	const users = useAppSelector((state) =>
 	{
@@ -265,14 +301,15 @@ const MessagesArea = (text: any) =>
 		}
 		if (i === msgRoom.length)
 		{
+			//dispatch(setKindOfConversation("privateMessage"));
+			dispatch(setActiveConversationId(activeId));
 			displayMessageArray = [
 				{
 					sender: "server",
-					message: "conversation vide " + activeId,
+					message: "Conversation with " + activeId,
 					date: "09:30"
 				},
 			];
-			console.log("ALors ? ", text);
 		}
 	}
 	return (
@@ -321,12 +358,24 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.connected);
 	});
-
+	const	numberOfChannels = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.numberOfChannels);
+	});
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
 	});
 	const currentChannelRef = useRef(currentChannel);
+
+	const	kindOfConv = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.kindOfConversation);
+	});
+	const	activeId = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.activeConversationId);
+	});
 
 	// USE STATES
 
@@ -371,6 +420,12 @@ const	ChatLayout = () =>
 	const [
 		channels,
 		setChannels
+	] = useState([]);
+
+	const
+	[
+		privateMessage,
+		setPrivateMessage
 	] = useState([]);
 
 	const [
@@ -439,11 +494,20 @@ const	ChatLayout = () =>
 		setJoiningChannelName
 	] = useState("");
 
+	// const
+	// [
+	// 	kindOfConversation,
+	// 	setKindOfConversation
+	// ] = useState("");
+
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
+		// TEST
+		console.log("chatLayout 433: ", kindOfConv);
+		console.log(" activeId: ", activeId);
 		const action = {
 			type: "create-channel",
 			payload: {
@@ -451,8 +515,13 @@ const	ChatLayout = () =>
 				chanMode: selectedMode,
 				chanPassword: chanPassword,
 				chanId: channels.length + 1,
+				activeId: activeId,
+				kind: kindOfConv
 			}
 		};
+		dispatch(setNumberOfChannels(channels.length));
+		console.log(" 2 chatLayout 433: ", kindOfConv);
+		console.log(" 2 chanName: ", action.payload.chanName);
 		socketRef.current?.emit("channel-info", action);
 	};
 
@@ -463,6 +532,7 @@ const	ChatLayout = () =>
 			payload: {
 				name: chanName,
 				id: chanId,
+				kind: kindOfConv
 			}
 		};
 		socketRef.current?.emit("channel-info", action);
@@ -470,6 +540,10 @@ const	ChatLayout = () =>
 
 	const handleSave = () =>
 	{
+		console.log("layout 469: ", kindOfConv);
+		setKindOfConversation("channel");
+		dispatch(setKindOfConversation("channel"));
+		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
 			alert("Channel name cannot be empty");
@@ -501,6 +575,8 @@ const	ChatLayout = () =>
 			type: "asked-join",
 			payload: {
 				chanName: chanName,
+				activeId: activeId,
+				kind: kindOfConv
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -536,18 +612,26 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.channels !== undefined)
 					setChannels(data.payload.channels);
+				if (data.payload.privateMessage !== undefined)
+					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
 			}
 
 			if(data.type === "add-new-channel")
 			{
-				setChannels(data.payload);
+				if (data.payload.chanMap !== undefined && data.payload.chanMap.length)
+					setChannels(data.payload.chanMap);
+				if (data.payload.privateMessageMap !== undefined)
+					setPrivateMessage(data.payload.privateMessageMap);
+				dispatch(setKindOfConversation(data.payload.kind));
 			}
 
 			if (data.type === "destroy-channel")
 			{
 				if (data.payload.message === "")
 					setChannels(data.payload.chanMap);
+				else if (data.payload.privateMessage !== undefined)
+					setPrivateMessage(data.payload.privateMessageMap);
 				else
 					alert(data.payload.message);
 			}
@@ -556,6 +640,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
+
 				else
 				{
 					setChanMessages([]);
@@ -629,7 +714,6 @@ const	ChatLayout = () =>
 				else
 					alert(data.payload.isInside);
 			}
-
 			if (data.type === "display-members")
 			{
 				setChannelMembers(data.payload.memberList);
@@ -684,6 +768,7 @@ const	ChatLayout = () =>
 		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
 		socket.on("left-message", leftChannelMessage);
+		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
 
         socket.connect();
@@ -699,6 +784,7 @@ const	ChatLayout = () =>
 			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
 			socket.on("left-message", leftChannelMessage);
+			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
         });
     }, []);
@@ -750,7 +836,7 @@ const	ChatLayout = () =>
 		// if (chatConnected === false)
 		// {
 		const action = {
-			type: "get-user-list"
+			type: "get-user-list",
 		};
 		socketRef.current?.emit("info", action);
 		// 	console.log("request data from server", connected);
@@ -806,10 +892,13 @@ const	ChatLayout = () =>
 
 	const	goToChannel = (chanName: string) =>
 	{
+		console.log("LAYOUT 815 ", activeId);
 		const	action = {
 			type: "did-I-join",
 			payload: {
 				chanName: chanName,
+				kind: kindOfConv,
+				userId: activeId
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -1121,6 +1210,7 @@ const	ChatLayout = () =>
 													primary={channel.name}
 													onClick={() =>
 													{
+														setKindOfConversation("channel");
 														return (goToChannel(channel.name));
 													}}
 												/>
@@ -1280,7 +1370,60 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<FriendsList arrayListUsers={arrayListUser} />
+						{/* ///////////// */}
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser}/>
+							<List>
+								{privateMessage.map((channel: any) =>
+									{
+										return (
+											<ListItem style={listItemStyle} key={channel.id}>
+												<ListItemText
+													style={
+														channel.name === currentChannel
+														? { color: "green" }
+														: listItemTextStyle
+													}
+													primary={channel.name}
+													onClick={() =>
+													{
+														setKindOfConversation("privateMessage");
+														return (goToChannel(channel.name));
+													}}
+												/>
+												<Button onClick={handleDialogOpen}>
+													Options
+												</Button>
+												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+													<DialogTitle>
+														Choose an Action
+													</DialogTitle>
+													<DialogContent>
+													<Button onClick={() =>
+														{
+															setKindOfConversation("privateMessage");
+															return handleJoinButtonClick(channel.mode, channel.name);
+														}}>
+															Talk
+														</Button>
+														<Button onClick={() =>
+														{
+															return handleRemoveButtonClick(channel.id, channel.name);
+														}}>
+															Remove
+														</Button>
+													</DialogContent>
+													<DialogActions>
+													<Button onClick={handleDialogClose} color="primary">
+														Cancel
+													</Button>
+													</DialogActions>
+												</Dialog>
+											</ListItem>
+										);
+									})
+								}
+							</List>
+						{/* ////////////////// */}
 					</TabPanel>
 					<TabPanel
 						area={false}
@@ -1356,7 +1499,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<MessagesArea />
+						<MessagesArea/>
 					</TabPanel>
 
 					<Divider />

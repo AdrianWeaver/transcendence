@@ -15,7 +15,9 @@ type ChanMapModel = {
 class Chat
 {
     public channels: Channel[] = [];
+    public privateMessage: Channel[] = [];
     public chanMap: Array<ChanMapModel> = [];
+    public privateMessageMap: Array<ChanMapModel> = [];
     public users: User[] = [];
     public server: Server | undefined;
     public activeMembers: number;

@@ -59,7 +59,9 @@ const	initialControllerState: ControllerModel = {
 					message: "undefined",
 					mode: "undefined",
 				}
-			]
+			],
+			kindOfConversation: "undefined",
+			numberOfChannels: -1
 		},
 	},
 	registration:
@@ -166,6 +168,14 @@ const	controllerSlice = createSlice(
 		setCurrentChannel(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.currentChannel = action.payload.user.chat.currentChannel;
+		},
+		setKindOfConversation(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.kindOfConversation = action.payload.user.chat.kindOfConversation;
+		},
+		setNumberOfChannels(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.numberOfChannels = action.payload.user.chat.numberOfChannels;
 		},
 		setMessageRoom(state, action: PayloadAction<ControllerModel>)
 		{

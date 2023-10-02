@@ -43,6 +43,8 @@ export interface ChatModel
 	"activeConversationId": string,
 	"currentChannel": string,
 	"chanMessages": MessageModel[],
+	"kindOfConversation": string,
+	"numberOfChannels": number
 }
 
 export interface	UserModel

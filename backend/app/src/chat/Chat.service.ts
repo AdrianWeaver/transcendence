@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 import {
@@ -71,6 +72,12 @@ export	class ChatService
 		return (this.chat.chanMap);
 	}
 
+	public getPrivateMessageMap(): ChanMapModel[]
+	{
+		return (this.chat.privateMessageMap);
+	}
+
+
 	// search users and sockets
 
 	public	searchUser(clientId: string)
@@ -125,16 +132,28 @@ export	class ChatService
 
 	// channel functions
 
-	public	addNewChannel(newChannel: Channel, chanId: number)
+	public	addNewChannel(newChannel: Channel, chanId: number, kind: string)
 	{
-		this.chat.channels.push(newChannel);
-		const newElement: ChanMapModel = {
-			id: chanId,
-			name: newChannel.name,
-			mode: newChannel.mode
-
-		};
-		this.chat.chanMap.push(newElement);
+		if (kind === "channel")
+		{
+			this.chat.channels.push(newChannel);
+			const newElement: ChanMapModel = {
+				id: chanId,
+				name: newChannel.name,
+				mode: newChannel.mode
+			};
+			this.chat.chanMap.push(newElement);
+		}
+		else if (kind === "privateMessage")
+		{
+			this.chat.privateMessage.push(newChannel);
+			const newElement: ChanMapModel = {
+				id: chanId,
+				name: newChannel.name,
+				mode: "undefined"
+			};
+			this.chat.privateMessageMap.push(newElement);
+		}
 	}
 
 	public	getAllUsers()
@@ -191,5 +210,48 @@ export	class ChatService
 			return (element.name === chanName);
 		});
 		return (searchChannel);
+	}
+
+	public	createPrivateConvName(senderId: string, receiverId: string)
+	{
+		const	tmp = senderId.slice(0, senderId.length / 2);
+		const	tmp1 = receiverId.slice(0, receiverId.length / 2);
+		const	newId = tmp + tmp1;
+		return (newId);
+	}
+
+	public	searchPrivateConvByUsers(convId: string, userId: string, userId1: string)
+	{
+		const	userIndex = this.searchUserIndex(userId);
+		const	userIndex1 = this.searchUserIndex(userId1);
+
+		if (userIndex > -1)
+		{
+			const	searchConv = this.chat.users[userIndex].channels.find((element) =>
+			{
+				return (element.name === convId);
+			});
+			if (searchConv !== undefined)
+				return searchConv;
+		}
+		if (userIndex1 > -1)
+		{
+			const	searchConv = this.chat.users[userIndex1].channels.find((element) =>
+			{
+				return (element.name === convId);
+			});
+			if (searchConv !== undefined)
+				return searchConv;
+		}
+		return undefined;
+	}
+
+	public	searchPrivateConvByName(chanName: string)
+	{
+		const	searchPrivateMessage = this.chat.privateMessage.find((element) =>
+		{
+			return (element.name === chanName);
+		});
+		return (searchPrivateMessage);
 	}
 }
