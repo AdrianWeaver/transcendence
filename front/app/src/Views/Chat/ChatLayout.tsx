@@ -408,6 +408,11 @@ const	ChatLayout = () =>
 		setBlockedList
 	] = useState<string[]>([]);
 
+	const [
+		isMuted,
+		setIsMuted
+	] = useState(false);
+
 	// END OF USE STATEs
 
 	const handleClickOpen = () =>
@@ -435,6 +440,7 @@ const	ChatLayout = () =>
 	] = useState("");
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
+	const blockedListRef = useRef(blockedList);
 
 	const	createNewChannel = () =>
 	{
@@ -601,7 +607,13 @@ const	ChatLayout = () =>
 		{
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setChanMessages(data.payload.messages);
+				// we will filter messages from blocked users if any
+				const	tmpMessages = data.payload.messages;
+				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
+				{
+					return (!blockedListRef.current.includes(message.sender));
+				});
+				setChanMessages(filteredMessages);
 			}
 		};
 
@@ -653,6 +665,14 @@ const	ChatLayout = () =>
 				const	alertMessage = "You have blocked " + data.payload.newBlocked + ".";
 				alert(alertMessage);
 			}
+
+			if (data.type === "set-is-muted")
+			{
+				console.log("LOL");
+				setIsMuted(true);
+				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
+				alert(message);
+			}
 		};
 
 		socket.on("connect", connect);
@@ -687,9 +707,20 @@ const	ChatLayout = () =>
 	{
 		currentChannelRef.current = currentChannel;
 		joiningChannelNameRef.current = joiningChannelName;
+		blockedListRef.current = blockedList;
+
+		if (isMuted === true)
+		{
+			setTimeout(() =>
+			{
+				setIsMuted(false);
+			}, 60000);
+		}
 	}, [
 		currentChannel,
-		joiningChannelName
+		joiningChannelName,
+		isMuted,
+		blockedList
 	]);
 
 	const handlePasswordSubmit = (password: string) =>
@@ -753,7 +784,10 @@ const	ChatLayout = () =>
 
 	const handleTextChange = (e: any) =>
 	{
-		setText(e.target.value);
+		if (isMuted === true)
+			alert("You are muted for the moment being.");
+		else
+			setText(e.target.value);
 	};
 
 	const handleSendClick = () =>
@@ -865,7 +899,7 @@ const	ChatLayout = () =>
 
 	// END OF MEMBERS
 
-	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK)
+	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
 
 	const	kickUserFromChannel = (userName: string, chanName: string) =>
 	{
@@ -908,6 +942,18 @@ const	ChatLayout = () =>
 			type: "block-user",
 			payload: {
 				blockedName: userName,
+			}
+		};
+		socketRef.current.emit("user-info", action);
+	};
+
+	const	muteUserInChannel = (userName: string, chanName: string) =>
+	{
+		const	action = {
+			type: "mute-user",
+			payload: {
+				chanName: chanName,
+				userName: userName,
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -1135,6 +1181,12 @@ const	ChatLayout = () =>
 																						banUserFromChannel(member.name, channel.name);
 																					}}>
 																						Ban
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						muteUserInChannel(member.name, channel.name);
+																					}}>
+																						Mute
 																					</Button>
 																				</>)}
 																				{member.name !== uniqueId && (

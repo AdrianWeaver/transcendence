@@ -456,15 +456,36 @@ export class ChatSocketEvents
 			if (data.type === "block-user")
 			{
 				const	userMe = this.chatService.getUserByName(client.id);
-				userMe?.friends.push(data.payload.blockedName);
+				if (userMe === undefined)
+					return ;
+				console.log("blocked: " + data.payload.blockedName);
+				userMe.blocked.push(data.payload.blockedName);
+				console.log("blocked members: " + userMe.blocked);
 				const	action = {
 					type: "block-user",
 					payload: {
-						blockedList: userMe?.blocked,
+						blockedList: userMe.blocked,
 						newBlocked: data.payload.blockedName,
 					}
 				};
 				client.emit("user-info", action);
+			}
+
+			if (data.type === "mute-user")
+			{
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	targetClient = channel.findClientById(data.payload.userName);
+				if (targetClient === undefined)
+					return ;
+				const	action = {
+					type: "set-is-muted",
+					payload: {
+						chanName: channel.name,
+					}
+				};
+				targetClient.emit("user-info", action);
 			}
 		}
 	}
