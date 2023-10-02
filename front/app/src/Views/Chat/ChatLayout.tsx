@@ -72,6 +72,12 @@ type MembersModel =
 	name:string
 }
 
+type ChanMapModel = {
+    id: number,
+    name: string,
+    mode: string
+};
+
 // chat part 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -468,6 +474,15 @@ const	ChatLayout = () =>
 		setIsMuted
 	] = useState(false);
 
+	const [
+		buttonSelection,
+		setButtonSelection
+	] = useState<ChanMapModel>({
+		id: 0,
+		name: "",
+		mode: "",
+	});
+
 	// END OF USE STATEs
 
 	const handleClickOpen = () =>
@@ -482,6 +497,8 @@ const	ChatLayout = () =>
 		setChanPassword("");
 		setOpen(false);
 	};
+
+
 
 	const
 	[
@@ -935,6 +952,11 @@ const	ChatLayout = () =>
 	const handleDialogClose = () =>
 	{
 		setIsDialogOpen(false);
+		setButtonSelection({
+			id: 0,
+			name: "",
+			mode: "",
+		});
 	};
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
@@ -1214,7 +1236,11 @@ const	ChatLayout = () =>
 														return (goToChannel(channel.name));
 													}}
 												/>
-												<Button onClick={handleDialogOpen}>
+												<Button onClick={() =>
+												{
+													handleDialogOpen();
+													setButtonSelection(channel);
+												}}>
 													Options
 												</Button>
 												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
@@ -1224,25 +1250,25 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(channel.mode, channel.name);
+															return handleJoinButtonClick(buttonSelection.mode, buttonSelection.name);
 														}}>
 															Join
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleLeaveButtonClick(channel.id, channel.name);
+															return handleLeaveButtonClick(buttonSelection.id, buttonSelection.name);
 														}}>
 															Leave
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(channel.id, channel.name);
+															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
 														}}>
 															Remove
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(channel.name);
+															return handleMembersClickOpen(buttonSelection.name);
 														}}>
 															Members
 														</Button>
@@ -1261,20 +1287,20 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						kickUserFromChannel(member.name, channel.name);
+																						kickUserFromChannel(member.name, buttonSelection.name);
 																						handleMembersClose();
 																					}}>
 																						Kick
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						banUserFromChannel(member.name, channel.name);
+																						banUserFromChannel(member.name, buttonSelection.name);
 																					}}>
 																						Ban
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						muteUserInChannel(member.name, channel.name);
+																						muteUserInChannel(member.name, buttonSelection.name);
 																					}}>
 																						Mute
 																					</Button>
