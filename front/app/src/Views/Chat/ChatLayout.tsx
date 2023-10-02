@@ -566,6 +566,7 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
+		console.log("JOIN CHANNEL ", kindOfConversation);
 		const	action = {
 			type: "asked-join",
 			payload: {
@@ -625,10 +626,10 @@ const	ChatLayout = () =>
 
 			if (data.type === "destroy-channel")
 			{
-				if (data.payload.message === "")
-					setChannels(data.payload.chanMap);
-				else if (data.payload.privateMessage !== undefined)
+				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
+				else if (data.payload.message === "")
+					setChannels(data.payload.chanMap);
 				else
 					alert(data.payload.message);
 			}
@@ -712,9 +713,12 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.isInside === "")
 				{
+					console.log("is inside ", kindOfConversation, " ", data.payload);
 					dispatch(setCurrentChannel(data.payload.chanName));
-					setChanMessages(data.payload.chanMessages);
-					setPrivMessages(data.payload.chanMessages);
+					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+						setChanMessages(data.payload.chanMessages);
+					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+						setPrivMessages(data.payload.chanMessages);
 				}
 				else
 					alert(data.payload.isInside);
@@ -730,10 +734,13 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "left-channel")
 			{
+				console.log("is inside ", kindOfConversation, " ", data.payload);
 				if (currentChannelRef.current === data.payload.chanName)
 				{
-					setChanMessages([]);
-					setPrivMessages([]);
+					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+						setChanMessages([]);
+					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
 				}
 				alert(data.payload.message);
@@ -793,7 +800,11 @@ const	ChatLayout = () =>
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
         });
-    }, []);
+    }, [
+		// dispatch,
+		// joinChannel,
+		// kindOfConversation
+	]);
 
 	useEffect(() =>
 	{
@@ -896,14 +907,13 @@ const	ChatLayout = () =>
 		// MessagesArea(text);
 	};
 
-	const	goToChannel = (chanName: string) =>
+	const	goToChannel = (chanName: string, kind: string) =>
 	{
-		console.log("LAYOUT 905 ", activeId, " kind ? ", kindOfConversation);
 		const	action = {
 			type: "did-I-join",
 			payload: {
 				chanName: chanName,
-				kind: kindOfConversation,
+				kind: kind,
 				userId: activeId
 			}
 		};
@@ -1218,7 +1228,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("channel");
-														return (goToChannel(channel.name));
+														return (goToChannel(channel.name, "channel"));
 													}}
 												/>
 												<Button onClick={handleDialogOpen}>
@@ -1395,7 +1405,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name));
+														return (goToChannel(channel.name, "privateMessage"));
 													}}
 												/>
 											</ListItem>

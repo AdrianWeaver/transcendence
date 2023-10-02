@@ -333,7 +333,7 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join")
+			if (data.type === "asked-join" && data.payload.kind === "channel")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
@@ -356,6 +356,7 @@ export class ChatSocketEvents
 				client.emit("display-channels", action);
 				if (action.payload.message === "")
 				{
+					console.log("KIND ????", data.payload.kind);
 					client.join(data.payload.chanName);
 					const id = searchChannel.messages.length + 1;
 					const	messageText = "Welcome to the channel, " + client.id + " !";
@@ -377,6 +378,7 @@ export class ChatSocketEvents
 					// if (room)
 					// 	console.log("room members: " + room.size);
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
+
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);
 					searchChannel.sockets.push(client);
@@ -399,6 +401,7 @@ export class ChatSocketEvents
 
 			if (data.type === "did-I-join")
 			{
+				console.log("did i join ", data.payload.kind);
 				let	channel;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
@@ -409,6 +412,7 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 						isInside: "",
 						chanMessages: channel?.messages,
+						kind: data.payload.kind
 					}
 				};
 				if (channel?.isMember(client.id) === false)
