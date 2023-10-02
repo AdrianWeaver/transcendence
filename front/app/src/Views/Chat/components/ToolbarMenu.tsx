@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-
+/* eslint-disable max-lines-per-function */
 
 import {
 	Tab,
@@ -17,12 +17,6 @@ import
 
 import { setActiveViewToolbar } from "../../../Redux/store/chatAction";
 
-// type ToolbarProps =
-// {
-// 	activeView?: number
-// };
-
-// eslint-disable-next-line max-lines-per-function
 const ToolbarMenu = () =>
 {
 	const	style = useTheme();
