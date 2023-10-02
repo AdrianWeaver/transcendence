@@ -1,5 +1,5 @@
 #!/bin/bash
 
-npm install
+npm install --no-bin-links
 
 exec "$@"
