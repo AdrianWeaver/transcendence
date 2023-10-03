@@ -1,6 +1,7 @@
 /* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
+import { type } from "os";
 import Channel from "./Channel";
 import Message from "./Message";
 import User from "./User";
@@ -12,6 +13,17 @@ type ChanMapModel = {
     mode: string
 };
 
+type Score = {
+	playerOne: number,
+	playerTwo: number
+}
+
+type MatchHistory = {
+    playerOne: string,
+	playerTwo: string,
+	score: Score,
+	moves: number
+};
 class Chat
 {
     public channels: Channel[] = [];
@@ -23,6 +35,7 @@ class Chat
     public activeMembers: number;
     public memberSocketIds: string[] = [];
     public message: Message[];
+	public matchHistory: MatchHistory;
     public deleteChannel: (name: string) => void;
     public addUserToChannel: (name: string, id: string) => void;
     public displayMessage: (message: Message) => void;
