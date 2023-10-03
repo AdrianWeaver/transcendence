@@ -2,7 +2,6 @@
 import {
 	BrowserRouter,
 	Navigate,
-	Outlet,
 	Route,
 	Routes,
 } from "react-router-dom";
@@ -18,10 +17,9 @@ import TestBall from "../Views/TestBall/TestBall";
 
 import GameSetup from "../Views/GameSetup/GameSetup";
 
-import Chat from "../Views/Chat/Chat";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
-import { setBigWindow } from "../Redux/store/controllerAction";
-import { Landing } from "../Views/Chat/Landing";
+// import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
+// import { setBigWindow } from "../Redux/store/controllerAction";
+// import { Landing } from "../Views/Chat/Landing";
 import ChatLayout from "../Views/Chat/ChatLayout";
 
 
@@ -85,7 +83,7 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="the-chat"
-					element={<Chat />}
+					element={<ChatLayout />}
 				/>
 				<Route
 					path="the-chat-layout"
