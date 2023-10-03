@@ -58,6 +58,7 @@ import {
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
 import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
+import { clearSocket, setSocket } from "../../Redux/store/chatAction";
 
 type MessageModel =
 {
@@ -340,30 +341,18 @@ const	ChatLayout = () =>
 
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
-	const	chatConnected = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.connected);
-	});
-	const	numberOfChannels = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.numberOfChannels);
-	});
+
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
 	});
+
 	const currentChannelRef = useRef(currentChannel);
 
-	const	kindOfConv = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.kindOfConversation);
-	});
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
 	});
-
-	// USE STATES
 
 	const
 	[
@@ -483,8 +472,6 @@ const	ChatLayout = () =>
 		setChannelToInvite
 	] = useState("");
 
-	// END OF USE STATEs
-
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -497,8 +484,6 @@ const	ChatLayout = () =>
 		setChanPassword("");
 		setOpen(false);
 	};
-
-
 
 	const
 	[
@@ -548,8 +533,6 @@ const	ChatLayout = () =>
 	const handleSave = () =>
 	{
 		setKindOfConversation("channel");
-		// dispatch(setKindOfConversation("channel"));
-		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
 			alert("Channel name cannot be empty");
@@ -589,23 +572,27 @@ const	ChatLayout = () =>
 		socketRef.current.emit("channel-info", action);
 	};
 
+	const	socket = useAppSelector((state) =>
+	{
+		return (state.chat.socket);
+	});
+
 	useEffect(() =>
 	{
-		const socket = io(URL,
-			{
+		if (!socket)
+		{
+			const	config = {
 				autoConnect: false,
 				reconnectionAttempts: 5,
-			});
+			};
+			const	newSocket = io(URL, config);
+			dispatch(setSocket(newSocket));
+		}
 
 		socketRef.current = socket;
-
 		const connect = () =>
 		{
 			setConnected(true);
-			// setTimeout(() =>
-			// {
-			// 	socket.emit("info", action);
-			// }, 1000);
 		};
 
 		const disconnect = () =>
@@ -788,38 +775,44 @@ const	ChatLayout = () =>
 			}
 		};
 
-		socket.on("connect", connect);
-		socket.on("disconnect", disconnect);
-		socket.on("error", connectError);
-		socket.on("info", serverInfo);
-		socket.on("send-message", sendMessageToUser);
-		socket.on("display-channels", updateChannels);
-		socket.on("channel-info", channelInfo);
-		socket.on("update-messages", updateMessages);
-		socket.on("left-message", leftChannelMessage);
-		socket.on("get-user-list", updateChannels);
-		socket.on("user-info", userInfo);
-
-        socket.connect();
-
+		if (socket)
+		{
+			socket.on("connect", connect);
+			socket.on("disconnect", disconnect);
+			socket.on("error", connectError);
+			socket.on("info", serverInfo);
+			socket.on("send-message", sendMessageToUser);
+			socket.on("display-channels", updateChannels);
+			socket.on("channel-info", channelInfo);
+			socket.on("update-messages", updateMessages);
+			socket.on("left-message", leftChannelMessage);
+			socket.on("get-user-list", updateChannels);
+			socket.on("user-info", userInfo);
+			socket.connect();
+		}
 		return (() =>
 		{
-			socket.off("connect", connect);
-			socket.off("disconnect", disconnect);
-			socket.off("error", connectError);
-			socket.off("info", serverInfo);
-			socket.off("sending-message", sendMessageToUser);
-			socket.off("display-channels", updateChannels);
-			socket.off("channel-info", channelInfo);
-			socket.off("update-messages", updateMessages);
-			socket.on("left-message", leftChannelMessage);
-			socket.off("get-user-list", updateChannels);
-			socket.off("user-info", userInfo);
-        });
-    }, [
-		// dispatch,
-		// joinChannel,
-		// kindOfConversation
+			if (socket)
+			{
+				socket.off("connect", connect);
+				socket.off("disconnect", disconnect);
+				socket.off("error", connectError);
+				socket.off("info", serverInfo);
+				socket.off("sending-message", sendMessageToUser);
+				socket.off("display-channels", updateChannels);
+				socket.off("channel-info", channelInfo);
+				socket.off("update-messages", updateMessages);
+				socket.on("left-message", leftChannelMessage);
+				socket.off("get-user-list", updateChannels);
+				socket.off("user-info", userInfo);
+				socket.close();
+				dispatch(clearSocket());
+			}
+		});
+	},
+	[
+		socket,
+		dispatch
 	]);
 
 	useEffect(() =>

@@ -170,6 +170,7 @@ export	class ChatService
 			};
 			users.push(user);
 		});
+		console.log(users);
 		return (users);
 	}
 

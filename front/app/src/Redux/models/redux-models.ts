@@ -1,3 +1,10 @@
+// import { Socket } from "socket.io-client";
+
+export interface ChatStateModel
+{
+	"toolbarActiveView": number,
+	socket: any | null;
+}
 export interface MessageModelInterface
 {
 	sender: string,
