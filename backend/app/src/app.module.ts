@@ -4,7 +4,7 @@ import { AppService } from "./app.service";
 import {
 	AnonymousUserService
 } from "./anonymous-user/anonymous-user.service";
-import { AdminsModule } from './admins/admins.module';
+import { AdminsModule } from "./admins/admins.module";
 import
 {
 	AnonymousUserController
@@ -12,7 +12,7 @@ import
 import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
 import { GameSocketModule } from "./game-socket/game-socket.module";
-import { ChatModule } from './chat/chat.module';
+import { ChatModule } from "./chat/chat.module";
 import { ChatService } from "./chat/Chat.service";
 
 
@@ -21,7 +21,6 @@ import { ChatService } from "./chat/Chat.service";
 	imports:
 	[
 		AdminsModule,
-		//GameSocketModule,
 		ChatModule,
 	],
 	controllers: [

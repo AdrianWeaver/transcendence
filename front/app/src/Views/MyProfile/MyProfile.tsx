@@ -27,11 +27,10 @@ const	MyProfile = () =>
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	console.log(data);
-	let	ft, pseudo, online;
+	let	ft, online;
 	let	id, lastName, firstName, login, email, url, active, avatar;
 
 	ft = true;
-	pseudo = "Guest";
 	if (data !== undefined)
 	{
 		id = data.id;
@@ -100,6 +99,12 @@ const	MyProfile = () =>
 		setChannelToInvite
 	] = useState("");
 
+	const
+	[
+		pseudo,
+		setPseudo
+	] = useState("");
+
 	const handleFriendsClickOpen = (userId: string) =>
 	{
 		setFriendsOpen(true);
@@ -131,12 +136,12 @@ const	MyProfile = () =>
 	const	blockFriend = (userName: string) =>
 	{
 		const	action = {
-			type: "block-friend",
+			type: "block-user",
 			payload: {
 				userName: userName,
 			}
 		};
-		socketRef.current.emit("my-profile-info", action);
+		socketRef.current.emit("user-info", action);
 	};
 
 	const	addUserToFriends = (userName: string) =>
@@ -147,7 +152,7 @@ const	MyProfile = () =>
 				friendName: userName,
 			}
 		};
-		socketRef.current.emit("my-profile-info", action);
+		socketRef.current.emit("user-info", action);
 	};
 
 	const	addFriendsToBlocked = (userName: string) =>
@@ -166,16 +171,26 @@ const	MyProfile = () =>
 		console.log("friend: " + userName);
 		console.log("channel : " + channelToInvite);
 		const	action = {
-			type: "invite-friend-to-chan",
+			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
 				userName: userName,
 			}
 		};
-		socketRef.current.emit("my-profile-info", action);
+		socketRef.current.emit("user-info", action);
 		// setChannelToInvite("");
 	};
 
+	const	changePseudo = (newPseudo: string) =>
+	{
+		if (newPseudo === pseudo)
+			return ;
+		const	action = {
+			type: "change-pseudo",
+			payload: newPseudo
+		};
+		socketRef.current.emit("my-profile-info", action);
+	};
 
 	return (
 		<>
@@ -188,8 +203,9 @@ const	MyProfile = () =>
 			<p>pseudo : {pseudo}</p>
 			<p>login : {login} (id:{id})</p>
 			<p>email : {email}</p>
-			<a href= {url}>URL</a>
+			{/* <a href= {url}>URL</a> */}
 
+			<p></p>
 			{/* <p><Button onClick={addAsFriend}>Add as friend</Button></p> */}
 			<Button onClick={() =>
 			{

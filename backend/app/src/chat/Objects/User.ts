@@ -5,6 +5,7 @@
 import Chat from "./Chat";
 import Channel from "./Channel";
 import { Socket } from "socket.io";
+import Profile from "src/my-profileOLD/Objects/Profile";
 
 type	FriendsModel = {
 	id: number,
@@ -14,6 +15,7 @@ type	FriendsModel = {
 class User
 {
     public name: string;
+	public profile: Profile;
 	public client: Socket;
     public id: string;
     public chat: Chat | undefined;
@@ -23,9 +25,12 @@ class User
 	public unlockChannel: (password: string, chanName: string) => void;
 	public joinChannel: (chanName: string) => void;
 	public leaveChannel: (chanName: string) => void;
+	public createProfile: (pseudo: string, data: any) => void;
 
     public constructor(name: string, client: Socket)
     {
+		const	profile = new Profile(this);
+		this.profile = profile;
         this.name = name;
 		this.client = client;
         this.id = client.id;
@@ -84,6 +89,11 @@ class User
                 }
             }
         };
+		this.createProfile = (pseudo: string, data: any) =>
+		{
+			if (pseudo.length > 0 && data !== undefined)
+				this.profile?.fillProfile(pseudo, data);
+		};
     }
 }
 
