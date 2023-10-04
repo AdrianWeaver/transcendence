@@ -69,3 +69,13 @@ model User {
   email String   @unique
   name  String?
 }
+
+model AnonymousUser {
+  	uuid      					String  @unique 
+	password                	String  // must not be	null 
+	token                		String
+	lastConnection           	Int
+	userCreatedAt				String
+	revokeConnectionRequest		Boolean
+	isRegistredAsRegularUser	Boolean
+}

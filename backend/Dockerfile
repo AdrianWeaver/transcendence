@@ -1,6 +1,6 @@
 FROM debian:buster
 
-WORKDIR /localghost/src/app
+WORKDIR /app
 
 COPY    ./app/package*.json ./
 
@@ -24,5 +24,7 @@ RUN npm install -g @nestjs/cli
 RUN npm install -g pm2
 RUN npm install -g pm2-monit
 RUN npm install -g eslint
+
+RUN npx prisma generate /app/src/prisma/prisma
 
 CMD [ "/bin/bash" ]
