@@ -4,10 +4,13 @@
 import { useEffect, useRef, useState } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-
+import Title from "./components/Title";
 import data from "./realFakeData.json";
 import { ConstructionSharp } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
+import "./assets/index.css";
+import LeftSide from "./components/LeftSide";
+import RightSide from "./components/RightSide";
 
 type	FriendsModel =
 {
@@ -26,11 +29,16 @@ const	MyProfile = () =>
 	const	savePrevPage = useSavePrevPage();
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	console.log(data);
-	let	ft, online;
-	let	id, lastName, firstName, login, email, url, active, avatar;
+	// console.log(data);
+	let	ft, online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
+	let	id, lastName, firstName, login, email, active, avatar;
 
 	ft = true;
+	const	displayStyle: React.CSSProperties = {
+		textAlign: "center",
+		fontSize: "8px"
+	};
+
 	if (data !== undefined)
 	{
 		id = data.id;
@@ -38,9 +46,13 @@ const	MyProfile = () =>
 		firstName = data.first_name;
 		login = data.login;
 		email = data.email;
-		url = data.url;
 		active = data["active?"];
 		avatar = data.image;
+		rank = 5;
+		gamesPlayed = 20;
+		victories = 9;
+		defeats = 11;
+		perfectGame = 3;
 	}
 	else
 	{
@@ -49,20 +61,14 @@ const	MyProfile = () =>
 		firstName = "undefined";
 		login = "undefined";
 		email = "undefined";
-		url = "undefined";
 		active = undefined;
 		avatar = "https://thispersondoesnotexist.com/";
+		rank = 5;
+		gamesPlayed = 20;
+		victories = 9;
+		defeats = 11;
+		perfectGame = 3;
 	}
-
-	if (active !== undefined)
-		online = "🟢";
-	else
-		online = "🔴";
-
-	useEffect(() =>
-	{
-		savePrevPage("/me/profile");
-	});
 
 	const [
 		friendsOpen,
@@ -104,6 +110,16 @@ const	MyProfile = () =>
 		pseudo,
 		setPseudo
 	] = useState("");
+
+	if (active !== undefined)
+		online = "🟢";
+	else
+		online = "🔴";
+
+	useEffect(() =>
+	{
+		savePrevPage("/me/profile");
+	});
 
 	const handleFriendsClickOpen = (userId: string) =>
 	{
@@ -185,39 +201,64 @@ const	MyProfile = () =>
 	{
 		if (newPseudo === pseudo)
 			return ;
-		const	action = {
-			type: "change-pseudo",
-			payload: newPseudo
-		};
-		socketRef.current.emit("my-profile-info", action);
+		// TEST NEED TO VERIFY IT'S NOT USED PSEUDO
+		setPseudo(newPseudo);
 	};
 
+	changePseudo(login);
+// TEST
+	playing = true;
+	if (!online)
+		playing = false;
+	if (playing === true)
+		status = "playing... 🏓";
+	else if (active)
+		status = "🟢";
+	else
+		status = "🔴";
+
+		// console.log(status);
 	return (
 		<>
-			<MenuBar />
-			<p>{"<Profile>"}</p>
-			<p>ACTIVE : {online}</p>
-			<p> <img src={avatar.link} width="90" height="90" /></p>
-			<p>Last Name : {lastName}</p>
-			<p>First Name : {firstName}</p>
-			<p>pseudo : {pseudo}</p>
-			<p>login : {login} (id:{id})</p>
-			<p>email : {email}</p>
-			{/* <a href= {url}>URL</a> */}
 
-			<p></p>
-			{/* <p><Button onClick={addAsFriend}>Add as friend</Button></p> */}
-			<Button onClick={() =>
+			<MenuBar />
+			<Title
+				name={pseudo}
+				avatar={avatar.link} />
+			<Grid container>
+				<Grid item xs={6}>
+					<div>
+						<LeftSide
+							status={status}
+							pseudo={pseudo}
+							lastName={lastName}
+							firstName={firstName}
+						/>
+					</div>
+				</Grid>
+				<Grid item xs={6}>
+					<div>
+						<RightSide
+							rank={rank}
+							gamesPlayed={gamesPlayed}
+							victories={victories}
+							defeats={defeats}
+							perfectGame={perfectGame}
+						/>
+					</div>
+				</Grid>
+			</Grid>
+			{/* <Button onClick={() =>
 			{
 				return handleFriendsClickOpen(buttonSelection.name);
 			}}>
 				Friends
-			</Button>
-			<Dialog open={friendsOpen} onClose={handleFriendsClose} maxWidth="sm" fullWidth>
+			</Button> */}
+			{/* <Dialog open={friendsOpen} onClose={handleFriendsClose} maxWidth="sm" fullWidth>
 				<DialogTitle>
 					Friends of {pseudo}
 				</DialogTitle>
-				<DialogContent>
+					 <DialogContent>
 					<ul>
 					{
 						friends.map((friend) =>
@@ -300,7 +341,7 @@ const	MyProfile = () =>
 						Close
 					</Button>
 				</DialogActions>
-			</Dialog>
+			</Dialog> */}
 		</>
 	);
 };

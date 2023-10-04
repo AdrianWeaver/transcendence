@@ -109,9 +109,9 @@ class User
 			found = false;
 			if (this.chat)
 			{
-				if (this.chat.users)
+				if (this.chat.users !== undefined)
 				{
-					for (const taken of this.chat?.users)
+					for (const taken of this.chat.users)
 					{
 						if (taken.profile.pseudo === pseudo)
 						{
@@ -123,7 +123,7 @@ class User
 						this.profile.pseudo = pseudo;
 				}
 			}
-		}
+		};
 		// this.createProfile = (pseudo: string, data: any) =>
 		// {
 		// 	if (pseudo.length > 0 && data !== undefined)
