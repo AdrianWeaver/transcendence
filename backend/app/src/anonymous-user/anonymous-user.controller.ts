@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 import {
@@ -6,7 +7,8 @@ import {
 	Post,
 	UseGuards,
 	Req,
-	Logger
+	Logger,
+	Res
 } from "@nestjs/common";
 import
 {
@@ -25,6 +27,8 @@ import
 	CustomRequest
 }	from "./anonymous-user.interface";
 import { AuthorizationGuard } from "./anonymous-user.authorizationGuard";
+import { Response } from "express";
+import { PrismaClient } from "@prisma/client";
 
 class AnonymousRegisterDto
 {
@@ -52,12 +56,45 @@ export class AnonymousUserController
 	}
 
 	@Post("register")
-	getAnonymousRegister(@Body() body:AnonymousRegisterDto)
-	: AnonymousUserRegisterResponseModel
+	getAnonymousRegister(
+		@Body() body: AnonymousRegisterDto,
+		@Res() res: Response)
+	// : AnonymousUserRegisterResponseModel
 	{
 		this.logger
-			.log("A user request 'register' route with uid :" + body.uuid);
-		return (this.anonymousUserService.register(body.uuid));
+			.debug("A user request 'register' route with uid :" + body.uuid);
+		const	retValue = this.anonymousUserService.register(body.uuid);
+
+		this.logger.debug("return Value :", retValue);
+		if (retValue.toDB.lastConnection === "never connected")
+			retValue.toDB.lastConnection = -1;
+		res.send(retValue.res).status(200)
+			.end();
+		// res.send(retValue.res);
+		const prisma = new PrismaClient();
+		const	rec = retValue.toDB;
+		prisma.$connect();
+		prisma.anonymousUser.create({
+			data:
+			{
+				uuid: rec.uuid,
+				isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
+				lastConnection: rec.lastConnection as number,
+				password: rec.password,
+				revokeConnectionRequest: rec.revokeConnectionRequest,
+				token: rec.token,
+				userCreatedAt: rec.userCreatedAt
+			}
+		})
+			.catch((error) =>
+			{
+				throw error;
+			})
+			.finally(async () =>
+			{
+				prisma.$disconnect();
+			});
+		return ;
 	}
 
 	@Post("login")

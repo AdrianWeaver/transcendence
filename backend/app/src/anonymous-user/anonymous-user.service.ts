@@ -46,7 +46,8 @@ export class AnonymousUserService
 		return (this.secret);
 	}
 
-	public	register(uuid: string) : AnonymousUserRegisterResponseModel
+	public	register(uuid: string)
+		: {res:AnonymousUserRegisterResponseModel, toDB: AnonymousUserModel}
 	{
 		const searchUser = this.anonymousUser.find((user) =>
 		{
@@ -72,7 +73,11 @@ export class AnonymousUserService
 				creationDate: newAnonymous.userCreatedAt,
 				statusCode: 200
 			};
-			return (response);
+			return (
+			{
+				res: response,
+				toDB: newAnonymous
+			});
 		}
 		else
 			throw new BadRequestException("UUID already exists");

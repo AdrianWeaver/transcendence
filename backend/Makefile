@@ -120,7 +120,7 @@ create_container:
 ifeq ($(shell docker ps --all --filter "name=backend" -q),)
 	@echo "Container doesnt exists"
 	@echo "Starting instance of container (preparing installation) from $(pwd)/app"
-	@docker run -d -i -v $(APP_HOST_DIR):/app -p 3000:3000 --name backend dev_back
+	@docker run -d -i -v $(APP_HOST_DIR):/app -p 3000:3000 -p 5555:5555 --name backend dev_back
 else
 	@echo "Container already exists"
 endif
