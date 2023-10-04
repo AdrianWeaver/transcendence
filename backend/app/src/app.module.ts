@@ -15,6 +15,7 @@ import { GameSocketModule } from "./game-socket/game-socket.module";
 import { ChatModule } from "./chat/chat.module";
 import { ChatApiModule } from "./chat-api/chat-api.module";
 import { ChatApiController } from "./chat-api/chat-api.controller";
+import { ChatApiService } from "./chat-api/chat-api.service";
 
 
 @Module(
@@ -34,7 +35,8 @@ import { ChatApiController } from "./chat-api/chat-api.controller";
 		AppService,
 		AnonymousUserService,
 		AdminsService,
-		ChatApiModule
+		ChatApiModule,
+		ChatApiService
 	],
 })
 
