@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import { useEffect, useRef, useState } from "react";
+import { Component, useEffect, useRef, useState } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import Title from "./components/Title";
@@ -216,7 +216,6 @@ const	MyProfile = () =>
 		status = "🟢";
 	else
 		status = "🔴";
-
 		// console.log(status);
 	return (
 		<>
@@ -224,30 +223,29 @@ const	MyProfile = () =>
 			<MenuBar />
 			<Title
 				name={pseudo}
-				avatar={avatar.link} />
-			<Grid container>
-				<Grid item xs={6}>
-					<div>
-						<LeftSide
-							status={status}
-							pseudo={pseudo}
-							lastName={lastName}
-							firstName={firstName}
-						/>
-					</div>
+			/>
+			<div className="wrapper">
+				<Grid container>
+						<Grid item xs={6}>
+								<LeftSide
+									status={status}
+									pseudo={pseudo}
+									avatar={avatar.link}
+								/>
+						</Grid>
+						<Grid item xs={6}>
+								<RightSide
+									rank={rank}
+									gamesPlayed={gamesPlayed}
+									victories={victories}
+									defeats={defeats}
+									perfectGame={perfectGame}
+									lastName={lastName}
+									firstName={firstName}
+								/>
+						</Grid>
 				</Grid>
-				<Grid item xs={6}>
-					<div>
-						<RightSide
-							rank={rank}
-							gamesPlayed={gamesPlayed}
-							victories={victories}
-							defeats={defeats}
-							perfectGame={perfectGame}
-						/>
-					</div>
-				</Grid>
-			</Grid>
+			</div>
 			{/* <Button onClick={() =>
 			{
 				return handleFriendsClickOpen(buttonSelection.name);
