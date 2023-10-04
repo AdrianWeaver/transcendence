@@ -1,8 +1,10 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
-import { Typography } from "@mui/material";
+import { Info } from "@mui/icons-material";
+import { Grid, Typography } from "@mui/material";
 import { useState } from "react";
+import Infos from "./Infos";
 
 type	RightSideProps =
 {
@@ -10,7 +12,9 @@ type	RightSideProps =
 	gamesPlayed: number,
 	victories: number,
 	defeats: number,
-	perfectGame: number
+	perfectGame: number,
+	lastName: string,
+	firstName: string
 };
 
 const	RightSide = (props: RightSideProps) =>
@@ -39,15 +43,27 @@ const	RightSide = (props: RightSideProps) =>
 	perfectPlay(props.perfectGame);
 	return (
 		<>
-			<Typography variant="h4" component="h4">
-				STATS
-			</Typography>
-			<Typography>
-				Victories: {props.victories} / {props.gamesPlayed} games played.
-			</Typography>
-			<Typography>
-				{perfect}
-			</Typography>
+		<div className="right">
+			<Grid container>
+				<Grid item sx={6}>
+					<Infos
+						lastName={props.lastName}
+						firstName={props.firstName}
+					/>
+				</Grid>
+				<Grid item sx={6}>
+					<Typography variant="h4" component="h4">
+						STATS
+					</Typography>
+					<Typography>
+						{props.victories} victories / {props.gamesPlayed} games played.
+					</Typography>
+					<Typography>
+						{perfect}
+					</Typography>
+				</Grid>
+			</Grid>
+		</div>
 		</>
 	);
 };
