@@ -44,7 +44,8 @@ type ChanMapModel =
 	mode: string
 };
 
-@Injectable()
+@Injectable({
+})
 export	class ChatService
 {
 	// data here 

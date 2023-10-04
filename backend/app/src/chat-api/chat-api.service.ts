@@ -12,6 +12,7 @@ export class ChatApiService
 
 	public	getUserArray() : ChatUserModel[]
 	{
+		this.logger.log(this.chatService.getAllUsers());
 		return (this.chatService.getAllUsers());
 	}
 }
