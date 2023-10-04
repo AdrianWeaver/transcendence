@@ -4,7 +4,7 @@ import { AppService } from "./app.service";
 import {
 	AnonymousUserService
 } from "./anonymous-user/anonymous-user.service";
-import { AdminsModule } from './admins/admins.module';
+import { AdminsModule } from "./admins/admins.module";
 import
 {
 	AnonymousUserController
@@ -12,8 +12,9 @@ import
 import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
 import { GameSocketModule } from "./game-socket/game-socket.module";
-import { ChatModule } from './chat/chat.module';
-import { ChatService } from "./chat/Chat.service";
+import { ChatModule } from "./chat/chat.module";
+import { ChatApiModule } from "./chat-api/chat-api.module";
+import { ChatApiController } from "./chat-api/chat-api.controller";
 
 
 @Module(
@@ -21,19 +22,19 @@ import { ChatService } from "./chat/Chat.service";
 	imports:
 	[
 		AdminsModule,
-		//GameSocketModule,
 		ChatModule,
 	],
 	controllers: [
 		AppController,
 		AnonymousUserController,
-		AdminsController
+		AdminsController,
+		ChatApiController,
 	],
 	providers: [
 		AppService,
 		AnonymousUserService,
-		ChatService,
-		AdminsService
+		AdminsService,
+		ChatApiModule
 	],
 })
 

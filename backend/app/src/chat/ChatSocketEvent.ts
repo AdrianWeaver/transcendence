@@ -57,7 +57,6 @@ export class ChatSocketEvents
 	{
 		@WebSocketServer()
 		server: Server;
-		// chat: Chat;
 
 		public	constructor(private readonly chatService: ChatService)
 		{
