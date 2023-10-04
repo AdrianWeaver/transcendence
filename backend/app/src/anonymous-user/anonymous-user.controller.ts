@@ -86,7 +86,7 @@ export class AnonymousUserController
 				userCreatedAt: rec.userCreatedAt
 			}
 		})
-			.catch((error) =>
+			.catch((error: any) =>
 			{
 				throw error;
 			})
