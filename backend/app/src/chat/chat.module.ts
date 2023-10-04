@@ -5,15 +5,12 @@ import { ChatApiController } from "./chat-api.controller";
 // import { AuthorizationGuard} from "src/anonymous-user/anonymous-user.authorizationGuard";
 
 @Module({
-	controllers: [ChatApiController],
 	providers:
 	[
 		ChatSocketEvents,
-		ChatService,
-		// AuthorizationGuard
+		ChatService
 	],
-	exports:
-	[ChatService]
+	exports: [ChatService]
 })
 export class ChatModule
 {}

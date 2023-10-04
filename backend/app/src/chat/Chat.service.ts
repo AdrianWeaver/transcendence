@@ -2,7 +2,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 import {
-	Injectable
+	Injectable, Logger
 }	from "@nestjs/common";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
@@ -44,18 +44,28 @@ type ChanMapModel =
 	mode: string
 };
 
+import { v4 as uuidv4 } from "uuid";
+
 @Injectable()
 export	class ChatService
 {
 	// data here 
 	private	chat: Chat;
+	private	log = new Logger("instance-chat-service");
+	private	uuid = uuidv4();
 
 	constructor()
 	{
 		this.chat = new Chat();
+		this.log.debug("started service instance - id instance : " + this.uuid);
 	}
 
 	// getters
+
+	public	getChatInstanceId() : string
+	{
+		return (this.uuid);
+	}
 
 	public	getChat(): Chat
 	{
