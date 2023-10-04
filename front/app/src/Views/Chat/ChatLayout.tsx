@@ -498,8 +498,6 @@ const	ChatLayout = () =>
 		setOpen(false);
 	};
 
-
-
 	const
 	[
 		arrayListUser,
