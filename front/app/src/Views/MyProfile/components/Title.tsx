@@ -9,7 +9,6 @@ import { Avatar, Typography } from "@mui/material";
 type	TitleProps =
 {
 	name: string,
-	avatar: string | ((url: string) => string)
 };
 
 const	Title = (props: TitleProps) =>
@@ -29,15 +28,6 @@ const	Title = (props: TitleProps) =>
 	return (
 		<>
 			<header className="chat__mainHeader">
-				<Avatar
-					alt={props.name}
-					src={props.avatar}
-					sx=
-					{{
-						width: 50,
-						height: 50
-					}}
-				/>
 				<Typography variant="h3">{props.name}'s profile</Typography>
 				<button className="leaveProfile__btn"
 					onClick={handleLeaveProfile}>

@@ -17,15 +17,15 @@ body{
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  width: 450px;
+  width: 500px;
   display: flex;
   box-shadow: 0 1px 20px 0 rgba(69,90,100,.08);
 }
 
 .wrapper .left{
-  width: 35%;
+  width: 100%;
   background: linear-gradient(to right,#01a9ac,#01dbdf);
-  padding: 30px 25px;
+  padding: 115px 25px;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   text-align: center;
@@ -33,7 +33,7 @@ body{
 }
 
 .wrapper .left img{
-  border-radius: 5px;
+  border-radius: 50px;
   margin-bottom: 10px;
 }
 
@@ -46,9 +46,9 @@ body{
 }
 
 .wrapper .right{
-  width: 65%;
+  width: 100%;
   background: #fff;
-  padding: 30px 25px;
+  padding: 69px 25px;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }

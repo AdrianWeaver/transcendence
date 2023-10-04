@@ -1,27 +1,31 @@
 /* eslint-disable max-len */
-import { Typography } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 
 type	LeftSideProps =
 {
 	status: string,
 	pseudo: string,
-	lastName: string,
-	firstName: string,
+	avatar: string | ((url: string) => string)
 };
 
 const	LeftSide = (props: LeftSideProps) =>
 {
 	return (
 		<>
-			<Typography variant="h4" component="h4">
-				INFORMATIONS
-			</Typography>
+		<div className="left">
+			<Avatar
+				alt={props.pseudo}
+				src={props.avatar}
+				sx=
+				{{
+					width: 70,
+					height: 70
+				}}
+			/>
 			<Typography>
-				Pseudo: {props.pseudo} is {props.status}
+					{props.pseudo} is {props.status}
 			</Typography>
-			<Typography>
-				Fullname: {props.firstName} {props.lastName}
-			</Typography>
+		</div>
 		</>
 	);
 };
