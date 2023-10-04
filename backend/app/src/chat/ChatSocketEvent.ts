@@ -7,6 +7,7 @@ import { Server, Socket } from "socket.io";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
+import { Prisma } from "@prisma/client";
 
 import
 {
