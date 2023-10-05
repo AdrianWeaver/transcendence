@@ -41,41 +41,82 @@ export class AnonymousUserService implements OnModuleInit
 		this.prisma = new PrismaClient();
 	}
 
+	public async populateOnStart() :Promise<AnonymousUserModel[]>
+	{
+		const	array: Array<AnonymousUserModel> = [];
+		try
+		{
+			const	data = await this.prisma.anonymousUser.findMany();
+			data.forEach((obj) =>
+			{
+				const toStore: AnonymousUserModel = {
+					uuid: obj.uuid,
+					password: obj.password,
+					token: obj.token,
+					lastConnection: obj.lastConnection,
+					userCreatedAt: obj.userCreatedAt,
+					revokeConnectionRequest: obj.revokeConnectionRequest,
+					isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
+				};
+				if (toStore.lastConnection === -1)
+					toStore.lastConnection = "never connected";
+				this.anonymousUser.push(toStore);
+			});
+			return (array);
+		}
+		catch (err: any)
+		{
+			console.log(err);
+		}
+		return (array);
+	}
+
 	onModuleInit()
 	{
 		this.logger.debug("The anonymous user service has been instiated with id :", this.instanceId);
-
-		this.prisma.anonymousUser
-			.findMany()
-			.then((data) =>
+		this.populateOnStart()
+			.then(() =>
 			{
-				// console.log(data);
-				data.forEach((obj) =>
-				{
-					const	toStore: AnonymousUserModel = {
-						uuid: obj.uuid,
-						password: obj.password,
-						token: obj.token,
-						lastConnection: obj.lastConnection,
-						userCreatedAt: obj.userCreatedAt,
-						revokeConnectionRequest: obj.revokeConnectionRequest,
-						isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
-					};
-					if (toStore.lastConnection === -1)
-						toStore.lastConnection = "never connected";
-					this.anonymousUser.push(toStore);
-					console.log("test: ", obj);
-				});
-			})
-			.catch((error: any) =>
-			{
-				this.logger.error("database failure", error);
-			})
-			.finally(() =>
-			{
-				// return (data);
+				this.logger
+					.debug("We have "
+						+ this.anonymousUser.length
+						+ " user in memory");
 			});
-		// this.anonymousUser = test;
+			// .then(() =>
+			// {
+			// 	this.logger
+			// 		.debug("We have "
+			// 			+ this.anonymousUser.length
+			// 			+ " user in memory");
+			// });
+			// .then((data) =>
+			// {
+			// 	// console.log(data);
+			// 	data.forEach((obj) =>
+			// 	{
+			// 		const	toStore: AnonymousUserModel = {
+			// 			uuid: obj.uuid,
+			// 			password: obj.password,
+			// 			token: obj.token,
+			// 			lastConnection: obj.lastConnection,
+			// 			userCreatedAt: obj.userCreatedAt,
+			// 			revokeConnectionRequest: obj.revokeConnectionRequest,
+			// 			isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
+			// 		};
+			// 		if (toStore.lastConnection === -1)
+			// 			toStore.lastConnection = "never connected";
+			// 		this.anonymousUser.push(toStore);
+			// 	});
+			// })
+			// .catch((error: any) =>
+			// {
+			// 	this.logger.error("database failure", error);
+			// })
+			// .finally(() =>
+			// {
+			// 	// disconnect
+			// });
+		// this data is empty
 	}
 
 	public getInstanceId() : string

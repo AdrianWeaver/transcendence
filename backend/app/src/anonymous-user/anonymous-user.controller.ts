@@ -95,7 +95,8 @@ export class AnonymousUserController
 		// 		prisma.$disconnect();
 		// 	});
 		// return ;
-
+		res.send(retValue.res).status(200)
+			.end();
 		const prisma = new PrismaClient();
 		const	rec = retValue.toDB;
 		prisma.$connect();
@@ -120,19 +121,26 @@ export class AnonymousUserController
 				prisma.$disconnect();
 			});
 		this.logger.debug("This data is stored");
-		res.send(retValue.res).status(200)
-			.end();
 		return ;
 	}
 
 	@Post("login")
-	anonymousUserLogin(@Body() body: AnonymousUserLoginDto)
-	: AnonymousUserLoginResponseModel
+	anonymousUserLogin(
+		@Body() body: AnonymousUserLoginDto,
+		@Res() res: Response)
+	// : AnonymousUserLoginResponseModel
 	{
 		this.logger
 			.log("A user request 'login' route with uid :" + body.uuid);
-			
+
+		// remplacer return par res.send(....). pour pouvoir envoyer au client la reponse
+		// car return met fin a la continuite du code. Cf: voir register.
+		
 		return (this.anonymousUserService.login(body.uuid, body.password));
+		// cela implique que le service login renvoie un objet 
+		// tels que vu dans register
+
+		// faire un appel sur prisma pour mettre a jour l'utilisateur en base de donnes 
 	}
 
 	@Post("verify-token")
