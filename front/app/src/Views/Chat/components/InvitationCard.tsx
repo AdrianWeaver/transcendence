@@ -7,19 +7,20 @@
 import { useTheme } from "@emotion/react";
 import
 {
-    Card,
-    CardContent,
-    Typography,
-    IconButton,
-    CardMedia,
-    Box
+	Card,
+	CardContent,
+	Typography,
+	IconButton,
+	CardMedia,
+	Box
 } from "@mui/material";
 
 // please use vector this one is just for testing card
 import pong from "../assets/pong.jpeg";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-const InvitationCard = () => {
+const	InvitationCard = () =>
+{
 	const theme = useTheme();
 	return (
 		<Card sx={{
