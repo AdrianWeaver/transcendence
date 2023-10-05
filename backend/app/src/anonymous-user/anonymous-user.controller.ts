@@ -103,6 +103,7 @@ export class AnonymousUserController
 	{
 		this.logger
 			.log("A user request 'login' route with uid :" + body.uuid);
+			
 		return (this.anonymousUserService.login(body.uuid, body.password));
 	}
 
