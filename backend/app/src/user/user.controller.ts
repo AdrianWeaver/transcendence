@@ -82,6 +82,7 @@ export class UserController
 			.request(config)
 			.then((res) =>
 			{
+				console.log(res);
 				const	data = res.data;
 
 				// this.logger.debug(data);
@@ -94,7 +95,34 @@ export class UserController
 					createdAt: data.created_at,
 					secretValidUntil: data.secret_valid_until
 				};
-				console.log(newObject);
+				const	log: any = {
+					// uuid: res.headers.get()
+				};
+				console.log("log: ", log);
+				console.log("newObject: ", newObject);
+				console.log("from data : ", data);
+				return (newObject);
+			})
+			.then((newObject : any) =>
+			{
+				const config = {
+					method: "get",
+					maxBodyLength: Infinity,
+					url: "https://api.intra.42.fr/v2/me",
+					headers: {
+						"Authorization": "Bearer " + newObject.accessToken,
+					}
+				};
+				Api()
+				.request(config)
+				.then((res) =>
+				{
+					console.log(res);
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+				});
 			})
 			.catch((error) =>
 			{
