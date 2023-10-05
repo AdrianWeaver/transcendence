@@ -111,16 +111,21 @@ export class UserController
 				.request(config)
 				.then((res) =>
 				{
-					console.log(res);
+					console.log("res intra: ", res);
 					const	data = res.data;
 					const	userObject: any = {
+						// Do we need it ?
+						status: data.status,
+						// Do we neet that ?
+						date: data.date,
 						id: data.id,
 						email: data.email,
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
 						url: data.url,
-						avatar: data.image.link
+						avatar: data.image.link,
+						location: data.location,
 					};
 					console.log("USER: ", userObject);
 				})
