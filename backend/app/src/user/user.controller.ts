@@ -115,9 +115,9 @@ export class UserController
 					const	data = res.data;
 					const	userObject: any = {
 						// Do we need it ?
-						status: data.status,
+						status: res.status,
 						// Do we neet that ?
-						date: data.date,
+						date: res.headers.date,
 						id: data.id,
 						email: data.email,
 						login: data.login,
