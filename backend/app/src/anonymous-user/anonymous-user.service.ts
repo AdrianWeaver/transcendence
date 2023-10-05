@@ -5,7 +5,9 @@ import
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
-	InternalServerErrorException
+	InternalServerErrorException,
+	Logger,
+	OnModuleInit
 }	from "@nestjs/common";
 import
 {
@@ -19,11 +21,67 @@ import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
+import { PrismaClient } from "@prisma/client";
+
 @Injectable()
-export class AnonymousUserService
+export class AnonymousUserService implements OnModuleInit
 {
-	private	anonymousUser: Array<AnonymousUserModel> = [];
-	private	secret = randomBytes(64).toString("hex");
+	private	anonymousUser: Array<AnonymousUserModel>;
+	private	secret;
+	private logger;
+	private instanceId;
+	public	prisma;
+
+	constructor()
+	{
+		this.anonymousUser = [];
+		this.secret = randomBytes(64).toString("hex");
+		this.logger = new Logger("anonymous-user-service");
+		this.instanceId = uuidv4();
+		this.prisma = new PrismaClient();
+	}
+
+	onModuleInit()
+	{
+		this.logger.debug("The anonymous user service has been instiated with id :", this.instanceId);
+
+		this.prisma.anonymousUser
+			.findMany()
+			.then((data) =>
+			{
+				// console.log(data);
+				data.forEach((obj) =>
+				{
+					const	toStore: AnonymousUserModel = {
+						uuid: obj.uuid,
+						password: obj.password,
+						token: obj.token,
+						lastConnection: obj.lastConnection,
+						userCreatedAt: obj.userCreatedAt,
+						revokeConnectionRequest: obj.revokeConnectionRequest,
+						isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
+					};
+					if (toStore.lastConnection === -1)
+						toStore.lastConnection = "never connected";
+					this.anonymousUser.push(toStore);
+					console.log("test: ", obj);
+				});
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error("database failure", error);
+			})
+			.finally(() =>
+			{
+				// return (data);
+			});
+		// this.anonymousUser = test;
+	}
+
+	public getInstanceId() : string
+	{
+		return (this.instanceId);
+	}
 
 	public	getAnonymousUserArray(): AnonymousAdminResponseModel
 	{

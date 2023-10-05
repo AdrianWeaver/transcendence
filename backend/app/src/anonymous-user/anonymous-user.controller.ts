@@ -53,6 +53,8 @@ export class AnonymousUserController
 	constructor(private readonly anonymousUserService: AnonymousUserService)
 	{
 		this.logger = new Logger("anonymous-user controller");
+		this.logger.debug("anonymous instance service : "
+							+ this.anonymousUserService.getInstanceId());
 	}
 
 	@Post("register")
@@ -68,8 +70,6 @@ export class AnonymousUserController
 		this.logger.debug("return Value :", retValue);
 		if (retValue.toDB.lastConnection === "never connected")
 			retValue.toDB.lastConnection = -1;
-		res.send(retValue.res).status(200)
-			.end();
 		// res.send(retValue.res);
 		// const prisma = new PrismaClient();
 		// const	rec = retValue.toDB;
@@ -95,6 +95,34 @@ export class AnonymousUserController
 		// 		prisma.$disconnect();
 		// 	});
 		// return ;
+
+		const prisma = new PrismaClient();
+		const	rec = retValue.toDB;
+		prisma.$connect();
+		prisma.anonymousUser.create({
+			data:
+			{
+				uuid: rec.uuid,
+				isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
+				lastConnection: rec.lastConnection as number,
+				password: rec.password,
+				revokeConnectionRequest: rec.revokeConnectionRequest,
+				token: rec.token,
+				userCreatedAt: rec.userCreatedAt
+			}
+		})
+			.catch((error: any) =>
+			{
+				throw error;
+			})
+			.finally(async () =>
+			{
+				prisma.$disconnect();
+			});
+		this.logger.debug("This data is stored");
+		res.send(retValue.res).status(200)
+			.end();
+		return ;
 	}
 
 	@Post("login")

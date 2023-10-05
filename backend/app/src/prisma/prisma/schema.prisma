@@ -12,7 +12,7 @@ datasource db {
 
 model AnonymousUser {
   	uuid      					String  @unique 
-	password                	String  // must not be	null 
+	password                	String  
 	token                		String
 	lastConnection           	Int
 	userCreatedAt				String

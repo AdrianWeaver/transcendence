@@ -18,7 +18,7 @@ import { ChatApiController } from "./chat-api/chat-api.controller";
 import { ChatApiService } from "./chat-api/chat-api.service";
 import { UserController } from "./user/user.controller";
 import { UserService } from "./user/user.service";
-
+import { AnonymousUserModule } from "./anonymous-user/anonymous-user.module";
 
 @Module(
 {
@@ -26,6 +26,7 @@ import { UserService } from "./user/user.service";
 	[
 		AdminsModule,
 		ChatModule,
+		AnonymousUserModule
 	],
 	controllers: [
 		AppController,

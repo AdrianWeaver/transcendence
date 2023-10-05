@@ -6,7 +6,7 @@
 // {
 // 	// lecture de la base de donnee a partir de prisma
 // 	const allUsers = await prisma.user.findMany();
-
+// console.log(typeof allUsers)
 // 	// creation des Array en memoire, ici juste un console.log
 // 	console.log(allUsers)
 // }
