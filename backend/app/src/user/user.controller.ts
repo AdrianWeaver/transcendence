@@ -95,12 +95,6 @@ export class UserController
 					createdAt: data.created_at,
 					secretValidUntil: data.secret_valid_until
 				};
-				const	log: any = {
-					// uuid: res.headers.get()
-				};
-				console.log("log: ", log);
-				console.log("newObject: ", newObject);
-				console.log("from data : ", data);
 				return (newObject);
 			})
 			.then((newObject : any) =>
@@ -118,6 +112,17 @@ export class UserController
 				.then((res) =>
 				{
 					console.log(res);
+					const	data = res.data;
+					const	userObject: any = {
+						id: data.id,
+						email: data.email,
+						login: data.login,
+						firstName: data.first_name,
+						lastName: data.last_name,
+						url: data.url,
+						avatar: data.image.link
+					};
+					console.log("USER: ", userObject);
 				})
 				.catch((error) =>
 				{
