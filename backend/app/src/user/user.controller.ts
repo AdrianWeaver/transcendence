@@ -3,7 +3,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, Logger, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Post, Res } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsNotEmpty, IsUUID } from "class-validator";
 import { Response } from "express";
@@ -13,6 +13,8 @@ import	Api from "../Api";
 import axios, { AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { error } from "console";
+import { ApplicationUserModel, UserModel } from "./user.interface";
+import { register } from "module";
 
 class	RegisterDto
 {
@@ -82,11 +84,10 @@ export class UserController
 			.request(config)
 			.then((res) =>
 			{
-				console.log(res);
 				const	data = res.data;
 
 				// this.logger.debug(data);
-				const	newObject: any = {
+				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
 					tokenType: data.token_type,
 					expiresIn: data.expires_in,
@@ -111,11 +112,11 @@ export class UserController
 				.request(config)
 				.then((res) =>
 				{
-					console.log("res intra: ", res);
 					const	data = res.data;
-					const	userObject: any = {
+					const	userObject: UserModel = {
+						ftApi: newObject,
 						// Do we need it ?
-						status: res.status,
+						retStatus: res.status,
 						// Do we neet that ?
 						date: res.headers.date,
 						id: data.id,
@@ -124,10 +125,14 @@ export class UserController
 						firstName: data.first_name,
 						lastName: data.last_name,
 						url: data.url,
-						avatar: data.image.link,
+						avatar: data.image,
 						location: data.location,
+			// TEST anonymous user
+						uuid: body.uuid,
+						password: "a450dfbf-ad05-43d1-956e-634e779cd610",
+						createdAt: "undefined"
 					};
-					console.log("USER: ", userObject);
+					this.userService.register(userObject);
 				})
 				.catch((error) =>
 				{
@@ -138,42 +143,17 @@ export class UserController
 			{
 				console.log(error);
 			});
-		// const configAPI = {
-		// method: "post",
-		// maxBodyLength: Infinity,
-		// url: "https://api.intra.42.fr/oauth/token",
-		// 	dataAPI: dataAPI
-		// };
-
-		// axios.request(configAPI)
-		// .then((response:any ) => {
-		// console.log(JSON.stringify(response.data));
-		// })
-		// .catch((error:any) => {
-		// console.log(error);
-		// });
-			// Api()
-			// .post("/oauth/token", dataAPI, configAPI)
-			// .then((res) =>
-			// {
-			// 	console.log(res);
-			// 	console.log("ca marche ou pas wesh ?");
-			// })
-			// .catch((error) =>
-			// {
-			// 	console.log(error);
-			// });
 
 		// creer la requete pour recuperer le token grace a body
 		// La requete provient de Postman
-		// client_id est ecrit en dur pour le moment 
+		// client_id est ecrit en dur pour le moment
 		// client_secret est ecriit en dur pour le moment
 		// POur les tests le code est envoye par postman apres avoir clique sur la carte du site
 
 
 		// On devrait pouvoir logger le token.
 		// fin de la premiere etape,
-		// On refait un point apres pour ne pas se melanger les pinceaux 
+		// On refait un point apres pour ne pas se melanger les pinceaux
 		return ("okay");
 		// this.logger.debug(""register" route request with uid: ", body.uuid);
 		// const	retValue = this.userService.register(body.uuid);
@@ -206,5 +186,12 @@ export class UserController
 		// 		prisma.$disconnect();
 		// 	});
 		// 	return ;
+	}
+
+	@Get("all-users")
+	getAllUser()
+		: UserModel[]
+	{
+		return (this.userService.getUserArray());
 	}
 }
