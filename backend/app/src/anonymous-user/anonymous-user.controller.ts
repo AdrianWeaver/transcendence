@@ -71,30 +71,30 @@ export class AnonymousUserController
 		res.send(retValue.res).status(200)
 			.end();
 		// res.send(retValue.res);
-		const prisma = new PrismaClient();
-		const	rec = retValue.toDB;
-		prisma.$connect();
-		prisma.anonymousUser.create({
-			data:
-			{
-				uuid: rec.uuid,
-				isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
-				lastConnection: rec.lastConnection as number,
-				password: rec.password,
-				revokeConnectionRequest: rec.revokeConnectionRequest,
-				token: rec.token,
-				userCreatedAt: rec.userCreatedAt
-			}
-		})
-			.catch((error: any) =>
-			{
-				throw error;
-			})
-			.finally(async () =>
-			{
-				prisma.$disconnect();
-			});
-		return ;
+		// const prisma = new PrismaClient();
+		// const	rec = retValue.toDB;
+		// prisma.$connect();
+		// prisma.anonymousUser.create({
+		// 	data:
+		// 	{
+		// 		uuid: rec.uuid,
+		// 		isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
+		// 		lastConnection: rec.lastConnection as number,
+		// 		password: rec.password,
+		// 		revokeConnectionRequest: rec.revokeConnectionRequest,
+		// 		token: rec.token,
+		// 		userCreatedAt: rec.userCreatedAt
+		// 	}
+		// })
+		// 	.catch((error: any) =>
+		// 	{
+		// 		throw error;
+		// 	})
+		// 	.finally(async () =>
+		// 	{
+		// 		prisma.$disconnect();
+		// 	});
+		// return ;
 	}
 
 	@Post("login")
