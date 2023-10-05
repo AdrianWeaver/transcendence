@@ -53,12 +53,12 @@ export class AnonymousUserService implements OnModuleInit
 					uuid: obj.uuid,
 					password: obj.password,
 					token: obj.token,
-					lastConnection: obj.lastConnection,
+					lastConnection: obj.lastConnection as bigint,
 					userCreatedAt: obj.userCreatedAt,
 					revokeConnectionRequest: obj.revokeConnectionRequest,
 					isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
 				};
-				if (toStore.lastConnection === -1)
+				if (toStore.lastConnection === BigInt(-1))
 					toStore.lastConnection = "never connected";
 				this.anonymousUser.push(toStore);
 			});
@@ -183,7 +183,7 @@ export class AnonymousUserService implements OnModuleInit
 	}
 
 	public login(uuid: string, password: string)
-		: AnonymousUserLoginResponseModel
+		: {res:AnonymousUserLoginResponseModel, toDB: AnonymousUserModel}
 	{
 		const	searchUser = this.anonymousUser.find((user) =>
 		{
@@ -194,7 +194,7 @@ export class AnonymousUserService implements OnModuleInit
 		else
 		{
 			// console.log(this.secret);
-			searchUser.lastConnection = Date.now();
+			searchUser.lastConnection = BigInt(Date.now());
 			searchUser.revokeConnectionRequest = false;
 			searchUser.token = "Bearer " + jwt.sign(
 				{
@@ -211,10 +211,14 @@ export class AnonymousUserService implements OnModuleInit
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
-					searchUser.lastConnection + (1000 * 60 * 60 * 24)
+					searchUser.lastConnection + BigInt(1000 * 60 * 60 * 24)
 				// Date.now()
 			};
-			return (response);
+			return (
+			{
+				res: response,
+				toDB: searchUser
+			});
 		}
 	}
 
@@ -238,7 +242,7 @@ export class AnonymousUserService implements OnModuleInit
 			throw new InternalServerErrorException();
 		if (user.revokeConnectionRequest === false)
 			throw new InternalServerErrorException();
-		user.lastConnection = Date.now();
+		user.lastConnection = BigInt(Date.now());
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
 		// console.log("Anonymous user revoke session uuid : " + user.uuid);

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
@@ -22,6 +23,7 @@ import
 import
 {
 	AnonymousUserLoginResponseModel,
+	AnonymousUserModel,
 	AnonymousUserRegisterResponseModel,
 	AnonymousUserVerifyTokenResModel,
 	CustomRequest
@@ -69,7 +71,7 @@ export class AnonymousUserController
 
 		this.logger.debug("return Value :", retValue);
 		if (retValue.toDB.lastConnection === "never connected")
-			retValue.toDB.lastConnection = -1;
+			retValue.toDB.lastConnection = BigInt(-1);
 		// res.send(retValue.res);
 		// const prisma = new PrismaClient();
 		// const	rec = retValue.toDB;
@@ -97,7 +99,7 @@ export class AnonymousUserController
 		// return ;
 		res.send(retValue.res).status(200)
 			.end();
-		const prisma = new PrismaClient();
+		const	prisma = new PrismaClient();
 		const	rec = retValue.toDB;
 		prisma.$connect();
 		prisma.anonymousUser.create({
@@ -105,7 +107,7 @@ export class AnonymousUserController
 			{
 				uuid: rec.uuid,
 				isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
-				lastConnection: rec.lastConnection as number,
+				lastConnection: rec.lastConnection as bigint,
 				password: rec.password,
 				revokeConnectionRequest: rec.revokeConnectionRequest,
 				token: rec.token,
@@ -124,6 +126,32 @@ export class AnonymousUserController
 		return ;
 	}
 
+	public async updateUserLogin(toDb: AnonymousUserModel)
+	{
+		try
+		{
+			const	prisma = new PrismaClient();
+			prisma.$connect();
+			const	updatedUser = await prisma.anonymousUser.update({
+				where:
+				{
+					uuid: toDb.uuid,
+				},
+				data: {
+					lastConnection: toDb.lastConnection as bigint,
+					token: toDb.token,
+					revokeConnectionRequest: toDb.revokeConnectionRequest,
+				},
+			});
+			this.logger.debug(updatedUser);
+		}
+		catch (err: any)
+		{
+			console.log(err);
+			throw err;
+		}
+	}
+
 	@Post("login")
 	anonymousUserLogin(
 		@Body() body: AnonymousUserLoginDto,
@@ -132,14 +160,28 @@ export class AnonymousUserController
 	{
 		this.logger
 			.log("A user request 'login' route with uid :" + body.uuid);
-
 		// remplacer return par res.send(....). pour pouvoir envoyer au client la reponse
 		// car return met fin a la continuite du code. Cf: voir register.
 		
-		return (this.anonymousUserService.login(body.uuid, body.password));
+		// return (this.anonymousUserService.login(body.uuid, body.password));
+		const	retValue = this.anonymousUserService.login(body.uuid, body.password);
+		// remplacer return par res.send(....). pour pouvoir envoyer au client la reponse
+		// car return met fin a la continuite du code. Cf: voir register.
+		res.send(retValue.res).status(200)
+			.end();
+		this.updateUserLogin(retValue.toDB)
+			.then(() =>
+			{
+				this.logger.debug("Everything correct");
+			})
+			.catch((err : any) =>
+			{
+				this.logger.error("Error ", err);
+			});
+		// this.logger.log("updatedUser: ");
+		// return (this.anonymousUserService.login(body.uuid, body.password));
 		// cela implique que le service login renvoie un objet 
 		// tels que vu dans register
-
 		// faire un appel sur prisma pour mettre a jour l'utilisateur en base de donnes 
 	}
 

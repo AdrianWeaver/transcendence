@@ -14,7 +14,7 @@ model AnonymousUser {
   	uuid      					String  @unique 
 	password                	String  
 	token                		String
-	lastConnection           	Int
+	lastConnection           	BigInt
 	userCreatedAt				String
 	revokeConnectionRequest		Boolean
 	isRegistredAsRegularUser	Boolean

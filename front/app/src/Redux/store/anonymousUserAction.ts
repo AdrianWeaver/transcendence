@@ -97,7 +97,7 @@ export const	loginAnonymousUser = ()
 			const response: Model = {
 				...prevState.anonymousUser,
 				message: data.message as string,
-				expireAt: data.expireAt as number,
+				expireAt: data.expireAt as bigint,
 				token: data.token as string
 			};
 			dispatch(action.loginAnonymousUser(response));

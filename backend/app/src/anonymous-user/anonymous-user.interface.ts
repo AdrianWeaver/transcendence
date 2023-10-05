@@ -3,7 +3,7 @@ export interface AnonymousUserModel
 	uuid: string;
 	password: string;
 	token: string;
-	lastConnection: number | "never connected";
+	lastConnection: bigint | "never connected";
 	userCreatedAt: string;
 	revokeConnectionRequest: boolean;
 	isRegistredAsRegularUser: boolean;
@@ -14,7 +14,7 @@ export interface AnonymousUserAdminDisplayableModel
 	uuid: string;
 	// password: string;
 	token: string;
-	lastConnection: number | "never connected";
+	lastConnection: bigint | "never connected";
 	userCreatedAt: string;
 	revokeConnectionRequest: boolean;
 	isRegistredAsRegularUser: boolean;
@@ -44,7 +44,7 @@ export interface AnonymousUserLoginResponseModel
 {
 	message: string;
 	token: string;
-	expireAt: number;
+	expireAt: bigint;
 }
 
 export interface AnonymousUserVerifyTokenResModel
