@@ -51,7 +51,7 @@ export	class ChatService
 {
 	// data here 
 	private	chat: Chat;
-	private	log = new Logger("instance-chat-service");
+	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 
 	constructor()

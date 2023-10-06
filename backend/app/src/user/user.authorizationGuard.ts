@@ -5,6 +5,7 @@ import {
 	CanActivate,
 	ExecutionContext,
 	Injectable,
+	Logger,
 	UnauthorizedException
 }	from "@nestjs/common";
 import { Observable } from "rxjs";
@@ -21,9 +22,10 @@ import {
 @Injectable()
 export	class UserAuthorizationGuard implements CanActivate
 {
+	private readonly logger = new Logger("User-Auth-guard");
 	constructor(private readonly service: UserService)
 	{
-
+		this.logger.log("UserAuthorizationGuard instance created with instance id : " + this.service.getUuidInstance());
 	}
 
 	private	isValidTokenSignature(token: string, secret: string)

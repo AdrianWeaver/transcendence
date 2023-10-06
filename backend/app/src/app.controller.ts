@@ -12,7 +12,7 @@ export class AppController implements OnModuleInit
 
 	constructor(private readonly appService: AppService)
 	{
-		this.logger = new Logger("main controlelr");
+		this.logger = new Logger("main controller");
 	}
 
 	@Get("/server-status")
