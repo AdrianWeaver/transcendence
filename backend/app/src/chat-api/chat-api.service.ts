@@ -7,7 +7,7 @@ export class ChatApiService
 	private	log = new Logger("api-chat-service");
 	constructor(private readonly chatService: ChatService)
 	{
-		this.log.debug("adapter of websocket instance id :"
+		this.log.log("adapter of websocket instance id :"
 			+ this.chatService.getChatInstanceId());
 	}
 
