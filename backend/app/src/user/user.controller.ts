@@ -3,7 +3,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, Get,Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, IsUUID } from "class-validator";
 import { Response } from "express";
@@ -16,6 +16,7 @@ import { error } from "console";
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { register } from "module";
 import { AuthorizationGuard } from "src/anonymous-user/anonymous-user.authorizationGuard";
+import { UserAuthorizationGuard } from "./user.authorizationGuard";
 
 class	RegisterDto
 {
@@ -124,6 +125,7 @@ export class UserController
 						url: data.url,
 						avatar: data.image,
 						location: data.location,
+						revokedConnectionRequest: false,
 						// TEST anonymous user
 						// uuid: body.uuid,
 						// password: "a450dfbf-ad05-43d1-956e-634e779cd610",
@@ -222,11 +224,7 @@ export class UserController
 	verifyToken(@Req() headers: {authorization?: string})
 		: UserVerifyTokenResModel
 	{
-		console.log(headers);
-		// if (this.userService.verifyToken() === "TOKEN OK")
-		// 	console.log("token OK");
-		// else
-		// 	throw error();
+		console.log(headers.authorization);
 		this.logger
 			.log("'verify-token' route request");
 		const	response: UserVerifyTokenResModel = {

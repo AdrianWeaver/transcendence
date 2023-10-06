@@ -30,6 +30,7 @@ export interface UserModel
 			}
 	}
 	location: string;
+	revokedConnectionRequest: boolean;
 	// uuid: string;
 	// password: string;
 	// token: string;
@@ -78,4 +79,22 @@ export interface UserVerifyTokenResModel
 {
 	message: string;
 	statusCode: number;
+}
+
+export interface JWTDecoded
+{
+	id?: string;
+	email?: boolean;
+	iat?: number;
+	exp?: number;
+}
+
+export interface UserAuthorizationGuardSignatureModel
+{
+	validTokenSignature: boolean;
+	id?: string;
+	email?: boolean;
+	iat?: number;
+	exp?: number;
+	token?: string;
 }
