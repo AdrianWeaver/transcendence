@@ -1,16 +1,18 @@
 
-export const	joinChannel = (
+
+export const	goToChannel = (
 	chanName: string,
+	kind: string,
 	socketRef: React.MutableRefObject<any>,
-	activeId: string,
-	kindOfConversation: string) =>
+	activeId: string
+	) =>
 {
 	const	action = {
-		type: "asked-join",
+		type: "did-I-join",
 		payload: {
 			chanName: chanName,
-			activeId: activeId,
-			kind: kindOfConversation
+			kind: kind,
+			userId: activeId
 		}
 	};
 	socketRef.current.emit("channel-info", action);

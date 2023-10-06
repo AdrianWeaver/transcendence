@@ -38,6 +38,12 @@ import	{ handlePasswordSubmit } from "./actionsSocket/handlePasswordSubmit";
 import	{ kickUserFromChannel } from "./actionsSocket/kickUserFromChannel";
 import	{ banUserFromChannel } from "./actionsSocket/banUserFromChannel";
 import	{ joinChannel } from "./actionsSocket/joinChannel";
+import	{ refreshListUser } from "./actionsSocket/refreshListUser";
+import	{ goToChannel } from "./actionsSocket/goToChannel";
+import	{ leaveChannel } from "./actionsSocket/leaveChannel";
+import	{ handleMembersClickOpen } from "./actionsSocket/handleMembersClickOpen";
+import	{ handleSendClick } from "./actionsSocket/handleSendClick";
+import	{ createNewChannel } from "./actionsSocket/createNewChannel"; 
 
 
 const URL = "http://localhost:3000";
@@ -246,8 +252,6 @@ const	ChatLayout = () =>
 		setChannelToInvite
 	] = useState("");
 
-	// END OF USE STATEs
-
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -274,24 +278,6 @@ const	ChatLayout = () =>
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
-
-	const	createNewChannel = () =>
-	{
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: channelName,
-				chanMode: selectedMode,
-				chanPassword: chanPassword,
-				chanId: channels.length + 1,
-				pmIndex: privateMessage.length + 1,
-				activeId: activeId,
-				kind: kindOfConversation
-			}
-		};
-		dispatch(setNumberOfChannels(channels.length));
-		socketRef.current?.emit("channel-info", action);
-	};
 
 	const handleSave = () =>
 	{
@@ -320,7 +306,17 @@ const	ChatLayout = () =>
 			return;
 		}
 		setKindOfConversation("channel");
-		createNewChannel();
+		createNewChannel(
+			socketRef,
+			channelName,
+			selectedMode,
+			chanPassword,
+			channels,
+			privateMessage,
+			activeId,
+			kindOfConversation
+		);
+		dispatch(setNumberOfChannels(channels.length));
 		handleClose();
 	};
 
@@ -583,14 +579,6 @@ const	ChatLayout = () =>
 		setValue(index);
 	};
 
-	const refreshListUser = () =>
-	{
-		const action = {
-			type: "get-user-list",
-		};
-		socketRef.current?.emit("info", action);
-		console.log("refresh the list of user");
-	};
 
 	const listItemStyle = {
 		display: "flex",
@@ -616,46 +604,6 @@ const	ChatLayout = () =>
 		else
 			setText(e.target.value);
 	};
-
-	const handleSendClick = () =>
-	{
-		const action = {
-			type: "sent-message",
-			payload: {
-				chanName: currentChannel,
-				message: text,
-			}
-		};
-		socketRef.current.emit("info", action);
-		setText("");
-		// MessagesArea(text);
-	};
-
-	const	goToChannel = (chanName: string, kind: string) =>
-	{
-		const	action = {
-			type: "did-I-join",
-			payload: {
-				chanName: chanName,
-				kind: kind,
-				userId: activeId
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	const	leaveChannel = (chanName: string) =>
-	{
-		const	action = {
-			type: "leave-channel",
-			payload: {
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
 
 	const [
 		isDialogOpen,
@@ -696,7 +644,7 @@ const	ChatLayout = () =>
 
 	const handleLeaveButtonClick = (chanId: number, chanName: string) =>
 	{
-		leaveChannel(chanName);
+		leaveChannel(chanName, socketRef);
 		handleDialogClose();
 	};
 
@@ -714,33 +662,21 @@ const	ChatLayout = () =>
 		setMembersOpen
 	] = useState(false);
 
-	const handleMembersClickOpen = (chanName: string) =>
-	{
-		setMembersOpen(true);
-		const	action = {
-			type: "member-list",
-			payload: {
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
 	const handleMembersClose = () =>
 	{
 		setMembersOpen(false);
 	};
-
-	// END OF MEMBERS
-
-	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
 
 	return (
 		<div>
 			<MenuBar />
 			<div>
 				connected:{connected}
-				<button onClick={refreshListUser}>click to refresh</button>
+				<button onClick={ () =>
+					{
+					refreshListUser(socketRef);
+					}}>
+					click to refresh</button>
 			</div>
 			<Grid
 				container
@@ -897,7 +833,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("channel");
-														return (goToChannel(channel.name, "channel"));
+														return (goToChannel(channel.name, "channel", socketRef, activeId));
 													}}
 												/>
 												<Button onClick={() =>
@@ -932,7 +868,8 @@ const	ChatLayout = () =>
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															setMembersOpen(true);
+															return handleMembersClickOpen(buttonSelection.name, socketRef);
 														}}>
 															Members
 														</Button>
@@ -1129,7 +1066,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name, "privateMessage"));
+														return (goToChannel(channel.name, "privateMessage", socketRef, activeId));
 													}}
 												/>
 											</ListItem>
@@ -1264,7 +1201,11 @@ const	ChatLayout = () =>
 							/>
 						</Grid>
 						<Grid xs={1} sx={{ alignItems: "right" }}>
-							<Fab color="primary" aria-label="add" onClick={handleSendClick}>
+							<Fab color="primary" aria-label="add" onClick={ () =>
+								{
+									handleSendClick(socketRef, currentChannel, text);
+									setText("");
+								}}>
 							<SendIcon />
 							</Fab>
 						</Grid>
