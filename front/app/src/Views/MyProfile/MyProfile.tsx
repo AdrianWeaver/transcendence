@@ -11,6 +11,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextFi
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { io } from "socket.io-client";
 
 type	FriendsModel =
 {
@@ -28,7 +30,10 @@ const	MyProfile = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-
+	const	activeId = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.activeConversationId);
+	});
 	// console.log(data);
 	let	ft, online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
 	let	id, lastName, firstName, login, email, active, avatar;
@@ -118,6 +123,13 @@ const	MyProfile = () =>
 
 	useEffect(() =>
 	{
+		// const socket = io(URL,
+		// {
+		// 	autoConnect: false,
+		// 	reconnectionAttempts: 5,
+		// });
+
+		// socketRef.current = socket;
 		savePrevPage("/me/profile");
 	});
 
@@ -160,12 +172,12 @@ const	MyProfile = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
-	const	addUserToFriends = (userName: string) =>
+	const	addUserToFriends = () =>
 	{
 		const	action = {
 			type: "add-friend",
 			payload: {
-				friendName: userName,
+				friendName: activeId,
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -224,6 +236,8 @@ const	MyProfile = () =>
 			<Title
 				name={pseudo}
 			/>
+			<Button onClick={addUserToFriends} variant="outlined">ADD AS FRIEND
+			</Button>
 			<div className="wrapper">
 				<Grid container>
 						<Grid item xs={6}>

@@ -1,10 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AnonymousUserController } from './anonymous-user.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { AnonymousUserController } from "./anonymous-user.controller";
 
-describe('AnonymousUserController', () => {
+describe("AnonymousUserController", () =>
+{
   let controller: AnonymousUserController;
 
-  beforeEach(async () => {
+  beforeEach(async () =>
+  {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AnonymousUserController],
     }).compile();
@@ -12,7 +14,8 @@ describe('AnonymousUserController', () => {
     controller = module.get<AnonymousUserController>(AnonymousUserController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () =>
+  {
     expect(controller).toBeDefined();
   });
 });
