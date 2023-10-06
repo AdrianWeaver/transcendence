@@ -11,7 +11,6 @@ import
 }	from "./anonymous-user/anonymous-user.controller";
 import { AdminsService } from "./admins/admins.service";
 import { AdminsController } from "./admins/admins.controller";
-import { GameSocketModule } from "./game-socket/game-socket.module";
 import { ChatModule } from "./chat/chat.module";
 import { ChatApiModule } from "./chat-api/chat-api.module";
 import { ChatApiController } from "./chat-api/chat-api.controller";
