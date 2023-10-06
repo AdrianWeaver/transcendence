@@ -5,7 +5,8 @@ import
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
-	InternalServerErrorException
+	InternalServerErrorException,
+	Logger
 }	from "@nestjs/common";
 import
 {
@@ -23,7 +24,23 @@ import	* as jwt from "jsonwebtoken";
 export class AnonymousUserService
 {
 	private	anonymousUser: Array<AnonymousUserModel> = [];
-	private	secret = randomBytes(64).toString("hex");
+	private	secret;
+	private	uuidInstance: string;
+	private	logger = new Logger("anymous-user-service itself");
+
+	public constructor ()
+	{
+		this.anonymousUser = [];
+		this.secret = randomBytes(64).toString("hex");
+		this.uuidInstance = uuidv4();
+		this.logger.debug("An instance of service is started with id: "
+			+ this.uuidInstance);
+	}
+
+	public	getUuidInstance (): string
+	{
+		return (this.uuidInstance);
+	}
 
 	public	getAnonymousUserArray(): AnonymousAdminResponseModel
 	{
