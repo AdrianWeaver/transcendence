@@ -3,9 +3,9 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, Get, Logger, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get,Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsEmail, IsNotEmpty, IsUUID } from "class-validator";
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
@@ -13,8 +13,9 @@ import	Api from "../Api";
 import axios, { AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { error } from "console";
-import { ApplicationUserModel, UserModel } from "./user.interface";
+import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { register } from "module";
+import { AuthorizationGuard } from "src/anonymous-user/anonymous-user.authorizationGuard";
 
 class	RegisterDto
 {
@@ -22,26 +23,21 @@ class	RegisterDto
 	code: string;
 
 	@IsNotEmpty()
-	@IsUUID()
-	uuid: string;
+	id: any;
 
+	@IsEmail()
 	@IsNotEmpty()
-	@IsUUID()
-	password: string;
+	email: string;
+}
 
-	// @IsNotEmpty()
-	// userCreatedAt: string;
-	// @IsNotEmpty()
-	// clientid: string;
+class UserLoginDto
+{
+	@IsNotEmpty()
+	id: any;
 
-	// @IsNotEmpty()
-	// clientsecret: string;
-
-	// @IsNotEmpty()
-	// granttype: string;
-
-	// @IsNotEmpty()
-	// indirecturi: string;
+	@IsEmail()
+	@IsNotEmpty()
+	email: string;
 }
 
 @Controller("user")
@@ -58,14 +54,15 @@ export class UserController
 	@Post("register")
 	getUserRegister(
 		@Body() body: RegisterDto)
-		: string
+		// : UserRegisterResponseModel
 	{
 		// console.log("code: ", body.code);
 		// console.log("password: ", body.password);
 		// console.log("created at: ", body.userCreatedAt);
 		// console.log("uuid: ", body.uuid);
 
-
+		let	retValue;
+		let	userObject: UserModel;
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
@@ -113,7 +110,7 @@ export class UserController
 				.then((res) =>
 				{
 					const	data = res.data;
-					const	userObject: UserModel = {
+					userObject = {
 						ftApi: newObject,
 						// Do we need it ?
 						retStatus: res.status,
@@ -127,12 +124,26 @@ export class UserController
 						url: data.url,
 						avatar: data.image,
 						location: data.location,
-			// TEST anonymous user
-						uuid: body.uuid,
-						password: "a450dfbf-ad05-43d1-956e-634e779cd610",
-						createdAt: "undefined"
+						// TEST anonymous user
+						// uuid: body.uuid,
+						// password: "a450dfbf-ad05-43d1-956e-634e779cd610",
+						// createdAt: "undefined",
+						authService:
+						{
+							token: "",
+							expAt: 0,
+							doubleAuth:
+							{
+								lastIpClient: "undefined",
+								phoneNumber: "undefined",
+								phoneRegistered: false,
+								validationCode: "undefined",
+								valid: false,
+							}
+						}
 					};
-					this.userService.register(userObject);
+					retValue = this.userService.register(userObject);
+					return (retValue.res);
 				})
 				.catch((error) =>
 				{
@@ -154,7 +165,7 @@ export class UserController
 		// On devrait pouvoir logger le token.
 		// fin de la premiere etape,
 		// On refait un point apres pour ne pas se melanger les pinceaux
-		return ("okay");
+		// return ("okay");
 		// this.logger.debug(""register" route request with uid: ", body.uuid);
 		// const	retValue = this.userService.register(body.uuid);
 
@@ -186,6 +197,7 @@ export class UserController
 		// 		prisma.$disconnect();
 		// 	});
 		// 	return ;
+		return ("Okay");
 	}
 
 	@Get("all-users")
@@ -194,4 +206,34 @@ export class UserController
 	{
 		return (this.userService.getUserArray());
 	}
+
+	@Post("login")
+	userLogin(
+		@Body() body: UserLoginDto)
+	: UserLoginResponseModel
+	{
+		this.logger
+			.log("login route requested with id: ", body.id);
+		return (this.userService.login(body.id, body.email));
+	}
+
+	@Post("verify-token")
+	@UseGuards(UserAuthorizationGuard)
+	verifyToken(@Req() headers: {authorization?: string})
+		: UserVerifyTokenResModel
+	{
+		console.log(headers);
+		// if (this.userService.verifyToken() === "TOKEN OK")
+		// 	console.log("token OK");
+		// else
+		// 	throw error();
+		this.logger
+			.log("'verify-token' route request");
+		const	response: UserVerifyTokenResModel = {
+			message: "Successfully verified token",
+			statusCode: 200
+		};
+		return (response);
+	}
+
 }

@@ -13,7 +13,7 @@ export interface UserModel
 	ftApi: ApplicationUserModel;
 	retStatus: number;
 	date: string;
-	id: any;
+	id: number;
 	email: string;
 	login: string;
 	firstName: string;
@@ -30,11 +30,25 @@ export interface UserModel
 			}
 	}
 	location: string;
-	uuid: string;
-	password: string;
+	// uuid: string;
+	// password: string;
 	// token: string;
 	// lastConnection: number | "never connected";
-	createdAt: string;
+	// createdAt: string;
+	authService:
+	{
+		token: string;
+		expAt: number;
+		doubleAuth:
+		{
+			valid: boolean;
+			validationCode: string;
+			// model phone number +33621523456
+			phoneNumber: string;
+			phoneRegistered: boolean;
+			lastIpClient: string;
+		}
+	};
 	// revokeConnectionRequest: boolean;
 }
 
@@ -47,8 +61,21 @@ export interface AdminResponseModel
 export interface UserRegisterResponseModel
 {
 	message: string;
-	uuid: string;
-	password: string;
-	creationDate: string;
+	token: string;
+	// uuid: string;
+	// password: string;
+	// creationDate: string;
+	statusCode: number;
+}
+export interface UserLoginResponseModel
+{
+	message: string;
+	token: string;
+	expireAt: number;
+}
+
+export interface UserVerifyTokenResModel
+{
+	message: string;
 	statusCode: number;
 }
