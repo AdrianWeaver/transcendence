@@ -3,19 +3,13 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, Get,Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Post, Req } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, IsUUID } from "class-validator";
-import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { IsEmail, IsNotEmpty, } from "class-validator";
 
 import	Api from "../Api";
-import axios, { AxiosRequestConfig } from "axios";
-import qs from "qs";
-import { error } from "console";
-import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
-import { register } from "module";
-import { AuthorizationGuard } from "src/anonymous-user/anonymous-user.authorizationGuard";
+
+import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserVerifyTokenResModel } from "./user.interface";
 
 class	RegisterDto
 {
@@ -48,7 +42,7 @@ export class UserController
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
-		this.logger.log("instance loaded");
+		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
 	}
 
 	@Post("register")
@@ -218,7 +212,7 @@ export class UserController
 	}
 
 	@Post("verify-token")
-	@UseGuards(UserAuthorizationGuard)
+	// @UseGuards(UserAuthorizationGuard)
 	verifyToken(@Req() headers: {authorization?: string})
 		: UserVerifyTokenResModel
 	{

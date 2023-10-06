@@ -15,4 +15,9 @@ export class ChatApiService
 	{
 		return (this.chatService.getAllUsers());
 	}
+
+	public getUuidInstance(): string
+	{
+		return (this.chatService.getChatInstanceId());
+	}
 }

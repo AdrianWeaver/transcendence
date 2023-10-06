@@ -31,14 +31,13 @@ import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 	],
 	controllers: [
 		AppController,
-		// AnonymousUserController,
+		AnonymousUserController,
 		AdminsController,
 		ChatApiController,
 		UserController
 	],
 	providers: [
 		AppService,
-		// AnonymousUserService,
 		UserService,
 		AdminsService,
 		ChatApiModule,

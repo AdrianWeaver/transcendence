@@ -8,7 +8,8 @@ export class ChatApiController
 	constructor(private readonly chatApiService: ChatApiService)
 	{
 		this.logger
-			.log("instanciate controller for the chat API's");
+			.log("instanciate controller for the chat API's with instance id:"
+				+ this.chatApiService.getUuidInstance());
 	}
 
 	@Get("all-user")

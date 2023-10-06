@@ -28,7 +28,7 @@ import
 }	from "./anonymous-user.interface";
 import { AuthorizationGuard } from "./anonymous-user.authorizationGuard";
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 
 class AnonymousRegisterDto
 {
@@ -53,7 +53,9 @@ export class AnonymousUserController
 	constructor(private readonly anonymousUserService: AnonymousUserService)
 	{
 		this.logger = new Logger("anonymous-user controller");
-		this.logger.debug("I'm connected :)");
+		this.logger
+		.debug("I'm connected to anonymous-user-service instance id :"
+			+ this.anonymousUserService.getUuidInstance());
 	}
 
 	@Post("register")
@@ -71,31 +73,6 @@ export class AnonymousUserController
 			retValue.toDB.lastConnection = -1;
 		res.send(retValue.res).status(200)
 			.end();
-		// res.send(retValue.res);
-		// const prisma = new PrismaClient();
-		// const	rec = retValue.toDB;
-		// prisma.$connect();
-		// prisma.anonymousUser.create({
-		// 	data:
-		// 	{
-		// 		uuid: rec.uuid,
-		// 		isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
-		// 		lastConnection: rec.lastConnection as number,
-		// 		password: rec.password,
-		// 		revokeConnectionRequest: rec.revokeConnectionRequest,
-		// 		token: rec.token,
-		// 		userCreatedAt: rec.userCreatedAt
-		// 	}
-		// })
-		// 	.catch((error: any) =>
-		// 	{
-		// 		throw error;
-		// 	})
-		// 	.finally(async () =>
-		// 	{
-		// 		prisma.$disconnect();
-		// 	});
-		// return ;
 	}
 
 	@Post("login")
