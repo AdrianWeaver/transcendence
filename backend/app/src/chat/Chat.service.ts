@@ -57,7 +57,7 @@ export	class ChatService
 	constructor()
 	{
 		this.chat = new Chat();
-		this.log.debug("started service instance - id instance : " + this.uuid);
+		this.log.log("started service instance - id instance : " + this.uuid);
 	}
 
 	// getters

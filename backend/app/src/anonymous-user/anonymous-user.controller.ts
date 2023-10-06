@@ -53,6 +53,7 @@ export class AnonymousUserController
 	constructor(private readonly anonymousUserService: AnonymousUserService)
 	{
 		this.logger = new Logger("anonymous-user controller");
+		this.logger.debug("I'm connected :)");
 	}
 
 	@Post("register")

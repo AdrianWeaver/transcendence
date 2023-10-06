@@ -48,7 +48,7 @@ export class UserController
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
-		this.logger.debug("instance loaded");
+		this.logger.log("instance loaded");
 	}
 
 	@Post("register")
