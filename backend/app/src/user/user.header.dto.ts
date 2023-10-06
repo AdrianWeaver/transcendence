@@ -1,8 +1,8 @@
 
-// import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 
-// export class UserHeaderDto
-// {
-// 	@ApiProperty()
-// 	readonly authorization: string;
-// }
+export class UserHeaderDto
+{
+	@ApiProperty()
+	readonly authorization: string;
+}

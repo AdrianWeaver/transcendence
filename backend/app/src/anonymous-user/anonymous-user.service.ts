@@ -25,6 +25,7 @@ export class AnonymousUserService
 {
 	private	anonymousUser: Array<AnonymousUserModel> = [];
 	private	secret;
+	// private	secret = randomBytes(64).toString("hex");
 	private	uuidInstance: string;
 	private	logger = new Logger("anymous-user-service itself");
 

@@ -16,7 +16,7 @@ import { error } from "console";
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { register } from "module";
 import { AuthorizationGuard } from "src/anonymous-user/anonymous-user.authorizationGuard";
-// import { UserAuthorizationGuard } from "./user.authorizationGuard";
+import { UserAuthorizationGuard } from "./user.authorizationGuard";
 
 class	RegisterDto
 {
@@ -220,7 +220,7 @@ export class UserController
 	}
 
 	@Post("verify-token")
-	// @UseGuards(UserAuthorizationGuard)
+	@UseGuards(UserAuthorizationGuard)
 	verifyToken(@Req() headers: {authorization?: string})
 		: UserVerifyTokenResModel
 	{
