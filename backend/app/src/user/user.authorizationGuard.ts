@@ -58,7 +58,7 @@ export	class UserAuthorizationGuard implements CanActivate
 		{
 			if (error instanceof jwt.JsonWebTokenError)
 			{
-				console.log("User has tryed to use a wrong token signature");
+				console.log("User has tried to use a wrong token signature");
 				throw new UnauthorizedException();
 			}
 			console.log("Error on Anonymous isValidTokenSignature : ", error);
