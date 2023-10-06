@@ -4,10 +4,9 @@ import { AnonymousUserController } from "./anonymous-user.controller";
 
 
 @Module({
-	providers:
-	[
+	providers: [
 		AnonymousUserService,
-		AnonymousUserController
+		AnonymousUserController // to test 
 	],
 	exports: [AnonymousUserService]
 })

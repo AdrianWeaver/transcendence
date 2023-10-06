@@ -59,6 +59,11 @@ export class UserService
 		return (response);
 	}
 
+	public	getSecret() : string
+	{
+		return (this.secret);
+	}
+
 	public	register(data: UserModel)
 		: {res: UserRegisterResponseModel, toDB: UserModel}
 	{
@@ -80,6 +85,11 @@ export class UserService
 				url: data.url,
 				avatar: data.avatar,
 				location: data.location,
+				revokedConnectionRequest: data.revokedConnectionRequest,
+				// uuid: data.uuid,
+				// // TEST anonymous user pw
+				// password: data.password,
+				// createdAt: data.createdAt,
 				authService:
 				{
 					token: "Bearer " + jwt.sign(
@@ -154,6 +164,32 @@ export class UserService
 			return (response);
 	}
 
+	public	userIdentifiedRequestEndOfSession(id: any)
+	{
+		const	user = this.user.find((user) =>
+		{
+			return (user.id.toString() === id.toString());
+		});
+		if (!user)
+			throw new InternalServerErrorException();
+		if (user.revokedConnectionRequest === false)
+			throw new InternalServerErrorException();
+		user.authService.token = "no token";
+		user.revokedConnectionRequest = false;
+		return (false);
+	}
+
+	public revokeTokenById(id: any)
+	{
+		const	user = this.user.find((user) =>
+		{
+			return (user.id.toString() === id.toString());
+		});
+		if (!user)
+			throw new InternalServerErrorException();
+		user.revokedConnectionRequest = true;
+	}
+
 	public	getUserById(id: any)
 		: UserModel | undefined
 	{
@@ -169,7 +205,6 @@ export class UserService
 	{
 		const	searchUser = this.user.findIndex((elem) =>
 		{
-			console.log("user token ", elem.authService.token, " token ", token);
 			return (elem.authService.token === token);
 		});
 		if (searchUser !== undefined)

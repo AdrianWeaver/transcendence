@@ -3,6 +3,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
+
 import { Body, Controller, Get, Logger, Post, Req } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, } from "class-validator";
@@ -118,6 +119,7 @@ export class UserController
 						url: data.url,
 						avatar: data.image,
 						location: data.location,
+						revokedConnectionRequest: false,
 						// TEST anonymous user
 						// uuid: body.uuid,
 						// password: "a450dfbf-ad05-43d1-956e-634e779cd610",
@@ -216,11 +218,7 @@ export class UserController
 	verifyToken(@Req() headers: {authorization?: string})
 		: UserVerifyTokenResModel
 	{
-		console.log(headers);
-		// if (this.userService.verifyToken() === "TOKEN OK")
-		// 	console.log("token OK");
-		// else
-		// 	throw error();
+		console.log(headers.authorization);
 		this.logger
 			.log("'verify-token' route request");
 		const	response: UserVerifyTokenResModel = {

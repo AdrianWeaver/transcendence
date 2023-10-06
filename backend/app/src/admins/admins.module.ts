@@ -6,7 +6,10 @@ import { AnonymousUserModule } from "../anonymous-user/anonyous-user.module";
 
 @Module({
 	imports: [AnonymousUserModule],
-	providers: [AdminsService],
+	providers: [
+		AdminsService,
+		AnonymousUserService
+	],
 	controllers: [AdminsController],
 	exports: [AdminsService]
 })
