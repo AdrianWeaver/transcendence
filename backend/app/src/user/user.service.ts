@@ -5,7 +5,9 @@ import
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
-	InternalServerErrorException} from "@nestjs/common";
+	InternalServerErrorException,
+	Logger
+} from "@nestjs/common";
 import
 {
 	AdminResponseModel,
@@ -22,8 +24,21 @@ import	* as jwt from "jsonwebtoken";
 @Injectable()
 export class UserService
 {
-	private user: Array<UserModel> = [];
+	private	user: Array<UserModel> = [];
 	private	secret = randomBytes(64).toString("hex");
+	private readonly logger = new Logger("user-service itself");
+	private readonly uuidInstance = uuidv4();
+
+	public constructor()
+	{
+		this.logger.log("Base instance loaded with the instance id: "
+			+ this.getUuidInstance());
+	}
+
+	public	getUuidInstance(): string
+	{
+		return (this.uuidInstance);
+	}
 
 	public	getUserArray(): Array<UserModel>
 	{
@@ -36,7 +51,6 @@ export class UserService
 		{
 			return ({
 				...elem,
-				// TEST
 				password: "[hidden information]"
 			});
 		});
@@ -106,10 +120,6 @@ export class UserService
 				message: "Your session has been created, you must loggin",
 				token: newUser.authService.token,
 				statusCode: newUser.retStatus
-				// uuid: newUser.uuid,
-				// password: newUser.password,
-				// creationDate: newUser.createdAt,
-				// statusCode: newUser.retStatus
 			};
 			console.log("user service newUser 78: ", newUser);
 			console.log(" ");
