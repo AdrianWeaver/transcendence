@@ -5,7 +5,6 @@
 /* eslint-disable max-lines-per-function */
 
 import {
-	Box,
 	Button,
 	Divider,
 	Fab,
@@ -18,7 +17,6 @@ import {
 	Tabs,
 	TextField,
 	Toolbar,
-	Typography,
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -27,8 +25,26 @@ import {
 } from "@mui/material";
 
 import MessageItem from "./components/MessageItem";
-import CurrentlyTalkingFriend from "./components/CurrentlyTalkingFriend";
-import FriendItem from "./components/FriendItem";
+import FriendsList from "./components/FriendsList";
+import TabPanel from "./components/TabPanel";
+
+import	{ inviteUserToChannel } from "./actionsSocket/inviteUserToChannel";
+import	{ muteUserInChannel } from "./actionsSocket/muteUserInChannel";
+import	{ addUserToBlocked } from "./actionsSocket/addUserToBlocked";
+import	{ addUserToFriends } from "./actionsSocket/addUserToFriends";
+import	{ makeAdmin } from "./actionsSocket/makeAdmin";
+import	{ removeChannel } from "./actionsSocket/removeChannel";
+import	{ handlePasswordSubmit } from "./actionsSocket/handlePasswordSubmit";
+import	{ kickUserFromChannel } from "./actionsSocket/kickUserFromChannel";
+import	{ banUserFromChannel } from "./actionsSocket/banUserFromChannel";
+import	{ joinChannel } from "./actionsSocket/joinChannel";
+import	{ refreshListUser } from "./actionsSocket/refreshListUser";
+import	{ goToChannel } from "./actionsSocket/goToChannel";
+import	{ leaveChannel } from "./actionsSocket/leaveChannel";
+import	{ handleMembersClickOpen } from "./actionsSocket/handleMembersClickOpen";
+import	{ handleSendClick } from "./actionsSocket/handleSendClick";
+import	{ createNewChannel } from "./actionsSocket/createNewChannel"; 
+
 
 const URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
@@ -36,12 +52,11 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
 import
 {
-	CSSProperties,
 	useState,
 	useEffect,
 	useRef
 }	from "react";
-import { motion } from "framer-motion";
+
 import { io } from "socket.io-client";
 
 import {
@@ -49,15 +64,12 @@ import {
 	useAppSelector
 } from "../../Redux/hooks/redux-hooks";
 import {
-	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
 	setMessageRoom,
-	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { MessageRoomModel } from "../../Redux/models/redux-models";
-import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
 
 type MessageModel =
 {
@@ -79,250 +91,7 @@ type ChanMapModel = {
 };
 
 // chat part 
-interface TabPanelProps {
-	children?: React.ReactNode;
-	dir?: string;
-	index: number;
-	value: number;
-	style?: CSSProperties;
-	area?: boolean;
-}
 
-const TabPanel = (props: TabPanelProps) =>
-{
-	const { children, value, index, ...other } = props;
-	let animationSettings;
-
-	if (props.area === false)
-		animationSettings = {
-			type: "spring",
-			duration: 0.3,
-			scale: 0.6,
-			stiffness: 0
-		};
-	else
-		animationSettings = {
-			type: "sidebar",
-			duration: 0.5,
-			scale: 0.85,
-			stiffness: 80,
-		};
-	return (
-		<motion.div
-			initial={
-				{
-					opacity: 0,
-					scale: animationSettings.scale
-				}}
-			animate={{
-				opacity: value === index ? 1 : 0,
-				scale: value === index ? 1 : animationSettings.scale
-			}}
-			transition={
-				{
-					duration: animationSettings.duration,
-					type: animationSettings.type,
-					stiffness: 80,
-				}}
-			style={{ display: value === index ? "block" : "none" }}
-		>
-			<Typography
-				component="div"
-				role="tabpanel"
-				hidden={value !== index}
-				id={`action-tabpanel-${index}`}
-				aria-labelledby={`action-tab-${index}`}
-				{...other}
-			>
-				<Box sx={{ p: 3 }}>{children}</Box>
-			</Typography>
-		</motion.div>
-	);
-};
-
-type FriendsListProps = {
-	arrayListUsers: string[],
-	socketRef: React.MutableRefObject<SocketIOClient.Socket>
-};
-
-const FriendsList = (props: FriendsListProps) =>
-{
-	const	dispatch = useAppDispatch();
-	const	users = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.users);
-	});
-
-	const	numberOfChannels = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.numberOfChannels);
-	});
-
-	const	createNewConv = (activeId: string) =>
-	{
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: "undefined",
-				chanMode: "undefined",
-				chanPassword: "undefined",
-				chanId: numberOfChannels + 1,
-				activeId: activeId
-			}
-		};
-		props.socketRef.current.emit("channel-info", action);
-	};
-	const displayConversationWindow = (id: string) =>
-	{
-		const action = {
-			type: "display-conversation",
-			payload:
-			{
-				id: id,
-				index: numberOfChannels + 1
-			}
-		};
-		props.socketRef.current?.emit("display-conversation", action);
-	};
-
-	return (
-		<>
-			<CurrentlyTalkingFriend />
-			<Divider />
-			<Grid
-				item
-				xs={12}
-				// style={{padding: '10px'}}
-				sx={{ padding: "10px" }}
-			>
-				<TextField
-					id="outlined-basic-email"
-					label="Search"
-					variant="outlined"
-					fullWidth
-				/>
-			</Grid>
-			<Divider />
-			<List>
-				{
-					users.map((elem, index) =>
-					{
-						return (
-							<>
-								<div onClick={() =>
-								{
-									displayConversationWindow(elem.id);
-									dispatch(setActiveConversationId(elem.id));
-									// dispatch(setKindOfConversation("privateMessage"));
-									createNewConv(elem.id);
-								}}>
-									<FriendItem
-										name={elem.name + ": " + elem.id}
-										avatar={elem.avatar}
-										key={index}
-										online={true}
-									/>
-								</div>
-							</>
-						);
-					})
-				}
-			</List>
-		</>
-	);
-};
-
-
-const MessagesArea = () =>
-{
-	let displayMessageArray;
-
-	displayMessageArray = [
-	{
-		sender: "server",
-		message: "Not initiliazed",
-		date: "09:30"
-	},
-	];
-	const	dispatch = useAppDispatch();
-
-	const users = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.users);
-	});
-
-	const activeId = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.activeConversationId);
-	});
-
-	const userActiveIndex = users.findIndex((elem) =>
-	{
-		return (elem.id === activeId);
-	});
-	if (userActiveIndex === -1)
-	{
-		displayMessageArray = [
-			{
-				sender: "server",
-				message: "Ce client n'existe pas",
-				date: "09:30"
-			},
-		];
-	}
-	else
-	{
-		const msgRoom = users[userActiveIndex].msgRoom;
-		let i;
-
-		i = 0;
-		while (msgRoom.length)
-		{
-			if (msgRoom[i].id === activeId)
-			{
-				displayMessageArray = msgRoom[i].content;
-				break;
-			}
-			i++;
-		}
-		if (i === msgRoom.length)
-		{
-			// dispatch(setKindOfConversation("privateMessage"));
-			dispatch(setActiveConversationId(activeId));
-			displayMessageArray = [
-				{
-					sender: "server",
-					message: "Conversation with " + activeId,
-					date: "09:30"
-				},
-			];
-		}
-	}
-	return (
-		<>
-			<List
-				sx={{
-					height: "70vh",
-					overflowY: "auto"
-				}}
-			>
-				{
-					displayMessageArray.map((elem, key) =>
-					{
-						return (
-							<MessageItem
-								key={key}
-								date={elem.date}
-								sender={elem.sender as "me" | "other" | "server"}
-								message={elem.message}
-							/>
-						);
-					})
-				}
-			</List>
-		</>
-	);
-};
 
 const a11yProps = (index: any) =>
 {
@@ -483,8 +252,6 @@ const	ChatLayout = () =>
 		setChannelToInvite
 	] = useState("");
 
-	// END OF USE STATEs
-
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -511,37 +278,6 @@ const	ChatLayout = () =>
 
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
-
-	const	createNewChannel = () =>
-	{
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: channelName,
-				chanMode: selectedMode,
-				chanPassword: chanPassword,
-				chanId: channels.length + 1,
-				pmIndex: privateMessage.length + 1,
-				activeId: activeId,
-				kind: kindOfConversation
-			}
-		};
-		dispatch(setNumberOfChannels(channels.length));
-		socketRef.current?.emit("channel-info", action);
-	};
-
-	const	removeChannel = (chanId: number, chanName: string) =>
-	{
-		const	action = {
-			type: "destroy-channel",
-			payload: {
-				name: chanName,
-				id: chanId,
-				kind: kindOfConversation
-			}
-		};
-		socketRef.current?.emit("channel-info", action);
-	};
 
 	const handleSave = () =>
 	{
@@ -570,21 +306,18 @@ const	ChatLayout = () =>
 			return;
 		}
 		setKindOfConversation("channel");
-		createNewChannel();
+		createNewChannel(
+			socketRef,
+			channelName,
+			selectedMode,
+			chanPassword,
+			channels,
+			privateMessage,
+			activeId,
+			kindOfConversation
+		);
+		dispatch(setNumberOfChannels(channels.length));
 		handleClose();
-	};
-
-	const	joinChannel = (chanName: string) =>
-	{
-		const	action = {
-			type: "asked-join",
-			payload: {
-				chanName: chanName,
-				activeId: activeId,
-				kind: kindOfConversation
-			}
-		};
-		socketRef.current.emit("channel-info", action);
 	};
 
 	useEffect(() =>
@@ -658,7 +391,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.correct === "true")
 				{
-					joinChannel(joiningChannelNameRef.current);
+					joinChannel(joiningChannelNameRef.current, socketRef, activeId, kindOfConversation);
 					setOpenPasswordDialog(false);
 					setUserPassword("");
 				}
@@ -814,11 +547,7 @@ const	ChatLayout = () =>
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
         });
-    }, [
-		// dispatch,
-		// joinChannel,
-		// kindOfConversation
-	]);
+    }, []);
 
 	useEffect(() =>
 	{
@@ -840,18 +569,6 @@ const	ChatLayout = () =>
 		blockedList
 	]);
 
-	const handlePasswordSubmit = (password: string) =>
-	{
-		const	action = {
-			type: "password-for-protected",
-			payload: {
-				password: password,
-				chanName: joiningChannelName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
 	const handleChange = (event: React.SyntheticEvent, newValue: number) =>
 	{
 		setValue(newValue);
@@ -862,25 +579,6 @@ const	ChatLayout = () =>
 		setValue(index);
 	};
 
-	const refreshListUser = () =>
-	{
-		// if (chatConnected === false)
-		// {
-		const action = {
-			type: "get-user-list",
-		};
-		socketRef.current?.emit("info", action);
-		// 	console.log("request data from server", connected);
-		// 	dispatch(setChatConnected(true));
-		// }
-		console.log("refresh the list of user");
-	};
-
-	const customButtonStyle = {
-		// padding: "4px 8px",
-		fontSize: "12px",
-		margin: "0 8px",
-	};
 
 	const listItemStyle = {
 		display: "flex",
@@ -906,46 +604,6 @@ const	ChatLayout = () =>
 		else
 			setText(e.target.value);
 	};
-
-	const handleSendClick = () =>
-	{
-		const action = {
-			type: "sent-message",
-			payload: {
-				chanName: currentChannel,
-				message: text,
-			}
-		};
-		socketRef.current.emit("info", action);
-		setText("");
-		// MessagesArea(text);
-	};
-
-	const	goToChannel = (chanName: string, kind: string) =>
-	{
-		const	action = {
-			type: "did-I-join",
-			payload: {
-				chanName: chanName,
-				kind: kind,
-				userId: activeId
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	const	leaveChannel = (chanName: string) =>
-	{
-		const	action = {
-			type: "leave-channel",
-			payload: {
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
 
 	const [
 		isDialogOpen,
@@ -980,19 +638,19 @@ const	ChatLayout = () =>
 			setOpenPasswordDialog(true);
 		}
 		else
-			joinChannel(chanName);
+			joinChannel(chanName, socketRef, activeId, kindOfConversation);
 		handleDialogClose();
 	};
 
 	const handleLeaveButtonClick = (chanId: number, chanName: string) =>
 	{
-		leaveChannel(chanName);
+		leaveChannel(chanName, socketRef);
 		handleDialogClose();
 	};
 
 	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
 	{
-		removeChannel(chanId, chanName);
+		removeChannel(chanId, chanName, socketRef, kindOfConversation);
 		handleDialogClose();
 	};
 
@@ -1004,116 +662,9 @@ const	ChatLayout = () =>
 		setMembersOpen
 	] = useState(false);
 
-	const handleMembersClickOpen = (chanName: string) =>
-	{
-		setMembersOpen(true);
-		const	action = {
-			type: "member-list",
-			payload: {
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
 	const handleMembersClose = () =>
 	{
 		setMembersOpen(false);
-	};
-
-	// END OF MEMBERS
-
-	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
-
-	const	kickUserFromChannel = (userName: string, chanName: string) =>
-	{
-		const	action = {
-			type: "kick-member",
-			payload: {
-				userName: userName,
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	const	banUserFromChannel = (userName: string, chanName: string) =>
-	{
-		const	action = {
-			type: "ban-member",
-			payload: {
-				userName: userName,
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
-	const	addUserToFriends = (userName: string) =>
-	{
-		const	action = {
-			type: "add-friend",
-			payload: {
-				friendName: userName,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
-	const	addUserToBlocked = (userName: string) =>
-	{
-		const	action = {
-			type: "block-user",
-			payload: {
-				blockedName: userName,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
-	const	muteUserInChannel = (userName: string, chanName: string) =>
-	{
-		const	action = {
-			type: "mute-user",
-			payload: {
-				chanName: chanName,
-				userName: userName,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
-	// END OF MEMBERS FUNCTIONS
-
-	// INVITE
-
-	const	inviteUserToChannel = (userName: string) =>
-	{
-		console.log("member: " + userName);
-		console.log("chanel : " + channelToInvite);
-		const	action = {
-			type: "invite-member",
-			payload: {
-				chanName: channelToInvite,
-				userName: userName,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-		// setChannelToInvite("");
-	};
-
-	// END OF INVITE
-
-	const	makeAdmin = (userName: string, chanName: string) =>
-	{
-		const	action = {
-			type: "make-admin",
-			payload: {
-				userName: userName,
-				chanName: chanName,
-			}
-		};
-		socketRef.current.emit("user-info", action);
 	};
 
 	return (
@@ -1121,7 +672,11 @@ const	ChatLayout = () =>
 			<MenuBar />
 			<div>
 				connected:{connected}
-				<button onClick={refreshListUser}>click to refresh</button>
+				<button onClick={ () =>
+					{
+					refreshListUser(socketRef);
+					}}>
+					click to refresh</button>
 			</div>
 			<Grid
 				container
@@ -1228,7 +783,7 @@ const	ChatLayout = () =>
 										}}
 										/>
 										<label htmlFor="option2">Protected</label>
-									</div>
+									</div>n
 									<div>
 										<input
 										type="radio"
@@ -1278,7 +833,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("channel");
-														return (goToChannel(channel.name, "channel"));
+														return (goToChannel(channel.name, "channel", socketRef, activeId));
 													}}
 												/>
 												<Button onClick={() =>
@@ -1313,7 +868,8 @@ const	ChatLayout = () =>
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															setMembersOpen(true);
+															return handleMembersClickOpen(buttonSelection.name, socketRef);
 														}}>
 															Members
 														</Button>
@@ -1332,26 +888,26 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						kickUserFromChannel(member.name, buttonSelection.name);
+																						kickUserFromChannel(member.name, buttonSelection.name, socketRef);
 																						handleMembersClose();
 																					}}>
 																						Kick
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						banUserFromChannel(member.name, buttonSelection.name);
+																						banUserFromChannel(member.name, buttonSelection.name, socketRef);
 																					}}>
 																						Ban
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						muteUserInChannel(member.name, buttonSelection.name);
+																						muteUserInChannel(member.name, buttonSelection.name, socketRef);
 																					}}>
 																						Mute
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						makeAdmin(member.name, buttonSelection.name);
+																						makeAdmin(member.name, buttonSelection.name, socketRef);
 																					}}>
 																						Make admin
 																					</Button>
@@ -1360,13 +916,13 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						addUserToFriends(member.name);
+																						addUserToFriends(member.name, socketRef);
 																					}}>
 																						Add friend
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						addUserToBlocked(member.name);
+																						addUserToBlocked(member.name, socketRef);
 																					}}>
 																						Block
 																					</Button>
@@ -1398,7 +954,11 @@ const	ChatLayout = () =>
 																						<DialogActions>
 																							<Button onClick={() =>
 																								{
-																									inviteUserToChannel(member.name);
+																									inviteUserToChannel(
+																										member.name,
+																										channelToInvite,
+																										socketRef
+																										);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
 																								Invite
@@ -1466,7 +1026,7 @@ const	ChatLayout = () =>
 														<Button
 															onClick={() =>
 															{
-																handlePasswordSubmit(userPassword);
+																handlePasswordSubmit(userPassword, socketRef, joiningChannelName);
 															}}
 															color="primary"
 															>
@@ -1506,7 +1066,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name, "privateMessage"));
+														return (goToChannel(channel.name, "privateMessage", socketRef, activeId));
 													}}
 												/>
 											</ListItem>
@@ -1641,7 +1201,11 @@ const	ChatLayout = () =>
 							/>
 						</Grid>
 						<Grid xs={1} sx={{ alignItems: "right" }}>
-							<Fab color="primary" aria-label="add" onClick={handleSendClick}>
+							<Fab color="primary" aria-label="add" onClick={ () =>
+								{
+									handleSendClick(socketRef, currentChannel, text);
+									setText("");
+								}}>
 							<SendIcon />
 							</Fab>
 						</Grid>

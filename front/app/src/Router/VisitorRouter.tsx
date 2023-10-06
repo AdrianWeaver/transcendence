@@ -11,7 +11,8 @@ import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
-import Chat from "../Views/Chat/Chat";
+// import Chat from "../Views/Chat/Chat";
+import ChatLayout from "../Views/Chat/ChatLayout";
 
 /**
  * This is unauth router
@@ -57,7 +58,7 @@ const	VisitorRouter = () =>
 				
 				<Route
 					path="the-chat"
-					element={<Chat />}
+					element={<ChatLayout />}
 				/>
 				{/* show 404 when route not found */}
 				<Route
