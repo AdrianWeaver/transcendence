@@ -13,7 +13,7 @@ export interface UserModel
 	ftApi: ApplicationUserModel;
 	retStatus: number;
 	date: string;
-	id: any;
+	id: number;
 	email: string;
 	login: string;
 	firstName: string;
@@ -30,11 +30,11 @@ export interface UserModel
 			}
 	}
 	location: string;
-	uuid: string;
-	password: string;
+	// uuid: string;
+	// password: string;
 	// token: string;
 	// lastConnection: number | "never connected";
-	createdAt: string;
+	// createdAt: string;
 	authService:
 	{
 		token: string;
@@ -65,5 +65,17 @@ export interface UserRegisterResponseModel
 	// uuid: string;
 	// password: string;
 	// creationDate: string;
+	statusCode: number;
+}
+export interface UserLoginResponseModel
+{
+	message: string;
+	token: string;
+	expireAt: number;
+}
+
+export interface UserVerifyTokenResModel
+{
+	message: string;
 	statusCode: number;
 }

@@ -1,9 +1,14 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import { BadRequestException, Injectable } from "@nestjs/common";
+import
+{
+	BadRequestException,
+	ForbiddenException,
+	Injectable } from "@nestjs/common";
 import
 {
 	AdminResponseModel,
+	UserLoginResponseModel,
 	UserModel,
 	UserRegisterResponseModel,
 } from "./user.interface";
@@ -46,7 +51,7 @@ export class UserService
 	{
 		const	searchUser = this.user.find((user) =>
 		{
-			return (user.uuid === data.uuid);
+			return (user.id === data.id);
 		});
 		if (searchUser === undefined)
 		{
@@ -62,10 +67,10 @@ export class UserService
 				url: data.url,
 				avatar: data.avatar,
 				location: data.location,
-				uuid: data.uuid,
-				// TEST anonymous user pw
-				password: data.password,
-				createdAt: data.createdAt,
+				// uuid: data.uuid,
+				// // TEST anonymous user pw
+				// password: data.password,
+				// createdAt: data.createdAt,
 				authService:
 				{
 					token: "Bearer " + jwt.sign(
@@ -110,5 +115,60 @@ export class UserService
 		}
 		else
 			throw new BadRequestException("UUID already exists");
+	}
+
+	public	login(id: any, email:string)
+		: UserLoginResponseModel
+	{
+		const	searchUser = this.user.find((user) =>
+		{
+			return (user.id.toString() === id.toString()
+				&& user.email === email);
+		});
+		if (searchUser === undefined)
+			throw new ForbiddenException("Invalid credential");
+		else
+
+			searchUser.authService.token = "Bearer " + jwt.sign(
+				{
+					id: searchUser.id,
+					mail: searchUser.email
+				},
+				this.secret,
+				{
+					expiresIn: "1d"
+				}
+			);
+
+			const	response: UserLoginResponseModel = {
+				message:
+					"You are successfully connected as " + searchUser.login,
+				token: searchUser.authService.token,
+				expireAt: searchUser.authService.expAt
+			};
+			return (response);
+	}
+
+	public	getUserById(id: any)
+		: UserModel | undefined
+	{
+		const	response = this.user.find((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		return (response);
+	}
+
+	public	verifyToken(token: string)
+		: string
+	{
+		const	searchUser = this.user.findIndex((elem) =>
+		{
+			console.log("user token ", elem.authService.token, " token ", token);
+			return (elem.authService.token === token);
+		});
+		if (searchUser !== undefined)
+			return ("TOKEN OK");
+		return ("TOKEN NOT OK");
 	}
 }

@@ -3,9 +3,9 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, Get, Logger, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get,Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsEmail, IsNotEmpty, IsUUID } from "class-validator";
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
@@ -13,8 +13,9 @@ import	Api from "../Api";
 import axios, { AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { error } from "console";
-import { ApplicationUserModel, UserModel, UserRegisterResponseModel } from "./user.interface";
+import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { register } from "module";
+import { AuthorizationGuard } from "src/anonymous-user/anonymous-user.authorizationGuard";
 
 class	RegisterDto
 {
@@ -22,26 +23,21 @@ class	RegisterDto
 	code: string;
 
 	@IsNotEmpty()
-	@IsUUID()
-	uuid: string;
+	id: any;
 
+	@IsEmail()
 	@IsNotEmpty()
-	@IsUUID()
-	password: string;
+	email: string;
+}
 
-	// @IsNotEmpty()
-	// userCreatedAt: string;
-	// @IsNotEmpty()
-	// clientid: string;
+class UserLoginDto
+{
+	@IsNotEmpty()
+	id: any;
 
-	// @IsNotEmpty()
-	// clientsecret: string;
-
-	// @IsNotEmpty()
-	// granttype: string;
-
-	// @IsNotEmpty()
-	// indirecturi: string;
+	@IsEmail()
+	@IsNotEmpty()
+	email: string;
 }
 
 @Controller("user")
@@ -129,9 +125,9 @@ export class UserController
 						avatar: data.image,
 						location: data.location,
 						// TEST anonymous user
-						uuid: body.uuid,
-						password: "a450dfbf-ad05-43d1-956e-634e779cd610",
-						createdAt: "undefined",
+						// uuid: body.uuid,
+						// password: "a450dfbf-ad05-43d1-956e-634e779cd610",
+						// createdAt: "undefined",
 						authService:
 						{
 							token: "",
@@ -210,4 +206,34 @@ export class UserController
 	{
 		return (this.userService.getUserArray());
 	}
+
+	@Post("login")
+	userLogin(
+		@Body() body: UserLoginDto)
+	: UserLoginResponseModel
+	{
+		this.logger
+			.log("login route requested with id: ", body.id);
+		return (this.userService.login(body.id, body.email));
+	}
+
+	@Post("verify-token")
+	@UseGuards(UserAuthorizationGuard)
+	verifyToken(@Req() headers: {authorization?: string})
+		: UserVerifyTokenResModel
+	{
+		console.log(headers);
+		// if (this.userService.verifyToken() === "TOKEN OK")
+		// 	console.log("token OK");
+		// else
+		// 	throw error();
+		this.logger
+			.log("'verify-token' route request");
+		const	response: UserVerifyTokenResModel = {
+			message: "Successfully verified token",
+			statusCode: 200
+		};
+		return (response);
+	}
+
 }
