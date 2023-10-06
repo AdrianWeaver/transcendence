@@ -1,0 +1,29 @@
+docker run -d -e POSTGRES_DB=db_postgres --name postgres -e POSTGRES_PASSWORD=password_postgres -e POSTGRES_USER=user_postgres -p 6500:5432 postgres
+
+// des problemes de droits sont apparu et set chmod 777 .env schema.prisma
+// modification de DATABASE_URL dans  prisma/.env adresse recupere a partir de docker inspect postgres
+
+
+// on entre dans le backend container 
+
+// comportement atendu
+# Prisma schema loaded from prisma/schema.prisma
+# Environment variables loaded from .env
+# Datasource "db": PostgreSQL database "db_postgres", schema "public" at "172.17.0.5:5432"
+
+# ✖ Introspecting based on datasource defined in prisma/schema.prisma
+# Error: 
+# P4001 The introspected database was empty: 
+
+# prisma db pull could not create any models in your schema.prisma file and you will not be able to generate Prisma Client with the prisma generate command.
+
+# To fix this, you have two options:
+
+# - manually create a table in your database.
+# - make sure the database connection URL inside the datasource block in schema.prisma points to a database that is not empty (it must contain at least one table).
+
+# Then you can run prisma db pull again. 
+
+// we use npx prisma migrate dev 
+
+We finaly use npx prisma db pull to check the configuration
