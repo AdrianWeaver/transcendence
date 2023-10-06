@@ -10,10 +10,14 @@ import
 import { v4 as uuidv4 } from "uuid";
 import User from "src/chat/Objects/User";
 
+import { randomBytes } from "crypto";
+import	* as jwt from "jsonwebtoken";
+
 @Injectable()
 export class UserService
 {
 	private user: Array<UserModel> = [];
+	private	secret = randomBytes(64).toString("hex");
 
 	public	getUserArray(): Array<UserModel>
 	{
@@ -48,15 +52,6 @@ export class UserService
 		{
 			const newUser: UserModel = {
 				ftApi: data.ftApi,
-				// ftApi: {
-				// 	accessToken: data.ft_api.accessToken,
-				// 	tokenType: data.ft_api.tokenType,
-				// 	expiresIn: data.ft_api.expiresIn,
-				// 	refreshToken: data.ft_api.refreshToken,
-				// 	scope: data.ft_api.scope,
-				// 	createdAt: data.ft_api.createdAt,
-				// 	secretValidUntil: data.ft_api.secretValidUntil
-				// },
 				retStatus: data.retStatus,
 				date: data.date,
 				id: data.id,
@@ -70,15 +65,39 @@ export class UserService
 				uuid: data.uuid,
 				// TEST anonymous user pw
 				password: data.password,
-				createdAt: data.createdAt
+				createdAt: data.createdAt,
+				authService:
+				{
+					token: "Bearer " + jwt.sign(
+						{
+							id: data.id,
+							mail: data.email
+						},
+						this.secret,
+						{
+							expiresIn: "1d"
+						}
+					),
+					expAt: Date.now() + (1000 * 60 * 60 * 24),
+					doubleAuth:
+					{
+						lastIpClient: "undefined",
+						phoneNumber: "undefined",
+						phoneRegistered: false,
+						validationCode: "undefined",
+						valid: false,
+					}
+				}
 			};
 			this.user.push(newUser);
 			const	response: UserRegisterResponseModel = {
 				message: "Your session has been created, you must loggin",
-				uuid: newUser.uuid,
-				password: newUser.password,
-				creationDate: newUser.createdAt,
+				token: newUser.authService.token,
 				statusCode: newUser.retStatus
+				// uuid: newUser.uuid,
+				// password: newUser.password,
+				// creationDate: newUser.createdAt,
+				// statusCode: newUser.retStatus
 			};
 			console.log("user service newUser 78: ", newUser);
 			console.log(" ");

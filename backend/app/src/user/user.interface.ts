@@ -35,6 +35,20 @@ export interface UserModel
 	// token: string;
 	// lastConnection: number | "never connected";
 	createdAt: string;
+	authService:
+	{
+		token: string;
+		expAt: number;
+		doubleAuth:
+		{
+			valid: boolean;
+			validationCode: string;
+			// model phone number +33621523456
+			phoneNumber: string;
+			phoneRegistered: boolean;
+			lastIpClient: string;
+		}
+	};
 	// revokeConnectionRequest: boolean;
 }
 
@@ -47,8 +61,9 @@ export interface AdminResponseModel
 export interface UserRegisterResponseModel
 {
 	message: string;
-	uuid: string;
-	password: string;
-	creationDate: string;
+	token: string;
+	// uuid: string;
+	// password: string;
+	// creationDate: string;
 	statusCode: number;
 }
