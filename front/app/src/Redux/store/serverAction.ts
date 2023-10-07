@@ -72,7 +72,8 @@ export const	resetState = ()
 			connexionAttempt: 0,
 			error: false,
 			message: "",
-			serverActiveSince: "unknow"
+			serverActiveSince: "unknow",
+			serverLocation: "localhost"
 		};
 		dispatch(serverActions.resetState(response));
 	});
@@ -126,7 +127,8 @@ export	const	getServerConnection = ()
 
 		// const	user = prevState.controller.user;
 
-		const	data = await ServerService.getConnection();
+		const	data = await ServerService
+			.getConnection(prevState.server.serverLocation);
 		if (data.success === false)
 		{
 			// console.log("data tyes", data);
@@ -152,5 +154,19 @@ export	const	setErrorService = (server: ServerModel)
 	return ((dispatch) =>
 	{
 		dispatch(setErrorService(server));
+	});
+};
+
+export const	setServerLocation = (locationServer: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+		const	response: ServerModel = {
+			...prevState.server,
+			serverLocation: locationServer
+		};
+		dispatch(serverActions.setServerLocation(response));
 	});
 };

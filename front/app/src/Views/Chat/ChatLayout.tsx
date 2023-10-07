@@ -45,8 +45,6 @@ import	{ handleMembersClickOpen } from "./actionsSocket/handleMembersClickOpen";
 import	{ handleSendClick } from "./actionsSocket/handleSendClick";
 import	{ createNewChannel } from "./actionsSocket/createNewChannel"; 
 
-
-const URL = "http://localhost:3000";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -130,6 +128,10 @@ const	ChatLayout = () =>
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
+	});
+	const	url = useAppSelector((state) =>
+	{
+		return ("http://" + state.server.serverLocation + ":3000");
 	});
 
 	// USE STATES
@@ -322,7 +324,7 @@ const	ChatLayout = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(URL,
+		const socket = io(url,
 			{
 				autoConnect: false,
 				reconnectionAttempts: 5,

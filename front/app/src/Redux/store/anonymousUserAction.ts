@@ -91,7 +91,9 @@ export const	loginAnonymousUser = ()
 		const	password = prevState.anonymousUser.password;
 
 		const	data: AnonymousUserLoginResponseModel
-			= await ServerService.loginAnonymousUser(uuid, password);
+			= await ServerService
+				.loginAnonymousUser(
+					uuid, password, prevState.server.serverLocation);
 		if (data.statusCode === 200)
 		{
 			const response: Model = {
@@ -146,7 +148,7 @@ export const	registerAnonymousUser = ()
 		const	uuid = prev.anonymousUser.uuid;
 
 		const	data: AnonymousUserRegisterResponseModel
-			= await ServerService.register(uuid);
+			= await ServerService.register(uuid, prev.server.serverLocation);
 		if (data.statusCode === 200)
 		{
 			const	res: Model = {
@@ -211,7 +213,8 @@ export const	verifyTokenAnonymousUser = ()
 		const	prevState = getState();
 
 		const	token = prevState.anonymousUser.token;
-		const	data = await ServerService.verifyTokenAnonymousUser(token);
+		const	data = await ServerService
+			.verifyTokenAnonymousUser(token, prevState.server.serverLocation);
 		if (data === "ERROR")
 		{
 			res = {

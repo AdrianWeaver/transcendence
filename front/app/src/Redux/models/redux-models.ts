@@ -107,6 +107,7 @@ export interface	ServerModel
 	"connexionAttempt": number,
 	"error": boolean,
 	"message": string,
+	"serverLocation": string
 }
 
 export interface	CanvasModel
