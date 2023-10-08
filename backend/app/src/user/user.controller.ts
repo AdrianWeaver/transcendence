@@ -4,13 +4,14 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, Logger, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Post, Req, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, } from "class-validator";
 
 import	Api from "../Api";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserVerifyTokenResModel } from "./user.interface";
+import { UserAuthorizationGuard } from "./user.authorizationGuard";
 
 class	RegisterDto
 {
@@ -214,7 +215,7 @@ export class UserController
 	}
 
 	@Post("verify-token")
-	// @UseGuards(UserAuthorizationGuard)
+	@UseGuards(UserAuthorizationGuard)
 	verifyToken(@Req() headers: {authorization?: string})
 		: UserVerifyTokenResModel
 	{

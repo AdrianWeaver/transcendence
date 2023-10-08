@@ -149,7 +149,7 @@ export class UserService
 			searchUser.authService.token = "Bearer " + jwt.sign(
 				{
 					id: searchUser.id,
-					mail: searchUser.email
+					email: searchUser.email
 				},
 				this.secret,
 				{
