@@ -70,8 +70,9 @@ export class AnonymousUserController
 		const	retValue = this.anonymousUserService.register(body.uuid);
 
 		this.logger.debug("return Value :", retValue);
-		if (retValue.toDB.lastConnection === "never connected")
-			retValue.toDB.lastConnection = BigInt(-1);
+		// if (retValue.toDB.lastConnection === "never connected")
+		// 	retValue.toDB.lastConnection = BigInt(-1);
+
 		// res.send(retValue.res);
 		// const prisma = new PrismaClient();
 		// const	rec = retValue.toDB;
@@ -107,7 +108,7 @@ export class AnonymousUserController
 			{
 				uuid: rec.uuid,
 				isRegistredAsRegularUser: rec.isRegistredAsRegularUser,
-				lastConnection: rec.lastConnection as bigint,
+				lastConnection: rec.lastConnection as string,
 				password: rec.password,
 				revokeConnectionRequest: rec.revokeConnectionRequest,
 				token: rec.token,
@@ -138,7 +139,7 @@ export class AnonymousUserController
 					uuid: toDb.uuid,
 				},
 				data: {
-					lastConnection: toDb.lastConnection as bigint,
+					lastConnection: toDb.lastConnection as string,
 					token: toDb.token,
 					revokeConnectionRequest: toDb.revokeConnectionRequest,
 				},
@@ -162,9 +163,10 @@ export class AnonymousUserController
 			.log("A user request 'login' route with uid :" + body.uuid);
 		// remplacer return par res.send(....). pour pouvoir envoyer au client la reponse
 		// car return met fin a la continuite du code. Cf: voir register.
-		
+
 		// return (this.anonymousUserService.login(body.uuid, body.password));
 		const	retValue = this.anonymousUserService.login(body.uuid, body.password);
+		this.logger.log("LOL");
 		// remplacer return par res.send(....). pour pouvoir envoyer au client la reponse
 		// car return met fin a la continuite du code. Cf: voir register.
 		res.send(retValue.res).status(200)

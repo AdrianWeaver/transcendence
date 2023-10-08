@@ -54,13 +54,13 @@ export class AnonymousUserService implements OnModuleInit
 					uuid: obj.uuid,
 					password: obj.password,
 					token: obj.token,
-					lastConnection: obj.lastConnection as bigint,
+					lastConnection: obj.lastConnection,
 					userCreatedAt: obj.userCreatedAt,
 					revokeConnectionRequest: obj.revokeConnectionRequest,
 					isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
 				};
-				if (toStore.lastConnection === BigInt(-1))
-					toStore.lastConnection = "never connected";
+				// if (toStore.lastConnection === BigInt(-1).toString())
+				// 	toStore.lastConnection = "never connected";
 				this.anonymousUser.push(toStore);
 			});
 			return (array);
@@ -212,8 +212,7 @@ export class AnonymousUserService implements OnModuleInit
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
-					searchUser.lastConnection + BigInt(1000 * 60 * 60 * 24)
-				// Date.now()
+					searchUser.lastConnection + BigInt(1000 * 60 * 60 * 24),
 			};
 			return (
 			{
