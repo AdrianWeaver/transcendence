@@ -104,6 +104,7 @@ export interface UserRegisterResponseModel
 	message: string;
 	id: string;
 	email: string;
-	creationDate: string;
+	// creationDate: string;
+	token: string;
 	statusCode: number;
 }

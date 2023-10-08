@@ -119,6 +119,8 @@ export class UserService
 			const	response: UserRegisterResponseModel = {
 				message: "Your session has been created, you must loggin",
 				token: newUser.authService.token,
+				id: newUser.id,
+				email: newUser.email,
 				statusCode: newUser.retStatus
 			};
 			console.log("user service newUser 78: ", newUser);
