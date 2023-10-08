@@ -216,7 +216,7 @@ export class UserController
 
 	@Post("verify-token")
 	@UseGuards(UserAuthorizationGuard)
-	verifyToken(@Req() headers: {authorization?: string})
+	verifyToken(@Req() headers: any)
 		: UserVerifyTokenResModel
 	{
 		console.log(headers.authorization);
