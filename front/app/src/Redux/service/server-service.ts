@@ -8,10 +8,10 @@ import
 }	from "../models/redux-models";
 
 const	ServerService = {
-	async getConnection()
+	async getConnection(serverLocation: string)
 	{
 		return (
-			Api()
+			Api(serverLocation)
 				.get("/server-status")
 				.then((res) =>
 				{
@@ -32,7 +32,7 @@ const	ServerService = {
 				})
 		);
 	},
-	async	register(uuid: string)
+	async	register(uuid: string, serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
 			headers:
@@ -52,7 +52,7 @@ const	ServerService = {
 		// };
 
 		return (
-			Api()
+			Api(serverLocation)
 				.post("/anonymous-user/register", data, config)
 				.then((res) =>
 				{
@@ -82,7 +82,10 @@ const	ServerService = {
 				})
 		);
 	},
-	async	loginAnonymousUser(uuid: string, password: string)
+	async	loginAnonymousUser(
+		uuid: string,
+		password: string,
+		serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
 			headers:
@@ -96,7 +99,7 @@ const	ServerService = {
 			password: password
 		};
 		return (
-			Api()
+			Api(serverLocation)
 				.post("/anonymous-user/login", data, config)
 				.then((res) =>
 				{
@@ -122,7 +125,7 @@ const	ServerService = {
 				})
 		);
 	},
-	async	verifyTokenAnonymousUser(token: string)
+	async	verifyTokenAnonymousUser(token: string, serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
 			headers:
@@ -133,7 +136,7 @@ const	ServerService = {
 		};
 		console.log("the token -->", token);
 		return (
-			Api()
+			Api(serverLocation)
 				.post("anonymous-user/verify-token", {}, config)
 				.then((res) =>
 				{

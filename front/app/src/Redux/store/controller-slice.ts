@@ -15,7 +15,7 @@ const	initialControllerState: ControllerModel = {
 	previousPage: "/",
 	user:
 	{
-		isLoggedIn: false,
+		isLoggedIn: true,
 		username: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,

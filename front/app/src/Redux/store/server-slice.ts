@@ -15,6 +15,7 @@ export const	initialServerState: ServerModel = {
 	connexionAttempt: 0,
 	error: false,
 	message: "",
+	serverLocation: "localhost"
 };
 
 const	serverSlice = createSlice(
@@ -64,7 +65,11 @@ const	serverSlice = createSlice(
 		{
 			state.error = action.payload.error;
 			state.message = action.payload.message;
-		}
+		},
+		setServerLocation(state, action: PayloadAction<ServerModel>)
+		{
+			state.serverLocation = action.payload.serverLocation;
+		},
 	}
 });
 

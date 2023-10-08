@@ -25,8 +25,6 @@ import {
 	setServerDimension
 } from "../../Redux/store/gameEngineAction";
 
-const	URL = "http://localhost:3000";
-
 type	ActionSocket = {
 	type: string,
 	payload?: any
@@ -66,9 +64,22 @@ const	TestBall = () =>
 		return (state.gameEngine.board);
 	});
 
+	const	url = useAppSelector((state) =>
+	{
+		return ("http://" + state.server.serverLocation + ":3000");
+	});
+
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
 	const	game = new Game();
+	// remove me after fix
+	try
+	{
+		throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
+	}catch (error)
+	{
+		console.log(error);
+	}
 	const	gameRef = useRef<Game>(game);
 	gameRef.current = game;
 	game.board.game = game;
@@ -79,7 +90,7 @@ const	TestBall = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(URL,
+		const socket = io(url,
 		{
 			autoConnect: false,
 			reconnectionAttempts: 5,
