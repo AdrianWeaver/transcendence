@@ -41,6 +41,7 @@ class User
 	public leaveChannel: (chanName: string) => void;
 	public createProfile: (pseudo: string, data: any) => void;
 	public changePseudo: (pseudo: string) => void;
+	public changeAvatar: (avatar: string) => void;
 
     public constructor(name: string, client: Socket)
     {
@@ -124,11 +125,11 @@ class User
 				}
 			}
 		};
-		// this.createProfile = (pseudo: string, data: any) =>
-		// {
-		// 	if (pseudo.length > 0 && data !== undefined)
-		// 		this.profile?.fillProfile(pseudo, data);
-		// };
+
+		this.changeAvatar = (avatar: string) =>
+		{
+			this.profile.avatar = avatar;
+		};
     }
 }
 

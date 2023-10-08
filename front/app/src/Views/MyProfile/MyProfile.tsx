@@ -244,7 +244,8 @@ const	MyProfile = () =>
 								<LeftSide
 									status={status}
 									pseudo={pseudo}
-									avatar={avatar.link}
+									imageUrl={avatar.link}
+									defaultUrl="https://thispersondoesnotexist.com/"
 								/>
 						</Grid>
 						<Grid item xs={6}>

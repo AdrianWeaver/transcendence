@@ -98,3 +98,12 @@ export interface UserAuthorizationGuardSignatureModel
 	exp?: number;
 	token?: string;
 }
+
+export interface UserRegisterResponseModel
+{
+	message: string;
+	id: string;
+	email: string;
+	creationDate: string;
+	statusCode: number;
+}
