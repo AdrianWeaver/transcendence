@@ -24,6 +24,7 @@ type MatchHistory = {
 	score: Score,
 	moves: number
 };
+
 class Chat
 {
     public channels: Channel[] = [];

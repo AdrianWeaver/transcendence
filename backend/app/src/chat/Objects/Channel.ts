@@ -38,6 +38,7 @@ class Channel
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
 
+    // eslint-disable-next-line max-params
     public constructor(name: string, client: Socket, mode: string, password: string, kind: string)
     {
         this.kind = kind;
