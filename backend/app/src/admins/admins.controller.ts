@@ -12,9 +12,6 @@ export class AdminsController
 	constructor(private readonly anonymousUserService: AnonymousUserService)
 	{
 		this.logger = new Logger("ADMIN");
-		this.logger
-			.debug("Admin start with anonymous-user-service instance id "
-				+ this.anonymousUserService.getUuidInstance());
 	}
 
 	// Unprotected for now may use a special Guard For Administrator/Moderator

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import
@@ -6,7 +7,8 @@ import
 	ForbiddenException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	OnModuleInit
 }	from "@nestjs/common";
 import
 {
@@ -20,27 +22,107 @@ import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
-@Injectable()
-export class AnonymousUserService
-{
-	private	anonymousUser: Array<AnonymousUserModel> = [];
-	private	secret;
-	// private	secret = randomBytes(64).toString("hex");
-	private	uuidInstance: string;
-	private	logger = new Logger("anymous-user-service itself");
+import { PrismaClient } from "@prisma/client";
 
-	public constructor ()
+@Injectable()
+export class AnonymousUserService implements OnModuleInit
+{
+	private	anonymousUser: Array<AnonymousUserModel>;
+	private	secret;
+	private logger;
+	private instanceId;
+	public	prisma;
+
+	constructor()
 	{
 		this.anonymousUser = [];
 		this.secret = randomBytes(64).toString("hex");
-		this.uuidInstance = uuidv4();
-		this.logger.debug("An instance of service is started with id: "
-			+ this.uuidInstance);
+		this.logger = new Logger("anonymous-user-service");
+		this.instanceId = uuidv4();
+		this.prisma = new PrismaClient();
 	}
 
-	public	getUuidInstance (): string
+	public async populateOnStart() :Promise<AnonymousUserModel[]>
 	{
-		return (this.uuidInstance);
+		const	array: Array<AnonymousUserModel> = [];
+		try
+		{
+			const	data = await this.prisma.anonymousUser.findMany();
+			data.forEach((obj) =>
+			{
+				const toStore: AnonymousUserModel = {
+					uuid: obj.uuid,
+					password: obj.password,
+					token: obj.token,
+					lastConnection: obj.lastConnection,
+					userCreatedAt: obj.userCreatedAt,
+					revokeConnectionRequest: obj.revokeConnectionRequest,
+					isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
+				};
+				// if (toStore.lastConnection === BigInt(-1).toString())
+				// 	toStore.lastConnection = "never connected";
+				this.anonymousUser.push(toStore);
+			});
+			return (array);
+		}
+		catch (err: any)
+		{
+			console.log(err);
+		}
+		return (array);
+	}
+
+	onModuleInit()
+	{
+		this.logger.debug("The anonymous user service has been instiated with id :", this.instanceId);
+		this.populateOnStart()
+			.then(() =>
+			{
+				this.logger
+					.debug("We have "
+						+ this.anonymousUser.length
+						+ " user in memory");
+			});
+			// .then(() =>
+			// {
+			// 	this.logger
+			// 		.debug("We have "
+			// 			+ this.anonymousUser.length
+			// 			+ " user in memory");
+			// });
+			// .then((data) =>
+			// {
+			// 	// console.log(data);
+			// 	data.forEach((obj) =>
+			// 	{
+			// 		const	toStore: AnonymousUserModel = {
+			// 			uuid: obj.uuid,
+			// 			password: obj.password,
+			// 			token: obj.token,
+			// 			lastConnection: obj.lastConnection,
+			// 			userCreatedAt: obj.userCreatedAt,
+			// 			revokeConnectionRequest: obj.revokeConnectionRequest,
+			// 			isRegistredAsRegularUser: obj.isRegistredAsRegularUser,
+			// 		};
+			// 		if (toStore.lastConnection === -1)
+			// 			toStore.lastConnection = "never connected";
+			// 		this.anonymousUser.push(toStore);
+			// 	});
+			// })
+			// .catch((error: any) =>
+			// {
+			// 	this.logger.error("database failure", error);
+			// })
+			// .finally(() =>
+			// {
+			// 	// disconnect
+			// });
+		// this data is empty
+	}
+
+	public getInstanceId() : string
+	{
+		return (this.instanceId);
 	}
 
 	public	getAnonymousUserArray(): AnonymousAdminResponseModel
@@ -102,7 +184,7 @@ export class AnonymousUserService
 	}
 
 	public login(uuid: string, password: string)
-		: AnonymousUserLoginResponseModel
+		: {res:AnonymousUserLoginResponseModel, toDB: AnonymousUserModel}
 	{
 		const	searchUser = this.anonymousUser.find((user) =>
 		{
@@ -113,7 +195,7 @@ export class AnonymousUserService
 		else
 		{
 			// console.log(this.secret);
-			searchUser.lastConnection = Date.now();
+			searchUser.lastConnection = BigInt(Date.now());
 			searchUser.revokeConnectionRequest = false;
 			searchUser.token = "Bearer " + jwt.sign(
 				{
@@ -130,10 +212,13 @@ export class AnonymousUserService
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
-					searchUser.lastConnection + (1000 * 60 * 60 * 24)
-				// Date.now()
+					searchUser.lastConnection + BigInt(1000 * 60 * 60 * 24),
 			};
-			return (response);
+			return (
+			{
+				res: response,
+				toDB: searchUser
+			});
 		}
 	}
 
@@ -157,7 +242,7 @@ export class AnonymousUserService
 			throw new InternalServerErrorException();
 		if (user.revokeConnectionRequest === false)
 			throw new InternalServerErrorException();
-		user.lastConnection = Date.now();
+		user.lastConnection = BigInt(Date.now());
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
 		// console.log("Anonymous user revoke session uuid : " + user.uuid);

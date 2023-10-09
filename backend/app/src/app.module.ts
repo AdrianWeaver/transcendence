@@ -1,7 +1,9 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-
+import {
+	AnonymousUserService
+} from "./anonymous-user/anonymous-user.service";
 import { AdminsModule } from "./admins/admins.module";
 import
 {
@@ -16,8 +18,7 @@ import { ChatApiController } from "./chat-api/chat-api.controller";
 import { ChatApiService } from "./chat-api/chat-api.service";
 import { UserController } from "./user/user.controller";
 import { UserService } from "./user/user.service";
-import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
-
+import { AnonymousUserModule } from "./anonymous-user/anonymous-user.module";
 
 @Module(
 {
@@ -36,6 +37,7 @@ import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 	],
 	providers: [
 		AppService,
+		AnonymousUserService,
 		UserService,
 		AdminsService,
 		ChatApiModule,

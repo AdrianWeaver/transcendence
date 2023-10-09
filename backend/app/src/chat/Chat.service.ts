@@ -51,13 +51,13 @@ export	class ChatService
 {
 	// data here 
 	private	chat: Chat;
-	private	log = new Logger("instance-chat-service itself");
+	private	log = new Logger("instance-chat-service");
 	private	uuid = uuidv4();
 
 	constructor()
 	{
 		this.chat = new Chat();
-		this.log.log("started service instance - id instance : " + this.uuid);
+		this.log.debug("started service instance - id instance : " + this.uuid);
 	}
 
 	// getters

@@ -8,7 +8,7 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 import { Prisma } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+
 import
 {
 	ConnectedSocket,
@@ -21,7 +21,6 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService } from "./Chat.service";
-import { Logger } from "@nestjs/common";
 
 type	ActionSocket = {
 	type: string,
@@ -59,12 +58,9 @@ export class ChatSocketEvents
 	{
 		@WebSocketServer()
 		server: Server;
-		private readonly logger = new Logger("Chat-socket-events");
 
 		public	constructor(private readonly chatService: ChatService)
 		{
-			this.logger.debug("An instance is started with chat service id: "
-				+ this.chatService.getChatInstanceId());
 		}
 
 		afterInit(server: any)

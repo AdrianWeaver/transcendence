@@ -1,0 +1,57 @@
+// import { PrismaClient } from "@prisma/client";
+
+// const prisma = new PrismaClient();
+
+// async function main()
+// {
+// 	// lecture de la base de donnee a partir de prisma
+// 	const allUsers = await prisma.user.findMany();
+// console.log(typeof allUsers)
+// 	// creation des Array en memoire, ici juste un console.log
+// 	console.log(allUsers)
+// }
+
+// main()
+// 	.catch(e =>
+// 	{
+// 		throw e;
+// 	})
+// 	.finally(async () =>
+// 	{
+// 		await prisma.$disconnect();
+// 	});
+
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
+
+async function main()
+{
+	// cet object est en memoire
+	const	user = {
+		name: "John Doe",
+		email: "johndoe@example.com"
+	}
+
+	// Enregistrement d'un nouvel utilisateur dans la base de donnee
+	const newUser = await prisma.user.create(
+	{
+		data:
+		{
+			name: user.name,
+			email: user.email,
+		},
+	})
+
+	console.log(newUser)
+}
+
+main()
+	.catch(e =>
+	{
+		throw e;
+	})
+	.finally(async () =>
+	{
+		await prisma.$disconnect();
+	});
