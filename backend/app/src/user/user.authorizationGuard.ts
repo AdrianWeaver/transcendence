@@ -53,7 +53,7 @@ export	class UserAuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			// console.log("Valid Signature :", response);
+			console.log("Valid Signature :", response);
 			return (response);
 		}
 		catch (error)

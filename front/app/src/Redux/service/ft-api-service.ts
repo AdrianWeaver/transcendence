@@ -6,7 +6,7 @@ import Api from "../store/Api";
 const	UserServices = {
 	async	register(code: string, hostname: string)
 	{
-		console.log("test");
+		// console.log("test");
 		const	config: AxiosRequestConfig = {
 			headers:
 			{
@@ -22,13 +22,42 @@ const	UserServices = {
 			.post("/user/register", data, config)
 			.then((data) =>
 			{
-				console.log("register front");
-				// console.log(data);
+				// console.log("register front");
+				// console.log(data.data);
 				return (data.data);
 			})
 			.catch((error) =>
 			{
 				console.error("error from api redux ");
+				// console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+	async	verifyToken(token: string, hostname: string)
+	{
+		console.log("Hello token");
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/verify-token", {}, config,)
+			.then((data) =>
+			{
+				// console.log("register front");
+				// console.log(data.data);
+				console.log(data);
+				return ("OKay");
+			})
+			.catch((error) =>
+			{
+				console.error("error from verify token");
 				// console.error(error);
 				return ("ERROR");
 			})

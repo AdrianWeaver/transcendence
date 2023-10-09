@@ -238,6 +238,7 @@ const	controllerSlice = createSlice(
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.username = action.payload.user.username;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
@@ -253,6 +254,10 @@ const	controllerSlice = createSlice(
 			state.user.registrationProcess = action.payload.user.registrationProcess;
 			state.user.registrationError = action.payload.user.registrationError;
 		},
+		verifyToken(state, action: PayloadAction<ControllerModel>)
+		{
+			// state = action.payload
+		}
 	}
 });
 

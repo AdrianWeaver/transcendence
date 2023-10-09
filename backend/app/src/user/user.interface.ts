@@ -50,6 +50,7 @@ export interface UserModel
 			lastIpClient: string;
 		}
 	};
+	registrationProcessEnded: boolean;
 	// revokeConnectionRequest: boolean;
 }
 
@@ -107,4 +108,5 @@ export interface UserRegisterResponseModel
 	// creationDate: string;
 	token: string;
 	statusCode: number;
+	login: string;
 }

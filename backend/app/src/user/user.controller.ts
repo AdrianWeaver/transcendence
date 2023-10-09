@@ -114,6 +114,7 @@ export class UserController
 				{
 					const	data = resData.data;
 					userObject = {
+						registrationProcessEnded: false,
 						ftApi: newObject,
 						// Do we need it ?
 						retStatus: resData.status,
@@ -164,50 +165,6 @@ export class UserController
 					error: error
 				});
 			});
-
-		// creer la requete pour recuperer le token grace a body
-		// La requete provient de Postman
-		// client_id est ecrit en dur pour le moment
-		// client_secret est ecriit en dur pour le moment
-		// POur les tests le code est envoye par postman apres avoir clique sur la carte du site
-
-
-		// On devrait pouvoir logger le token.
-		// fin de la premiere etape,
-		// On refait un point apres pour ne pas se melanger les pinceaux
-		// return ("okay");
-		// this.logger.debug(""register" route request with uid: ", body.uuid);
-		// const	retValue = this.userService.register(body.uuid);
-
-		// this.logger.debug("return value: ", retValue);
-		// if (retValue.toDB.lastConnection === "never connected")
-		// 	retValue.toDB.lastConnection = -1;
-		// res.send(retValue.res).status(200)
-		// 	.end();
-		// const	prisma = new PrismaClient();
-		// const	rec = retValue.toDB;
-		// prisma.$connect();
-		// prisma.user.create({
-		// 	data:
-		// 	{
-		// 		uuid: rec.uuid,
-		// 		lastConnection: rec.lastConnection as number,
-		// 		password: rec.password,
-		// 		revokeConnectionRequest: rec.revokeConnectionRequest,
-		// 		token: rec.token,
-		// 		userCreatedAt: rec.userCreatedAt
-		// 	}
-		// })
-		// 	.catch((error: any) =>
-		// 	{
-		// 		throw error;
-		// 	})
-		// 	.finally(async () =>
-		// 	{
-		// 		prisma.$disconnect();
-		// 	});
-		// 	return ;
-		// return ("Okay");
 	}
 
 	@Get("all-users")
@@ -227,6 +184,7 @@ export class UserController
 		return (this.userService.login(body.id, body.email));
 	}
 
+	// Our token 
 	@Post("verify-token")
 	@UseGuards(UserAuthorizationGuard)
 	verifyToken(@Req() headers: any)

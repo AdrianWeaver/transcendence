@@ -652,6 +652,34 @@ export const	setUserData = (data: any)
 	});
 }
 
+export const verifyToken = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const prev = getState();
+
+		// console.log("Value of prevState");
+		// console.log(prev);
+		if (prev.controller.user.registrationError !== "undefined"
+			|| prev.controller.user.bearerToken === "undefined")
+			return ;
+		console.log("Before await");
+		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+		if (data === "ERROR")
+		{
+			dispatch(setRegistrationProcessError());
+			// reinit.
+			return ;
+		}
+
+		// console.log("Data inside verify token ");
+		// console.log(data);
+		dispatch(setRegistrationProcessSuccess());
+		dispatch(userRegistrationStepTwo());
+	})
+}
+
 export const registerClientWithCode = (code : string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -672,19 +700,12 @@ export const registerClientWithCode = (code : string)
 		// console.log("Code is equals to : ", code);
 		const	data: any = await UserServices.register(code, "localhost");
 		if (data === "ERROR")
+		{
 			dispatch(setRegistrationProcessError());
+			return ;
+		}
 		else
 		{
-			// console.log(data);	
-			// dispatch(setRegistrationProcessSuccess());
-			// const userData = {
-			// 	id: data.id,
-			// 	email: data.email,
-			// 	token: data.token,
-			// 	message: data.message,
-			// };
-			// if (userData)
-			// 	setUserData(userData);
 			response = {
 				...prev.controller,
 				user:
@@ -692,10 +713,13 @@ export const registerClientWithCode = (code : string)
 					...prev.controller.user,
 					id: data.id,
 					email: data.email,
-					bearerToken: data.token,
+					bearerToken: data.token, // our token
+					username: data.login
 				}
 			}
 		}
 		dispatch(controllerActions.registerClientWithCode(response));
+		// dispatch(controllerActions.verifyToken());
+		console.log("end of registration");
 	});
 };
