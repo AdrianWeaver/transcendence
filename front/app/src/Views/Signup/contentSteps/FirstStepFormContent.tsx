@@ -225,6 +225,7 @@ const	FirstStepFormContent = () =>
 		) =>
 		{
 			key;
+			console.log("key ", key, " value: ", value);
 			return (value === true);
 		});
 		console.log("filtered", filtered);
@@ -238,6 +239,22 @@ const	FirstStepFormContent = () =>
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
+			<Grid item xs={12}>
+					<TextField
+						name="username"
+						required
+						fullWidth
+						id="username"
+						label="Username"
+						error={errorValidation.username}
+						helperText={
+							// NEED TO CHECK IS IT S USED
+							errorValidation.username
+								? "Username is required"
+								: ""
+						}
+					/>
+				</Grid>
 				<Grid item xs={12} sm={6}>
 					<TextField
 						autoComplete="given-name"

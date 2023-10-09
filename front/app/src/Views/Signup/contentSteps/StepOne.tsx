@@ -1,9 +1,11 @@
+import FirstStepFormContent from "./FirstStepFormContent";
 
 const	StepOne = () =>
 {
 	return (
-	<>
-	</>
+		<>
+			<FirstStepFormContent />
+		</>
 	);
 };
 

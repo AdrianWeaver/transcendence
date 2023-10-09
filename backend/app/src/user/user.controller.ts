@@ -10,7 +10,7 @@ import { IsEmail, IsNotEmpty, } from "class-validator";
 import { Response } from "express";
 import	Api from "../Api";
 
-import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 
@@ -135,6 +135,7 @@ export class UserController
 							expAt: 0,
 							doubleAuth:
 							{
+								enable: false,
 								lastIpClient: "undefined",
 								phoneNumber: "undefined",
 								phoneRegistered: false,
@@ -198,6 +199,14 @@ export class UserController
 			statusCode: 200
 		};
 		return (response);
+	}
+
+	@Get("my-info")
+	getMyInfo()
+		: UserPublicResponseModel
+	{
+		// NEED TO FIND A WAY TO KNOW THE USER ID
+		return (this.userService.getMyInfo(97756));
 	}
 
 }

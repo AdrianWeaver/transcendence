@@ -11,10 +11,12 @@ class	UserRegistration
 	public	passwordConfirm: string;
 	public	uniquenessPassword: string;
 	public	errorTable: UserRegistrationChecker;
+	public	username: string;
 
 	public	constructor(data: FormData)
 	{
 		this.data = data;
+		this.username = this.form("username");
 		this.firstName = this.form("firstName");
 		this.lastName = this.form("lastName");
 		this.emailAddress = this.form("email");
@@ -38,12 +40,13 @@ class	UserRegistration
 	{
 		return (
 		{
+			username: this.username,
 			firstName: this.firstName,
 			lastName: this.lastName,
 			emailAddress: this.emailAddress,
 			password: this.password,
 			passwordConfirm: this.passwordConfirm,
-			uniquenessPassword: this.uniquenessPassword
+			uniquenessPassword: this.uniquenessPassword,
 		});
 	};
 }
