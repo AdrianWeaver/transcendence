@@ -12,6 +12,7 @@ import	Api from "../Api";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
+import dotenv from "dotenv";
 
 class	RegisterDto
 {
@@ -62,8 +63,8 @@ export class UserController
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
-		dataAPI.append("client_id", "u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563");
-		dataAPI.append("client_secret", "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");
+		// dataAPI.append("client_id", process.env.FT_UID);
+		// dataAPI.append("client_secret", process.env.FT_SECRET);
 		dataAPI.append("redirect_uri", "http://localhost:3001");
 
 		// this.logger.debug(dataAPI);
