@@ -13,7 +13,7 @@ export interface UserModel
 	ftApi: ApplicationUserModel;
 	retStatus: number;
 	date: string;
-	id: number;
+	id: any;
 	email: string;
 	login: string;
 	firstName: string;
@@ -50,6 +50,7 @@ export interface UserModel
 			lastIpClient: string;
 		}
 	};
+	registrationProcessEnded: boolean;
 	// revokeConnectionRequest: boolean;
 }
 
@@ -83,8 +84,8 @@ export interface UserVerifyTokenResModel
 
 export interface JWTDecoded
 {
-	id?: string;
-	email?: boolean;
+	id?: any;
+	email?: string;
 	iat?: number;
 	exp?: number;
 }
@@ -92,9 +93,20 @@ export interface JWTDecoded
 export interface UserAuthorizationGuardSignatureModel
 {
 	validTokenSignature: boolean;
-	id?: string;
-	email?: boolean;
+	id?: any;
+	email?: string;
 	iat?: number;
 	exp?: number;
 	token?: string;
+}
+
+export interface UserRegisterResponseModel
+{
+	message: string;
+	id: string;
+	email: string;
+	// creationDate: string;
+	token: string;
+	statusCode: number;
+	login: string;
 }

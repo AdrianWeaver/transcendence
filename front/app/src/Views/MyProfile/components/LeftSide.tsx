@@ -1,11 +1,13 @@
 /* eslint-disable max-len */
 import { Avatar, Typography } from "@mui/material";
+import MyAvatar from "./MyAvatar";
 
 type	LeftSideProps =
 {
 	status: string,
 	pseudo: string,
-	avatar: string | ((url: string) => string)
+	imageUrl: string | ((url: string) => string)
+	defaultUrl: string
 };
 
 const	LeftSide = (props: LeftSideProps) =>
@@ -13,15 +15,10 @@ const	LeftSide = (props: LeftSideProps) =>
 	return (
 		<>
 		<div className="left">
-			<Avatar
-				alt={props.pseudo}
-				src={props.avatar}
-				sx=
-				{{
-					width: 70,
-					height: 70
-				}}
-			/>
+			<MyAvatar
+				pseudo={props.pseudo}
+				defaultUrl={props.defaultUrl}
+				imageUrl={props.imageUrl} />
 			<Typography>
 					{props.pseudo} is {props.status}
 			</Typography>

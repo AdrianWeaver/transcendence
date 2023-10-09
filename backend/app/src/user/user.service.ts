@@ -73,65 +73,68 @@ export class UserService
 		{
 			return (user.id === data.id);
 		});
-		if (searchUser === undefined)
+		if (searchUser?.registrationProcessEnded === true)
+			throw new BadRequestException("Account already created");
+		if (searchUser !== undefined)
 		{
-			const newUser: UserModel = {
-				ftApi: data.ftApi,
-				retStatus: data.retStatus,
-				date: data.date,
-				id: data.id,
-				email: data.email,
-				login: data.login,
-				firstName: data.firstName,
-				lastName: data.lastName,
-				url: data.url,
-				avatar: data.avatar,
-				location: data.location,
-				revokedConnectionRequest: data.revokedConnectionRequest,
-				// uuid: data.uuid,
-				// // TEST anonymous user pw
-				// password: data.password,
-				// createdAt: data.createdAt,
-				authService:
-				{
-					token: "Bearer " + jwt.sign(
-						{
-							id: data.id,
-							mail: data.email
-						},
-						this.secret,
-						{
-							expiresIn: "1d"
-						}
-					),
-					expAt: Date.now() + (1000 * 60 * 60 * 24),
-					doubleAuth:
-					{
-						lastIpClient: "undefined",
-						phoneNumber: "undefined",
-						phoneRegistered: false,
-						validationCode: "undefined",
-						valid: false,
-					}
-				}
-			};
-			this.user.push(newUser);
-			const	response: UserRegisterResponseModel = {
-				message: "Your session has been created, you must loggin",
-				token: newUser.authService.token,
-				statusCode: newUser.retStatus
-			};
-			console.log("user service newUser 78: ", newUser);
-			console.log(" ");
-			console.log("user service response 79: ", response);
-			return (
+			const	index = this.user.findIndex((user) =>
 			{
-				res: response,
-				toDB: newUser
+				return (user.id === data.id);
 			});
+			if (index !== -1)
+				this.user.splice(index, 1);
 		}
-		else
-			throw new BadRequestException("UUID already exists");
+		const newUser: UserModel = {
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			login: data.login,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			location: data.location,
+			revokedConnectionRequest: data.revokedConnectionRequest,
+			authService:
+			{
+				token: "Bearer " + jwt.sign(
+					{
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					lastIpClient: "undefined",
+					phoneNumber: "undefined",
+					phoneRegistered: false,
+					validationCode: "undefined",
+					valid: false,
+				}
+			}
+		};
+		this.user.push(newUser);
+		const	response: UserRegisterResponseModel = {
+			message: "Your session has been created, you must loggin",
+			token: newUser.authService.token,
+			id: newUser.id,
+			email: newUser.email,
+			statusCode: newUser.retStatus,
+			login: newUser.login
+		};
+		return (
+		{
+			res: response,
+			toDB: newUser
+		});
 	}
 
 	public	login(id: any, email:string)
@@ -149,7 +152,7 @@ export class UserService
 			searchUser.authService.token = "Bearer " + jwt.sign(
 				{
 					id: searchUser.id,
-					mail: searchUser.email
+					email: searchUser.email
 				},
 				this.secret,
 				{

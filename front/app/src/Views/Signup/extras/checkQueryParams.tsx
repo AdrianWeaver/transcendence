@@ -53,12 +53,12 @@ export const	checkQueryParams = (pQuery : object) =>
 	}
 	else if (params.length === 1)
 	{
-		console.log("Code is provied");
+		// console.log("Code is provied");
 		if (params[0].split("=").length !== 2)
 			message = {error: "malformed_query"};
 		else
 			message = { code: params[0].split("=")[1]};
-		console.log("Response parsed ", message);
+		// console.log("Response parsed ", message);
 		return (message);
 	}
 	else

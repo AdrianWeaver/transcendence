@@ -53,7 +53,7 @@ export	class UserAuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			// console.log("Valid Signature :", response);
+			console.log("Valid Signature :", response);
 			return (response);
 		}
 		catch (error)
@@ -63,7 +63,7 @@ export	class UserAuthorizationGuard implements CanActivate
 				console.log("User has tried to use a wrong token signature");
 				throw new UnauthorizedException();
 			}
-			console.log("Error on Anonymous isValidTokenSignature : ", error);
+			console.log("Error on isValidTokenSignature : ", error);
 			return ({validTokenSignature: false});
 		}
 	}
@@ -90,10 +90,7 @@ export	class UserAuthorizationGuard implements CanActivate
 		: boolean
 	{
 		if (user.authService.token !== tok.token)
-		{
-			console.log("token mismatch", user.authService.token, tok.token);
 			return (false);
-		}
 		return (true);
 	}
 
@@ -104,7 +101,6 @@ export	class UserAuthorizationGuard implements CanActivate
 		const	headers: UserHeaderDto = request.headers;
 
 		const	secret = this.service.getSecret();
-
 		const token = this.isValidTokenSignature(headers.authorization, secret);
 		if (this.isTokenExtractValid(token) === false)
 			return (false);
@@ -117,6 +113,8 @@ export	class UserAuthorizationGuard implements CanActivate
 
 		const isValid = this.checkTokenPayloadAuthenticity(user, token);
 		request.user = user;
+
+
 		return (isValid);
 	}
 }

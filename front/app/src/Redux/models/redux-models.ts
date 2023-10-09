@@ -2,7 +2,7 @@ export interface MessageModelInterface
 {
 	sender: string,
 	message: string,
-	date: string
+	mode: string
 }
 
 type MessageModel =
@@ -54,6 +54,10 @@ export interface	UserModel
 	"bearerToken": string,
 	"rememberMe": boolean,
 	"chat": ChatModel,
+	"id": number,
+	"email": string
+	"registrationProcess": boolean,
+	"registrationError": string
 }
 
 export interface	AnonymousUserModel

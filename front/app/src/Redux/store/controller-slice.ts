@@ -15,7 +15,11 @@ const	initialControllerState: ControllerModel = {
 	previousPage: "/",
 	user:
 	{
-		isLoggedIn: true,
+		isLoggedIn: false,
+		registrationProcess: false,
+		registrationError: "undefined",
+		email: "",
+		id: -1,
 		username: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
@@ -44,7 +48,8 @@ const	initialControllerState: ControllerModel = {
 						{
 							sender: "undefined",
 							message: "undefined",
-							date: "undefined"
+							// date: "undefined"
+							mode: "undefined"
 						}
 					]
 				}
@@ -221,6 +226,37 @@ const	controllerSlice = createSlice(
 				}
 				i++;
 			}
+		},
+		setUserData(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.bearerToken = action.payload.user.bearerToken;
+		},
+		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.username = action.payload.user.username;
+		},
+		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.registrationProcess = action.payload.user.registrationProcess;
+			state.user.registrationError = action.payload.user.registrationError;
+		},
+		setRegistrationProcessSuccess(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.registrationProcess = action.payload.user.registrationProcess;
+		},
+		setRegistrationProcessError(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.registrationProcess = action.payload.user.registrationProcess;
+			state.user.registrationError = action.payload.user.registrationError;
+		},
+		verifyToken(state, action: PayloadAction<ControllerModel>)
+		{
+			// state = action.payload
 		}
 	}
 });
