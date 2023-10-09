@@ -262,7 +262,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="username"
 						label="Username"
-						value={props.username}
+						// value={props.username}
 						error={errorValidation.username}
 						helperText={
 							// NEED TO CHECK IS IT S USED
