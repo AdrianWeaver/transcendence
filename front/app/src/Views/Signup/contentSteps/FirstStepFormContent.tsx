@@ -150,10 +150,26 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 		return (<></>);
 };
 
-const	FirstStepFormContent = () =>
+type	FirstStepFormContentProps =
+{
+	username: string
+	email: string
+	lastName: string
+	firstName: string
+};
+
+const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 {
 	const	dispatch = useAppDispatch();
 
+	if (props.email === undefined)
+		props.email = "undefined";
+	if (props.firstName === undefined)
+		props.firstName = "undefined";
+	if (props.lastName === undefined)
+		props.lastName = "undefined";
+	if (props.username === undefined)
+		props.username = "undefined";
 	const	[
 		firstTriggerPassword,
 		setPasswordFirstTrigger
@@ -246,6 +262,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="username"
 						label="Username"
+						value={props.username}
 						error={errorValidation.username}
 						helperText={
 							// NEED TO CHECK IS IT S USED
@@ -263,6 +280,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="firstName"
 						label="First Name"
+						value={props.firstName}
 						autoFocus
 						error={errorValidation.firstName}
 						helperText={
@@ -278,6 +296,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="lastName"
 						label="Last Name"
+						value={props.lastName}
 						name="lastName"
 						autoComplete="family-name"
 						error={errorValidation.lastName}
@@ -294,6 +313,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="email"
 						label="Email Address"
+						value={props.email}
 						name="email"
 						autoComplete="email"
 						error={errorValidation.email}
