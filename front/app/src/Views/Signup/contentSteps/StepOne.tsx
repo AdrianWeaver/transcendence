@@ -1,7 +1,10 @@
 
 const	StepOne = () =>
 {
-	return (<></>);
+	return (
+	<>
+	</>
+	);
 };
 
 export default StepOne;
