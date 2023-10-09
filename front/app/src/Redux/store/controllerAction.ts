@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable semi */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -11,6 +12,7 @@ import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "./index";
 import { CanvasModel, ChatUserModel, ControllerModel, MessageModelInterface, MessageRoomModel } from "../models/redux-models";
 
+import UserServices from "../service/ft-api-service";
 type MessageModel =
 {
 	sender: string,
@@ -510,7 +512,7 @@ export const setMessage = (message: MessageModelInterface[], clientId: string, m
 							msgRoom: [
 								{
 									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-									content: message
+									content: message,
 								}
 							]
 						}
@@ -567,5 +569,133 @@ export const addMessage = (clientId: string, msgIndex: number, text: string, ind
 			};
 			dispatch(controllerActions.addMessage(response));
 		}
+	});
+};
+
+export const setRegistrationProcessStart = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registrationProcess: true,
+				registrationError: "undefined"
+			}
+		};
+		dispatch(controllerActions.setRegistrationProcessStart(response));
+	})
+}
+
+export const setRegistrationProcessSuccess = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registrationProcess: false
+			}
+		};
+		dispatch(controllerActions.setRegistrationProcessSuccess(response));
+	})
+}
+
+export const setRegistrationProcessError = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registrationProcess: false,
+				registrationError: "error",
+			}
+		};
+		dispatch(controllerActions.setRegistrationProcessError(response));
+	})
+}
+
+export const	setUserData = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				id: data.id,
+				email: data.email,
+				bearerToken: data.token,
+			}
+		}
+		dispatch(controllerActions.setUserData(response));
+	});
+}
+
+export const registerClientWithCode = (code : string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationProcess
+			|| prev.controller.user.registrationError !== "undefined")
+		{
+			// dispatch(controllerActions.registerClientWithCode(prev.controller));
+			return ;
+		}
+		dispatch(setRegistrationProcessStart())
+		// console.log("Code is equals to : ", code);
+		const	data: any = await UserServices.register(code, "localhost");
+		if (data === "ERROR")
+			dispatch(setRegistrationProcessError());
+		else
+		{
+			// console.log(data);	
+			// dispatch(setRegistrationProcessSuccess());
+			// const userData = {
+			// 	id: data.id,
+			// 	email: data.email,
+			// 	token: data.token,
+			// 	message: data.message,
+			// };
+			// if (userData)
+			// 	setUserData(userData);
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					id: data.id,
+					email: data.email,
+					bearerToken: data.token,
+				}
+			}
+		}
+		dispatch(controllerActions.registerClientWithCode(response));
 	});
 };

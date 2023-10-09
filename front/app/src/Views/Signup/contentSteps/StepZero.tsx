@@ -15,6 +15,8 @@ import { useLocation } from "react-router-dom";
 
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
+import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
+import { registerClientWithCode } from "../../../Redux/store/controllerAction";
 
 const	getText = () =>
 {
@@ -87,6 +89,7 @@ const	StepZero = () =>
 {
 	const	query = useLocation();
 	const	imgSource = coalitionImage;
+	const	dispatch = useAppDispatch();
 
 	const	[
 		visible,
@@ -104,7 +107,6 @@ const	StepZero = () =>
 	{
 		const timer = setTimeout(() =>
 		{
-			console.log("Just set visible to false");
 			setVisible(false);
 		}, 3000);
 		return (() =>
@@ -122,8 +124,10 @@ const	StepZero = () =>
 
 	const	responseQuery = checkQueryParams(query);
 	const	alertInfo = AlertComponent(responseQuery);
-
-	console.log("Redirected Query", responseQuery.redirected);
+	console.log(responseQuery);
+	if (responseQuery.code)
+		dispatch(registerClientWithCode(responseQuery.code));
+	// console.log("Redirected Query", responseQuery.redirected);
 
 	return (
 		<Card sx={{ m: 5}}>

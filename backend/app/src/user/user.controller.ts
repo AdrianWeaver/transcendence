@@ -4,27 +4,28 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, Logger, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, } from "class-validator";
-
+import { Response } from "express";
 import	Api from "../Api";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
+
 
 class	RegisterDto
 {
 	@IsNotEmpty()
 	code: string;
 
-	@IsNotEmpty()
-	id: any;
+	// @IsNotEmpty()
+	// id: any;
 
-	@IsEmail()
-	@IsNotEmpty()
-	email: string;
+	// @IsEmail()
+	// @IsNotEmpty()
+	// email: string;
 }
 
 class UserLoginDto
@@ -41,33 +42,38 @@ class UserLoginDto
 export class UserController
 {
 	private	readonly logger;
+	private	env;
 
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
+		this.env = dotenv.config();
 	}
 
 	@Post("register")
 	getUserRegister(
-		@Body() body: RegisterDto)
-		// : UserRegisterResponseModel
+		@Body() body: RegisterDto,
+		@Res() res: Response)
 	{
-		// console.log("code: ", body.code);
-		// console.log("password: ", body.password);
-		// console.log("created at: ", body.userCreatedAt);
-		// console.log("uuid: ", body.uuid);
-
+		// need to throw 5xx exception
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.FT_UID
+			|| !this.env.parsed.FT_SECRET)
+			throw new InternalServerErrorException();
 		let	retValue;
 		let	userObject: UserModel;
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
-		// dataAPI.append("client_id", process.env.FT_UID);
-		// dataAPI.append("client_secret", process.env.FT_SECRET);
+		dataAPI.append("client_id", this.env.parsed.FT_UID);
+		dataAPI.append("client_secret", this.env.parsed.FT_SECRET);
 		dataAPI.append("redirect_uri", "http://localhost:3001");
 
-		// this.logger.debug(dataAPI);
+		this.logger.debug(dataAPI);
 		const config = {
 			method: "post",
 			maxBodyLength: Infinity,
@@ -104,15 +110,15 @@ export class UserController
 				};
 				Api()
 				.request(config)
-				.then((res) =>
+				.then((resData) =>
 				{
-					const	data = res.data;
+					const	data = resData.data;
 					userObject = {
 						ftApi: newObject,
 						// Do we need it ?
-						retStatus: res.status,
+						retStatus: resData.status,
 						// Do we neet that ?
-						date: res.headers.date,
+						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
 						login: data.login,
@@ -122,10 +128,6 @@ export class UserController
 						avatar: data.image,
 						location: data.location,
 						revokedConnectionRequest: false,
-						// TEST anonymous user
-						// uuid: body.uuid,
-						// password: "a450dfbf-ad05-43d1-956e-634e779cd610",
-						// createdAt: "undefined",
 						authService:
 						{
 							token: "",
@@ -141,16 +143,26 @@ export class UserController
 						}
 					};
 					retValue = this.userService.register(userObject);
-					return (retValue.res);
+					res.status(200).send(retValue.res);
+					// mise a jour vers la database
 				})
 				.catch((error) =>
 				{
-					console.log(error);
+					// this.logger.error("Get my information route", error);
+					// throw new InternalServerErrorException();
+					res.status(500).send({
+						message: "internal server Error ",
+						error: error
+					});
 				});
 			})
 			.catch((error) =>
 			{
-				console.log(error);
+				// this.logger.error("redeem code for token", error);
+				res.status(401).send({
+					message: "wrong code provided",
+					error: error
+				});
 			});
 
 		// creer la requete pour recuperer le token grace a body
@@ -195,7 +207,7 @@ export class UserController
 		// 		prisma.$disconnect();
 		// 	});
 		// 	return ;
-		return ("Okay");
+		// return ("Okay");
 	}
 
 	@Get("all-users")

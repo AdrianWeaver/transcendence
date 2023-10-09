@@ -88,10 +88,6 @@ export class UserService
 				avatar: data.avatar,
 				location: data.location,
 				revokedConnectionRequest: data.revokedConnectionRequest,
-				// uuid: data.uuid,
-				// // TEST anonymous user pw
-				// password: data.password,
-				// createdAt: data.createdAt,
 				authService:
 				{
 					token: "Bearer " + jwt.sign(
@@ -123,9 +119,6 @@ export class UserService
 				email: newUser.email,
 				statusCode: newUser.retStatus
 			};
-			console.log("user service newUser 78: ", newUser);
-			console.log(" ");
-			console.log("user service response 79: ", response);
 			return (
 			{
 				res: response,
