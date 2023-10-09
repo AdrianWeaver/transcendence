@@ -20,7 +20,6 @@ const FriendItem = (props: FriendItemProps) =>
 	return (
 		<ListItem
 			button
-			key={props.key}
 		>
 			<ListItemIcon>
 				<Avatar

@@ -1,5 +1,4 @@
 
-
 export const	goToChannel = (
 	chanName: string,
 	kind: string,

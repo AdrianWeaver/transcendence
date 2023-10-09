@@ -20,12 +20,13 @@ import {
 import CurrentlyTalkingFriend from "./CurrentlyTalkingFriend";
 import FriendItem from "./FriendItem";
 
+import { createNewConv } from "../actionsSocket/createNewConv";
+import { displayConversationWindow } from "../actionsSocket/displayConversationWindow";
 import
 {
 	setActiveConversationId
 }	from "../../../Redux/store/controllerAction";
 
-// import SocketIOClient from "@type/sockl"
 
 type FriendsListProps = {
 	arrayListUsers: string[],
@@ -44,33 +45,6 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
-
-	const	createNewConv = (activeId: string) =>
-	{
-		const action = {
-			type: "create-channel",
-			payload: {
-				chanName: "undefined",
-				chanMode: "undefined",
-				chanPassword: "undefined",
-				chanId: numberOfChannels + 1,
-				activeId: activeId
-			}
-		};
-		props.socketRef.current.emit("channel-info", action);
-	};
-	const displayConversationWindow = (id: string) =>
-	{
-		const action = {
-			type: "display-conversation",
-			payload:
-			{
-				id: id,
-				index: numberOfChannels + 1
-			}
-		};
-		props.socketRef.current?.emit("display-conversation", action);
-	};
 
 	return (
 		<>
@@ -94,23 +68,27 @@ const FriendsList = (props: FriendsListProps) =>
 				{
 					users.map((elem, index) =>
 					{
+						console.log("elem", elem);
+						console.log("index", index);
 						return (
-							<>
-								<div onClick={() =>
-								{
-									displayConversationWindow(elem.id);
-									dispatch(setActiveConversationId(elem.id));
-									// dispatch(setKindOfConversation("privateMessage"));
-									createNewConv(elem.id);
-								}}>
+							// <>
+								<div
+									key={index}
+									onClick={() =>
+									{
+										displayConversationWindow(elem.id, numberOfChannels, props.socketRef);
+										dispatch(setActiveConversationId(elem.id));
+										// dispatch(setKindOfConversation("privateMessage"));
+										createNewConv(elem.id, numberOfChannels, props.socketRef);
+									}}
+								>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
 										avatar={elem.avatar}
-										key={index}
 										online={true}
 									/>
 								</div>
-							</>
+							// </>
 						);
 					})
 				}

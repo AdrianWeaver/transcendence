@@ -88,9 +88,6 @@ type ChanMapModel = {
     mode: string
 };
 
-// chat part 
-
-
 const a11yProps = (index: any) =>
 {
 	return (
@@ -111,20 +108,14 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.connected);
 	});
-	const	numberOfChannels = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.numberOfChannels);
-	});
+
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
 	});
 	const currentChannelRef = useRef(currentChannel);
 
-	const	kindOfConv = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.kindOfConversation);
-	});
+
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
@@ -325,20 +316,16 @@ const	ChatLayout = () =>
 	useEffect(() =>
 	{
 		const socket = io(url,
-			{
-				autoConnect: false,
-				reconnectionAttempts: 5,
-			});
+		{
+			autoConnect: false,
+			reconnectionAttempts: 5,
+		});
 
 		socketRef.current = socket;
 
 		const connect = () =>
 		{
 			setConnected(true);
-			// setTimeout(() =>
-			// {
-			// 	socket.emit("info", action);
-			// }, 1000);
 		};
 
 		const disconnect = () =>
@@ -364,7 +351,6 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
-				// dispatch(setKindOfConversation(data.payload.kind));
 			}
 
 			if (data.type === "destroy-channel")
@@ -436,6 +422,7 @@ const	ChatLayout = () =>
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				setKindOfConversation(data.payload.kind);
+
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
 				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
@@ -533,7 +520,7 @@ const	ChatLayout = () =>
 		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
 
-        socket.connect();
+		socket.connect();
 
 		return (() =>
 		{
@@ -548,8 +535,8 @@ const	ChatLayout = () =>
 			socket.on("left-message", leftChannelMessage);
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
-        });
-    }, []);
+		});
+	}, []);
 
 	useEffect(() =>
 	{
@@ -656,9 +643,6 @@ const	ChatLayout = () =>
 		handleDialogClose();
 	};
 
-	// END OF OPTIONS NEXT TO CHANNEL NAME
-
-	// SHOW MEMBERS FUNCTIONS:
 	const [
 		membersOpen,
 		setMembersOpen
@@ -821,10 +805,11 @@ const	ChatLayout = () =>
 							</Dialog>
 							<List>
 								{
-									channels.map((channel: any) =>
+									channels.map((channel: any, index) =>
 									{
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
+											// <ListItem style={listItemStyle} key={channel.id}>
+											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
 													style={
 														channel.name === currentChannelRef.current
@@ -882,9 +867,11 @@ const	ChatLayout = () =>
 															<DialogContent>
 																<ul>
 																{
-																	channelMembers.map((member) =>
+																	channelMembers.map((member, index) =>
 																	{
-																		return (<li key={member.id}>
+																		return (
+																			// <li key={member.id}>
+																			<li key={index}>
 																				{member.name}
 																				{isChannelAdmin && member.name !== uniqueId && (
 																				<>
@@ -1053,24 +1040,25 @@ const	ChatLayout = () =>
 						{/* ///////////// */}
 							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser}/>
 							<List>
-								{privateMessage.map((channel: any) =>
+								{privateMessage.map((channel: any, index) =>
 									{
 										// setKindOfConversation("privateMessage");
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
+											// <ListItem style={listItemStyle} key={channel.id}>
+											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
-													style={
-														channel.name === currentChannel
-														? { color: "green" }
-														: listItemTextStyle
-													}
-													primary={channel.name}
-													onClick={() =>
-													{
-														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name, "privateMessage", socketRef, activeId));
-													}}
-												/>
+														style={
+															channel.name === currentChannel
+															? { color: "green" }
+															: listItemTextStyle
+														}
+														primary={channel.name}
+														onClick={() =>
+														{
+															setKindOfConversation("privateMessage");
+															return (goToChannel(channel.name, "privateMessage", socketRef, activeId));
+														}}
+													/>
 											</ListItem>
 										);
 									})
@@ -1088,18 +1076,19 @@ const	ChatLayout = () =>
 						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
 						<List>
 							{
-								friendList.map((friend: any) =>
+								friendList.map((friend: any, index) =>
 								{
 									return (
-										<ListItem style={listItemStyle} key={friend.id}>
+										// <ListItem style={listItemStyle} key={friend.id} key>
+										<ListItem style={listItemStyle} key={index}>
 											<ListItemText
-												style={listItemTextStyle}
-												primary={friend.name}
-												// onClick={() =>
-												// {
-												// 	return (goToChannel(channel.name));
-												// }}
-											/>
+													style={listItemTextStyle}
+													primary={friend.name}
+													// onClick={() =>
+													// {
+													// 	return (goToChannel(channel.name));
+													// }}
+												/>
 										</ListItem>
 									);
 								})
@@ -1189,10 +1178,8 @@ const	ChatLayout = () =>
 
 					<Grid
 						container
-						// style={{padding: '20px'}}
 						sx={{ padding: "20px" }}
 					>
-						{/* <SendingArea /> */}
 						<Grid item xs={11}>
 							<TextField
 							id="outlined-basic-email"
