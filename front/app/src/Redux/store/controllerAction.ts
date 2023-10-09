@@ -669,7 +669,7 @@ export const verifyToken = ()
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
-			// reinit.
+			dispatch(resetRegistration);
 			return ;
 		}
 
