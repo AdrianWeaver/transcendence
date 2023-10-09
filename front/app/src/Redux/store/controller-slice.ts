@@ -21,6 +21,8 @@ const	initialControllerState: ControllerModel = {
 		email: "",
 		id: -1,
 		username: "undefined",
+		firstName: "undefined",
+		lastName: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
 		chat:
@@ -232,6 +234,8 @@ const	controllerSlice = createSlice(
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{
@@ -239,6 +243,8 @@ const	controllerSlice = createSlice(
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
 			state.user.username = action.payload.user.username;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{

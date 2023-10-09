@@ -5,6 +5,7 @@ const	StepOne = () =>
 {
 	const	controller = useAppSelector((state) =>
 	{
+		console.log("HEREEE ", state.controller.user.firstName);
 		return (state.controller);
 	});
 	return (
@@ -12,8 +13,8 @@ const	StepOne = () =>
 			<FirstStepFormContent
 				username={controller.user.username}
 				email={controller.user.email}
-				firstName="Johanna"
-				lastName="Courtois" />
+				firstName={controller.user.firstName}
+				lastName={controller.user.lastName} />
 		</>
 	);
 };

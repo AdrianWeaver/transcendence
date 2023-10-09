@@ -124,4 +124,6 @@ export interface UserRegisterResponseModel
 	token: string;
 	statusCode: number;
 	login: string;
+	firstName: string;
+	lastName: string;
 }

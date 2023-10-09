@@ -131,7 +131,9 @@ export class UserService
 			id: newUser.id,
 			email: newUser.email,
 			statusCode: newUser.retStatus,
-			login: newUser.login
+			login: newUser.login,
+			firstName: newUser.firstName,
+			lastName: newUser.lastName
 		};
 		return (
 		{

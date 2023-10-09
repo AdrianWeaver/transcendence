@@ -646,6 +646,8 @@ export const	setUserData = (data: any)
 				id: data.id,
 				email: data.email,
 				bearerToken: data.token,
+				firstName: data.firstName,
+				lastName: data.lastName
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -713,8 +715,11 @@ export const registerClientWithCode = (code : string)
 					...prev.controller.user,
 					id: data.id,
 					email: data.email,
-					bearerToken: data.token, // our token
-					username: data.login
+					// our token
+					bearerToken: data.token,
+					username: data.login,
+					firstName: data.firstName,
+					lastName: data.lastName
 				}
 			}
 		}

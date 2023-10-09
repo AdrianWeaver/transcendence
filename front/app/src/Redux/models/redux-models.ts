@@ -55,7 +55,9 @@ export interface	UserModel
 	"rememberMe": boolean,
 	"chat": ChatModel,
 	"id": number,
-	"email": string
+	"email": string,
+	"firstName": string,
+	"lastName": string,
 	"registrationProcess": boolean,
 	"registrationError": string
 }
