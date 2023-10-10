@@ -19,6 +19,8 @@ class	UserSecurity
 		this.data = data;
 		this.doubleAuth = this.form("doubleAuth");
 		this.phoneNumber = this.form("phone-number");
+		if (this.phoneNumber === undefined)
+			this.phoneNumber = "undefined";
 		this.checker = new UserSecurityChecker();
 		this.valid = false;
 	}

@@ -18,12 +18,11 @@ class	UserSecurityChecker
 	public checkNumber(data: UserSecurity)
 	{
 		this.resetError();
-		data.doubleAuth = true;
 		if (data.doubleAuth)
 		{
-			if (this.phoneNumber === undefined)
+			if (data.phoneNumber === undefined)
 					return (true);
-			if (data.phoneNumber.length > 0 && data.phoneNumber.length < 12)
+			if (data.phoneNumber?.length > 0 && data.phoneNumber?.length < 12)
 			{
 				if (!Number(data.phoneNumber))
 					return (true);

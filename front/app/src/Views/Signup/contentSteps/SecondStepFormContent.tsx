@@ -38,15 +38,19 @@ const	SecondStepFormContent = () =>
 		user.check();
 		setErrorValidation(user.checker);
 		const	phone = user.getPlainObject();
+		console.log(phone);
 		if (phone.doubleAuth)
 		{
-			dispatch(setDoubleAuth(required));
+			// dispatch(setDoubleAuth(required));
 			if (phone.valid)
 				dispatch(setPhoneNumber(phone.phoneNumber));
 				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
 		}
 		else
+		{
+			console.log("ici ?");
 			dispatch(setUserLoggedIn());
+		}
 	};
 
 	const	handleSwitch = (event: any) =>
