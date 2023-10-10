@@ -1,10 +1,16 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
-import { Box, Button, Grid, Link, TextField } from "@mui/material";
+import { Box, Button, FormControlLabel, Grid, Link, Switch, TextField } from "@mui/material";
 import UserRegistration from "../../../Object/UserRegistration";
 import { useState } from "react";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
-import { setUserLoggedIn } from "../../../Redux/store/controllerAction";
+import {
+	useAppDispatch,
+	useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import {
+	setDoubleAuth,
+	setPhoneNumber,
+	setUserLoggedIn } from "../../../Redux/store/controllerAction";
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 
@@ -18,29 +24,68 @@ const	SecondStepFormContent = () =>
 		setErrorValidation
 	] = useState(new UserSecurityChecker());
 
+	const	[
+		required,
+		setRequired
+	] = useState(false);
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
-		dispatch(setUserLoggedIn);
+		const	data = new FormData(event.currentTarget);
+		const	user = new UserSecurity(data);
+		console.log("data: ", data);
+		user.check();
+		setErrorValidation(user.checker);
+		const	phone = user.getPlainObject();
+		if (phone.doubleAuth)
+		{
+			dispatch(setDoubleAuth);
+			if (phone.valid)
+				dispatch(setPhoneNumber);
+		}
+		if (phone.valid)
+			dispatch(setUserLoggedIn);
 	};
 
-	const	checkPhone = () =>
+	const	handleSwitch = (event: any) =>
 	{
-		// check format +33622143240
+		const	checked = event.target?.checked;
+
+		setRequired(checked);
+		dispatch(setDoubleAuth(checked));
+		console.log(required);
 	};
+
 
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
-			<Grid item xs={12}>
+			<Grid item xs={12} sm={6}>
+			<FormControlLabel
+			value="double-authenfication"
+			control={
+				<Switch color="primary"
+				onClick={handleSwitch} />
+			}
+			label="Double Authentification"
+			labelPlacement="start"
+        />
+				</Grid>
+			<Grid item xs={12} sm={6}>
 					<TextField
 						name="phone-number"
-						required
+						required={required}
 						fullWidth
 						id="phone-number"
 						label="Phone Number"
 						// value={props.username}
 						error={errorValidation.phoneNumber}
+						helperText={
+							errorValidation.phoneNumber
+								? "phone number is required"
+								: ""
+						}
 					/>
 				</Grid>
 				</Grid>
@@ -54,16 +99,9 @@ const	SecondStepFormContent = () =>
 					mb: 2
 				}}
 			>
-				Log in
+				Finish to register
 			</Button>
-			<Grid container justifyContent="flex-end">
-				<Grid item>
-				<Link href="/login" variant="body2">
-					Already have an account? Sign in
-				</Link>
-				</Grid>
-			</Grid>
-			</Box>
+		</Box>
 	);
 };
 

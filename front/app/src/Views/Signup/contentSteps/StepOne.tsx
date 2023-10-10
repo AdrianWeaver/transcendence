@@ -5,7 +5,6 @@ const	StepOne = () =>
 {
 	const	controller = useAppSelector((state) =>
 	{
-		console.log("HEREEE ", state.controller.user.firstName);
 		return (state.controller);
 	});
 	return (

@@ -747,3 +747,42 @@ export const registerClientWithCode = (code : string)
 		console.log("end of registration");
 	});
 };
+
+
+export const	setDoubleAuth = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				doubleAuth: data.doubleAuth,
+			}
+		}
+		dispatch(controllerActions.setDoubleAuth(response));
+	});
+}
+
+export const	setPhoneNumber = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				phoneNumber: data.phoneNumber,
+			}
+		}
+		dispatch(controllerActions.setPhoneNumber(response));
+	});
+}

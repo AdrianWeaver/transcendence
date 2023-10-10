@@ -164,14 +164,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 {
 	const	dispatch = useAppDispatch();
 
-	if (props.email === undefined)
-		props.email = "undefined";
-	if (props.firstName === undefined)
-		props.firstName = "undefined";
-	if (props.lastName === undefined)
-		props.lastName = "undefined";
-	if (props.username === undefined)
-		props.username = "undefined";
 	const	[
 		firstTriggerPassword,
 		setPasswordFirstTrigger

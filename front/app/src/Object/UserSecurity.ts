@@ -12,7 +12,7 @@ class	UserSecurity
 	public	phoneNumber: string;
 	public	doubleAuth: boolean;
 	public	checker: UserSecurityChecker;
-
+	public	valid: boolean;
 
 	public	constructor(data: FormData)
 	{
@@ -20,12 +20,13 @@ class	UserSecurity
 		this.doubleAuth = this.form("doubleAuth");
 		this.phoneNumber = this.form("phone-number");
 		this.checker = new UserSecurityChecker();
+		this.valid = false;
 	}
 
 	public	check = () =>
 	{
 		this.checker.checkNumber(this);
-	}
+	};
 
 	public	form = (field: string) =>
 	{
@@ -38,6 +39,7 @@ class	UserSecurity
 		{
 			phoneNumber: this.phoneNumber,
 			doubleAuth: this.doubleAuth,
+			valid: this.valid
 		});
 	};
 }

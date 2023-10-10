@@ -59,7 +59,9 @@ export interface	UserModel
 	"firstName": string,
 	"lastName": string,
 	"registrationProcess": boolean,
-	"registrationError": string
+	"registrationError": string,
+	"doubleAuth": boolean,
+	"phoneNumber": string
 }
 
 export interface	AnonymousUserModel

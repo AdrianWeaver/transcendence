@@ -25,6 +25,8 @@ const	initialControllerState: ControllerModel = {
 		lastName: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
+		doubleAuth: false,
+		phoneNumber: "undefined",
 		chat:
 		{
 			window:
@@ -267,7 +269,15 @@ const	controllerSlice = createSlice(
 		verifyToken(state, action: PayloadAction<ControllerModel>)
 		{
 			// state = action.payload
-		}
+		},
+		setDoubleAuth(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
+		setPhoneNumber(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
 	}
 });
 
