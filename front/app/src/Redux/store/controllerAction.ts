@@ -786,3 +786,22 @@ export const	setPhoneNumber = (data: any)
 		dispatch(controllerActions.setPhoneNumber(response));
 	});
 }
+
+export const	setRegistered = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registered: data.registered,
+			}
+		}
+		dispatch(controllerActions.setRegistered(response));
+	});
+}

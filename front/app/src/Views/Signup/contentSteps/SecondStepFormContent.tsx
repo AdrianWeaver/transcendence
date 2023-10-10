@@ -10,6 +10,7 @@ import {
 import {
 	setDoubleAuth,
 	setPhoneNumber,
+	setRegistered,
 	setUserLoggedIn } from "../../../Redux/store/controllerAction";
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
@@ -48,7 +49,7 @@ const	SecondStepFormContent = () =>
 		}
 		else
 		{
-			console.log("ici ?");
+			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
 		}
 	};

@@ -27,6 +27,7 @@ const	initialControllerState: ControllerModel = {
 		rememberMe: false,
 		doubleAuth: false,
 		phoneNumber: "undefined",
+		registered: false,
 		chat:
 		{
 			window:
@@ -277,6 +278,10 @@ const	controllerSlice = createSlice(
 		setPhoneNumber(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
+		setRegistered(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.registered = action.payload.user.registered;
 		},
 	}
 });

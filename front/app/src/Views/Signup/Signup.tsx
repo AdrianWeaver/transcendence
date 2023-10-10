@@ -46,7 +46,7 @@ const	Signup = () =>
 		content = <StepZero />;
 	if (stepper === 1)
 		content = <StepOne />;
-	if (stepper === 2)
+	if (stepper === 2 && !controllerState.user.registered)
 		content = <StepTwo />;
 	return (
 		<>
