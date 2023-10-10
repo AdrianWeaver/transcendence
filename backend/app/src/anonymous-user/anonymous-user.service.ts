@@ -162,7 +162,8 @@ export class AnonymousUserService
 	}
 
 	public login(uuid: string, password: string)
-		: AnonymousUserLoginResponseModel
+		// : AnonymousUserLoginResponseModel
+		: {db : AnonymousUserModel, res: AnonymousUserLoginResponseModel}
 	{
 		const	searchUser = this.anonymousUser.find((user) =>
 		{
@@ -193,7 +194,11 @@ export class AnonymousUserService
 					searchUser.lastConnection + (1000 * 60 * 60 * 24)
 				// Date.now()
 			};
-			return (response);
+			const	retValue = {
+				db: searchUser,
+				res: response
+			};
+			return (retValue);
 		}
 	}
 
