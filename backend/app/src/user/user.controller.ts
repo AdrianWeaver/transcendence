@@ -47,7 +47,7 @@ export class UserController
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
-		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
+		this.logger.log("instance UserService loaded with real user");
 		this.env = dotenv.config();
 	}
 

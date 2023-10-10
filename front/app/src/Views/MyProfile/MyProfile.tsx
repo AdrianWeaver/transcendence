@@ -50,6 +50,7 @@ const	MyProfile = () =>
 
 	if (user !== undefined)
 	{
+		console.log("avatar : ", user.avatar);
 		id = user.id;
 		lastName = user.lastName;
 		firstName = user.firstName;

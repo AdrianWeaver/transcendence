@@ -2,6 +2,8 @@
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
+import { useAppDispatch } from "../hooks/redux-hooks";
+import { setAvatar } from "../store/controllerAction";
 
 const	UserServices = {
 	async	register(code: string, hostname: string)
@@ -23,7 +25,10 @@ const	UserServices = {
 			.then((data) =>
 			{
 				// console.log("register front");
-				// console.log(data.data);
+				// console.log("here ", data.data);
+				// const dispatch = useAppDispatch();
+
+				// dispatch(setAvatar(data.data.avatar.link));
 				return (data.data);
 			})
 			.catch((error) =>

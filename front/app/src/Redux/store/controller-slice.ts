@@ -304,6 +304,7 @@ const	controllerSlice = createSlice(
 			state.user.registrationProcess = action.payload.user.registrationProcess;
 			state.user.registrationError = action.payload.user.registrationError;
 			state.user.rememberMe = action.payload.user.rememberMe;
+			state.user.avatar = action.payload.user.avatar;
 		},
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{

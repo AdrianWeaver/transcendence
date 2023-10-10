@@ -839,6 +839,7 @@ export const	reinitialiseUser = (data: any)
 				doubleAuth: false,
 				phoneNumber: "undefined",
 				registered: false,
+				avatar: "undefined"
 
 
 			}

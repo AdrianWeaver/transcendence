@@ -63,7 +63,16 @@ export interface	UserModel
 	"doubleAuth": boolean,
 	"phoneNumber": string,
 	"registered": boolean,
-	"avatar": string
+	"avatar": string | {
+		link: string,
+		version:
+			{
+				large: string,
+				medium: string,
+				micro: string,
+				small: string
+			}
+	}
 }
 
 export interface	AnonymousUserModel

@@ -41,7 +41,6 @@ export class UserService
 	{
 		return (this.uuidInstance);
 	}
-
 	public	getUserArray(): Array<UserModel>
 	{
 		return (this.user);
@@ -53,7 +52,6 @@ export class UserService
 		{
 			return ({
 				...elem,
-				password: "[hidden information]"
 			});
 		});
 		const	response = {
@@ -133,7 +131,8 @@ export class UserService
 			statusCode: newUser.retStatus,
 			login: newUser.login,
 			firstName: newUser.firstName,
-			lastName: newUser.lastName
+			lastName: newUser.lastName,
+			avatar: newUser.avatar
 		};
 		return (
 		{
