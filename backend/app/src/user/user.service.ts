@@ -20,19 +20,80 @@ import User from "src/chat/Objects/User";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
 @Injectable()
 export class UserService
 {
 	private	user: Array<UserModel> = [];
-	private	secret = randomBytes(64).toString("hex");
+	private	secret: string;
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
+	private readonly secretId = "user-service-secret";
 
 	public constructor()
 	{
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
+		this.loadSecretFromDB();
+	}
+
+	private	generateSecretForDB()
+	{
+		const	toDB = {
+			"secret_id": this.secretId,
+			"value": randomBytes(64).toString("hex")
+		};
+		const	prisma = new PrismaClient();
+		prisma.secretTable
+			.create(
+				{
+					data: toDB
+				}
+			).then(() =>
+			{
+				this.loadSecretFromDB();
+			})
+			.catch((error) =>
+			{
+				this.logger.error(error);
+			});
+	}
+
+	private	loadSecretFromDB()
+	{
+		const	prisma = new PrismaClient();
+		prisma.secretTable
+			.findUnique({
+				where:
+				{
+					// eslint-disable-next-line camelcase
+					secret_id: this.secretId,
+				}
+			}).then((data) =>
+			{
+				this.logger.debug("Next line is for database");
+				this.logger.debug(typeof data);
+				this.logger.debug(data);
+				if (data === null)
+				{
+					this.logger.log("data is eq to null");
+					this.generateSecretForDB();
+				}
+				else
+				{
+					this.logger.log("data is provided");
+					this.secret = data?.value;
+				}
+			})
+			.catch((error) =>
+			{
+				this.logger.error(error);
+			})
+			.finally(() =>
+			{
+				this.logger.debug("end of load into database ");
+			});
 	}
 
 	public	getUuidInstance(): string
