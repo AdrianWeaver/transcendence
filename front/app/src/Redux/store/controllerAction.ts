@@ -738,7 +738,8 @@ export const registerClientWithCode = (code : string)
 					bearerToken: data.token,
 					username: data.login,
 					firstName: data.firstName,
-					lastName: data.lastName
+					lastName: data.lastName,
+					avatar: data.avatar
 				}
 			}
 		}

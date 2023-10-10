@@ -85,7 +85,7 @@ const	MyProfile = () =>
 		login = "undefined";
 		email = "undefined";
 		active = undefined;
-		avatar = "https://thispersondoesnotexist.com/";
+		avatar = "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg";
 		rank = 5;
 		gamesPlayed = 20;
 		victories = 9;

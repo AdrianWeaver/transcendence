@@ -16,7 +16,8 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
-		avatar: "https://thispersondoesnotexist.com/",
+		// avatar: "https://thispersondoesnotexist.com/",
+		avatar: "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
@@ -253,6 +254,7 @@ const	controllerSlice = createSlice(
 			state.user.username = action.payload.user.username;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
+			state.user.avatar = action.payload.user.avatar;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
