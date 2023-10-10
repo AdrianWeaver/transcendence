@@ -805,3 +805,44 @@ export const	setRegistered = (data: any)
 		dispatch(controllerActions.setRegistered(response));
 	});
 }
+
+export const	reinitialiseUser = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			registration:
+			{
+				startedRegister: false,
+				step: 0,
+				codeOauthFT: "undefined",
+				abortRequested: false,
+				requestHomeLink: false
+			},
+			user:
+			{
+				...prev.controller.user,
+				isLoggedIn: false,
+				id: -1,
+				rememberMe: false,
+				email: "undefined",
+				bearerToken: "undefined",
+				firstName: "undefined",
+				lastName: "undefined",
+				username: "undefined",
+				registrationProcess: false,
+				registrationError: "undefined",
+				doubleAuth: false,
+				phoneNumber: "undefined",
+				registered: false,
+
+
+			}
+		}
+		dispatch(controllerActions.reinitialiseUser(response));
+	});
+}

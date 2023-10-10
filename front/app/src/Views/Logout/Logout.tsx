@@ -5,6 +5,7 @@ import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useDispatch } from "react-redux";
 // import { ContactsOutlined } from "@mui/icons-material";
 import { logOffUser,
+	reinitialiseUser,
 	resetRegistration } from "../../Redux/store/controllerAction";
 import { Button } from "@mui/material";
 
@@ -21,7 +22,7 @@ const	Logout = () =>
 	{
 		dispatch(logOffUser());
 		// TEST
-		dispatch(resetRegistration());
+		dispatch(reinitialiseUser());
 		navigate("/");
 	};
 
