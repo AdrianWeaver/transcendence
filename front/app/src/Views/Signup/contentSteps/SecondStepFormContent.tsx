@@ -40,12 +40,13 @@ const	SecondStepFormContent = () =>
 		const	phone = user.getPlainObject();
 		if (phone.doubleAuth)
 		{
-			dispatch(setDoubleAuth);
+			dispatch(setDoubleAuth(required));
 			if (phone.valid)
-				dispatch(setPhoneNumber);
+				dispatch(setPhoneNumber(phone.phoneNumber));
+				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
 		}
-		if (phone.valid)
-			dispatch(setUserLoggedIn);
+		else
+			dispatch(setUserLoggedIn());
 	};
 
 	const	handleSwitch = (event: any) =>
