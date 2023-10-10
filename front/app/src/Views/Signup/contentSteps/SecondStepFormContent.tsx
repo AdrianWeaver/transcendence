@@ -57,38 +57,45 @@ const	SecondStepFormContent = () =>
 		console.log(required);
 	};
 
+	const	fieldPhone = (
+		<Grid item xs={12} sm={12}>
+			<TextField
+				name="phone-number"
+				required={required}
+				fullWidth
+				id="phone-number"
+				label="Phone Number"
+				// value={props.username}
+				error={errorValidation.phoneNumber}
+				helperText={
+					errorValidation.phoneNumber
+						? "phone number is required"
+						: ""
+				}
+			/>
+		</Grid>
+	);
 
 	return (
-		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-			<Grid container spacing={2}>
-			<Grid item xs={12} sm={6}>
-			<FormControlLabel
-			value="double-authenfication"
-			control={
-				<Switch color="primary"
-				onClick={handleSwitch} />
-			}
-			label="Double Authentification"
-			labelPlacement="start"
-        />
-				</Grid>
-			<Grid item xs={12} sm={6}>
-					<TextField
-						name="phone-number"
-						required={required}
-						fullWidth
-						id="phone-number"
-						label="Phone Number"
-						// value={props.username}
-						error={errorValidation.phoneNumber}
-						helperText={
-							errorValidation.phoneNumber
-								? "phone number is required"
-								: ""
+		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} >
+			<Grid container spacing={2} textAlign="center">
+				<Grid item xs={12} sm={12} >
+					<FormControlLabel
+						value="double-authenfication"
+						control={
+							<Switch color="primary"
+							onClick={handleSwitch} />
 						}
+						label="Double Authentification"
+						labelPlacement="start"
 					/>
 				</Grid>
-				</Grid>
+				{
+					(required)
+					? fieldPhone
+					: <></>
+				}
+			</Grid>
 			<Button
 				type="submit"
 				fullWidth

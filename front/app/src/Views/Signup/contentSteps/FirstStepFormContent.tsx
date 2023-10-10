@@ -241,7 +241,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
-			dispatch(userRegistrationStepThree());
+			dispatch(userRegistrationStepThree);
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"
