@@ -34,6 +34,10 @@ const	MyProfile = () =>
 	{
 		return (state.controller.user.chat.activeConversationId);
 	});
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	// console.log(data);
 	let	ft, online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
 	let	id, lastName, firstName, login, email, active, avatar;
@@ -44,14 +48,27 @@ const	MyProfile = () =>
 		fontSize: "8px"
 	};
 
-	if (data !== undefined)
+	if (user !== undefined)
+	{
+		id = user.id;
+		lastName = user.lastName;
+		firstName = user.firstName;
+		login = user.username;
+		email = user.email;
+		avatar = user.avatar;
+		rank = 25;
+		gamesPlayed = 250;
+		victories = 19;
+		defeats = 122151;
+		perfectGame = 3;
+	}
+	else if (data !== undefined)
 	{
 		id = data.id;
 		lastName = data.last_name;
 		firstName = data.first_name;
 		login = data.login;
 		email = data.email;
-		active = data["active?"];
 		avatar = data.image;
 		rank = 5;
 		gamesPlayed = 20;

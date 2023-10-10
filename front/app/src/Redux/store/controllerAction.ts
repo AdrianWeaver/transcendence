@@ -846,3 +846,22 @@ export const	reinitialiseUser = (data: any)
 		dispatch(controllerActions.reinitialiseUser(response));
 	});
 }
+
+export const	setAvatar = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				avatar: data.avatar,
+			}
+		}
+		dispatch(controllerActions.setPhoneNumber(response));
+	});
+}

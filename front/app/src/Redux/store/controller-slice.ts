@@ -16,6 +16,7 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
+		avatar: "https://thispersondoesnotexist.com/",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
@@ -303,7 +304,11 @@ const	controllerSlice = createSlice(
 			state.user.registrationProcess = action.payload.user.registrationProcess;
 			state.user.registrationError = action.payload.user.registrationError;
 			state.user.rememberMe = action.payload.user.rememberMe;
-		}
+		},
+		setAvatar(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.avatar = action.payload.user.avatar;
+		},
 	}
 });
 

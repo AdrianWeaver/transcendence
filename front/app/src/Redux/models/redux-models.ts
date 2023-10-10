@@ -62,7 +62,8 @@ export interface	UserModel
 	"registrationError": string,
 	"doubleAuth": boolean,
 	"phoneNumber": string,
-	"registered": boolean
+	"registered": boolean,
+	"avatar": string
 }
 
 export interface	AnonymousUserModel

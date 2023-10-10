@@ -21,7 +21,6 @@ const	Logout = () =>
 	const	logUserOut = () =>
 	{
 		dispatch(logOffUser());
-		// TEST
 		dispatch(reinitialiseUser());
 		navigate("/");
 	};
