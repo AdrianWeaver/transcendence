@@ -1,3 +1,4 @@
+import { Public } from "@mui/icons-material";
 import UserRegistration from "./UserRegistration";
 /* eslint-disable max-statements */
 

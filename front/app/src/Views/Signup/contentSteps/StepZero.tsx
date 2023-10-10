@@ -17,7 +17,7 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 
 const	getText = () =>
 {
@@ -132,7 +132,10 @@ const	StepZero = () =>
 	if (responseQuery.code)
 		dispatch(registerClientWithCode(responseQuery.code));
 	if (user.bearerToken !== "undefined")
+	{
 		dispatch(verifyToken());
+		dispatch(userRegistrationStepTwo());
+	}
 	// console.log("Redirected Query", responseQuery.redirected);
 	// console.log("data inside Step zero", user);
 

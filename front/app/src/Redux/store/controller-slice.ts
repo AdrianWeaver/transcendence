@@ -122,6 +122,10 @@ const	controllerSlice = createSlice(
 		{
 			state.registration.step = action.payload.registration.step;
 		},
+		userRegistrationStepThree(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.step = action.payload.registration.step;
+		},
 		setCanvasSize(state, action: PayloadAction<ControllerModel>)
 		{
 			state.canvas = action.payload.canvas;

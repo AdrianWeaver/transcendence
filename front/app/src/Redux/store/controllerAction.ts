@@ -136,6 +136,25 @@ export const	userRegistrationStepTwo = ()
 	});
 };
 
+
+export const	userRegistrationStepThree = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				step: 2,
+			}
+		};
+		dispatch(controllerActions.userRegistrationStepThree(response));
+	});
+};
+
 export const	setCanvasSize = (size: CanvasModel)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
