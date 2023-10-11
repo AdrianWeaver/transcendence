@@ -133,7 +133,8 @@ export class UserService
 			statusCode: newUser.retStatus,
 			login: newUser.login,
 			firstName: newUser.firstName,
-			lastName: newUser.lastName
+			lastName: newUser.lastName,
+			avatar: newUser.avatar
 		};
 		return (
 		{

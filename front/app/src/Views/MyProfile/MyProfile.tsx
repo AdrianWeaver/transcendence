@@ -55,7 +55,11 @@ const	MyProfile = () =>
 		firstName = user.firstName;
 		login = user.username;
 		email = user.email;
-		avatar = user.avatar;
+		console.log("avatar ", user.avatar);
+		if (user.avatar?.link)
+			avatar = user.avatar?.link;
+		else if (user.avatar === undefined)
+			avatar = "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg";
 		rank = 25;
 		gamesPlayed = 250;
 		victories = 19;
@@ -69,7 +73,7 @@ const	MyProfile = () =>
 		firstName = data.first_name;
 		login = data.login;
 		email = data.email;
-		avatar = data.image;
+		avatar = data.image?.link;
 		rank = 5;
 		gamesPlayed = 20;
 		victories = 9;
@@ -189,17 +193,6 @@ const	MyProfile = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
-	const	addUserToFriends = () =>
-	{
-		const	action = {
-			type: "add-friend",
-			payload: {
-				friendName: activeId,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
 	const	addFriendsToBlocked = (userName: string) =>
 	{
 		const	action = {
@@ -253,16 +246,14 @@ const	MyProfile = () =>
 			<Title
 				name={pseudo}
 			/>
-			<Button onClick={addUserToFriends} variant="outlined">ADD AS FRIEND
-			</Button>
 			<div className="wrapper">
 				<Grid container>
 						<Grid item xs={6}>
 								<LeftSide
 									status={status}
 									pseudo={pseudo}
-									imageUrl={avatar.link}
-									defaultUrl="https://thispersondoesnotexist.com/"
+									imageUrl={avatar}
+									defaultUrl="https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg"
 								/>
 						</Grid>
 						<Grid item xs={6}>

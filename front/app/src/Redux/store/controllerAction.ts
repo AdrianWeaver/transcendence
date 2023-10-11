@@ -742,6 +742,7 @@ export const registerClientWithCode = (code : string)
 					avatar: data.avatar
 				}
 			}
+			console.log("controller action 745  ", data);
 		}
 		dispatch(controllerActions.registerClientWithCode(response));
 		// dispatch(controllerActions.verifyToken());
@@ -840,6 +841,8 @@ export const	reinitialiseUser = (data: any)
 				doubleAuth: false,
 				phoneNumber: "undefined",
 				registered: false,
+				// ou thispersondoesntexist?
+				avatar: "undefined"
 
 
 			}
@@ -863,6 +866,6 @@ export const	setAvatar = (data: any)
 				avatar: data.avatar,
 			}
 		}
-		dispatch(controllerActions.setPhoneNumber(response));
+		dispatch(controllerActions.setAvatar(response));
 	});
 }

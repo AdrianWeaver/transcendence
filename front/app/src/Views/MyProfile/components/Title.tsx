@@ -28,12 +28,14 @@ const	Title = (props: TitleProps) =>
 	return (
 		<>
 			<header className="chat__mainHeader">
-				<Typography variant="h3">{props.name}'s profile</Typography>
+				<Typography variant="h3">
+					{props.name}'s profile
+				</Typography>
+			</header>
 				<button className="leaveProfile__btn"
 					onClick={handleLeaveProfile}>
-				X
+				Leave profile
 				</button>
-			</header>
 		</>
 	);
 };

@@ -11,7 +11,7 @@ import
 	useRedirectRegistration
 }	from "../../Router/Hooks/useRedirectRegistration";
 import EscButton from "./Header/EscButton";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import HeaderForm from "./Header/HeaderForm";
 import Copyright from "./Footer/Copyright";
 import StepOne from "./contentSteps/StepOne";
@@ -19,6 +19,8 @@ import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
 import { useEffect } from "react";
+import {
+	setRegistrationProcessStart } from "../../Redux/store/controllerAction";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -46,7 +48,7 @@ const	Signup = () =>
 		content = <StepZero />;
 	if (stepper === 1)
 		content = <StepOne />;
-	if (stepper === 2 && !controllerState.user.registered)
+	if (stepper === 2)
 		content = <StepTwo />;
 	return (
 		<>
