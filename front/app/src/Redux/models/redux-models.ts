@@ -55,9 +55,23 @@ export interface	UserModel
 	"rememberMe": boolean,
 	"chat": ChatModel,
 	"id": number,
-	"email": string
+	"email": string,
+	"firstName": string,
+	"lastName": string,
 	"registrationProcess": boolean,
-	"registrationError": string
+	"registrationError": string,
+	"doubleAuth": boolean,
+	"phoneNumber": string,
+	"registered": boolean,
+	"avatar": string | {
+		link: string,
+		version: {
+			large: string,
+			medium: string,
+			micro: string,
+			small: string
+		}
+	}
 }
 
 export interface	AnonymousUserModel

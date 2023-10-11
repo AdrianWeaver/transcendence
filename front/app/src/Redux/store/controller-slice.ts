@@ -16,13 +16,20 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
+		// avatar: "https://thispersondoesnotexist.com/",
+		avatar: "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
 		id: -1,
 		username: "undefined",
+		firstName: "undefined",
+		lastName: "undefined",
 		bearerToken: "undefined",
 		rememberMe: false,
+		doubleAuth: false,
+		phoneNumber: "undefined",
+		registered: false,
 		chat:
 		{
 			window:
@@ -117,6 +124,10 @@ const	controllerSlice = createSlice(
 				= action.payload.registration.startedRegister;
 		},
 		userRegistrationStepTwo(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.step = action.payload.registration.step;
+		},
+		userRegistrationStepThree(state, action: PayloadAction<ControllerModel>)
 		{
 			state.registration.step = action.payload.registration.step;
 		},
@@ -232,6 +243,8 @@ const	controllerSlice = createSlice(
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{
@@ -239,6 +252,9 @@ const	controllerSlice = createSlice(
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
 			state.user.username = action.payload.user.username;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			state.user.avatar = action.payload.user.avatar;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
@@ -257,7 +273,44 @@ const	controllerSlice = createSlice(
 		verifyToken(state, action: PayloadAction<ControllerModel>)
 		{
 			// state = action.payload
-		}
+		},
+		setDoubleAuth(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
+		setPhoneNumber(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
+		setRegistered(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.registered = action.payload.user.registered;
+		},
+		reinitialiseUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.startedRegister = action.payload.registration.startedRegister;
+			state.registration.codeOauthFT = action.payload.registration.codeOauthFT;
+			state.registration.abortRequested = action.payload.registration.abortRequested;
+			state.registration.requestHomeLink = action.payload.registration.requestHomeLink;
+			state.registration.step = action.payload.registration.step;
+			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+			state.user.email = action.payload.user.email;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			state.user.id = action.payload.user.id;
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.registered = action.payload.user.registered;
+			state.user.username = action.payload.user.username;
+			state.user.registrationProcess = action.payload.user.registrationProcess;
+			state.user.registrationError = action.payload.user.registrationError;
+			state.user.rememberMe = action.payload.user.rememberMe;
+		},
+		setAvatar(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.avatar = action.payload.user.avatar;
+		},
 	}
 });
 

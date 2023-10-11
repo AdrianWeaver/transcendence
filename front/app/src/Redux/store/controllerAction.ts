@@ -136,6 +136,25 @@ export const	userRegistrationStepTwo = ()
 	});
 };
 
+
+export const	userRegistrationStepThree = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				step: 2,
+			}
+		};
+		dispatch(controllerActions.userRegistrationStepThree(response));
+	});
+};
+
 export const	setCanvasSize = (size: CanvasModel)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -646,6 +665,8 @@ export const	setUserData = (data: any)
 				id: data.id,
 				email: data.email,
 				bearerToken: data.token,
+				firstName: data.firstName,
+				lastName: data.lastName
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -713,13 +734,138 @@ export const registerClientWithCode = (code : string)
 					...prev.controller.user,
 					id: data.id,
 					email: data.email,
-					bearerToken: data.token, // our token
-					username: data.login
+					// our token
+					bearerToken: data.token,
+					username: data.login,
+					firstName: data.firstName,
+					lastName: data.lastName,
+					avatar: data.avatar
 				}
 			}
+			console.log("controller action 745  ", data);
 		}
 		dispatch(controllerActions.registerClientWithCode(response));
 		// dispatch(controllerActions.verifyToken());
 		console.log("end of registration");
 	});
 };
+
+
+export const	setDoubleAuth = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				doubleAuth: data.doubleAuth,
+			}
+		}
+		dispatch(controllerActions.setDoubleAuth(response));
+	});
+}
+
+export const	setPhoneNumber = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				phoneNumber: data.phoneNumber,
+			}
+		}
+		dispatch(controllerActions.setPhoneNumber(response));
+	});
+}
+
+export const	setRegistered = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registered: data.registered,
+			}
+		}
+		dispatch(controllerActions.setRegistered(response));
+	});
+}
+
+export const	reinitialiseUser = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			registration:
+			{
+				startedRegister: false,
+				step: 0,
+				codeOauthFT: "undefined",
+				abortRequested: false,
+				requestHomeLink: false
+			},
+			user:
+			{
+				...prev.controller.user,
+				isLoggedIn: false,
+				id: -1,
+				rememberMe: false,
+				email: "undefined",
+				bearerToken: "undefined",
+				firstName: "undefined",
+				lastName: "undefined",
+				username: "undefined",
+				registrationProcess: false,
+				registrationError: "undefined",
+				doubleAuth: false,
+				phoneNumber: "undefined",
+				registered: false,
+				// ou thispersondoesntexist?
+				avatar: "undefined"
+
+
+			}
+		}
+		dispatch(controllerActions.reinitialiseUser(response));
+	});
+}
+
+export const	setAvatar = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				avatar: data.avatar,
+			}
+		}
+		dispatch(controllerActions.setAvatar(response));
+	});
+}

@@ -22,8 +22,8 @@ const	UserServices = {
 			.post("/user/register", data, config)
 			.then((data) =>
 			{
-				// console.log("register front");
-				// console.log(data.data);
+				console.log("register front");
+				console.log(data.data);
 				return (data.data);
 			})
 			.catch((error) =>

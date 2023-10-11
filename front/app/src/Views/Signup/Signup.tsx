@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import
@@ -11,7 +12,7 @@ import
 	useRedirectRegistration
 }	from "../../Router/Hooks/useRedirectRegistration";
 import EscButton from "./Header/EscButton";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import HeaderForm from "./Header/HeaderForm";
 import Copyright from "./Footer/Copyright";
 import StepOne from "./contentSteps/StepOne";
@@ -19,6 +20,11 @@ import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
 import { useEffect } from "react";
+import {
+	registerClientWithCode,
+	setRegistrationProcessStart, setUserData, verifyToken } from "../../Redux/store/controllerAction";
+import { checkQueryParams } from "./extras/checkQueryParams";
+import { useLocation } from "react-router-dom";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -29,7 +35,7 @@ const	styleMainBox = {
 
 const	Signup = () =>
 {
-	let		content;
+	let		content = <></>;
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);
@@ -44,10 +50,12 @@ const	Signup = () =>
 
 	if (stepper === 0)
 		content = <StepZero />;
-	if (stepper === 1)
+	else if (stepper === 1)
 		content = <StepOne />;
-	if (stepper === 2)
+	else if (stepper === 2)
 		content = <StepTwo />;
+	else
+		content = <></>;
 	return (
 		<>
 			<EscButton />

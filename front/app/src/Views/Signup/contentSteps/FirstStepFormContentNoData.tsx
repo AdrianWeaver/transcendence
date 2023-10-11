@@ -152,15 +152,7 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 		return (<></>);
 };
 
-type	FirstStepFormContentProps =
-{
-	username: string
-	email: string
-	lastName: string
-	firstName: string
-};
-
-const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
+const	FirstStepFormContentNoData = () =>
 {
 	const	dispatch = useAppDispatch();
 
@@ -256,7 +248,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="username"
 						label="Username"
-						// value={props.username}
 						error={errorValidation.username}
 						helperText={
 							// NEED TO CHECK IS IT S USED
@@ -274,7 +265,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="firstName"
 						label="First Name"
-						value={props.firstName}
 						autoFocus
 						error={errorValidation.firstName}
 						helperText={
@@ -290,7 +280,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="lastName"
 						label="Last Name"
-						value={props.lastName}
 						name="lastName"
 						autoComplete="family-name"
 						error={errorValidation.lastName}
@@ -307,7 +296,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="email"
 						label="Email Address"
-						value={props.email}
 						name="email"
 						autoComplete="email"
 						error={errorValidation.email}
@@ -404,4 +392,4 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 	);
 };
 
-export default FirstStepFormContent;
+export default FirstStepFormContentNoData;
