@@ -6,21 +6,26 @@
 import { useState } from "react";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import FirstStepFormContent from "./FirstStepFormContent";
+import FirstStepFormContentNoData from "./FirstStepFormContentNoData";
 
 const	StepOne = () =>
 {
-	const	controller = useAppSelector((state) =>
+	const	user = useAppSelector((state) =>
 	{
-		return (state.controller);
+		return (state.controller.user);
 	});
 
 	return (
 		<>
-			<FirstStepFormContent
-				username={controller.user.username}
-				email={controller.user.email}
-				firstName={controller.user.firstName}
-				lastName={controller.user.lastName} />
+			{
+				(user.email)
+				? <FirstStepFormContent
+					username={user.username}
+					email={user.email}
+					firstName={user.firstName}
+					lastName={user.lastName} />
+				: <FirstStepFormContentNoData />
+			}
 		</>
 	);
 };

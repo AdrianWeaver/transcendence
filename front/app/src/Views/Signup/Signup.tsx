@@ -35,7 +35,7 @@ const	styleMainBox = {
 
 const	Signup = () =>
 {
-	let		content;
+	let		content = <></>;
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);
@@ -54,6 +54,8 @@ const	Signup = () =>
 		content = <StepOne />;
 	else if (stepper === 2)
 		content = <StepTwo />;
+	else
+		content = <></>;
 	return (
 		<>
 			<EscButton />

@@ -101,10 +101,16 @@ const	StepZero = () =>
 		return (state.controller.user);
 	});
 
+	const	step = useAppSelector((state) =>
+	{
+		return (state.controller.registration.step);
+	});
+
 	const	url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code";
 
 	const	openSameTab = () =>
 	{
+		// dispatch(userRegistrationStepTwo());
 		window.open(url, "_self");
 	};
 
@@ -119,7 +125,8 @@ const	StepZero = () =>
 			clearTimeout(timer);
 		});
 	});
-
+	if (step === 1)
+		return (<></>);
 	const	displayRedirect = (<>
 		<Alert severity="warning">
 			Veuillez continuer les etapes.
@@ -139,38 +146,51 @@ const	StepZero = () =>
 	console.log("Redirected Query", responseQuery.redirected);
 	console.log("data inside Step zero", user);
 
-	return (
+	const waiting = ((time: number) =>
+	{
+		setTimeout(() =>
+		{
+			console.log("Wait component is now ready");
+		}, time);
+	});
+
+	// waiting(10000);
+
+	const	render = (
 		<Card sx={{ m: 5}}>
-				<CardActionArea
-					onClick={openSameTab}
-				>
+			<CardActionArea
+				onClick={openSameTab}
+			>
 				<CardMedia
-					component="img"
-					height="140"
-					image={imgSource}
-					alt="Image of intranet"
-					/>
-					<CardContent>
-						<Typography
-							gutterBottom
-							variant="h5"
-							component="div"
-						>
-							Connexion intra 42
-						</Typography>
-						<Typography
-							variant="body2"
-							color="text.secondary"
-						>
-							{
-								getText()
-							}
-						</Typography>
-					</CardContent>
+				component="img"
+				height="140"
+				image={imgSource}
+				alt="Image of intranet"
+				/>
+				<CardContent>
+					<Typography
+						gutterBottom
+						variant="h5"
+						component="div"
+					>
+						Connexion intra 42
+					</Typography>
+					<Typography
+						variant="body2"
+						color="text.secondary"
+					>
+					{
+						getText()
+					}
+					</Typography>
+				</CardContent>
 			</CardActionArea>
 			{(visible) ? displayRedirect : <></>}
 			{alertInfo}
-		</Card>
+		</Card>);
+	const	loader = <></>;
+	return (
+		render
 	);
 };
 
