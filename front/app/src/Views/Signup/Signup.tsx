@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import
@@ -20,7 +21,10 @@ import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
 import { useEffect } from "react";
 import {
-	setRegistrationProcessStart } from "../../Redux/store/controllerAction";
+	registerClientWithCode,
+	setRegistrationProcessStart, setUserData, verifyToken } from "../../Redux/store/controllerAction";
+import { checkQueryParams } from "./extras/checkQueryParams";
+import { useLocation } from "react-router-dom";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -46,9 +50,9 @@ const	Signup = () =>
 
 	if (stepper === 0)
 		content = <StepZero />;
-	if (stepper === 1)
+	else if (stepper === 1)
 		content = <StepOne />;
-	if (stepper === 2)
+	else if (stepper === 2)
 		content = <StepTwo />;
 	return (
 		<>

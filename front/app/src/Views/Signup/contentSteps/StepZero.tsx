@@ -17,7 +17,8 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setRegistrationProcessStart, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { UserModel } from "../../../Redux/models/redux-models";
 
 const	getText = () =>
 {
@@ -75,7 +76,6 @@ const	AlertComponent = (responseQuery: linkIntraModel) =>
 	return (alertInfo);
 };
 
-
 const	locationIsARedirectedPage = (pathname: string) =>
 {
 	if (pathname)
@@ -102,6 +102,7 @@ const	StepZero = () =>
 	});
 
 	const	url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code";
+
 	const	openSameTab = () =>
 	{
 		window.open(url, "_self");
@@ -128,23 +129,21 @@ const	StepZero = () =>
 
 	const	responseQuery = checkQueryParams(query);
 	const	alertInfo = AlertComponent(responseQuery);
-	console.log("stepZero ", responseQuery);
 	if (responseQuery.code)
 		dispatch(registerClientWithCode(responseQuery.code));
 	if (user.bearerToken !== "undefined")
 	{
 		dispatch(verifyToken());
-		// dispatch(setRegistrationProcessStart());
 		dispatch(userRegistrationStepTwo());
 	}
-	// console.log("Redirected Query", responseQuery.redirected);
-	// console.log("data inside Step zero", user);
+	console.log("Redirected Query", responseQuery.redirected);
+	console.log("data inside Step zero", user);
 
 	return (
 		<Card sx={{ m: 5}}>
-			<CardActionArea
-				onClick={openSameTab}
-			>
+				<CardActionArea
+					onClick={openSameTab}
+				>
 				<CardMedia
 					component="img"
 					height="140"
