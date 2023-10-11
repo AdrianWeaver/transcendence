@@ -19,6 +19,7 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
+	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
 
@@ -235,13 +236,15 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		) =>
 		{
 			key;
-			console.log("key ", key, " value: ", value);
 			return (value === true);
 		});
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
+		{
+			dispatch(setPseudo(userSignup.username));
 			dispatch(userRegistrationStepThree());
+		}
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"

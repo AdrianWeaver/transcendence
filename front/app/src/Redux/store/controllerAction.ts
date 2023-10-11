@@ -328,6 +328,7 @@ export const setPseudo = (name: string)
 			user:
 			{
 				...prevState.controller.user,
+				username: name,
 				chat:
 				{
 					...prevState.controller.user.chat,

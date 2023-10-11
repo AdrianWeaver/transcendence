@@ -167,6 +167,7 @@ const	controllerSlice = createSlice(
 		},
 		setPseudo(state, action: PayloadAction<ControllerModel>)
 		{
+			state.user.username = action.payload.user.username;
 			state.user.chat.pseudo = action.payload.user.chat.pseudo;
 		},
 		setChatConnected(state, action: PayloadAction<ControllerModel>)
