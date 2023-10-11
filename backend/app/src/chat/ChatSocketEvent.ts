@@ -7,7 +7,6 @@ import { Server, Socket } from "socket.io";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
-import { Prisma } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import
 {
@@ -22,6 +21,7 @@ import
 }	from "@nestjs/websockets";
 import { ChatService } from "./Chat.service";
 import { Logger } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
 
 type	ActionSocket = {
 	type: string,

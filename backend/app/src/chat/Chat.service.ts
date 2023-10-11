@@ -7,6 +7,7 @@ import {
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
+import { PrismaClient } from "@prisma/client";
 
 // export interface MessageModel
 // {
@@ -53,11 +54,75 @@ export	class ChatService
 	private	chat: Chat;
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
+	private prisma: PrismaClient;
+	private prismaChatID: string;
 
 	constructor()
 	{
 		this.chat = new Chat();
-		this.log.log("started service instance - id instance : " + this.uuid);
+		this.prisma = new PrismaClient();
+		this.initDB();
+		this.updateDB(this.prismaChatID);
+	}
+
+	// prisma db storage
+
+	public async initDB(): Promise<void>
+	{
+		try
+		{
+			await this.prisma.$connect;
+			const chatJSON = JSON.stringify(this.chat);
+			const storeInDb = await this.prisma.chatJson.create(
+			{
+				data:
+				{
+					contents: chatJSON,
+				},
+			});
+			this.log.debug("Saved chat message:", storeInDb);
+			this.prismaChatID = storeInDb.chatJsonID;
+			// Retrieve the stored data: this is a test
+			// const retrievedData = await this.prisma.chatJson.findUnique({
+			// 	where: {
+			// 		chatJsonID: storeInDb.chatJsonID,
+			// 	},
+			// });
+
+			// this.log.debug("Retrieved chat message:", retrievedData);
+		}
+		catch (error)
+		{
+			this.log.error("Error storing chat message:", error);
+		}
+		finally
+		{
+			await this.prisma.$disconnect();
+		}
+
+		this.log.debug("started service instance - id instance : " + this.uuid);
+	}
+
+	public async updateDB(chatJsonID: string): Promise<void>
+	{
+		try
+		{
+			await this.prisma.$connect;
+			const updatedChatJson = JSON.stringify(this.chat);
+			await this.prisma.chatJson.update({
+				where: { chatJsonID: chatJsonID },
+				data: { contents: updatedChatJson },
+			});
+			console.log("UpdatedChatJson: " + updatedChatJson);
+		}
+		catch (error)
+		{
+			this.log.error("Error storing chat message:", error);
+		}
+		finally
+		{
+			await this.prisma.$disconnect();
+		}
 	}
 
 	// getters
