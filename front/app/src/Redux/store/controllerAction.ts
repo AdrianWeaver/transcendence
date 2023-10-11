@@ -979,3 +979,41 @@ export const	setProfileMyView = ()
 		dispatch(controllerActions.setProfileMyView(response));
 	});
 }
+
+export const	setPassword = (password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				password: password
+			}
+		}
+		dispatch(controllerActions.setPassword(response));
+	});
+}
+
+export const	setEmail = (email: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				email: email
+			}
+		}
+		dispatch(controllerActions.setEmail(response));
+	});
+}

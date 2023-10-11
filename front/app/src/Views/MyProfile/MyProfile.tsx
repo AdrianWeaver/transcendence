@@ -14,7 +14,8 @@ import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
 import EditProfile from "./components/EditProfile";
-import { setProfileMyView } from "../../Redux/store/controllerAction";
+import { setProfileEditView, setProfileMyView } from "../../Redux/store/controllerAction";
+import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
 
 type	FriendsModel =
 {
@@ -48,15 +49,14 @@ const	MyProfile = () =>
 		return (state.controller.user);
 	});
 	// console.log(data);
-	let	ft, online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
+	let	online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
 	let	id, lastName, firstName, login, email, active, avatar;
 
-	ft = true;
-	const	displayStyle: React.CSSProperties = {
-		textAlign: "center",
-		fontSize: "8px"
-	};
-	
+	// const	displayStyle: React.CSSProperties = {
+	// 	textAlign: "center",
+	// 	fontSize: "8px"
+	// };
+
 	if (user !== undefined)
 	{
 		id = user.id;
@@ -235,7 +235,6 @@ const	MyProfile = () =>
 		// TEST NEED TO VERIFY IT'S NOT USED PSEUDO
 		setPseudo(newPseudo);
 	};
-	dispatch(setProfileMyView());
 	changePseudo(login);
 // TEST
 	playing = true;
@@ -248,6 +247,18 @@ const	MyProfile = () =>
 	else
 		status = "🔴";
 		// console.log(status);
+
+	const	editOrFriendRequest = () =>
+	{
+		// if (user.profile.publicView)
+		// 	// addUserToFriends();
+		// else
+		dispatch(setProfileEditView());
+		console.log("edit view: ", user.profile.editView);
+		console.log("friend view", user.profile.friendView);
+		console.log("public view", user.profile.publicView);
+		console.log("my view: ", user.profile.myView);
+	};
 
 	return (
 		<>
@@ -262,7 +273,7 @@ const	MyProfile = () =>
 				? 	<EditProfile />
 				: <div className="wrapper">
 					<Grid container>
-						<Grid item xs={6}>
+						<Grid item xs={12} sm={6}>
 								<LeftSide
 									status={status}
 									pseudo={pseudo}
@@ -270,7 +281,7 @@ const	MyProfile = () =>
 									defaultUrl="https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg"
 								/>
 						</Grid>
-						<Grid item xs={6}>
+						<Grid item xs={12} sm={6}>
 								<RightSide
 									rank={rank}
 									gamesPlayed={gamesPlayed}
@@ -282,103 +293,16 @@ const	MyProfile = () =>
 								/>
 						</Grid>
 					</Grid>
+					<Button onClick={editOrFriendRequest} variant="outlined">
+						{
+							(user.profile.publicView)
+							? "ADD AS FRIEND"
+							: "EDIT PROFILE"
+						}
+					</Button>
 				</div>
 
 			}
-			{/* <Button onClick={() =>
-			{
-				return handleFriendsClickOpen(buttonSelection.name);
-			}}>
-				Friends
-			</Button> */}
-			{/* <Dialog open={friendsOpen} onClose={handleFriendsClose} maxWidth="sm" fullWidth>
-				<DialogTitle>
-					Friends of {pseudo}
-				</DialogTitle>
-					 <DialogContent>
-					<ul>
-					{
-						friends.map((friend) =>
-						{
-							return (<li key={friend.id}>
-									{friend.name}
-									{friend.name !== uniqueId && (
-									<>
-										<Button onClick={() =>
-										{
-											removeFriend(friend.name);
-											handleFriendsClose();
-										}}>
-											Remove from friends
-										</Button>
-									</>)}
-									{friend.name !== uniqueId && (
-									<>
-										<Button onClick={() =>
-										{
-											addUserToFriends(friend.name);
-										}}>
-											Add friend
-										</Button>
-										<Button onClick={() =>
-										{
-											addFriendsToBlocked(friend.name);
-										}}>
-											Block
-										</Button>
-										<Button onClick={() =>
-										{
-											setInviteDialogOpen(true);
-											// inviteUserToChannel(friend.name);
-										}}>
-											Invite to a chan
-										</Button>
-										<Dialog open={inviteDialogOpen} onClose={() =>
-											{
-												setInviteDialogOpen(false);
-											}}
-											maxWidth="sm" fullWidth>
-											<DialogTitle>Invite friend to Channel</DialogTitle>
-											<DialogContent>
-												<TextField
-												label="Channel Name"
-												variant="outlined"
-												fullWidth
-												value={channelToInvite}
-												onChange={(e) =>
-												{
-													console.log("target value " + e.target.value);
-													setChannelToInvite(e.target.value);
-												}}/>
-											</DialogContent>
-											<DialogActions>
-												<Button onClick={() =>
-													{
-														inviteFriendToChannel(friend.name);
-														setInviteDialogOpen(false);
-													}} color="primary">
-													Invite
-												</Button>
-												<Button onClick={() =>
-												{
-													setInviteDialogOpen(false);
-												}} color="primary">
-												Cancel
-												</Button>
-											</DialogActions>
-										</Dialog>
-									</>)}
-								</li>);
-						})
-					}
-					</ul>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleFriendsClose} color="primary">
-						Close
-					</Button>
-				</DialogActions>
-			</Dialog> */}
 		</>
 	);
 };

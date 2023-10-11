@@ -35,12 +35,10 @@ const	SecondStepFormContent = () =>
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	user = new UserSecurity(data);
-		console.log("data: ", data);
+
 		user.check();
 		setErrorValidation(user.checker);
 		const	phone = user.getPlainObject();
-		console.log("phone: ", phone);
-		console.log("required: ", required);
 		if (required)
 		{
 			dispatch(setDoubleAuth(required));

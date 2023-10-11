@@ -19,6 +19,7 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
+	setPassword,
 	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
@@ -181,7 +182,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 
 	const	[
 		passwordValue,
-		setPassword
+		setPasswordValue
 	] = useState("");
 
 	const	[
@@ -199,7 +200,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 	) =>
 	{
 		event.preventDefault();
-		setPassword(event.target.value);
+		setPasswordValue(event.target.value);
 		setPasswordFirstTrigger(true);
 	};
 
@@ -243,12 +244,13 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		if (filtered.length === 0)
 		{
 			dispatch(setPseudo(userSignup.username));
+			dispatch(setPassword(userSignup.password));
 			dispatch(userRegistrationStepThree());
 		}
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"
-		+ "le meme mot de passe de connexion a l'intra 42";
+		+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>

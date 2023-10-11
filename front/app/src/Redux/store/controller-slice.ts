@@ -16,8 +16,7 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
-		// avatar: "https://thispersondoesnotexist.com/",
-		avatar: "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg",
+		avatar: "https://thispersondoesnotexist.com/",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
@@ -78,9 +77,10 @@ const	initialControllerState: ControllerModel = {
 		profile: {
 			editView: false,
 			friendView: false,
-			publicView: true,
-			myView: false
-		}
+			publicView: false,
+			myView: true
+		},
+		password: "undefined"
 	},
 	registration:
 	{
@@ -345,6 +345,14 @@ const	controllerSlice = createSlice(
 			state.user.profile.friendView = action.payload.user.profile.friendView;
 			state.user.profile.publicView = action.payload.user.profile.publicView;
 			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setPassword(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.password = action.payload.user.password;
+		},
+		setEmail(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.email = action.payload.user.email;
 		},
 	}
 });

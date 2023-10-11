@@ -79,7 +79,8 @@ export interface	UserModel
 			small: string
 		}
 	},
-	"profile": ProfileModel
+	"profile": ProfileModel,
+	"password": string
 }
 
 export interface	AnonymousUserModel

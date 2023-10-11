@@ -13,14 +13,25 @@ import {
 	Button,
 	Checkbox,
 	Box,
+	Switch,
 }	from "@mui/material";
 
 import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
+	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import {
+	setDoubleAuth,
+	setEmail,
+	setPassword,
+	setPhoneNumber,
+	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
+import UserSecurityChecker from "../../../Object/UserSecurityChecker";
+import UserSecurity from "../../../Object/UserSecurity";
+import UserProfileEdit from "../../../Object/UserProfileEdit";
+import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 
 type PasswordAlertProps ={
 	password: string,
@@ -155,6 +166,10 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 const	EditProfile = () =>
 {
 	const	dispatch = useAppDispatch();
+	const	user	= useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 
 	const	[
 		firstTriggerPassword,
@@ -168,13 +183,18 @@ const	EditProfile = () =>
 	const	[
 		errorValidation,
 		setErrorValidation
-	] = useState(new UserRegistrationChecker());
+	] = useState(new UserProfileEditChecker());
 
 	const	[
 		passwordValue,
-		setPassword
+		setPasswordValue
 	] = useState("");
 
+	const
+	[
+		required,
+		setRequired
+	] = useState(false);
 	const	[
 		uniquePassword,
 		setUniquePassword
@@ -190,7 +210,7 @@ const	EditProfile = () =>
 	) =>
 	{
 		event.preventDefault();
-		setPassword(event.target.value);
+		setPasswordValue(event.target.value);
 		setPasswordFirstTrigger(true);
 	};
 
@@ -212,13 +232,15 @@ const	EditProfile = () =>
 	{
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
-		const	userSignup = new UserRegistration(data);
+
+		const	userChanges = new UserProfileEdit(data, required, user);
 		// console.log(userSignup.getPlainObject());
-		userSignup.check();
-		setErrorValidation(userSignup.errorTable);
+		userChanges.check();
+
+		setErrorValidation(userChanges.errorTable);
 		// console.log(errorValidation);
 		const	asArray
-			= Object.entries(userSignup.errorTable.getPlainObject());
+			= Object.entries(userChanges.errorTable.getPlainObject());
 		const	filtered = asArray.filter(
 		([
 			key,
@@ -227,17 +249,52 @@ const	EditProfile = () =>
 		) =>
 		{
 			key;
-			console.log("key ", key, " value: ", value);
 			return (value === true);
 		});
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
-			dispatch(userRegistrationStepThree());
+		{
+			if (user.username !== userChanges.username)
+				dispatch(setPseudo(userChanges.username));
+			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
+			if (user.password !== userChanges.password)
+				dispatch(setPassword(userChanges.password));
+			if (user.email !== userChanges.emailAddress)
+				dispatch(setEmail(userChanges.emailAddress));
+			if (user.phoneNumber !== userChanges.phoneNumber)
+				dispatch(setPhoneNumber(userChanges.phoneNumber));
+		}
+	};
+	const	handleSwitch = (event: any) =>
+	{
+		const	checked = event.target?.checked;
+
+		setRequired(checked);
+		dispatch(setDoubleAuth(checked));
 	};
 
+	const	fieldPhone = (
+		<Grid item xs={12} sm={12}>
+			<TextField
+				name="phone-number"
+				required={required}
+				fullWidth
+				id="phone-number"
+				label="Phone Number"
+				// value={props.username}
+				error={errorValidation.phoneNumber}
+				helperText={
+					errorValidation.phoneNumber
+						? "phone number is required"
+						: ""
+				}
+			/>
+		</Grid>
+	);
+
 	const	disclamer = "Je suis sur de ne pas utiliser"
-		+ "le meme mot de passe de connexion a l'intra 42";
+		+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
@@ -257,39 +314,6 @@ const	EditProfile = () =>
 						}
 					/>
 				</Grid>
-				<Grid item xs={12} sm={6}>
-					<TextField
-						autoComplete="given-name"
-						name="firstName"
-						required
-						fullWidth
-						id="firstName"
-						label="First Name"
-						autoFocus
-						error={errorValidation.firstName}
-						helperText={
-							errorValidation.firstName
-								? "First name is required"
-								: ""
-						}
-					/>
-				</Grid>
-				<Grid item xs={12} sm={6}>
-					<TextField
-						required
-						fullWidth
-						id="lastName"
-						label="Last Name"
-						name="lastName"
-						autoComplete="family-name"
-						error={errorValidation.lastName}
-						helperText={
-							errorValidation.lastName
-								? "Last name is required"
-								: ""
-						}
-					/>
-				</Grid>
 				<Grid item xs={12}>
 				<TextField
 						required
@@ -305,6 +329,24 @@ const	EditProfile = () =>
 								: ""
 						}
 					/>
+				</Grid>
+				<Grid item xs={12} sm={12} >
+					<FormControlLabel
+						value="double-authenfication"
+						control={
+							<Switch color="primary"
+							onClick={handleSwitch} />
+						}
+						label="Double Authentification"
+						labelPlacement="start"
+					/>
+				</Grid>
+				<Grid item xs={12} sm={12}>
+				{
+					(required)
+					? fieldPhone
+					: <></>
+				}
 				</Grid>
 				<Grid item xs={12}>
 					<TextField
@@ -379,15 +421,8 @@ const	EditProfile = () =>
 					mb: 2
 				}}
 			>
-				Sign Up
+				Save changes
 			</Button>
-			<Grid container justifyContent="flex-end">
-				<Grid item>
-				<Link href="/signin" variant="body2">
-					Already have an account? Sign in
-				</Link>
-				</Grid>
-			</Grid>
 		</Box>
 	);
 };
