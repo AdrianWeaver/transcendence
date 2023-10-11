@@ -126,14 +126,4 @@ export interface UserRegisterResponseModel
 	login: string;
 	firstName: string;
 	lastName: string;
-	avatar: string | {
-			link: string,
-			version:
-				{
-					large: string,
-					medium: string,
-					small: string,
-					mini: string
-				}
-		}
 }
