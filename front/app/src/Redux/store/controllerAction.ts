@@ -111,7 +111,9 @@ export const	userRequestRegistration = ()
 			registration:
 			{
 				...previousState.controller.registration,
-				startedRegister: true
+				startedRegister: true,
+				// TEST
+				// step: 0
 			}
 		};
 		dispatch(controllerActions.userRequestRegistration(response));
@@ -740,7 +742,14 @@ export const registerClientWithCode = (code : string)
 					username: data.login,
 					firstName: data.firstName,
 					lastName: data.lastName,
-					avatar: data.avatar
+					avatar: data.avatar,
+					profile:
+					{
+						editView: false,
+						friendView: false,
+						publicView: false,
+						myView: true
+					}
 				}
 			}
 			console.log("controller action 745  ", data);
@@ -752,7 +761,7 @@ export const registerClientWithCode = (code : string)
 };
 
 
-export const	setDoubleAuth = (data: any)
+export const	setDoubleAuth = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -764,14 +773,14 @@ export const	setDoubleAuth = (data: any)
 			user:
 			{
 				...prev.controller.user,
-				doubleAuth: data.doubleAuth,
+				doubleAuth: data,
 			}
 		}
 		dispatch(controllerActions.setDoubleAuth(response));
 	});
 }
 
-export const	setPhoneNumber = (data: any)
+export const	setPhoneNumber = (data: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -783,14 +792,14 @@ export const	setPhoneNumber = (data: any)
 			user:
 			{
 				...prev.controller.user,
-				phoneNumber: data.phoneNumber,
+				phoneNumber: data,
 			}
 		}
 		dispatch(controllerActions.setPhoneNumber(response));
 	});
 }
 
-export const	setRegistered = (data: any)
+export const	setRegistered = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -802,14 +811,14 @@ export const	setRegistered = (data: any)
 			user:
 			{
 				...prev.controller.user,
-				registered: data.registered,
+				registered: data,
 			}
 		}
 		dispatch(controllerActions.setRegistered(response));
 	});
 }
 
-export const	reinitialiseUser = (data: any)
+export const	reinitialiseUser = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -852,7 +861,7 @@ export const	reinitialiseUser = (data: any)
 	});
 }
 
-export const	setAvatar = (data: any)
+export const	setAvatar = (data: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -864,9 +873,109 @@ export const	setAvatar = (data: any)
 			user:
 			{
 				...prev.controller.user,
-				avatar: data.avatar,
+				avatar: data,
 			}
 		}
 		dispatch(controllerActions.setAvatar(response));
+	});
+}
+
+export const	setProfileEditView = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				profile:
+				{
+					editView: true,
+					friendView: false,
+					publicView: false,
+					myView: false
+				},
+			}
+		}
+		dispatch(controllerActions.setProfileEditView(response));
+	});
+}
+
+export const	setProfileFriendView = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				profile:
+				{
+					editView: false,
+					friendView: true,
+					publicView: false,
+					myView: false
+				},
+			}
+		}
+		dispatch(controllerActions.setProfileFriendView(response));
+	});
+}
+
+export const	setProfilePublicView = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				profile:
+				{
+					editView: false,
+					friendView: false,
+					publicView: true,
+					myView: false
+				},
+			}
+		}
+		dispatch(controllerActions.setProfilePublicView(response));
+	});
+}
+
+export const	setProfileMyView = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				profile:
+				{
+					editView: false,
+					friendView: false,
+					publicView: false,
+					myView: true
+				},
+			}
+		}
+		dispatch(controllerActions.setProfileMyView(response));
 	});
 }

@@ -9,24 +9,18 @@ import { Avatar, Typography } from "@mui/material";
 type	TitleProps =
 {
 	name: string,
+	prevPage: string
 };
 
 const	Title = (props: TitleProps) =>
 {
 	const	navigate = useNavigate();
 
-	// const	savePrevPage = useSavePrevPage();
-	let	prevPage: string;
+	const	previous = props.prevPage === "/me/profile" ? "/" : props.prevPage;
 
-	prevPage= useAppSelector((state) =>
-	{
-		return (state.controller.previousPage);
-	});
-	if (prevPage === "/me/profile")
-		prevPage = "/";
 	const	handleLeaveProfile = () =>
 	{
-		navigate(prevPage);
+		navigate(previous);
 	};
 	// TEST
 	return (

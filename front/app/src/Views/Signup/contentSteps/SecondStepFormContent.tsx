@@ -39,16 +39,19 @@ const	SecondStepFormContent = () =>
 		user.check();
 		setErrorValidation(user.checker);
 		const	phone = user.getPlainObject();
-		console.log(phone);
-		if (phone.doubleAuth)
+		console.log("phone: ", phone);
+		console.log("required: ", required);
+		if (required)
 		{
-			// dispatch(setDoubleAuth(required));
+			dispatch(setDoubleAuth(required));
 			if (phone.valid)
 				dispatch(setPhoneNumber(phone.phoneNumber));
 				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
 		}
 		else
 		{
+			dispatch(setDoubleAuth(required));
+			dispatch(setPhoneNumber("undefined"));
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
 		}

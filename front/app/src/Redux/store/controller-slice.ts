@@ -75,6 +75,12 @@ const	initialControllerState: ControllerModel = {
 			kindOfConversation: "undefined",
 			numberOfChannels: -1
 		},
+		profile: {
+			editView: false,
+			friendView: false,
+			publicView: true,
+			myView: false
+		}
 	},
 	registration:
 	{
@@ -311,6 +317,34 @@ const	controllerSlice = createSlice(
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.avatar = action.payload.user.avatar;
+		},
+		setProfileEditView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfilePublicView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfileFriendView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfileMyView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
 		},
 	}
 });

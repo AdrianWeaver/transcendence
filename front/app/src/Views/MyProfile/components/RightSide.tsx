@@ -4,6 +4,9 @@
 import { Info } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
 import { useState } from "react";
+import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
+import { setProfileEditView } from "../../../Redux/store/controllerAction";
+import EditProfile from "./EditProfile";
 
 type	RightSideProps =
 {
@@ -19,6 +22,7 @@ type	RightSideProps =
 const	RightSide = (props: RightSideProps) =>
 {
 	let	editOrFriendReq;
+	const	dispatch = useAppDispatch();
 
 	const
 	[
@@ -63,7 +67,10 @@ const	RightSide = (props: RightSideProps) =>
 		if (publicProfile)
 			editOrFriendReq = "ADD AS FRIEND";
 		else
+		{
 			editOrFriendReq = "EDIT PROFILE";
+			dispatch(setProfileEditView());
+		}
 	};
 
 	perfectPlay(props.perfectGame);

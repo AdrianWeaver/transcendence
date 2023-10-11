@@ -11,8 +11,10 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextFi
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
+import EditProfile from "./components/EditProfile";
+import { setProfileMyView } from "../../Redux/store/controllerAction";
 
 type	FriendsModel =
 {
@@ -29,6 +31,13 @@ type FriendsMapModel = {
 const	MyProfile = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
+	const	prevPage= useAppSelector((state) =>
+	{
+		return (state.controller.previousPage);
+	});
+
+	const	oldPrevPage = prevPage;
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	activeId = useAppSelector((state) =>
 	{
@@ -47,7 +56,7 @@ const	MyProfile = () =>
 		textAlign: "center",
 		fontSize: "8px"
 	};
-
+	
 	if (user !== undefined)
 	{
 		id = user.id;
@@ -226,7 +235,7 @@ const	MyProfile = () =>
 		// TEST NEED TO VERIFY IT'S NOT USED PSEUDO
 		setPseudo(newPseudo);
 	};
-
+	dispatch(setProfileMyView());
 	changePseudo(login);
 // TEST
 	playing = true;
@@ -239,15 +248,20 @@ const	MyProfile = () =>
 	else
 		status = "🔴";
 		// console.log(status);
+
 	return (
 		<>
 
 			<MenuBar />
 			<Title
 				name={pseudo}
+				prevPage={oldPrevPage}
 			/>
-			<div className="wrapper">
-				<Grid container>
+			{
+				(user.profile.editView)
+				? 	<EditProfile />
+				: <div className="wrapper">
+					<Grid container>
 						<Grid item xs={6}>
 								<LeftSide
 									status={status}
@@ -267,8 +281,10 @@ const	MyProfile = () =>
 									firstName={firstName}
 								/>
 						</Grid>
-				</Grid>
-			</div>
+					</Grid>
+				</div>
+
+			}
 			{/* <Button onClick={() =>
 			{
 				return handleFriendsClickOpen(buttonSelection.name);

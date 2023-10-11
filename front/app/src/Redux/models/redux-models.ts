@@ -47,6 +47,13 @@ export interface ChatModel
 	"numberOfChannels": number
 }
 
+export interface	ProfileModel
+{
+	editView: boolean,
+	friendView: boolean,
+	publicView: boolean
+	myView: boolean
+}
 export interface	UserModel
 {
 	"isLoggedIn": boolean,
@@ -71,7 +78,8 @@ export interface	UserModel
 			micro: string,
 			small: string
 		}
-	}
+	},
+	"profile": ProfileModel
 }
 
 export interface	AnonymousUserModel
@@ -141,7 +149,7 @@ export interface	ControllerModel
 	"themeMode": string,
 	"user": UserModel,
 	"registration": RegistrationProcessModel,
-	"canvas": CanvasModel
+	"canvas": CanvasModel,
 }
 
 export interface	Dimension
