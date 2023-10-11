@@ -154,15 +154,17 @@ export	class ChatService implements OnModuleInit
 					rawobj.channels?.forEach((rawChannelString: string) =>
 					{
 						const	rawChannelObject = JSON.parse(rawChannelString);
-						
+
 						console.log(rawChannelObject);
-						
-						// const	channel = new Channel();
+
+						const	channel = new Channel(rawChannelObject.name, null, rawChannelObject.mode,
+							rawChannelObject.password, rawChannelObject.kind);
+							arrayChannels.push(channel);
 					});
 					this.log.verbose("Just here the end raw object");
 					const	newChat: Chat = {
 						...this.chat,
-						channels: rawobj.channels,
+						channels: arrayChannels,
 						privateMessage: rawobj.privateMessage,
 						chanMap: rawobj.chanMap,
 						privateMessageMap: rawobj.privateMessageMap,

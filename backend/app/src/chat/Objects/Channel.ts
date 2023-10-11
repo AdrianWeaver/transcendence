@@ -38,7 +38,7 @@ class Channel
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
 
-    public constructor(name: string, client: Socket, mode: string, password: string, kind: string)
+    public constructor(name: string, client: Socket | null, mode: string, password: string, kind: string)
     {
         this.kind = kind;
         this.name = name;
@@ -46,6 +46,8 @@ class Channel
         this.mode = mode;
         this.chat = undefined;
         this.members++;
+        if (client === null)
+            return ;
         this.owner = client.id;
         if (this.members === 1)
             this.admins.push(client.id);
