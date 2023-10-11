@@ -78,6 +78,7 @@ export class ChatSocketEvents
 			{
 				const newUser = new User("test", client);
 				this.chatService.pushUser(newUser, client.id);
+				this.chatService.updateDatabase();
 				const	action = {
 					type: "init-channels",
 					payload: {
@@ -95,29 +96,32 @@ export class ChatSocketEvents
 			const	userIndex = this.chatService.searchUserIndex(client.id);
 			const	socketIndex = this.chatService.searchSocketIndex(client.id);
 			if (userIndex !== undefined)
+			{
 				this.chatService.deleteUser(userIndex, socketIndex);
+				this.chatService.updateDatabase();
+			}
 		}
 
-		@SubscribeMessage("display-conversation")
-		handleDisplayConversationWindow(
-			@MessageBody() data: ActionSocket,
-			@ConnectedSocket() client: Socket
-		)
-		{
-				if (data.type === "display-conversation")
-				{
-					const action = {
-						type: "conversation",
-						payload:
-						{
-							sender: client.id,
-							// conversationId: chanName
-							privMsgMap: this.chatService.getPrivateMessageMap()
-						}
-					};
-					this.server.to(data.payload.chanName).emit("display-conversation", action);
-				}
-			}
+		// @SubscribeMessage("display-conversation")
+		// handleDisplayConversationWindow(
+		// 	@MessageBody() data: ActionSocket,
+		// 	@ConnectedSocket() client: Socket
+		// )
+		// {
+		// 	if (data.type === "display-conversation")
+		// 	{
+		// 		const action = {
+		// 			type: "conversation",
+		// 			payload:
+		// 			{
+		// 				sender: client.id,
+		// 				// conversationId: chanName
+		// 				privMsgMap: this.chatService.getPrivateMessageMap()
+		// 			}
+		// 		};
+		// 		this.server.to(data.payload.chanName).emit("display-conversation", action);
+		// 	}
+		// }
 
 		@SubscribeMessage("sending-message")
 		handleSendingMessageToUser(
@@ -197,6 +201,7 @@ export class ChatSocketEvents
 					id: id
 				};
 				channel.addNewMessage(newMessage);
+				this.chatService.updateDatabase();
 				const	action = {
 					type: "update-messages",
 					payload: {
@@ -254,6 +259,7 @@ export class ChatSocketEvents
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
 						this.chatService.addNewChannel(newChannel, data.payload.chanId, kind);
+						this.chatService.updateDatabase();
 						const	action = {
 							type: "add-new-channel",
 							payload:
@@ -278,9 +284,11 @@ export class ChatSocketEvents
 							newPrivateMsg?.users.push(data.payload.activeId);
 							// newPrivateMsg?.users.push(client.id);
 							newPrivateMsg?.addAdmin(data.payload.activeId);
-							newPrivateMsg?.addAdmin(client.id);
+							// newPrivateMsg?.addAdmin(client.id);
+							// we do not need to add the person who initiated the channel because the contructor does that already
 							client.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
+							this.chatService.updateDatabase();
 						}
 						const	action = {
 							type: "add-new-channel",
@@ -324,6 +332,7 @@ export class ChatSocketEvents
 				if (isAdmin === true)
 				{
 					this.chatService.deleteChannel(data.payload.name);
+					this.chatService.updateDatabase();
 					this.server.emit("display-channels", action);
 				}
 				else
@@ -381,6 +390,7 @@ export class ChatSocketEvents
 					searchChannel.members++;
 					searchChannel?.users.push(client.id);
 					searchChannel.sockets.push(client);
+					this.chatService.updateDatabase();
 				}
 			}
 
@@ -444,6 +454,7 @@ export class ChatSocketEvents
 				this.server.to(data.payload.chanName).emit("update-messages", action);
 				action.payload.message = "You have been removed from " + data.payload.chanName;
 				client.emit("left-message", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "kick-member" || data.type === "ban-member")
@@ -485,6 +496,7 @@ export class ChatSocketEvents
 				else
 					action.payload.message = "You have been banned from " + channel.name;
 				targetClient.emit("left-message", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "member-list")
@@ -538,6 +550,7 @@ export class ChatSocketEvents
 					}
 				};
 				client.emit("user-info", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "block-user")
@@ -545,9 +558,7 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserByName(client.id);
 				if (userMe === undefined)
 					return ;
-				console.log("blocked: " + data.payload.blockedName);
 				userMe.blocked.push(data.payload.blockedName);
-				console.log("blocked members: " + userMe.blocked);
 				const	action = {
 					type: "block-user",
 					payload: {
@@ -556,6 +567,7 @@ export class ChatSocketEvents
 					}
 				};
 				client.emit("user-info", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "mute-user")
@@ -581,7 +593,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-				if (targetClient === undefined)
+				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
 					type: "invite-member",
@@ -636,6 +648,7 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 				}
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "make-admin")
@@ -644,7 +657,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-				if (targetClient === undefined)
+				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
 					type: "make-admin",
@@ -681,6 +694,7 @@ export class ChatSocketEvents
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
+					this.chatService.updateDatabase();
 			}
 		}
 	}

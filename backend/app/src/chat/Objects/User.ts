@@ -30,12 +30,13 @@ class User
     public name: string;
 	public profile: ProfileModel;
 	public stats: StatsModel;
-	public client: Socket;
     public id: string;
-    public chat: Chat | undefined;
     public channels: Channel[] = [];
 	public blocked: string[] = [];
 	public friends: FriendsModel[] = [];
+	public chat: Chat | undefined;
+	// this one must be initialisez when reconstructed or when reconnected with id 
+	public client: Socket | null;
 	public unlockChannel: (password: string, chanName: string) => void;
 	public joinChannel: (chanName: string) => void;
 	public leaveChannel: (chanName: string) => void;
@@ -43,15 +44,23 @@ class User
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
 
-    public constructor(name: string, client: Socket)
+    public constructor(name: string, client: Socket| null)
     {
         this.name = name;
 		this.client = client;
-        this.id = client.id;
+		if (client === null)
+		{
+			this.id = "to_implement";
+			this.client = null;
+		}
+		else
+			this.id = client.id;
         this.chat = undefined;
 
 		this.joinChannel = (chanName: string) =>
 		{
+			if (this.client === null)
+				return ;
 			if (this.chat && this.chat.server)
 			{
 				for (const channel of this.channels)
@@ -71,6 +80,8 @@ class User
 		};
 		this.leaveChannel = (chanName: string) =>
 		{
+			if (this.client === null)
+				return ;
 			if (this.chat)
 			{
 				for (const channel of this.channels)
@@ -78,7 +89,7 @@ class User
 					if (channel.name === chanName)
 					{
 						channel.members--;
-						client.leave(chanName);
+						this.client.leave(chanName);
 						if (channel.members === 0)
 							this.chat.deleteChannel(chanName);
 						break ;
@@ -88,6 +99,8 @@ class User
 		};
         this.unlockChannel = (password: string, chanName: string) =>
         {
+			if (this.client === null)
+				return ;
             if (this.chat)
             {
                 for (const channel of this.chat.channels)
@@ -131,6 +144,28 @@ class User
 			this.profile.avatar = avatar;
 		};
     }
+
+	public parseForDatabase()
+	{
+		const	channelsSerialized: string[] = [];
+
+		this.channels.forEach((channels) =>
+		{
+			console.log(channels.parseForDatabase());
+			channelsSerialized.push(channels.parseForDatabase());
+		});
+		const	serializedObject = {
+			channels: channelsSerialized,
+			name: this.name,
+			profile: this.profile,
+			stats: this.stats,
+			id: this.id,
+			blocked: this.blocked,
+			friends: this.friends,
+		};
+		const	retValue = JSON.stringify(serializedObject);
+		return (retValue);
+	}
 }
 
 export default User;

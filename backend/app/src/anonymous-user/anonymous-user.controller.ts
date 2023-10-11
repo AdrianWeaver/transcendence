@@ -68,7 +68,7 @@ export class AnonymousUserController
 			.debug("A user request 'register' route with uid :" + body.uuid);
 		const	retValue = this.anonymousUserService.register(body.uuid);
 
-		this.logger.debug("return Value :", retValue);
+		// this.logger.debug("return Value :", retValue);
 		if (retValue.toDB.lastConnection === "never connected")
 			retValue.toDB.lastConnection = -1;
 		res.send(retValue.res).status(200)

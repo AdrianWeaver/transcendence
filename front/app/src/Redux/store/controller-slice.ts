@@ -15,7 +15,7 @@ const	initialControllerState: ControllerModel = {
 	previousPage: "/",
 	user:
 	{
-		isLoggedIn: false,
+		isLoggedIn: true,
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
