@@ -15,14 +15,18 @@ const	Title = (props: TitleProps) =>
 {
 	const	navigate = useNavigate();
 
-	const	savePrevPage = useSavePrevPage();
-	const	controller = useAppSelector((state) =>
+	// const	savePrevPage = useSavePrevPage();
+	let	prevPage: string;
+
+	prevPage= useAppSelector((state) =>
 	{
-		return (state.controller);
+		return (state.controller.previousPage);
 	});
+	if (prevPage === "/me/profile")
+		prevPage = "/";
 	const	handleLeaveProfile = () =>
 	{
-		navigate(controller.previousPage);
+		navigate(prevPage);
 	};
 	// TEST
 	return (
