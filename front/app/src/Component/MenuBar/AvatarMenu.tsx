@@ -26,7 +26,7 @@ const	AvatarMenu = () =>
 
 	let myAvatar;
 
-	if (user.avatar)
+	if (user.avatar !== undefined)
 		if (user.avatar.link)
 			myAvatar = user.avatar.link;
 		else

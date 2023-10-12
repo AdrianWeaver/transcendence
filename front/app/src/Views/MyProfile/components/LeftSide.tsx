@@ -7,6 +7,7 @@ import { Avatar, Badge, Button, Grid, Typography } from "@mui/material";
 import MyAvatar from "./MyAvatar";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import { useNavigate } from "react-router-dom";
 
 type	LeftSideProps =
 {
@@ -21,7 +22,8 @@ type	LeftSideProps =
 			mini: string
 		}
 	}
-	defaultUrl: string
+	defaultUrl: string,
+	prevPage: string;
 };
 
 
@@ -31,6 +33,15 @@ const	LeftSide = (props: LeftSideProps) =>
 	{
 		return (state.controller.user);
 	});
+
+	const	navigate = useNavigate();
+
+	const	previous = props.prevPage === "/me/profile" ? "/" : props.prevPage;
+
+	const	handleLeaveProfile = () =>
+	{
+		navigate(previous);
+	};
 
 	return (
 		<div className="left">
@@ -64,6 +75,10 @@ const	LeftSide = (props: LeftSideProps) =>
 						</Typography>
 					}
 				</Grid>
+					<button className="leaveProfile__btn"
+						onClick={handleLeaveProfile}>
+							Leave profile
+					</button>
 			</Grid>
 		</div>
 	);

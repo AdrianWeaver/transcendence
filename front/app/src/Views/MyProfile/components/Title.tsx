@@ -22,14 +22,18 @@ const	Title = (props: TitleProps) =>
 	{
 		navigate(previous);
 	};
+	<button className="leaveProfile__btn"
+	onClick={handleLeaveProfile}>
+		Leave profile
+	</button>
 	// TEST
 	return (
 		<>
-			<header className="chat__mainHeader">
+			{/* <header className="chat__mainHeader">
 				<Typography variant="h3">
 					{props.name}'s profile
 				</Typography>
-			</header>
+			</header> */}
 				<button className="leaveProfile__btn"
 					onClick={handleLeaveProfile}>
 				Leave profile

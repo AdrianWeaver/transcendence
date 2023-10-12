@@ -7,6 +7,9 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 import { Alert, AlertTitle, Box, Button, Checkbox, FormControlLabel, Grid, List, ListItem, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { useNavigate } from "react-router-dom";
 
 type PasswordAlertProps ={
 	password: string,
@@ -127,7 +130,13 @@ const	PasswordAlert = (props: PasswordAlertProps) =>
 const	Signin = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
 
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.users);
+	});
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
@@ -174,7 +183,8 @@ const	Signin = () =>
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				// check user exists
+				dispatch(setUserLoggedIn());
+				navigate("/");
 			}
 	};
 

@@ -1,4 +1,5 @@
 /* eslint-disable max-statements */
+import { ChatUserModel } from "../Redux/models/redux-models";
 import UserLoginChecker from "./UserLoginChecker";
 
 class	UserLogin
@@ -7,15 +8,15 @@ class	UserLogin
 	public	checker: UserLoginChecker;
 	public	username: string;
 	public	password: string;
-	public	passwordConfirm: string;
+	// public	users: ;
 
 	constructor(data: FormData)
 	{
 		this.data = data;
 		this.username = this.form("username");
 		this.password = this.form("password");
-		this.passwordConfirm = this.form("passwordConfirm");
 		this.checker = new UserLoginChecker();
+		// this.users = users;
 	}
 
 	public	form(field: string)

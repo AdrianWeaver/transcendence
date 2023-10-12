@@ -32,7 +32,15 @@ setDefaultImage
 // call this method inner componentDidMount
 	const	renderImage = () =>
 	{
-		const	img = props.imageUrl.toString();
+		let	img;
+
+		if (props.imageUrl === undefined)
+			setDefaultImage(true);
+		else
+			if (props.imageUrl.link !== undefined)
+				img = props.imageUrl.link.toString();
+			else
+				img = props.imageUrl.toString();
 		fetch(img)
 		.then((res) =>
 		{
