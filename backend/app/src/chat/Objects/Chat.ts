@@ -6,6 +6,7 @@ import Channel from "./Channel";
 import Message from "./Message";
 import User from "./User";
 import { Server, Socket } from "socket.io";
+import { UserModel } from "src/user/user.interface";
 
 type ChanMapModel = {
     id: number,
@@ -19,10 +20,11 @@ type Score = {
 }
 
 type MatchHistory = {
-    playerOne: string,
-	playerTwo: string,
+    playerOne: UserModel,
+	playerTwo: UserModel,
 	score: Score,
-	moves: number
+	moves: number,
+    outStanding: boolean
 };
 class Chat
 {
@@ -35,7 +37,7 @@ class Chat
     public activeMembers: number;
     public memberSocketIds: string[] = [];
     public message: Message[];
-	public matchHistory: MatchHistory;
+	public matchHistory: MatchHistory[];
     public deleteChannel: (name: string) => void;
     public addUserToChannel: (name: string, id: string) => void;
     public displayMessage: (message: Message) => void;

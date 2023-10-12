@@ -192,6 +192,12 @@ const	EditProfile = () =>
 
 	const
 	[
+		passwordModified,
+		setPasswordModified
+	] = useState(false);
+
+	const
+	[
 		required,
 		setRequired
 	] = useState(false);
@@ -251,6 +257,10 @@ const	EditProfile = () =>
 			key;
 			return (value === true);
 		});
+		if (userChanges.password.length)
+			setPasswordModified(true);
+		else
+			setPasswordModified(false);
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
@@ -395,7 +405,26 @@ const	EditProfile = () =>
 					firstTrigger={firstTriggerPasswordConfirm}
 					passwordConfirm={passwordConfirmValue}
 					/>
-				<Grid item xs={12}>
+					{
+						(passwordModified)
+						? <Grid item xs={12}>
+							<FormControlLabel
+								control={
+									<Checkbox
+										required
+										value="AgreeWithUniquenessOfPassword"
+										color="primary"
+										name="uniquePassword"
+										onClick={handleUniquePassword}
+									/>
+								}
+								label={disclamer}
+							/>
+							<UniqueAlert isUnique={uniquePassword} />
+						</Grid>
+						: <></>
+					}
+				{/* <Grid item xs={12}>
 					<FormControlLabel
 						control={
 							<Checkbox
@@ -409,7 +438,7 @@ const	EditProfile = () =>
 						label={disclamer}
 					/>
 					<UniqueAlert isUnique={uniquePassword} />
-				</Grid>
+				</Grid> */}
 			</Grid>
 			<Button
 				type="submit"
