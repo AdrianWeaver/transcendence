@@ -9,31 +9,31 @@ import { Avatar, Typography } from "@mui/material";
 type	TitleProps =
 {
 	name: string,
+	prevPage: string
 };
 
 const	Title = (props: TitleProps) =>
 {
 	const	navigate = useNavigate();
 
-	const	savePrevPage = useSavePrevPage();
-	const	controller = useAppSelector((state) =>
-	{
-		return (state.controller);
-	});
+	const	previous = props.prevPage === "/me/profile" ? "/" : props.prevPage;
+
 	const	handleLeaveProfile = () =>
 	{
-		navigate(controller.previousPage);
+		navigate(previous);
 	};
 	// TEST
 	return (
 		<>
 			<header className="chat__mainHeader">
-				<Typography variant="h3">{props.name}'s profile</Typography>
+				<Typography variant="h3">
+					{props.name}'s profile
+				</Typography>
+			</header>
 				<button className="leaveProfile__btn"
 					onClick={handleLeaveProfile}>
-				X
+				Leave profile
 				</button>
-			</header>
 		</>
 	);
 };

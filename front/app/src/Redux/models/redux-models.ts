@@ -47,6 +47,13 @@ export interface ChatModel
 	"numberOfChannels": number
 }
 
+export interface	ProfileModel
+{
+	editView: boolean,
+	friendView: boolean,
+	publicView: boolean
+	myView: boolean
+}
 export interface	UserModel
 {
 	"isLoggedIn": boolean,
@@ -55,9 +62,25 @@ export interface	UserModel
 	"rememberMe": boolean,
 	"chat": ChatModel,
 	"id": number,
-	"email": string
+	"email": string,
+	"firstName": string,
+	"lastName": string,
 	"registrationProcess": boolean,
-	"registrationError": string
+	"registrationError": string,
+	"doubleAuth": boolean,
+	"phoneNumber": string,
+	"registered": boolean,
+	"avatar": string | {
+		link: string,
+		version: {
+			large: string,
+			medium: string,
+			micro: string,
+			small: string
+		}
+	},
+	"profile": ProfileModel,
+	"password": string
 }
 
 export interface	AnonymousUserModel
@@ -127,7 +150,7 @@ export interface	ControllerModel
 	"themeMode": string,
 	"user": UserModel,
 	"registration": RegistrationProcessModel,
-	"canvas": CanvasModel
+	"canvas": CanvasModel,
 }
 
 export interface	Dimension

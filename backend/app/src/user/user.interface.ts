@@ -8,6 +8,25 @@ export interface ApplicationUserModel
 	createdAt: string;
 	secretValidUntil: string;
 }
+
+export interface UserPublicResponseModel
+{
+	id: any;
+	email: string;
+	login: string;
+	firstName: string;
+	lastName: string;
+	// avatar: string | {
+	// 	link: string,
+	// 	version:
+	// 		{
+	// 			large: string,
+	// 			medium: string,
+	// 			small: string,
+	// 			mini: string
+	// 		}
+	// }
+}
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;
@@ -31,17 +50,13 @@ export interface UserModel
 	}
 	location: string;
 	revokedConnectionRequest: boolean;
-	// uuid: string;
-	// password: string;
-	// token: string;
-	// lastConnection: number | "never connected";
-	// createdAt: string;
 	authService:
 	{
 		token: string;
 		expAt: number;
 		doubleAuth:
 		{
+			enable: boolean;
 			valid: boolean;
 			validationCode: string;
 			// model phone number +33621523456
@@ -109,4 +124,15 @@ export interface UserRegisterResponseModel
 	token: string;
 	statusCode: number;
 	login: string;
+	firstName: string;
+	lastName: string;
+	avatar: string | {
+		link: string,
+		version: {
+			large: string,
+			medium: string,
+			small: string,
+			mini: string
+		}
+	}
 }

@@ -1,7 +1,13 @@
+import SecondStepFormContent from "./SecondStepFormContent";
 
 const	StepTwo = () =>
 {
-	return (<></>);
+	return (
+	<>
+		<SecondStepFormContent
+			/>
+	</>
+	);
 };
 
 export default StepTwo;
