@@ -25,6 +25,7 @@ import {
 	setEmail,
 	setPassword,
 	setPhoneNumber,
+	setProfileMyView,
 	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
@@ -257,7 +258,7 @@ const	EditProfile = () =>
 			key;
 			return (value === true);
 		});
-		if (userChanges.password.length)
+		if (userChanges.password.length && filtered.length === 0)
 			setPasswordModified(true);
 		else
 			setPasswordModified(false);
@@ -274,6 +275,7 @@ const	EditProfile = () =>
 				dispatch(setEmail(userChanges.emailAddress));
 			if (user.phoneNumber !== userChanges.phoneNumber)
 				dispatch(setPhoneNumber(userChanges.phoneNumber));
+			dispatch(setProfileMyView());
 		}
 	};
 	const	handleSwitch = (event: any) =>
@@ -424,21 +426,6 @@ const	EditProfile = () =>
 						</Grid>
 						: <></>
 					}
-				{/* <Grid item xs={12}>
-					<FormControlLabel
-						control={
-							<Checkbox
-								required
-								value="AgreeWithUniquenessOfPassword"
-								color="primary"
-								name="uniquePassword"
-								onClick={handleUniquePassword}
-							/>
-						}
-						label={disclamer}
-					/>
-					<UniqueAlert isUnique={uniquePassword} />
-				</Grid> */}
 			</Grid>
 			<Button
 				type="submit"
