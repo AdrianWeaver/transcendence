@@ -22,6 +22,7 @@ import
 import { ChatService } from "./Chat.service";
 import { Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { UserService } from "src/user/user.service";
 
 type	ActionSocket = {
 	type: string,
@@ -61,10 +62,14 @@ export class ChatSocketEvents
 		server: Server;
 		private readonly logger = new Logger("Chat-socket-events");
 
-		public	constructor(private readonly chatService: ChatService)
+		public	constructor(
+			private readonly chatService: ChatService,
+			private readonly userService: UserService)
 		{
 			this.logger.debug("An instance is started with chat service id: "
 				+ this.chatService.getChatInstanceId());
+			this.logger.debug("User instance service is :"
+				+ this.userService.getUuidInstance());
 		}
 
 		afterInit(server: any)
@@ -73,6 +78,11 @@ export class ChatSocketEvents
 
 		handleConnection(client: Socket)
 		{
+			console.log(client.handshake.auth);
+			// if (client.handshake.auth)
+			// {
+				
+			// }
 			const searchUser = this.chatService.searchUser(client.id);
 			if (searchUser === undefined)
 			{

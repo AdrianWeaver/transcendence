@@ -134,6 +134,10 @@ const	ChatLayout = () =>
 		return ("http://" + state.server.serverLocation + ":3000");
 	});
 
+	const	profileToken = useAppSelector((state) =>
+	{
+		return (state.controller.user.bearerToken);
+	});
 	// USE STATES
 
 	const
@@ -328,6 +332,10 @@ const	ChatLayout = () =>
 			{
 				autoConnect: false,
 				reconnectionAttempts: 5,
+				auth:
+				{
+					token: profileToken
+				}
 			});
 
 		socketRef.current = socket;
