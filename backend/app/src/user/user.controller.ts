@@ -56,6 +56,7 @@ export class UserController
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
+		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -172,6 +173,8 @@ export class UserController
 	getAllUser()
 		: UserModel[]
 	{
+		this.logger.verbose("request user data");
+		this.logger.verbose(this.userService.getUserArray());
 		return (this.userService.getUserArray());
 	}
 

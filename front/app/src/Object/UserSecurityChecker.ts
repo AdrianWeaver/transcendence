@@ -18,17 +18,15 @@ class	UserSecurityChecker
 	public checkNumber(data: UserSecurity)
 	{
 		this.resetError();
+		return (false);
 		if (data.doubleAuth)
 		{
 			if (data.phoneNumber === undefined)
 					return (true);
-			if (data.phoneNumber?.length > 0 && data.phoneNumber?.length < 12)
-			{
-				if (!Number(data.phoneNumber))
-					return (true);
-			}
-			else
+			if (data.phoneNumber?.length < 10 && data.phoneNumber?.length > 10)
 				return (true);
+			if (isNaN(Number(data.phoneNumber)))
+					return (true);
 		}
 		data.valid = true;
 		return (false);
