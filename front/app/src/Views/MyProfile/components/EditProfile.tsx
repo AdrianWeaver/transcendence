@@ -294,7 +294,6 @@ const	EditProfile = () =>
 				fullWidth
 				id="phone-number"
 				label="Phone Number"
-				// value={props.username}
 				error={errorValidation.phoneNumber}
 				helperText={
 					errorValidation.phoneNumber
