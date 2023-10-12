@@ -155,7 +155,27 @@ const	Signin = () =>
 	{
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
-		const	userCheck = new UserLogin(data);
+		const	userLogIn = new UserLogin(data);
+
+		userLogIn.check();
+		setErrorValidation(userLogIn.checker);
+		const	asArray = Object.entries(userLogIn.checker.getPlainObject());
+		const	filtered = asArray.filter(
+			([
+				key,
+				value
+			]
+			) =>
+			{
+				key;
+				return (value === true);
+			});
+			console.log("filtered", filtered);
+			// verifier toute les informations
+			if (filtered.length === 0)
+			{
+				// check user exists
+			}
 	};
 
 
@@ -171,7 +191,6 @@ const	Signin = () =>
 							fullWidth
 							id="username"
 							label="Username"
-							// value={props.username}
 							error={errorValidation.username}
 							helperText={
 									errorValidation.username
