@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
-import { Avatar, Button, Grid, Typography } from "@mui/material";
+import { Avatar, Badge, Button, Grid, Typography } from "@mui/material";
 import MyAvatar from "./MyAvatar";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
@@ -17,8 +17,8 @@ type	LeftSideProps =
 		version: {
 			large: string,
 			medium: string,
-			micro: string,
-			small: string
+			small: string,
+			mini: string
 		}
 	}
 	defaultUrl: string
@@ -27,54 +27,42 @@ type	LeftSideProps =
 
 const	LeftSide = (props: LeftSideProps) =>
 {
-	let	statusView;
 	const	user = useAppSelector((state) =>
 	{
 		return (state.controller.user);
 	});
 
-	const	getStatus = () =>
-	{
-		if (user.profile.myView)
-			statusView = (
-				<>
-					Hello myself
-				</>
-			);
-		else
-			statusView = (
-				<>
-					{props.pseudo} is {props.status}
-				</>
-			);
-		return (statusView);
-	};
-
 	return (
 		<div className="left">
 			<Grid container>
-				<Grid item xs={12}>
+				<Grid item xs={12} sm ={6}>
 					<MyAvatar
+						variant="square"
 						pseudo={props.pseudo}
 						defaultUrl={props.defaultUrl}
 						imageUrl={props.imageUrl} />
 				</Grid>
+				<Grid item xs={12} sm={6}>
+					♡
+				</Grid>
 				<Grid item xs={12}>
-					<Typography>
-						{
-							(user.profile.publicView)
-							? <Typography variant="h6">
-								{props.pseudo}
-							</Typography>
-							: (user.profile.myView)
+					{
+						(user.profile.myView)
+						? <>
+							♡ Hello myself ♡
+						</>
+						: <Typography>
+							{
+								(user.profile.publicView)
 								? <>
-									♡ Hello myself ♡
+									{props.pseudo}
 								</>
 								: <>
 									{props.pseudo} is {props.status}
 								</>
-						}
-					</Typography>
+							}
+						</Typography>
+					}
 				</Grid>
 			</Grid>
 		</div>

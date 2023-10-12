@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -14,7 +15,7 @@ import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
 import EditProfile from "./components/EditProfile";
-import { setProfileEditView, setProfileMyView } from "../../Redux/store/controllerAction";
+import { setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
 import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
 
 type	FriendsModel =
@@ -262,7 +263,6 @@ const	MyProfile = () =>
 
 	return (
 		<>
-
 			<MenuBar />
 			<Title
 				name={pseudo}
@@ -293,13 +293,17 @@ const	MyProfile = () =>
 								/>
 						</Grid>
 					</Grid>
-					<Button onClick={editOrFriendRequest} variant="outlined">
-						{
-							(user.profile.publicView)
-							? "ADD AS FRIEND"
-							: "EDIT PROFILE"
-						}
-					</Button>
+					{
+						(user.profile.friendView)
+						? <></>
+						: <Button onClick={editOrFriendRequest} variant="outlined">
+							{
+								(user.profile.publicView)
+								? "ADD AS FRIEND"
+								: "EDIT PROFILE"
+							}
+						</Button>
+					}
 				</div>
 
 			}
