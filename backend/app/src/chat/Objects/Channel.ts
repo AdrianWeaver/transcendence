@@ -22,12 +22,12 @@ class Channel
     public banned: string[] = [];
     public name: string;
     public users: string[] = [];
-    public sockets: Socket[] = [];
     public mode: string;
     public members: number;
-    public chat: Chat | undefined;
     public password: string | undefined;
     public messages: MessageModel[] = [];
+    public chat: Chat | undefined;
+	public sockets: Socket[] = [];
     public isMember: (id: string) => boolean;
     public isOwner: (id: string) => boolean;
     public isAdmin: (id: string) => boolean;
@@ -38,7 +38,7 @@ class Channel
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
 
-    public constructor(name: string, client: Socket, mode: string, password: string, kind: string)
+    public constructor(name: string, client: Socket | null, mode: string, password: string, kind: string)
     {
         this.kind = kind;
         this.name = name;
@@ -46,6 +46,8 @@ class Channel
         this.mode = mode;
         this.chat = undefined;
         this.members++;
+        if (client === null)
+            return ;
         this.owner = client.id;
         if (this.members === 1)
             this.admins.push(client.id);
@@ -128,6 +130,26 @@ class Channel
             }
             return (undefined);
         };
+    }
+
+    public parseForDatabase()
+    {
+        const	dbObject = {
+            admin: this.admin,
+            admins: this.admins,
+            banned: this.banned,
+            // chat: this.chat,
+            kind: this.kind,
+            members: this.members,
+            messages: this.messages,
+            mode: this.mode,
+            name: this.name,
+            owner: this.owner,
+            password: this.password,
+            users: this.users,
+        };
+        const retValue = JSON.stringify(dbObject);
+        return (retValue);
     }
 }
 

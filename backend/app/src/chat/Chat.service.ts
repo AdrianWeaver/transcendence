@@ -1,12 +1,14 @@
+/* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 import {
-	Injectable, Logger
+	Injectable, Logger, OnModuleInit
 }	from "@nestjs/common";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
+import { PrismaClient } from "@prisma/client";
 
 // export interface MessageModel
 // {
@@ -47,18 +49,193 @@ type ChanMapModel =
 import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
-export	class ChatService
+export	class ChatService implements OnModuleInit
 {
-	// data here 
 	private	chat: Chat;
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
+	private prisma: PrismaClient;
+	private readonly chatID = "id-chat-service-v-3";
 
 	constructor()
 	{
+		this.log.verbose("Chat Service is constructed");
 		this.chat = new Chat();
-		this.log.log("started service instance - id instance : " + this.uuid);
+		this.prisma = new PrismaClient();
+		// this.initDB();
+		// this.updateDB();
 	}
+
+	private onTableCreate()
+	{
+		const	dbString = this.parseForDatabase();
+		this.prisma.chatJson
+			.create(
+			{
+				data:
+				{
+					chatJsonID: this.chatID,
+					contents: dbString
+				}
+			})
+			.catch((error) =>
+			{
+				this.log.error("On table Create error");
+				this.log.error(error);
+			});
+	}
+
+	public parseForDatabase() : string
+	{
+		const	channelsDB: string[] = [];
+		const	usersToDB: string[] = [];
+
+		this.chat.channels.forEach((channel) =>
+		{
+			// console.log(channel.parseForDatabase());
+			channelsDB.push(channel.parseForDatabase());
+		});
+
+		this.chat.users.forEach((user) =>
+		{
+			console.log(user.parseForDatabase());
+			usersToDB.push(user.parseForDatabase());
+		});
+		const toDBObject = {
+			activeMembers: this.chat.activeMembers,
+			chanMap: this.chat.chanMap,
+			channels: channelsDB,
+			matchHistory: this.chat.matchHistory,
+			memberSocketIds: this.chat.memberSocketIds,
+			message: this.chat.message,
+			users: usersToDB,
+			privateMessage: this.chat.privateMessage,
+			privateMessageMap: this.chat.privateMessageMap,
+		};
+		// console.log(toDBObject);
+		this.log.verbose(JSON.stringify(toDBObject));
+		return (JSON.stringify(toDBObject));
+	}
+
+	private	loadTableToMemory()
+	{
+		this.prisma.chatJson
+			.findUnique(
+			{
+				where:
+				{
+					chatJsonID: this.chatID,
+				}
+			}
+			)
+			.then((data) =>
+			{
+				this.log.verbose("This is our object or  array");
+				this.log.verbose(data);
+				if (data === null)
+				{
+					this.onTableCreate();
+					this.loadTableToMemory();
+				}
+				else
+				{
+					const rawobj = JSON.parse(data.contents);
+					this.log.debug(rawobj);
+					const	arrayUsers: Array<User> = [];
+					rawobj.users?.forEach((rawUserString: string) =>
+					{
+						const rawUserObject = JSON.parse(rawUserString);
+						const	user = new User(rawUserObject.name, null);
+						console.log("USER TEST: ", user);
+						console.log("Raw user object: ", rawUserObject);
+						arrayUsers.push(user);
+					});
+
+					this.log.verbose("Just here the start raw object");
+					const	arrayChannels: Array<Channel> = [];
+					rawobj.channels?.forEach((rawChannelString: string) =>
+					{
+						const	rawChannelObject = JSON.parse(rawChannelString);
+
+						console.log(rawChannelObject);
+
+						const	channel = new Channel(rawChannelObject.name, null, rawChannelObject.mode,
+							rawChannelObject.password, rawChannelObject.kind);
+							arrayChannels.push(channel);
+					});
+					this.log.verbose("Just here the end raw object");
+					const	newChat: Chat = {
+						...this.chat,
+						channels: arrayChannels,
+						privateMessage: rawobj.privateMessage,
+						chanMap: rawobj.chanMap,
+						privateMessageMap: rawobj.privateMessageMap,
+						users: arrayUsers,
+						memberSocketIds: rawobj.memberSocketIds
+
+					};
+					// this.log.verbose(rawobj);
+					this.log.verbose(newChat);
+					this.chat = newChat;
+				}
+			})
+			.catch((error) =>
+			{
+				this.log.error(error);
+			});
+	}
+
+	onModuleInit()
+	{
+		this.log.verbose("Get from SQL database to In Memory DB");
+		this.loadTableToMemory();
+	}
+
+	public	updateDatabase()
+	{
+		this.log.verbose("Updating all Chat Object");
+		const dbString = this.parseForDatabase();
+		this.prisma.chatJson
+		.update(
+			{
+				where:
+				{
+					chatJsonID: this.chatID
+				},
+				data:
+				{
+					chatJsonID: this.chatID,
+					contents: dbString,
+				}
+			}
+		)
+		.catch((error) =>
+		{
+			this.log.error(error);
+		});
+		// this.log.verbose(JSON.parse(dbString));
+	}
+	// public async updateDB(): Promise<void>
+	// {
+	// 	try
+	// 	{
+	// 		await this.prisma.$connect;
+	// 		const updatedChatJson = JSON.stringify(this.chat);
+	// 		await this.prisma.chatJson.update({
+	// 			where: { chatJsonID: this.chatID },
+	// 			data: { contents: updatedChatJson },
+	// 		});
+	// 		console.log("UpdatedChatJson: " + updatedChatJson);
+	// 	}
+	// 	catch (error)
+	// 	{
+	// 		this.log.error("Error storing chat message:", error);
+	// 	}
+	// 	finally
+	// 	{
+	// 		await this.prisma.$disconnect();
+	// 	}
+	// }
 
 	// getters
 
