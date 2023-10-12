@@ -23,7 +23,7 @@ const	SecondStepFormContent = () =>
 	const	dispatch = useAppDispatch();
 	const	user = useAppSelector((state) =>
 	{
-		return (state.controller.user.phoneNumber);
+		return (state.controller.user);
 	});
 
 	const	[
@@ -57,14 +57,17 @@ const	SecondStepFormContent = () =>
 	{
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
-		const	user = new UserSecurity(data);
+		const	userPhone = new UserSecurity(data, user);
 
-		user.check();
-		setErrorValidation(user.checker);
-		const	phone = user.getPlainObject();
-		if (required)
+		userPhone.check();
+		setErrorValidation(userPhone.checker);
+		const	phone = userPhone.getPlainObject();
+
+		const	isNotValid = userPhone.checker.getPhoneNumberCheck();
+		console.log("isNotValid", isNotValid);
+		if (user.doubleAuth && !isNotValid)
 		{
-			dispatch(setDoubleAuth(required));
+			dispatch(setDoubleAuth(true));
 			// if (phone.valid)
 			// {
 				dispatch(setPhoneNumber(phone.phoneNumber));
@@ -76,7 +79,7 @@ const	SecondStepFormContent = () =>
 		}
 		else
 		{
-			dispatch(setDoubleAuth(required));
+			dispatch(setDoubleAuth(false));
 			dispatch(setPhoneNumber("undefined"));
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
@@ -87,9 +90,9 @@ const	SecondStepFormContent = () =>
 	{
 		const	checked = event.target?.checked;
 
+		// doesnt seem to set
 		setRequired(checked);
 		dispatch(setDoubleAuth(checked));
-		console.log(required);
 	};
 
 	const	handleChangeTwoAuthCode = (event: any) =>
@@ -105,12 +108,11 @@ const	SecondStepFormContent = () =>
 		fieldPhone = (
 			<Grid item xs={12} sm={12}>
 				<TextField
-					name="phone-number"
+					name="phoneNumber"
 					required={required}
 					fullWidth
-					id="phone-number"
+					id="phoneNumber"
 					label="Phone Number"
-					// value={props.username}
 					error={errorValidation.phoneNumber}
 					helperText={
 						errorValidation.phoneNumber
@@ -185,7 +187,7 @@ const	SecondStepFormContent = () =>
 			<Grid container spacing={2} textAlign="center">
 				<Grid item xs={12} sm={12} >
 					<FormControlLabel
-						value="double-authenfication"
+						value="doubleAuthentification"
 						control={
 							<Switch color="primary"
 							onClick={handleSwitch} />

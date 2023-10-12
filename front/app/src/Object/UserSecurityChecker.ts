@@ -18,18 +18,20 @@ class	UserSecurityChecker
 	public checkNumber(data: UserSecurity)
 	{
 		this.resetError();
-		return (false);
 		if (data.doubleAuth)
 		{
-			if (data.phoneNumber === undefined)
-					return (true);
-			if (data.phoneNumber?.length < 10 && data.phoneNumber?.length > 10)
-				return (true);
+			if (data.phoneNumber === undefined || data.phoneNumber === null
+					|| data.phoneNumber.length === 0
+					|| data.phoneNumber === "undefined")
+				this.phoneNumber = true;
+			if (data.phoneNumber?.length < 10
+					&& data.phoneNumber?.length > 10)
+				this.phoneNumber = true;
 			if (isNaN(Number(data.phoneNumber)))
-					return (true);
+				this.phoneNumber = true;
 		}
-		data.valid = true;
-		return (false);
+		else
+			data.valid = true;
 	}
 
 	// JE GARDE CETTE FONCTION POUR LES VERIFS TWILIO 
