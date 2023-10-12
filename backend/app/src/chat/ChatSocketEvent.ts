@@ -120,8 +120,6 @@ export class ChatSocketEvents
 				return ;
 			}
 
-			// rechercher en fonction de son profileId
-			// const searchUser = this.chatService.searchUser(client.id);
 			const searchUser = this.chatService.searchUserWithProfileId(profileId);
 			if (searchUser === undefined)
 			{
@@ -131,6 +129,8 @@ export class ChatSocketEvents
 			else
 			{
 				const oldSocketId = searchUser.id;
+				searchUser.changeSocket(client);
+				this.chatService.checkOldSocketInChannels(client, oldSocketId);
 			}
 				this.chatService.updateDatabase();
 				const	action = {

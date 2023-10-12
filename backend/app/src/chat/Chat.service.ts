@@ -9,6 +9,7 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 import { PrismaClient } from "@prisma/client";
+import { Socket } from "socket.io";
 
 // export interface MessageModel
 // {
@@ -301,6 +302,47 @@ export	class ChatService implements OnModuleInit
 			return (element === clientId);
 		});
 		return (searchSocket);
+	}
+
+	public	checkOldSocketInChannels(client: Socket, oldSocketId: string)
+	{
+		// change socket id in the chat structure
+		const index = this.chat.memberSocketIds.findIndex((element) =>
+		{
+			return (element === oldSocketId);
+		});
+		this.chat.memberSocketIds[index] = client.id;
+
+		// change socket in the channel structure
+		for (const channel of this.chat.channels)
+		{
+			if (channel.isMember(oldSocketId) === true)
+			{
+				const	socketIndex = channel.sockets.findIndex((element) =>
+				{
+					return (element.id === oldSocketId);
+				});
+				channel.sockets[socketIndex] = client;
+				if (channel.isAdmin(oldSocketId))
+				{
+					const adminIndex = channel.admins.findIndex((element) =>
+					{
+						return (element === oldSocketId);
+					});
+					channel.admins[adminIndex] = client.id;
+				}
+				if (channel.isOwner(oldSocketId) === true)
+					channel.owner = client.id;
+			}
+			if (channel.isBanned(oldSocketId) === true)
+			{
+				const bannedIndex = channel.banned.findIndex((element) =>
+				{
+					return (element === oldSocketId);
+				});
+				channel.banned[bannedIndex] = client.id;
+			}
+		}
 	}
 
 	// add and delete a user
