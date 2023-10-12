@@ -13,10 +13,26 @@ import	{ settings, settingsLinks } from "./config/SettingsItem";
 
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import MyAvatar from "../../Views/MyProfile/components/MyAvatar";
 
 const	AvatarMenu = () =>
 {
 	const	navigate = useNavigate();
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
+
+	let myAvatar;
+
+	if (user.avatar)
+		if (user.avatar.link)
+			myAvatar = user.avatar.link;
+		else
+			myAvatar = user.avatar;
+	else
+		myAvatar = "https://thispersondoesnotexist.com/";
 	const [
 		anchorElUser,
 		setAnchorElUser
@@ -53,7 +69,7 @@ const	AvatarMenu = () =>
 				>
 					<Avatar
 						alt="image profile"
-						src="https://thispersondoesnotexist.com/"
+						src={myAvatar}
 					/>
 				</IconButton>
 			</Tooltip>

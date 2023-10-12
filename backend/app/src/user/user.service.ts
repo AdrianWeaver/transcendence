@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import
@@ -13,6 +14,7 @@ import
 	AdminResponseModel,
 	UserLoginResponseModel,
 	UserModel,
+	UserPublicResponseModel,
 	UserRegisterResponseModel,
 } from "./user.interface";
 import { v4 as uuidv4 } from "uuid";
@@ -113,11 +115,12 @@ export class UserService
 				expAt: Date.now() + (1000 * 60 * 60 * 24),
 				doubleAuth:
 				{
-					lastIpClient: "undefined",
-					phoneNumber: "undefined",
-					phoneRegistered: false,
-					validationCode: "undefined",
-					valid: false,
+					enable: data.authService.doubleAuth.enable,
+					lastIpClient: data.authService.doubleAuth.lastIpClient,
+					phoneNumber: data.authService.doubleAuth.phoneNumber,
+					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+					validationCode: data.authService.doubleAuth.validationCode,
+					valid: data.authService.doubleAuth.valid,
 				}
 			}
 		};
@@ -128,7 +131,10 @@ export class UserService
 			id: newUser.id,
 			email: newUser.email,
 			statusCode: newUser.retStatus,
-			login: newUser.login
+			login: newUser.login,
+			firstName: newUser.firstName,
+			lastName: newUser.lastName,
+			avatar: newUser.avatar
 		};
 		return (
 		{
@@ -215,5 +221,33 @@ export class UserService
 		if (searchUser !== undefined)
 			return ("TOKEN OK");
 		return ("TOKEN NOT OK");
+	}
+
+	public	getMyInfo(id: any)
+		: UserPublicResponseModel
+	{
+		let	myInfo: UserPublicResponseModel;
+
+		myInfo = {
+			id: "undefined",
+			email: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			login: "undefined"
+		};
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+
+			myInfo = {
+				id: searchUser.id,
+				email: searchUser.email,
+				firstName: searchUser.firstName,
+				lastName: searchUser.lastName,
+				login: searchUser.login,
+			};
+		return (myInfo);
 	}
 }

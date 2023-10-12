@@ -19,8 +19,6 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
-	setPassword,
-	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
 
@@ -154,15 +152,7 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 		return (<></>);
 };
 
-type	FirstStepFormContentProps =
-{
-	username: string
-	email: string
-	lastName: string
-	firstName: string
-};
-
-const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
+const	FirstStepFormContentNoData = () =>
 {
 	const	dispatch = useAppDispatch();
 
@@ -182,7 +172,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 
 	const	[
 		passwordValue,
-		setPasswordValue
+		setPassword
 	] = useState("");
 
 	const	[
@@ -200,7 +190,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 	) =>
 	{
 		event.preventDefault();
-		setPasswordValue(event.target.value);
+		setPassword(event.target.value);
 		setPasswordFirstTrigger(true);
 	};
 
@@ -237,16 +227,13 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		) =>
 		{
 			key;
+			console.log("key ", key, " value: ", value);
 			return (value === true);
 		});
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
-		{
-			dispatch(setPseudo(userSignup.username));
-			dispatch(setPassword(userSignup.password));
 			dispatch(userRegistrationStepThree());
-		}
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"
@@ -261,7 +248,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="username"
 						label="Username"
-						// value={props.username}
 						error={errorValidation.username}
 						helperText={
 							// NEED TO CHECK IS IT S USED
@@ -279,7 +265,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="firstName"
 						label="First Name"
-						value={props.firstName}
 						autoFocus
 						error={errorValidation.firstName}
 						helperText={
@@ -295,7 +280,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="lastName"
 						label="Last Name"
-						value={props.lastName}
 						name="lastName"
 						autoComplete="family-name"
 						error={errorValidation.lastName}
@@ -312,7 +296,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="email"
 						label="Email Address"
-						value={props.email}
 						name="email"
 						autoComplete="email"
 						error={errorValidation.email}
@@ -409,4 +392,4 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 	);
 };
 
-export default FirstStepFormContent;
+export default FirstStepFormContentNoData;
