@@ -15,7 +15,6 @@ const	initialControllerState: ControllerModel = {
 	previousPage: "/",
 	user:
 	{
-		isLoggedIn: true,
 		isLoggedIn: false,
 		avatar: "https://thispersondoesnotexist.com/",
 		registrationProcess: false,

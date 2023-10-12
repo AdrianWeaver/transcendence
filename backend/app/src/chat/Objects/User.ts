@@ -46,10 +46,11 @@ class User
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
 
-    public constructor(name: string, client: Socket | null)
+    public constructor(name: string, client: Socket | null, profileId: string)
     {
         this.name = name;
 		this.client = client;
+		this.profileId = profileId;
 		if (client === null)
 		{
 			this.id = "to_implement";
@@ -164,7 +165,7 @@ class User
 			id: this.id,
 			blocked: this.blocked,
 			friends: this.friends,
-			profileId: this.profileId
+			profileId: this.profileId,
 		};
 		const	retValue = JSON.stringify(serializedObject);
 		return (retValue);

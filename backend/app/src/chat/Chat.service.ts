@@ -145,7 +145,7 @@ export	class ChatService implements OnModuleInit
 					rawobj.users?.forEach((rawUserString: string) =>
 					{
 						const rawUserObject = JSON.parse(rawUserString);
-						const	user = new User(rawUserObject.name, null);
+						const	user = new User(rawUserObject.name, null, rawUserObject.profileId);
 						console.log("USER TEST: ", user);
 						console.log("Raw user object: ", rawUserObject);
 						arrayUsers.push(user);
@@ -272,6 +272,15 @@ export	class ChatService implements OnModuleInit
 		const searchUser = this.chat.users.find((element) =>
 		{
 			return (element.id === clientId);
+		});
+		return (searchUser);
+	}
+
+	public	searchUserWithProfileId(profileId: string)
+	{
+		const searchUser = this.chat.users.find((element) =>
+		{
+			return (element.profileId === profileId);
 		});
 		return (searchUser);
 	}

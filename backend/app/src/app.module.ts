@@ -17,6 +17,7 @@ import { ChatApiService } from "./chat-api/chat-api.service";
 import { UserController } from "./user/user.controller";
 import { UserService } from "./user/user.service";
 import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
+import { UserModule } from "./user/user.module";
 
 
 @Module(
@@ -25,7 +26,8 @@ import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 	[
 		AdminsModule,
 		ChatModule,
-		AnonymousUserModule
+		AnonymousUserModule,
+		UserModule
 	],
 	controllers: [
 		AppController,
@@ -36,7 +38,7 @@ import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 	],
 	providers: [
 		AppService,
-		UserService,
+		// UserService,
 		AdminsService,
 		ChatApiModule,
 		ChatApiService
