@@ -172,7 +172,7 @@ export const	registerAnonymousUser = ()
 					data.statusCode as number,
 				)
 			);
-			console.error("Need to implement the properties: ");
+			// console.error("Need to implement the properties: ");
 		}
 	});
 };
