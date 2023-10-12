@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -7,15 +8,16 @@ import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import Title from "./components/Title";
 import data from "./realFakeData.json";
 import { ConstructionSharp } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, TextField, Typography } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
 import EditProfile from "./components/EditProfile";
-import { setProfileEditView, setProfileMyView } from "../../Redux/store/controllerAction";
+import { setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
 import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
+import { useNavigate } from "react-router-dom";
 
 type	FriendsModel =
 {
@@ -251,9 +253,9 @@ const	MyProfile = () =>
 	const	editOrFriendRequest = () =>
 	{
 		// if (user.profile.publicView)
-		// 	// addUserToFriends();
+		// 	addUserToFriends();
 		// else
-		dispatch(setProfileEditView());
+			dispatch(setProfileEditView());
 		console.log("edit view: ", user.profile.editView);
 		console.log("friend view", user.profile.friendView);
 		console.log("public view", user.profile.publicView);
@@ -262,12 +264,11 @@ const	MyProfile = () =>
 
 	return (
 		<>
-
 			<MenuBar />
-			<Title
-				name={pseudo}
-				prevPage={oldPrevPage}
-			/>
+				{/* <Title
+					name={pseudo}
+					prevPage={oldPrevPage}
+				/> */}
 			{
 				(user.profile.editView)
 				? 	<EditProfile />
@@ -279,6 +280,7 @@ const	MyProfile = () =>
 									pseudo={pseudo}
 									imageUrl={avatar}
 									defaultUrl="https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg"
+									prevPage={prevPage}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -293,15 +295,18 @@ const	MyProfile = () =>
 								/>
 						</Grid>
 					</Grid>
-					<Button onClick={editOrFriendRequest} variant="outlined">
-						{
-							(user.profile.publicView)
-							? "ADD AS FRIEND"
-							: "EDIT PROFILE"
-						}
-					</Button>
+					{
+						(user.profile.friendView)
+						? <></>
+						: <Button onClick={editOrFriendRequest} variant="outlined">
+							{
+								(user.profile.publicView)
+								? "ADD AS FRIEND"
+								: "EDIT PROFILE"
+							}
+						</Button>
+					}
 				</div>
-
 			}
 		</>
 	);

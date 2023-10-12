@@ -3,7 +3,7 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable eqeqeq */
-import { Avatar } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 import { useState } from "react";
 import { render } from "react-dom";
 
@@ -32,7 +32,15 @@ setDefaultImage
 // call this method inner componentDidMount
 	const	renderImage = () =>
 	{
-		const	img = props.imageUrl.toString();
+		let	img;
+
+		if (props.imageUrl === undefined)
+			setDefaultImage(true);
+		else
+			if (props.imageUrl.link !== undefined)
+				img = props.imageUrl.link.toString();
+			else
+				img = props.imageUrl.toString();
 		fetch(img)
 		.then((res) =>
 		{
@@ -71,7 +79,7 @@ setDefaultImage
 										/>;
 	return (
 		<>
-			{myImage};
+			{myImage}
 		</>
 	);
 };

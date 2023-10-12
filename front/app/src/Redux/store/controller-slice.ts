@@ -45,21 +45,7 @@ const	initialControllerState: ControllerModel = {
 				name: "undefined",
 				id: "undefined",
 				avatar: "undefined",
-				msgRoom: [
-				{
-					id: "undefined",
-					roomName: "undefined",
-					privateConv: true,
-					content: [
-						{
-							sender: "undefined",
-							message: "undefined",
-							// date: "undefined"
-							mode: "undefined"
-						}
-					]
-				}
-				]
+				password: "undefined",
 			}
 			],
 			activeConversationId: "undefined",
@@ -200,51 +186,51 @@ const	controllerSlice = createSlice(
 		{
 			state.user.chat.numberOfChannels = action.payload.user.chat.numberOfChannels;
 		},
-		setMessageRoom(state, action: PayloadAction<ControllerModel>)
-		{
-			let	i;
+		// setMessageRoom(state, action: PayloadAction<ControllerModel>)
+		// {
+		// 	let	i;
 
-			i = 0;
-			while (state.user.chat.users.length - 1)
-			{
-				state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
-				i++;
-			}
-		},
-		setMessage(state, action: PayloadAction<ControllerModel>)
-		{
-			let	i;
-			let	j;
+		// 	i = 0;
+		// 	while (state.user.chat.users.length - 1)
+		// 	{
+		// 		state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
+		// 		i++;
+		// 	}
+		// },
+		// setMessage(state, action: PayloadAction<ControllerModel>)
+		// {
+		// 	let	i;
+		// 	let	j;
 
-			i = 0;
-			while (state.user.chat.users.length - 1)
-			{
-				j = 0;
-				while (state.user.chat.users[i].msgRoom.length - 1)
-				{
-					state.user.chat.users[i].msgRoom[j] = action.payload.user.chat.users[i].msgRoom[j];
-					j++;
-				}
-				i++;
-			}
-		},
-		addMessage(state, action: PayloadAction<ControllerModel>)
-		{
-			let	i;
-			let	j;
+		// 	i = 0;
+		// 	while (state.user.chat.users.length - 1)
+		// 	{
+		// 		j = 0;
+		// 		while (state.user.chat.users[i].msgRoom.length - 1)
+		// 		{
+		// 			state.user.chat.users[i].msgRoom[j] = action.payload.user.chat.users[i].msgRoom[j];
+		// 			j++;
+		// 		}
+		// 		i++;
+		// 	}
+		// },
+		// addMessage(state, action: PayloadAction<ControllerModel>)
+		// {
+		// 	let	i;
+		// 	let	j;
 
-			i = 0;
-			while (state.user.chat.users.length - 1)
-			{
-				j = 0;
-				while (state.user.chat.users[i].msgRoom.length - 1)
-				{
-					state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
-					j++;
-				}
-				i++;
-			}
-		},
+		// 	i = 0;
+		// 	while (state.user.chat.users.length - 1)
+		// 	{
+		// 		j = 0;
+		// 		while (state.user.chat.users[i].msgRoom.length - 1)
+		// 		{
+		// 			state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
+		// 			j++;
+		// 		}
+		// 		i++;
+		// 	}
+		// },
 		setUserData(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.id = action.payload.user.id;
@@ -313,6 +299,9 @@ const	controllerSlice = createSlice(
 			state.user.registrationProcess = action.payload.user.registrationProcess;
 			state.user.registrationError = action.payload.user.registrationError;
 			state.user.rememberMe = action.payload.user.rememberMe;
+			state.user.avatar = action.payload.user.avatar;
+			state.user.chat.pseudo = action.payload.user.chat.pseudo;
+			state.user.password = action.payload.user.password;
 		},
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{

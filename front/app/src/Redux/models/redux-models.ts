@@ -1,32 +1,16 @@
-export interface MessageModelInterface
-{
-	sender: string,
-	message: string,
-	mode: string
-}
-
 type MessageModel =
 {
 	sender: string,
 	message: string,
 	mode: string
 }
-
-export interface MessageRoomModel
-{
-	"id": string,
-	"roomName": string,
-	// private msg or channel:
-	"privateConv": boolean,
-	"content": MessageModel[],
-}
-
 export	interface ChatUserModel
 {
+	// name == pseudo
 	"name": string,
 	"id": string,
 	"avatar": string,
-	"msgRoom": MessageRoomModel[]
+	"password": string,
 }
 
 export interface ChatModel

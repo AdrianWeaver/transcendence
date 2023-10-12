@@ -25,6 +25,7 @@ import {
 	setEmail,
 	setPassword,
 	setPhoneNumber,
+	setProfileMyView,
 	setPseudo,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
@@ -192,6 +193,12 @@ const	EditProfile = () =>
 
 	const
 	[
+		passwordModified,
+		setPasswordModified
+	] = useState(false);
+
+	const
+	[
 		required,
 		setRequired
 	] = useState(false);
@@ -251,6 +258,10 @@ const	EditProfile = () =>
 			key;
 			return (value === true);
 		});
+		if (userChanges.password.length && filtered.length === 0)
+			setPasswordModified(true);
+		else
+			setPasswordModified(false);
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
@@ -264,6 +275,7 @@ const	EditProfile = () =>
 				dispatch(setEmail(userChanges.emailAddress));
 			if (user.phoneNumber !== userChanges.phoneNumber)
 				dispatch(setPhoneNumber(userChanges.phoneNumber));
+			dispatch(setProfileMyView());
 		}
 	};
 	const	handleSwitch = (event: any) =>
@@ -282,7 +294,6 @@ const	EditProfile = () =>
 				fullWidth
 				id="phone-number"
 				label="Phone Number"
-				// value={props.username}
 				error={errorValidation.phoneNumber}
 				helperText={
 					errorValidation.phoneNumber
@@ -395,21 +406,25 @@ const	EditProfile = () =>
 					firstTrigger={firstTriggerPasswordConfirm}
 					passwordConfirm={passwordConfirmValue}
 					/>
-				<Grid item xs={12}>
-					<FormControlLabel
-						control={
-							<Checkbox
-								required
-								value="AgreeWithUniquenessOfPassword"
-								color="primary"
-								name="uniquePassword"
-								onClick={handleUniquePassword}
+					{
+						(passwordModified)
+						? <Grid item xs={12}>
+							<FormControlLabel
+								control={
+									<Checkbox
+										required
+										value="AgreeWithUniquenessOfPassword"
+										color="primary"
+										name="uniquePassword"
+										onClick={handleUniquePassword}
+									/>
+								}
+								label={disclamer}
 							/>
-						}
-						label={disclamer}
-					/>
-					<UniqueAlert isUnique={uniquePassword} />
-				</Grid>
+							<UniqueAlert isUnique={uniquePassword} />
+						</Grid>
+						: <></>
+					}
 			</Grid>
 			<Button
 				type="submit"

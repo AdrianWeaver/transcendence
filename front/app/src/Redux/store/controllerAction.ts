@@ -852,9 +852,13 @@ export const	reinitialiseUser = ()
 				phoneNumber: "undefined",
 				registered: false,
 				// ou thispersondoesntexist?
-				avatar: "undefined"
-
-
+				avatar: "undefined",
+				password: "undefined",
+				chat:
+				{
+					...prev.controller.user.chat,
+					pseudo: "undefined"
+				}
 			}
 		}
 		dispatch(controllerActions.reinitialiseUser(response));
