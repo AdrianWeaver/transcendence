@@ -251,9 +251,9 @@ const	MyProfile = () =>
 	const	editOrFriendRequest = () =>
 	{
 		// if (user.profile.publicView)
-		// 	// addUserToFriends();
+		// 	addUserToFriends();
 		// else
-		dispatch(setProfileEditView());
+			dispatch(setProfileEditView());
 		console.log("edit view: ", user.profile.editView);
 		console.log("friend view", user.profile.friendView);
 		console.log("public view", user.profile.publicView);
