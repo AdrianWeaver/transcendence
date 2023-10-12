@@ -30,8 +30,12 @@ class	UserProfileEdit
 			this.password = user.password;
 		this.passwordConfirm = this.form("passwordConfirm");
 		if (this.passwordConfirm.length === 0)
+		{
 			this.passwordConfirm = user.password;
-		this.uniquenessPassword = this.form("uniquePassword");
+			this.uniquenessPassword = "AgreeWithUniquenessOfPassword";
+		}
+		else
+			this.uniquenessPassword = this.form("uniquePassword");
 		this.errorTable = new UserProfileEditChecker();
 		if (doubleAuth)
 			if (this.form("phoneNumber").length === 0

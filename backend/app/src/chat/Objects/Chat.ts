@@ -6,6 +6,7 @@ import Channel from "./Channel";
 import Message from "./Message";
 import User from "./User";
 import { Server, Socket } from "socket.io";
+import { UserModel } from "src/user/user.interface";
 import { Public } from "@prisma/client/runtime/library";
 
 type ChanMapModel = {
@@ -20,10 +21,13 @@ type Score = {
 }
 
 type MatchHistory = {
-	playerOne: string,
-	playerTwo: string,
-	score: Score,
-	moves: number
+    playerOne: UserModel,
+    playerTwo: UserModel,
+    playerOne: string,
+    playerTwo: string,
+    score: Score,
+    moves: number,
+    outStanding: boolean
 };
 class Chat
 {
@@ -36,7 +40,7 @@ class Chat
 	public activeMembers: number;
 	public memberSocketIds: string[] = [];
 	public message: Message[];
-	public matchHistory: MatchHistory;
+	public matchHistory: MatchHistory[];
 	public deleteChannel: (name: string) => void;
 	public addUserToChannel: (name: string, id: string) => void;
 	public displayMessage: (message: Message) => void;

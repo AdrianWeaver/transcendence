@@ -405,7 +405,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 				</Link>
 				</Grid>
 			</Grid>
-			</Box>
+		</Box>
 	);
 };
 
