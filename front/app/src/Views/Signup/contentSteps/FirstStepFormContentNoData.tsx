@@ -237,7 +237,7 @@ const	FirstStepFormContentNoData = () =>
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"
-		+ "le meme mot de passe de connexion a l'intra 42";
+		+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>

@@ -16,8 +16,7 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
-		// avatar: "https://thispersondoesnotexist.com/",
-		avatar: "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg",
+		avatar: "https://thispersondoesnotexist.com/",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
@@ -75,6 +74,13 @@ const	initialControllerState: ControllerModel = {
 			kindOfConversation: "undefined",
 			numberOfChannels: -1
 		},
+		profile: {
+			editView: false,
+			friendView: false,
+			publicView: false,
+			myView: true
+		},
+		password: "undefined"
 	},
 	registration:
 	{
@@ -167,6 +173,7 @@ const	controllerSlice = createSlice(
 		},
 		setPseudo(state, action: PayloadAction<ControllerModel>)
 		{
+			state.user.username = action.payload.user.username;
 			state.user.chat.pseudo = action.payload.user.chat.pseudo;
 		},
 		setChatConnected(state, action: PayloadAction<ControllerModel>)
@@ -310,6 +317,42 @@ const	controllerSlice = createSlice(
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.avatar = action.payload.user.avatar;
+		},
+		setProfileEditView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfilePublicView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfileFriendView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setProfileMyView(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.profile.editView = action.payload.user.profile.editView;
+			state.user.profile.friendView = action.payload.user.profile.friendView;
+			state.user.profile.publicView = action.payload.user.profile.publicView;
+			state.user.profile.myView = action.payload.user.profile.myView;
+		},
+		setPassword(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.password = action.payload.user.password;
+		},
+		setEmail(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.email = action.payload.user.email;
 		},
 	}
 });

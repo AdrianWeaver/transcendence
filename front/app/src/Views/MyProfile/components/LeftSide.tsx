@@ -32,7 +32,7 @@ const	LeftSide = (props: LeftSideProps) =>
 						imageUrl={props.imageUrl} />
 				</Grid>
 				<Grid item xs={12}>
-					<Typography variant="h6">
+					<Typography>
 						{props.pseudo} is {props.status}
 					</Typography>
 				</Grid>

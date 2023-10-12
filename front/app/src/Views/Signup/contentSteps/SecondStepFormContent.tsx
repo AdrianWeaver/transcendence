@@ -35,20 +35,21 @@ const	SecondStepFormContent = () =>
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	user = new UserSecurity(data);
-		console.log("data: ", data);
+
 		user.check();
 		setErrorValidation(user.checker);
 		const	phone = user.getPlainObject();
-		console.log(phone);
-		if (phone.doubleAuth)
+		if (required)
 		{
-			// dispatch(setDoubleAuth(required));
+			dispatch(setDoubleAuth(required));
 			if (phone.valid)
 				dispatch(setPhoneNumber(phone.phoneNumber));
 				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
 		}
 		else
 		{
+			dispatch(setDoubleAuth(required));
+			dispatch(setPhoneNumber("undefined"));
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
 		}
