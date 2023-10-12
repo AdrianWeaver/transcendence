@@ -23,6 +23,8 @@ import { ChatService } from "./Chat.service";
 import { Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { UserService } from "src/user/user.service";
+import	* as jwt from "jsonwebtoken";
+import { profile } from "console";
 
 type	ActionSocket = {
 	type: string,
@@ -80,14 +82,56 @@ export class ChatSocketEvents
 		{
 			console.log(client.handshake.auth);
 			// if (client.handshake.auth)
-			// {
-				
-			// }
-			const searchUser = this.chatService.searchUser(client.id);
+			let profileId: string;
+			if (client.handshake.auth)
+			{
+				const	secret = this.userService.getSecret();
+				const	bearerToken: string = client.handshake.auth.token;
+				console.log(bearerToken);
+				const	token = bearerToken.split("Bearer ");
+				if (token.length !== 2)
+				{
+					client.disconnect();
+					return ;
+				}
+				try
+				{
+					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
+					console.log("Decoded Token ", decodedToken);
+					// decodedToken.id
+					profileId = decodedToken.id;
+				}
+				catch (error)
+				{
+					if (error instanceof jwt.JsonWebTokenError)
+					{
+						this.logger.warn("A client try to connect without authenticate");
+						client.disconnect();
+						return ;
+					}
+					this.logger.error(error);
+					return ;
+				}
+			}
+			else
+			{
+				this.logger.warn("A client try to connect without authenticate");
+				client.disconnect();
+				return ;
+			}
+
+			// rechercher en fonction de son profileId
+			// const searchUser = this.chatService.searchUser(client.id);
+			const searchUser = this.chatService.searchUserWithProfileId(profileId);
 			if (searchUser === undefined)
 			{
-				const newUser = new User("test", client);
+				const newUser = new User("test", client, profileId);
 				this.chatService.pushUser(newUser, client.id);
+			}
+			else
+			{
+				const oldSocketId = searchUser.id;
+			}
 				this.chatService.updateDatabase();
 				const	action = {
 					type: "init-channels",
@@ -98,7 +142,6 @@ export class ChatSocketEvents
 					}
 				};
 				client.emit("display-channels", action);
-			}
 		}
 
 		handleDisconnect(client: Socket)
