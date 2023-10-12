@@ -27,10 +27,12 @@ type	StatsModel = {
 };
 class User
 {
+	public profileId: string;
     public name: string;
 	public profile: ProfileModel;
 	public stats: StatsModel;
-    public id: string;
+    // socket id
+	public id: string;
     public channels: Channel[] = [];
 	public blocked: string[] = [];
 	public friends: FriendsModel[] = [];
@@ -44,7 +46,7 @@ class User
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
 
-    public constructor(name: string, client: Socket| null)
+    public constructor(name: string, client: Socket | null)
     {
         this.name = name;
 		this.client = client;
@@ -56,7 +58,7 @@ class User
 		else
 			this.id = client.id;
         this.chat = undefined;
-
+		this.profileId = "undefined yet";
 		this.joinChannel = (chanName: string) =>
 		{
 			if (this.client === null)
@@ -162,6 +164,7 @@ class User
 			id: this.id,
 			blocked: this.blocked,
 			friends: this.friends,
+			profileId: this.profileId
 		};
 		const	retValue = JSON.stringify(serializedObject);
 		return (retValue);

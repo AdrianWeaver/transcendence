@@ -55,7 +55,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service";
+	private readonly chatID = "id-chat-service-v-3";
 
 	constructor()
 	{
@@ -98,7 +98,7 @@ export	class ChatService implements OnModuleInit
 
 		this.chat.users.forEach((user) =>
 		{
-			// console.log(user.parseForDatabase());
+			console.log(user.parseForDatabase());
 			usersToDB.push(user.parseForDatabase());
 		});
 		const toDBObject = {
@@ -146,6 +146,8 @@ export	class ChatService implements OnModuleInit
 					{
 						const rawUserObject = JSON.parse(rawUserString);
 						const	user = new User(rawUserObject.name, null);
+						console.log("USER TEST: ", user);
+						console.log("Raw user object: ", rawUserObject);
 						arrayUsers.push(user);
 					});
 
