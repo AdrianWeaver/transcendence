@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "chatJSON" ALTER COLUMN "contents" SET DATA TYPE TEXT;
