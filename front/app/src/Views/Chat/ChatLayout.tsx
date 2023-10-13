@@ -64,10 +64,8 @@ import {
 import {
 	setCurrentChannel,
 	setChatUsers,
-	setMessageRoom,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
-import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
 {

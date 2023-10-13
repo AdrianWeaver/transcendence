@@ -41,6 +41,7 @@ export interface	ProfileModel
 export interface	UserModel
 {
 	"isLoggedIn": boolean,
+	"login": string,
 	"username": string,
 	"bearerToken": string,
 	"rememberMe": boolean,
@@ -54,13 +55,14 @@ export interface	UserModel
 	"doubleAuth": boolean,
 	"phoneNumber": string,
 	"registered": boolean,
-	"avatar": string | {
+	"avatar": string,
+	"ftAvatar": {
 		link: string,
 		version: {
 			large: string,
 			medium: string,
-			micro: string,
-			small: string
+			small: string,
+			mini: string
 		}
 	},
 	"profile": ProfileModel,

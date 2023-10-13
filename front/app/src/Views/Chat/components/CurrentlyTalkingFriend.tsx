@@ -9,8 +9,8 @@ import { Avatar, List, ListItem, ListItemIcon, ListItemText } from "@mui/materia
 const CurrentlyTalkingFriend = () =>
 {
 	const currentlyTalkingFriendDataFake = {
-		name: "John Wick",
-		avatar: "https://material-ui.com/static/images/avatar/1.jpg",
+		name: "Earl Hickey",
+		avatar: "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg",
 	};
 
 	return (

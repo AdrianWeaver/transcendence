@@ -35,7 +35,9 @@ const	styleMainBox = {
 
 const	Signup = () =>
 {
-	let		content = <></>;
+	let		content;
+
+	content= <></>;
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);

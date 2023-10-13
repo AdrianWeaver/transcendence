@@ -33,6 +33,7 @@ import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 import UserSecurity from "../../../Object/UserSecurity";
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
+import { useNavigate } from "react-router-dom";
 
 type PasswordAlertProps ={
 	password: string,
@@ -164,9 +165,16 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 		return (<></>);
 };
 
-const	EditProfile = () =>
+type	EditProfileProps =
+{
+	setting: boolean
+};
+
+const	EditProfile = (props: EditProfileProps) =>
 {
 	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
+
 	const	user	= useAppSelector((state) =>
 	{
 		return (state.controller.user);
@@ -275,9 +283,16 @@ const	EditProfile = () =>
 				dispatch(setEmail(userChanges.emailAddress));
 			if (user.phoneNumber !== userChanges.phoneNumber)
 				dispatch(setPhoneNumber(userChanges.phoneNumber));
-			dispatch(setProfileMyView());
+			if (props.setting)
+				navigate("/");
+			else
+			{
+				dispatch(setProfileMyView());
+				navigate("/me/profile");
+			}
 		}
 	};
+
 	const	handleSwitch = (event: any) =>
 	{
 		const	checked = event.target?.checked;
@@ -289,10 +304,10 @@ const	EditProfile = () =>
 	const	fieldPhone = (
 		<Grid item xs={12} sm={12}>
 			<TextField
-				name="phone-number"
+				name="phoneNumber"
 				required={required}
 				fullWidth
-				id="phone-number"
+				id="phoneNumber"
 				label="Phone Number"
 				error={errorValidation.phoneNumber}
 				helperText={
@@ -342,16 +357,21 @@ const	EditProfile = () =>
 					/>
 				</Grid>
 				<Grid item xs={12} sm={12} >
+				<Grid item xs={12} sm={12} >
 					<FormControlLabel
-						value="double-authenfication"
+						value="doubleAuthentification"
 						control={
-							<Switch color="primary"
-							onClick={handleSwitch} />
+							<Switch
+								defaultChecked={user.doubleAuth}
+								color="primary"
+								onClick={handleSwitch} />
 						}
 						label="Double Authentification"
 						labelPlacement="start"
 					/>
 				</Grid>
+				</Grid>
+
 				<Grid item xs={12} sm={12}>
 				{
 					(required)

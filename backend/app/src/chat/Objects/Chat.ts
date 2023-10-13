@@ -23,8 +23,6 @@ type Score = {
 type MatchHistory = {
     playerOne: UserModel,
     playerTwo: UserModel,
-    playerOne: string,
-    playerTwo: string,
     score: Score,
     moves: number,
     outStanding: boolean

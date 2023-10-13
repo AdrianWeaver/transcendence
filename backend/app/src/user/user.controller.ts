@@ -56,6 +56,7 @@ export class UserController
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
+		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -116,17 +117,17 @@ export class UserController
 					userObject = {
 						registrationProcessEnded: false,
 						ftApi: newObject,
-						// Do we need it ?
 						retStatus: resData.status,
-						// Do we neet that ?
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
+						username: data.login,
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
 						url: data.url,
-						avatar: data.image,
+						avatar: data.image?.link,
+						ftAvatar: data.image,
 						location: data.location,
 						revokedConnectionRequest: false,
 						authService:
@@ -172,6 +173,8 @@ export class UserController
 	getAllUser()
 		: UserModel[]
 	{
+		this.logger.verbose("request user data");
+		this.logger.verbose(this.userService.getUserArray());
 		return (this.userService.getUserArray());
 	}
 

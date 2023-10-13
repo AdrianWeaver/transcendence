@@ -16,16 +16,7 @@ export interface UserPublicResponseModel
 	login: string;
 	firstName: string;
 	lastName: string;
-	// avatar: string | {
-	// 	link: string,
-	// 	version:
-	// 		{
-	// 			large: string,
-	// 			medium: string,
-	// 			small: string,
-	// 			mini: string
-	// 		}
-	// }
+	username: string;
 }
 export interface UserModel
 {
@@ -34,11 +25,14 @@ export interface UserModel
 	date: string;
 	id: any;
 	email: string;
+	username: string;
 	login: string;
 	firstName: string;
 	lastName: string;
 	url: string;
-	avatar: string | {
+	avatar: string;
+	ftAvatar:
+	{
 		link: string,
 		version:
 			{
@@ -123,10 +117,13 @@ export interface UserRegisterResponseModel
 	// creationDate: string;
 	token: string;
 	statusCode: number;
+	username: string;
 	login: string;
 	firstName: string;
 	lastName: string;
-	avatar: string | {
+	avatar: string;
+	ftAvatar:
+	{
 		link: string,
 		version: {
 			large: string,
@@ -134,5 +131,5 @@ export interface UserRegisterResponseModel
 			small: string,
 			mini: string
 		}
-	}
+	};
 }

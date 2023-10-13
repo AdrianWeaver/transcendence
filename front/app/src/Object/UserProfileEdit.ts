@@ -23,8 +23,11 @@ class	UserProfileEdit
 		if (this.username.length === 0)
 			this.username = user.username;
 		this.emailAddress = this.form("email");
-		if (this.emailAddress.length === 0)
-			this.emailAddress = user.email;
+		if (this.emailAddress === undefined || this.emailAddress.length === 0)
+			if (user.email !== undefined)
+				this.emailAddress = user.email;
+			else
+				this.emailAddress = "undefined";
 		this.password = this.form("password");
 		if (this.password.length === 0)
 			this.password = user.password;
@@ -38,7 +41,9 @@ class	UserProfileEdit
 			this.uniquenessPassword = this.form("uniquePassword");
 		this.errorTable = new UserProfileEditChecker();
 		if (doubleAuth)
-			if (this.form("phoneNumber").length === 0
+			if ((this.form("phoneNumber") === null
+				|| this.form("phoneNumber").length === 0
+				||this.form("phoneNumber") === undefined)
 				&& user.phoneNumber !== undefined)
 				this.phoneNumber = user.phoneNumber;
 			else

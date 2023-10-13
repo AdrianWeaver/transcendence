@@ -10,25 +10,18 @@ import { render } from "react-dom";
 
 type	MyAvatarProps =
 {
-	imageUrl: string | {
-		link: string,
-		version: {
-			large: string,
-			medium: string,
-			micro: string,
-			small: string
-		}
-	}
+	imageUrl: string;
 	defaultUrl: string;
 	pseudo: string;
 }
 
 const	MyAvatar = (props: MyAvatarProps) =>
 {
-	const [
-defaultImage,
-setDefaultImage
-] = useState(true);
+	const
+	[
+		defaultImage,
+		setDefaultImage
+	] = useState(true);
 // call this method inner componentDidMount
 	const	renderImage = () =>
 	{
@@ -37,10 +30,8 @@ setDefaultImage
 		if (props.imageUrl === undefined)
 			setDefaultImage(true);
 		else
-			if (props.imageUrl.link !== undefined)
-				img = props.imageUrl.link.toString();
-			else
-				img = props.imageUrl.toString();
+			if (props.imageUrl !== undefined)
+				img = props.imageUrl;
 		fetch(img)
 		.then((res) =>
 		{
