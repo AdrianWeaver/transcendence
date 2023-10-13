@@ -1,29 +1,30 @@
+/* eslint-disable max-statements */
 import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import Chat from "../Chat/Chat";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
+import
+{
+	verifyTokenAnonymousUser
+}	from "../../Redux/store/anonymousUserAction";
 
 const	Home = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
 
+	dispatch(verifyTokenAnonymousUser());
 	useEffect(() =>
 	{
 		savePrevPage("/");
-	});
-
-	const	windowChat = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.window);
-	});
+	}, []);
 
 	const header = <MenuBar />;
 
-	const body = 
+	const body = (
 		<>
 			<h1>home view</h1>
-		</>;
+		</>);
 
 	return (
 		<>

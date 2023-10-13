@@ -54,7 +54,7 @@ export class UserService
 			{
 				this.loadSecretFromDB();
 			})
-			.catch((error) =>
+			.catch((error: any) =>
 			{
 				this.logger.error(error);
 			});
@@ -70,7 +70,7 @@ export class UserService
 					// eslint-disable-next-line camelcase
 					secret_id: this.secretId,
 				}
-			}).then((data) =>
+			}).then((data: any) =>
 			{
 				this.logger.debug("Next line is for database");
 				this.logger.debug(typeof data);
@@ -86,7 +86,7 @@ export class UserService
 					this.secret = data?.value;
 				}
 			})
-			.catch((error) =>
+			.catch((error: any) =>
 			{
 				this.logger.error(error);
 			})

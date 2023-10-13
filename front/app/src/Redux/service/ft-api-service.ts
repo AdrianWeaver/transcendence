@@ -36,7 +36,6 @@ const	UserServices = {
 	},
 	async	verifyToken(token: string, hostname: string)
 	{
-		console.log("Hello token");
 		const	config: AxiosRequestConfig = {
 			headers:
 			{
