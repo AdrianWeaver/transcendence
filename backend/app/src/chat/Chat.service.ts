@@ -56,7 +56,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-4";
+	private readonly chatID = "id-chat-service-v-6";
 
 	constructor()
 	{
@@ -99,7 +99,7 @@ export	class ChatService implements OnModuleInit
 
 		this.chat.users.forEach((user) =>
 		{
-			console.log(user.parseForDatabase());
+			// console.log(user.parseForDatabase());
 			usersToDB.push(user.parseForDatabase());
 		});
 		const toDBObject = {
@@ -114,7 +114,7 @@ export	class ChatService implements OnModuleInit
 			privateMessageMap: this.chat.privateMessageMap,
 		};
 		// console.log(toDBObject);
-		this.log.verbose(JSON.stringify(toDBObject));
+		// this.log.verbose(JSON.stringify(toDBObject));
 		return (JSON.stringify(toDBObject));
 	}
 
@@ -131,8 +131,8 @@ export	class ChatService implements OnModuleInit
 			)
 			.then((data) =>
 			{
-				this.log.verbose("This is our object or  array");
-				this.log.verbose(data);
+				// this.log.verbose("This is our object or  array");
+				// this.log.verbose(data);
 				if (data === null)
 				{
 					this.onTableCreate();
@@ -142,42 +142,65 @@ export	class ChatService implements OnModuleInit
 				{
 					const rawobj = JSON.parse(data.contents);
 					this.log.debug(rawobj);
-					const	arrayUsers: Array<User> = [];
-					rawobj.users?.forEach((rawUserString: string) =>
+					const	newChatInstance = new Chat();
+
+					// console.log(rawobj instanceof Chat);
+					// console.log(newChatInstance instanceof Chat);
+					const arrayUser: User[] = [];
+					// console.log(rawobj.users instanceof User);
+					rawobj.users.forEach((strobj: string) =>
 					{
-						const rawUserObject = JSON.parse(rawUserString);
-						const	user = new User(rawUserObject.name, null, rawUserObject.profileId);
-						console.log("USER TEST: ", user);
-						console.log("Raw user object: ", rawUserObject);
-						arrayUsers.push(user);
+						const rawUser = JSON.parse(strobj);
+						// Channel[] not implemented
+						// Blocked[]
+						// Friend[]
+						const	newUserInstance = new User(
+							rawUser.name,
+							null,
+							rawUser.profileId);
+						newUserInstance.chat = this.chat;
+						newUserInstance.id = "not-connect";
+						arrayUser.push(newUserInstance);
 					});
+					newChatInstance.users = arrayUser;
 
-					this.log.verbose("Just here the start raw object");
-					const	arrayChannels: Array<Channel> = [];
-					rawobj.channels?.forEach((rawChannelString: string) =>
+					const	arrayChanMap: Array<ChanMapModel> = [];
+					// console.log(rawobj.chanMap);
+					rawobj.chanMap.forEach((elem: ChanMapModel) =>
 					{
-						const	rawChannelObject = JSON.parse(rawChannelString);
-
-						console.log(rawChannelObject);
-
-						const	channel = new Channel(rawChannelObject.name, null, rawChannelObject.mode,
-							rawChannelObject.password, rawChannelObject.kind);
-							arrayChannels.push(channel);
+						const	objToMemory: ChanMapModel = {
+							id: elem.id,
+							mode: elem.mode,
+							name: elem.name
+						};
+						arrayChanMap.push(objToMemory);
 					});
-					this.log.verbose("Just here the end raw object");
-					const	newChat: Chat = {
-						...this.chat,
-						channels: arrayChannels,
-						privateMessage: rawobj.privateMessage,
-						chanMap: rawobj.chanMap,
-						privateMessageMap: rawobj.privateMessageMap,
-						users: arrayUsers,
-						memberSocketIds: rawobj.memberSocketIds
+					newChatInstance.chanMap = arrayChanMap;
 
-					};
-					// this.log.verbose(rawobj);
-					this.log.verbose(newChat);
-					this.chat = newChat;
+					const arrayChannels: Channel[] = [];
+					// console.log(rawobj.channels);
+					rawobj.channels.forEach((strchan : string) =>
+					{
+						const	rawobj = JSON.parse(strchan);
+
+						const	channel = new Channel(
+							rawobj.name,
+							null,
+							rawobj.mode,
+							rawobj.password,
+							rawobj.kind
+						);
+
+						// console.log(channel);
+						// console.log(rawobj);
+						arrayChannels.push(channel);
+					});
+					newChatInstance.channels = arrayChannels;
+					// toute fin
+					this.chat = newChatInstance;
+					console.log("End of parser check with serialized value ");
+					console.log( JSON.parse(this.parseForDatabase()));
+					console.log(this.chat);
 				}
 			})
 			.catch((error) =>
@@ -194,8 +217,9 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
-		this.log.verbose("Updating all Chat Object");
+		// this.log.verbose("Updating all Chat Object");
 		const dbString = this.parseForDatabase();
+		// this.log.verbose(JSON.parse(dbString));
 		this.prisma.chatJson
 		.update(
 			{
@@ -265,7 +289,6 @@ export	class ChatService implements OnModuleInit
 		return (this.chat.privateMessageMap);
 	}
 
-
 	// search users and sockets
 
 	public	searchUser(clientId: string)
@@ -299,62 +322,59 @@ export	class ChatService implements OnModuleInit
 	{
 		const	searchSocket = this.chat.memberSocketIds.findIndex((element) =>
 		{
-			return (element === clientId);
+			return (element.memberSocketId === clientId);
 		});
 		return (searchSocket);
 	}
 
 	public	checkOldSocketInChannels(client: Socket, oldSocketId: string)
 	{
-		console.log("OLD ID: " + oldSocketId);
-		console.log("NEW ID: " + client.id);
 		// change socket id in the chat structure
-		const index = this.chat.memberSocketIds.findIndex((element) =>
-		{
-			return (element === oldSocketId);
-		});
-		this.chat.memberSocketIds[index] = client.id;
+		// const index = this.chat.memberSocketIds.findIndex((element) =>
+		// {
+		// 	return (element === oldSocketId);
+		// });
+		// this.chat.memberSocketIds[index] = client.id;
 
-		// change socket in the channel structure
-		for (const channel of this.chat.channels)
-		{
-			this.log.debug("CHANNEL NAME: " + channel.name);
-			if (channel.isMember(oldSocketId) === true)
-			{
-				const	socketIndex = channel.sockets.findIndex((element) =>
-				{
-					return (element.id === oldSocketId);
-				});
-				channel.sockets[socketIndex] = client;
+		// for (const channel in this.chat.channels)
+		// {
+		// 	// const channel = JSON.parse(chan) as Channel;
+		// 	if (channel.isMember(oldSocketId) === true)
+		// 	{
+		// 		const	socketIndex = channel.sockets.findIndex((element) =>
+		// 		{
+		// 			return (element.id === oldSocketId);
+		// 		});
+		// 		channel.sockets[socketIndex] = client;
 
-				const	userIndex = channel.users.findIndex((element) =>
-				{
-					return (element === oldSocketId);
-				});
-				channel.users[userIndex] = client.id;
+		// 		const	userIndex = channel.users.findIndex((element) =>
+		// 		{
+		// 			return (element === oldSocketId);
+		// 		});
+		// 		channel.users[userIndex] = client.id;
 
-				if (channel.isAdmin(oldSocketId) === true)
-				{
-					const adminIndex = channel.admins.findIndex((element) =>
-					{
-						return (element === oldSocketId);
-					});
-					if (adminIndex === -1)
-						console.error("AdminIndex not found");
-					channel.admins[adminIndex] = client.id;
-				}
-				if (channel.isOwner(oldSocketId) === true)
-					channel.owner = client.id;
-			}
-			if (channel.isBanned(oldSocketId) === true)
-			{
-				const bannedIndex = channel.banned.findIndex((element) =>
-				{
-					return (element === oldSocketId);
-				});
-				channel.banned[bannedIndex] = client.id;
-			}
-		}
+		// 		if (channel.isAdmin(oldSocketId) === true)
+		// 		{
+		// 			const adminIndex = channel.admins.findIndex((element) =>
+		// 			{
+		// 				return (element === oldSocketId);
+		// 			});
+		// 			if (adminIndex === -1)
+		// 				console.error("AdminIndex not found");
+		// 			channel.admins[adminIndex] = client.id;
+		// 		}
+		// 		if (channel.isOwner(oldSocketId) === true)
+		// 			channel.owner = client.id;
+		// 	}
+		// 	if (channel.isBanned(oldSocketId) === true)
+		// 	{
+		// 		const bannedIndex = channel.banned.findIndex((element) =>
+		// 		{
+		// 			return (element === oldSocketId);
+		// 		});
+		// 		channel.banned[bannedIndex] = client.id;
+		// 	}
+		// }
 	}
 
 	// add and delete a user
@@ -362,7 +382,11 @@ export	class ChatService implements OnModuleInit
 	public	pushUser(newUser: User, clientId: string)
 	{
 		this.chat.users.push(newUser);
-		this.chat.memberSocketIds.push(clientId);
+		this.chat.memberSocketIds.push(
+			{
+				memberSocketId: clientId,
+				profileId: newUser.profileId}
+			);
 	}
 
 	public	deleteUser(userIndex: number, userSocket: number)
@@ -432,6 +456,11 @@ export	class ChatService implements OnModuleInit
 			users.push(user);
 		});
 		return (users);
+	}
+
+	public	getAllUsersArray()
+	{
+		return (this.chat.users);
 	}
 
 	public	sendMessageToUser(user: User)
@@ -514,5 +543,19 @@ export	class ChatService implements OnModuleInit
 			return (element.name === chanName);
 		});
 		return (searchPrivateMessage);
+	}
+
+	public	getIndexUserWithProfileId(profileId: string)
+	{
+		const	searchIndex = this.chat.users.findIndex((elem) =>
+		{
+			return (elem.profileId === profileId);
+		});
+		return (searchIndex);
+	}
+
+	public	setSocketToUser(index: number, client: Socket)
+	{
+		this.chat.users[index].changeSocket(client);
 	}
 }

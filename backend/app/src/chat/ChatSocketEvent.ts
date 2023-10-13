@@ -101,6 +101,22 @@ export class ChatSocketEvents
 					console.log("Decoded Token ", decodedToken);
 					// decodedToken.id
 					profileId = decodedToken.id;
+
+					this.logger.warn("ProfileId: ", profileId);
+					const index = this.chatService.getIndexUserWithProfileId(profileId);
+					if (index === -1)
+					{
+						this.logger.log("User not founded");
+						const newUser = new User("test", client, profileId);
+						this.chatService.pushUser(newUser, client.id);
+					}
+					else
+					{
+						// affect socket id
+						this.logger.log("Userfounded");
+						this.chatService.setSocketToUser(index, client);
+					}
+					console.log(this.chatService.getAllUsersArray());
 				}
 				catch (error)
 				{
@@ -120,29 +136,29 @@ export class ChatSocketEvents
 				client.disconnect();
 				return ;
 			}
-
-			const searchUser = this.chatService.searchUserWithProfileId(profileId);
-			if (searchUser === undefined)
-			{
-				const newUser = new User("test", client, profileId);
-				this.chatService.pushUser(newUser, client.id);
-			}
-			else
-			{
-				const oldSocketId = searchUser.id;
-				searchUser.changeSocket(client);
-				this.chatService.checkOldSocketInChannels(client, oldSocketId);
-			}
-				this.chatService.updateDatabase();
-				const	action = {
-					type: "init-channels",
-					payload: {
-						channels: this.chatService.getChanMap(),
-						uniqueId: client.id,
-						privateMessage: this.chatService.getPrivateMessageMap()
-					}
-				};
-				client.emit("display-channels", action);
+			return ;
+			// const searchUser = this.chatService.searchUserWithProfileId(profileId);
+			// if (searchUser === undefined)
+			// {
+			// 	const newUser = new User("test", client, profileId);
+			// 	this.chatService.pushUser(newUser, client.id);
+			// }
+			// else
+			// {
+			// 	const oldSocketId = searchUser.id;
+			// 	searchUser.changeSocket(client);
+			// 	this.chatService.checkOldSocketInChannels(client, oldSocketId);
+			// }
+			// 	this.chatService.updateDatabase();
+			// 	const	action = {
+			// 		type: "init-channels",
+			// 		payload: {
+			// 			channels: this.chatService.getChanMap(),
+			// 			uniqueId: client.id,
+			// 			privateMessage: this.chatService.getPrivateMessageMap()
+			// 		}
+			// 	};
+			// 	client.emit("display-channels", action);
 		}
 
 		handleDisconnect(client: Socket)

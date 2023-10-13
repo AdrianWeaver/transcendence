@@ -27,6 +27,12 @@ type MatchHistory = {
     moves: number,
     outStanding: boolean
 };
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
+
 class Chat
 {
 	public channels: Channel[] = [];
@@ -36,7 +42,8 @@ class Chat
 	public users: User[] = [];
 	public server: Server | undefined;
 	public activeMembers: number;
-	public memberSocketIds: string[] = [];
+	// public memberSocketIds: string[] = [];
+	public memberSocketIds: Array<MemberSocketIdModel> = [];
 	public message: Message[];
 	public matchHistory: MatchHistory[];
 	public deleteChannel: (name: string) => void;

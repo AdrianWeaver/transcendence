@@ -358,9 +358,15 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.kindOfConversation);
 	});
+
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
+	});
+
+	const	profileToken = useAppSelector((state) =>
+	{
+		return (state.controller.user.bearerToken);
 	});
 
 	// USE STATES
