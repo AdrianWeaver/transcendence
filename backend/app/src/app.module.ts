@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
@@ -15,10 +15,13 @@ import { ChatApiModule } from "./chat-api/chat-api.module";
 import { ChatApiController } from "./chat-api/chat-api.controller";
 import { ChatApiService } from "./chat-api/chat-api.service";
 import { UserController } from "./user/user.controller";
-import { UserService } from "./user/user.service";
 import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 import { UserModule } from "./user/user.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { dirname, join } from "path";
 
+// may change on prod (folder dist)
+const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 
 @Module(
 {
@@ -27,7 +30,16 @@ import { UserModule } from "./user/user.module";
 		AdminsModule,
 		ChatModule,
 		AnonymousUserModule,
-		UserModule
+		UserModule,
+		ServeStaticModule
+			.forRoot({
+				serveRoot: "/cdn/image/profile",
+				rootPath: pictureFolder,
+				serveStaticOptions:
+				{
+					index: false
+				}
+			}),
 	],
 	controllers: [
 		AppController,
@@ -45,6 +57,12 @@ import { UserModule } from "./user/user.module";
 	],
 })
 
-export class AppModule
+export class AppModule implements OnApplicationBootstrap
 {
+	private readonly	logger = new Logger("app-module");
+
+	onApplicationBootstrap()
+	{
+		this.logger.verbose("DIRECTORY: " + pictureFolder);
+	}
 }
