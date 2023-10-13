@@ -234,8 +234,6 @@ export class UserController
 	{
 		this.logger
 			.log("'double-auth' route request");
-		console.log("number ? ", data.numero);
-		console.log(req.user);
 		return (this.userService.getPhoneNumber(data.numero, req.user.id));
 	}
 }

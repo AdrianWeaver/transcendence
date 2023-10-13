@@ -10,6 +10,7 @@ import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	registerNumberForDoubleAuth,
 	setDoubleAuth,
 	setPhoneNumber,
 	setRegistered,
@@ -74,7 +75,17 @@ const	SecondStepFormContent = () =>
 		setPhoneInput
 	] = useState("");
 
-	const [muiPhone, setMuiPhone] = useState("+33");
+	const
+	[
+		muiPhone,
+		setMuiPhone
+	] = useState("+33");
+
+	const
+	[
+		numberRegistered,
+		setNumberRegistered
+	] = useState(false);
 
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
@@ -121,23 +132,12 @@ const	SecondStepFormContent = () =>
 		setTwoAuthCode(event.target.value);
 	};
 
-	const	getNumberFormat = (number: string) =>
-	{
-		const	format = number.slice(0, 1);
-
-		console.log("format ", format);
-		return (format);
-	};
-
 	let	fieldPhone;
 
 	if (displayInput === false)
 	{
 		fieldPhone = (
 			<Grid item xs={12} sm={12}>
-				{/* <PhoneInput
-					defaultCountry="fr"
-				/> */}
 				<MuiPhone value={muiPhone} onChange={setMuiPhone} />
 			</Grid>
 		);
@@ -176,9 +176,10 @@ const	SecondStepFormContent = () =>
 			}
 		};
 
-		const	handleSendSMS = () =>
+		const	handleRegisterNumber = () =>
 		{
-			setSendSMS(true);
+			setNumberRegistered(true);
+			dispatch(registerNumberForDoubleAuth(muiPhone, user.bearerToken));
 		};
 
 		const sendTheCode = (
@@ -196,7 +197,8 @@ const	SecondStepFormContent = () =>
 				finish the Authentification
 			</Button>
 		);
-		const sendButton = (
+
+		const sendSmsButton = (
 			<Button
 				type="submit"
 				fullWidth
@@ -206,9 +208,24 @@ const	SecondStepFormContent = () =>
 					mt: 3,
 					mb: 2
 				}}
-				onClick={handleSendSMS}
+				// onClick={handleReceiveCode}
 			>
-				Receive a SMS
+				Receive the code
+			</Button>
+		);
+		const registerNumButton = (
+			<Button
+				type="submit"
+				fullWidth
+				variant="contained"
+				sx={
+				{
+					mt: 3,
+					mb: 2
+				}}
+				onClick={handleRegisterNumber}
+			>
+				register phone number
 			</Button>
 		);
 		const finishButton = (
@@ -247,9 +264,11 @@ const	SecondStepFormContent = () =>
 				}
 				{
 					(required)
-					? (!sendSMS)
-						? sendButton
-						: sendTheCode
+					? (!numberRegistered)
+						? registerNumButton
+						: (!sendSMS)
+							? sendSmsButton
+							: sendTheCode
 					: <></>
 				}
 			</Grid>
