@@ -4,7 +4,7 @@
 /* eslint-disable max-statements */
 import { Box, Button, FormControlLabel, Grid, Link, Switch, TextField } from "@mui/material";
 import UserRegistration from "../../../Object/UserRegistration";
-import { useState } from "react";
+import React, { useState } from "react";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch,
@@ -17,6 +17,13 @@ import {
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 import axios from "axios";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import MuiPhone from "../component/MuiPhone";
+// import MuiPhoneNumber from "mui-phone-number";
+
+
+// import "react-international-phone/style.css";
 
 /* eslint-disable max-lines-per-function */
 const	SecondStepFormContent = () =>
@@ -60,6 +67,15 @@ const	SecondStepFormContent = () =>
 		twoAuthCode,
 		setTwoAuthCode
 	] = useState("");
+
+	const
+	[
+		phoneInput,
+		setPhoneInput
+	] = useState("");
+
+	const [muiPhone, setMuiPhone] = useState("+33");
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
@@ -105,24 +121,24 @@ const	SecondStepFormContent = () =>
 		setTwoAuthCode(event.target.value);
 	};
 
+	const	getNumberFormat = (number: string) =>
+	{
+		const	format = number.slice(0, 1);
+
+		console.log("format ", format);
+		return (format);
+	};
+
 	let	fieldPhone;
+
 	if (displayInput === false)
 	{
 		fieldPhone = (
 			<Grid item xs={12} sm={12}>
-				<TextField
-					name="phoneNumber"
-					required={required}
-					fullWidth
-					id="phoneNumber"
-					label="Phone Number"
-					error={errorValidation.phoneNumber}
-					helperText={
-						errorValidation.phoneNumber
-							? "phone number is required"
-							: ""
-					}
-				/>
+				{/* <PhoneInput
+					defaultCountry="fr"
+				/> */}
+				<MuiPhone value={muiPhone} onChange={setMuiPhone} />
 			</Grid>
 		);
 	}
@@ -152,6 +168,7 @@ const	SecondStepFormContent = () =>
 		{
 			console.log("the value of phone " + user.phoneNumber);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
+			setCodeValid(true);
 			if (codeValid)
 			{
 				dispatch(setUserLoggedIn());
@@ -208,6 +225,7 @@ const	SecondStepFormContent = () =>
 					Finish to register
 				</Button>
 		);
+
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} >
 			<Grid container spacing={2} textAlign="center">

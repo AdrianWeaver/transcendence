@@ -194,7 +194,6 @@ export class UserController
 	verifyToken(@Req() headers: any)
 		: UserVerifyTokenResModel
 	{
-		console.log(headers.authorization);
 		this.logger
 			.log("'verify-token' route request");
 		const	response: UserVerifyTokenResModel = {
