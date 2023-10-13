@@ -146,13 +146,13 @@ export class ChatSocketEvents
 
 		handleDisconnect(client: Socket)
 		{
-			const	userIndex = this.chatService.searchUserIndex(client.id);
-			const	socketIndex = this.chatService.searchSocketIndex(client.id);
-			if (userIndex !== undefined)
-			{
-				this.chatService.deleteUser(userIndex, socketIndex);
-				this.chatService.updateDatabase();
-			}
+			// const	userIndex = this.chatService.searchUserIndex(client.id);
+			// const	socketIndex = this.chatService.searchSocketIndex(client.id);
+			// if (userIndex !== undefined)
+			// {
+				// this.chatService.deleteUser(userIndex, socketIndex);
+				// this.chatService.updateDatabase();
+			// }
 		}
 
 		// @SubscribeMessage("display-conversation")

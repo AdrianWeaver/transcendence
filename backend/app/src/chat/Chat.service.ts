@@ -56,7 +56,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-3";
+	private readonly chatID = "id-chat-service-v-4";
 
 	constructor()
 	{
@@ -306,6 +306,8 @@ export	class ChatService implements OnModuleInit
 
 	public	checkOldSocketInChannels(client: Socket, oldSocketId: string)
 	{
+		console.log("OLD ID: " + oldSocketId);
+		console.log("NEW ID: " + client.id);
 		// change socket id in the chat structure
 		const index = this.chat.memberSocketIds.findIndex((element) =>
 		{
@@ -316,6 +318,7 @@ export	class ChatService implements OnModuleInit
 		// change socket in the channel structure
 		for (const channel of this.chat.channels)
 		{
+			this.log.debug("CHANNEL NAME: " + channel.name);
 			if (channel.isMember(oldSocketId) === true)
 			{
 				const	socketIndex = channel.sockets.findIndex((element) =>
@@ -323,12 +326,21 @@ export	class ChatService implements OnModuleInit
 					return (element.id === oldSocketId);
 				});
 				channel.sockets[socketIndex] = client;
-				if (channel.isAdmin(oldSocketId))
+
+				const	userIndex = channel.users.findIndex((element) =>
+				{
+					return (element === oldSocketId);
+				});
+				channel.users[userIndex] = client.id;
+
+				if (channel.isAdmin(oldSocketId) === true)
 				{
 					const adminIndex = channel.admins.findIndex((element) =>
 					{
 						return (element === oldSocketId);
 					});
+					if (adminIndex === -1)
+						console.error("AdminIndex not found");
 					channel.admins[adminIndex] = client.id;
 				}
 				if (channel.isOwner(oldSocketId) === true)

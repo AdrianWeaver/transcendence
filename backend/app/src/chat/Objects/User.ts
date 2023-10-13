@@ -60,7 +60,6 @@ class User
 		else
 			this.id = client.id;
         this.chat = undefined;
-		this.profileId = "undefined yet";
 		this.joinChannel = (chanName: string) =>
 		{
 			if (this.client === null)
