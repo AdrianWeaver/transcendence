@@ -45,8 +45,8 @@ const	SecondStepFormContent = () =>
 
 	const
 	[
-		buttonSendSms,
-		setButtonSendSms
+		codeValid,
+		setCodeValid
 	] = useState(false);
 
 	const
@@ -79,10 +79,6 @@ const	SecondStepFormContent = () =>
 				dispatch(setPhoneNumber(userPhone.phoneNumber));
 				setDisplayInput(true);
 			}
-				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
-				// dispatch(setRegistered(true));
-				// dispatch(setUserLoggedIn());
-			// }
 		}
 		else
 		{
@@ -154,8 +150,13 @@ const	SecondStepFormContent = () =>
 
 		const handleSendCode = () =>
 		{
-			console.log("the value of phone " + user);
-			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id 
+			console.log("the value of phone " + user.phoneNumber);
+			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
+			if (codeValid)
+			{
+				dispatch(setUserLoggedIn());
+				dispatch(setRegistered(true));
+			}
 		};
 
 		const	handleSendSMS = () =>
@@ -233,11 +234,6 @@ const	SecondStepFormContent = () =>
 						: sendTheCode
 					: <></>
 				}
-				{/* {
-					(required && sendSMS)
-					? sendTheCode
-					: <></>
-				} */}
 			</Grid>
 		</Box>
 	);
