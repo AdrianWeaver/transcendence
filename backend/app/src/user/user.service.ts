@@ -256,4 +256,19 @@ export class UserService
 			};
 		return (myInfo);
 	}
+
+	public	getPhoneNumber(numero: string, id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.enable = true;
+			searchUser.authService.doubleAuth.phoneNumber = numero;
+			searchUser.authService.doubleAuth.phoneRegistered = true;
+		}
+		return("ok");
+	}
 }

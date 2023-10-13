@@ -12,12 +12,14 @@ export interface ApplicationUserModel
 export interface UserPublicResponseModel
 {
 	id: any;
+	// phoneNumber: string;
 	email: string;
 	login: string;
 	firstName: string;
 	lastName: string;
 	username: string;
 }
+
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;
