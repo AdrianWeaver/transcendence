@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable curly */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -46,6 +47,12 @@ const	SecondStepFormContent = () =>
 	[
 		buttonSendSms,
 		setButtonSendSms
+	] = useState(false);
+
+	const
+	[
+		sendSMS,
+		setSendSMS
 	] = useState(false);
 
 	const
@@ -125,13 +132,53 @@ const	SecondStepFormContent = () =>
 	}
 	else
 	{
-		const handleSendSMS = () =>
+		const textField = (
+			<TextField
+				name="twoAuthCode"
+				required={true}
+				label="Enter the code"
+				value={twoAuthCode}
+				onChange={handleChangeTwoAuthCode}
+			/>
+		);
+		fieldPhone = (
+			<Grid item xs={12} sm={12}>
+				<Grid item xs={12}>
+					{
+						textField
+					}
+				</Grid>
+			</Grid>
+		);
+	}
+
+		const handleSendCode = () =>
 		{
 			console.log("the value of phone " + user);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id 
 		};
 
-		const button = (
+		const	handleSendSMS = () =>
+		{
+			setSendSMS(true);
+		};
+
+		const sendTheCode = (
+			<Button
+				type="submit"
+				fullWidth
+				variant="contained"
+				sx={
+				{
+					mt: 3,
+					mb: 2
+				}}
+				onClick={handleSendCode}
+			>
+				finish the Authentification
+			</Button>
+		);
+		const sendButton = (
 			<Button
 				type="submit"
 				fullWidth
@@ -143,45 +190,23 @@ const	SecondStepFormContent = () =>
 				}}
 				onClick={handleSendSMS}
 			>
-				Send SMS
+				Receive a SMS
 			</Button>
 		);
-		const textField = (
-			<TextField
-				name="twoAuthCode"
-				required={true}
-				label="Your code received by phone"
-				value={twoAuthCode}
-				onChange={handleChangeTwoAuthCode}
-			/>
-		);
-		fieldPhone = (
-			<Grid item xs={12} sm={12}>
-				<Grid item xs={12}>
+		const finishButton = (
+			<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={
 					{
-						(displayInput)
-						? button
-						: textField
-					}
-				</Grid>
-			</Grid>
+						mt: 3,
+						mb: 2
+					}}
+				>
+					Finish to register
+				</Button>
 		);
-	}
-
-	const finishButton = (
-		<Button
-				type="submit"
-				fullWidth
-				variant="contained"
-				sx={
-				{
-					mt: 3,
-					mb: 2
-				}}
-			>
-				Finish to register
-			</Button>
-	);
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} >
 			<Grid container spacing={2} textAlign="center">
@@ -199,15 +224,21 @@ const	SecondStepFormContent = () =>
 				{
 					(required)
 					? fieldPhone
+					: finishButton
+				}
+				{
+					(required)
+					? (!sendSMS)
+						? sendButton
+						: sendTheCode
 					: <></>
 				}
+				{/* {
+					(required && sendSMS)
+					? sendTheCode
+					: <></>
+				} */}
 			</Grid>
-			{
-				// (!required && )
-				// ? finishButton
-				// : <></>
-				finishButton
-			}
 		</Box>
 	);
 };
