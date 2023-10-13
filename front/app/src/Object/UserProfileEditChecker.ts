@@ -47,7 +47,7 @@ class	UserProfileEditChecker
 			if (data.phoneNumber === undefined || data.phoneNumber === null
 					|| data.phoneNumber === "undefined")
 					this.phoneNumber = true;
-			if (data.phoneNumber?.length < 10 && data.phoneNumber?.length > 10)
+			if (data.phoneNumber?.length < 10 || data.phoneNumber?.length > 10)
 				this.phoneNumber = true;
 			if (isNaN(Number(data.phoneNumber)))
 				this.phoneNumber = true;

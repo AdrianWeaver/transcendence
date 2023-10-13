@@ -25,7 +25,7 @@ class	UserSecurityChecker
 					|| data.phoneNumber === "undefined")
 				this.phoneNumber = true;
 			if (data.phoneNumber?.length < 10
-					&& data.phoneNumber?.length > 10)
+					|| data.phoneNumber?.length > 10)
 				this.phoneNumber = true;
 			if (isNaN(Number(data.phoneNumber)))
 				this.phoneNumber = true;
