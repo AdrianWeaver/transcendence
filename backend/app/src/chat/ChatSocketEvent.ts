@@ -42,6 +42,7 @@ type	MembersModel =
 {
 	id: number,
 	name: string
+	profileId: string
 }
 
 type	FriendsModel =
@@ -561,9 +562,13 @@ export class ChatSocketEvents
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
+					const profId = this.chatService.getProfileIdWithUserName(user);
+					if (profId === undefined)
+						return ;
 					const newMember: MembersModel = {
 						id: memberList.length + 1,
 						name: user,
+						profileId: profId,
 					};
 					memberList.push(newMember);
 				}

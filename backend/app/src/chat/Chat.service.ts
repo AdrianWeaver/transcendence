@@ -380,6 +380,17 @@ export	class ChatService implements OnModuleInit
 		return (searchUser);
 	}
 
+	public	getProfileIdWithUserName(userName: string)
+	{
+		const searchUser = this.chat.users.find((element) =>
+		{
+			return (element.id === userName);
+		});
+		if (searchUser === undefined)
+			return (undefined);
+		return (searchUser.profileId);
+	}
+
 	// channel functions
 
 	public	addNewChannel(newChannel: Channel, chanId: number, kind: string)
