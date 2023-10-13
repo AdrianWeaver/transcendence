@@ -67,28 +67,14 @@ const	MyProfile = () =>
 		login = user.username;
 		email = user.email;
 		console.log("avatar ", user.avatar);
-		if (user.avatar?.link)
-			avatar = user.avatar?.link;
+		if (user.avatar)
+			avatar = user.avatar;
 		else if (user.avatar === undefined)
-			avatar = "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg";
+			avatar = "https://thispersondoesnotexist.com";
 		rank = 25;
 		gamesPlayed = 250;
 		victories = 19;
 		defeats = 122151;
-		perfectGame = 3;
-	}
-	else if (data !== undefined)
-	{
-		id = data.id;
-		lastName = data.last_name;
-		firstName = data.first_name;
-		login = data.login;
-		email = data.email;
-		avatar = data.image?.link;
-		rank = 5;
-		gamesPlayed = 20;
-		victories = 9;
-		defeats = 11;
 		perfectGame = 3;
 	}
 	else
@@ -99,7 +85,7 @@ const	MyProfile = () =>
 		login = "undefined";
 		email = "undefined";
 		active = undefined;
-		avatar = "https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg";
+		avatar = "https://thispersondoesnotexist.com";
 		rank = 5;
 		gamesPlayed = 20;
 		victories = 9;
@@ -265,13 +251,10 @@ const	MyProfile = () =>
 	return (
 		<>
 			<MenuBar />
-				{/* <Title
-					name={pseudo}
-					prevPage={oldPrevPage}
-				/> */}
 			{
 				(user.profile.editView)
-				? 	<EditProfile />
+				? 	<EditProfile
+						setting={false} />
 				: <div className="wrapper">
 					<Grid container>
 						<Grid item xs={12} sm={6}>
@@ -279,7 +262,7 @@ const	MyProfile = () =>
 									status={status}
 									pseudo={pseudo}
 									imageUrl={avatar}
-									defaultUrl="https://pbs.twimg.com/profile_images/956695054126665728/0zl_Ejq2_400x400.jpg"
+									defaultUrl="https://thispersondoesnotexist.com/"
 									prevPage={prevPage}
 								/>
 						</Grid>

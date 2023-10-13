@@ -117,17 +117,17 @@ export class UserController
 					userObject = {
 						registrationProcessEnded: false,
 						ftApi: newObject,
-						// Do we need it ?
 						retStatus: resData.status,
-						// Do we neet that ?
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
+						username: data.login,
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
 						url: data.url,
-						avatar: data.image,
+						avatar: data.image?.link,
+						ftAvatar: data.image,
 						location: data.location,
 						revokedConnectionRequest: false,
 						authService:

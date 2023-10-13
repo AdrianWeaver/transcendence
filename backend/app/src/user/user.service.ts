@@ -93,11 +93,13 @@ export class UserService
 			date: data.date,
 			id: data.id,
 			email: data.email,
+			username: data.username,
 			login: data.login,
 			firstName: data.firstName,
 			lastName: data.lastName,
 			url: data.url,
 			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
 			location: data.location,
 			revokedConnectionRequest: data.revokedConnectionRequest,
 			authService:
@@ -131,10 +133,12 @@ export class UserService
 			id: newUser.id,
 			email: newUser.email,
 			statusCode: newUser.retStatus,
+			username: newUser.username,
 			login: newUser.login,
 			firstName: newUser.firstName,
 			lastName: newUser.lastName,
-			avatar: newUser.avatar
+			avatar: newUser.avatar,
+			ftAvatar: newUser.ftAvatar
 		};
 		return (
 		{
@@ -233,7 +237,8 @@ export class UserService
 			email: "undefined",
 			firstName: "undefined",
 			lastName: "undefined",
-			login: "undefined"
+			login: "undefined",
+			username: "undefined"
 		};
 		const	searchUser = this.user.find((elem) =>
 		{
@@ -247,6 +252,7 @@ export class UserService
 				firstName: searchUser.firstName,
 				lastName: searchUser.lastName,
 				login: searchUser.login,
+				username: searchUser.username
 			};
 		return (myInfo);
 	}

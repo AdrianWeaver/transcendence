@@ -10,7 +10,7 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ChatUserModel, ControllerModel, MessageModelInterface, MessageRoomModel } from "../models/redux-models";
+import { CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
 type MessageModel =
@@ -474,125 +474,125 @@ export const setNumberOfChannels = (numberOfChannels: number)
 	});
 };
 
-export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const prevState = getState();
-		console.log(prevState);
-		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-		{
-			return (elem.id === clientId);
-		});
-		if (userIndex !== -1)
-			prevState.controller.user.chat.users[userIndex].msgRoom = room;
-		else
-			console.log("Id not found");
-		const response: ControllerModel = {
-			...prevState.controller,
-			user:
-			{
-				...prevState.controller.user,
-				chat:
-				{
-					...prevState.controller.user.chat,
-					users: prevState.controller.user.chat.users,
-				}
-			}
-		};
-		dispatch(controllerActions.setMessageRoom(response));
-	});
-};
+// export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const prevState = getState();
+// 		console.log(prevState);
+// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+// 		{
+// 			return (elem.id === clientId);
+// 		});
+// 		if (userIndex !== -1)
+// 			prevState.controller.user.chat.users[userIndex].msgRoom = room;
+// 		else
+// 			console.log("Id not found");
+// 		const response: ControllerModel = {
+// 			...prevState.controller,
+// 			user:
+// 			{
+// 				...prevState.controller.user,
+// 				chat:
+// 				{
+// 					...prevState.controller.user.chat,
+// 					users: prevState.controller.user.chat.users,
+// 				}
+// 			}
+// 		};
+// 		dispatch(controllerActions.setMessageRoom(response));
+// 	});
+// };
 
-export const setMessage = (message: MessageModelInterface[], clientId: string, msgIndex: number)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const prevState = getState();
-		console.log(prevState);
-		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-		{
-			return (elem.id === clientId);
-		});
-		if (userIndex === -1)
-			console.log("Id not found");
-		else
-		{
-			const response: ControllerModel = {
-				...prevState.controller,
-				user:
-				{
-					...prevState.controller.user,
-					chat:
-					{
-						...prevState.controller.user.chat,
-						users: [
-						{
-							...prevState.controller.user.chat.users[userIndex],
-							msgRoom: [
-								{
-									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-									content: message,
-								}
-							]
-						}
-						]
-					}
-				}
-			};
-			dispatch(controllerActions.setMessage(response));
-		}
-	});
-};
+// export const setMessage = (message: MessageModelInterface[], clientId: string, msgIndex: number)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const prevState = getState();
+// 		console.log(prevState);
+// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+// 		{
+// 			return (elem.id === clientId);
+// 		});
+// 		if (userIndex === -1)
+// 			console.log("Id not found");
+// 		else
+// 		{
+// 			const response: ControllerModel = {
+// 				...prevState.controller,
+// 				user:
+// 				{
+// 					...prevState.controller.user,
+// 					chat:
+// 					{
+// 						...prevState.controller.user.chat,
+// 						users: [
+// 						{
+// 							...prevState.controller.user.chat.users[userIndex],
+// 							msgRoom: [
+// 								{
+// 									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
+// 									content: message,
+// 								}
+// 							]
+// 						}
+// 						]
+// 					}
+// 				}
+// 			};
+// 			dispatch(controllerActions.setMessage(response));
+// 		}
+// 	});
+// };
 
-export const addMessage = (clientId: string, msgIndex: number, text: string, index: number)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const prevState = getState();
-		console.log(prevState);
-		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-		{
-			return (elem.id === clientId);
-		});
-		if (userIndex === -1)
-			console.log("Id not found");
-		else
-		{
-			const response: ControllerModel = {
-				...prevState.controller,
-				user:
-				{
-					...prevState.controller.user,
-					chat:
-					{
-						...prevState.controller.user.chat,
-						users: [
-						{
-							...prevState.controller.user.chat.users[userIndex],
-							msgRoom: [
-								{
-									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-									content: [
-									{
-										...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex].content[index],
-										message: text
-									}
-									]
-								}
-							]
-						}
-						]
-					}
-				}
-			};
-			dispatch(controllerActions.addMessage(response));
-		}
-	});
-};
+// export const addMessage = (clientId: string, msgIndex: number, text: string, index: number)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const prevState = getState();
+// 		console.log(prevState);
+// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
+// 		{
+// 			return (elem.id === clientId);
+// 		});
+// 		if (userIndex === -1)
+// 			console.log("Id not found");
+// 		else
+// 		{
+// 			const response: ControllerModel = {
+// 				...prevState.controller,
+// 				user:
+// 				{
+// 					...prevState.controller.user,
+// 					chat:
+// 					{
+// 						...prevState.controller.user.chat,
+// 						users: [
+// 						{
+// 							...prevState.controller.user.chat.users[userIndex],
+// 							// msgRoom: [
+// 							// 	{
+// 							// 		...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
+// 							// 		content: [
+// 							// 		{
+// 							// 			...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex].content[index],
+// 							// 			message: text
+// 							// 		}
+// 							// 		]
+// 							// 	}
+// 							// ]
+// 						}
+// 						]
+// 					}
+// 				}
+// 			};
+// 			dispatch(controllerActions.addMessage(response));
+// 		}
+// 	});
+// };
 
 export const setRegistrationProcessStart = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -846,13 +846,13 @@ export const	reinitialiseUser = ()
 				firstName: "undefined",
 				lastName: "undefined",
 				username: "undefined",
+				login: "undefined",
 				registrationProcess: false,
 				registrationError: "undefined",
 				doubleAuth: false,
 				phoneNumber: "undefined",
 				registered: false,
-				// ou thispersondoesntexist?
-				avatar: "undefined",
+				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
 				chat:
 				{
@@ -1019,5 +1019,24 @@ export const	setEmail = (email: string)
 			}
 		}
 		dispatch(controllerActions.setEmail(response));
+	});
+}
+
+export const	setLogin = (login: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				login: login
+			}
+		}
+		dispatch(controllerActions.setLogin(response));
 	});
 }
