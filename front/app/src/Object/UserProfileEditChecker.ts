@@ -44,7 +44,6 @@ class	UserProfileEditChecker
 		this.email = !(emailRegex.test(data.emailAddress));
 		if (data.doubleAuth)
 		{
-			console.log(data.phoneNumber);
 			if (data.phoneNumber === undefined || data.phoneNumber === null
 					|| data.phoneNumber === "undefined")
 					this.phoneNumber = true;

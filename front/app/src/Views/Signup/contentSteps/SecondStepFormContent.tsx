@@ -65,13 +65,16 @@ const	SecondStepFormContent = () =>
 
 		const	isNotValid = userPhone.checker.getPhoneNumberCheck();
 		console.log("isNotValid", isNotValid);
-		if (user.doubleAuth && !isNotValid)
+		if (user.doubleAuth)
 		{
 			dispatch(setDoubleAuth(true));
 			// if (phone.valid)
 			// {
-				dispatch(setPhoneNumber(phone.phoneNumber));
-				setDisplayInput(true);
+				if (!isNotValid)
+				{
+					dispatch(setPhoneNumber(phone.phoneNumber));
+					setDisplayInput(true);
+				}
 				// NEED TO IMPLEMENT TWILIO DOUBLE AUTH 
 				// dispatch(setRegistered(true));
 				// dispatch(setUserLoggedIn());
