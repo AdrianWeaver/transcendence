@@ -52,11 +52,11 @@ import {
 	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
-	setMessageRoom,
+	// setMessageRoom,
 	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
-import { MessageRoomModel } from "../../Redux/models/redux-models";
+// import { MessageRoomModel } from "../../Redux/models/redux-models";
 import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
 
 type MessageModel =

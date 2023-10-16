@@ -108,7 +108,9 @@ export class ChatSocketEvents
 					if (index === -1)
 					{
 						this.logger.log("User not founded");
-						const newUser = new User("test", client, profileId);
+						const userName = this.userService.getUsernameByProfileId(profileId) as string;
+						console.log("USER NAME: " + userName);
+						const newUser = new User(userName, client, profileId);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else
