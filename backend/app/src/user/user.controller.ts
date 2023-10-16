@@ -52,6 +52,14 @@ class UserLoginDto
 	email: string;
 }
 
+class	TwilioResponseDto
+{
+	@IsNotEmpty()
+	// numero format +33
+	To: string;
+	// Channel = sms
+	Channel: string;
+}
 @Controller("user")
 export class UserController
 {
@@ -235,5 +243,17 @@ export class UserController
 		this.logger
 			.log("'double-auth' route request");
 		return (this.userService.getPhoneNumber(data.numero, req.user.id));
+	}
+
+	@Post("double-auth-twilio")
+	@UseGuards(UserAuthorizationGuard)
+	ReceiveValidationCodeTwilio(
+		@Body() data: TwilioResponseDto,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'double-auth-twilio' route request");
+		return ("code validation send");
 	}
 }

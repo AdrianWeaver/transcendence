@@ -92,6 +92,37 @@ const	UserServices = {
 				return ("error");
 			})
 		);
+	},
+
+	async	receiveValidationCodeFromTwilio
+		(token: string, hostname: string, numero: string)
+	{
+		console.log("receive validation code");
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				Authorization: token
+			}
+		};
+		const	data = {
+			numero: numero
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/double-auth/twilio", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service double auth TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service double auth TWILIO error: ", error);
+				return ("error");
+			})
+		);
 	}
 };
 
