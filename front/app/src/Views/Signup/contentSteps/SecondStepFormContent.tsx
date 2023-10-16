@@ -87,23 +87,26 @@ const	SecondStepFormContent = () =>
 		setNumberRegistered
 	] = useState(false);
 
+
+	const	formattingPhoneNumber = (num: string) =>
+	{
+		let	newNum;
+
+		newNum= num;
+		newNum = newNum.replace(/\s/g, "");
+		return (newNum);
+	};
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
-		// const	data = new FormData(event.currentTarget);
-		// const	userPhone = new UserSecurity(data, user);
-
-		// userPhone.check();
-		// setErrorValidation(userPhone.checker);
-
-		// const	isNotValid = userPhone.checker.getPhoneNumberCheck();
-		// console.log("isNotValid", isNotValid);
 		if (user.doubleAuth)
 		{
 			dispatch(setDoubleAuth(true));
 			if (numberRegistered)
 			{
-				dispatch(setPhoneNumber(muiPhone));
+				const numberFormat = formattingPhoneNumber(muiPhone);
+				dispatch(setPhoneNumber(numberFormat));
 				setDisplayInput(true);
 			}
 		}
@@ -120,7 +123,6 @@ const	SecondStepFormContent = () =>
 	{
 		const	checked = event.target?.checked;
 
-		// doesnt seem to set
 		setRequired(checked);
 		dispatch(setDoubleAuth(checked));
 	};

@@ -44,12 +44,17 @@ class	UserProfileEditChecker
 		this.email = !(emailRegex.test(data.emailAddress));
 		if (data.doubleAuth)
 		{
+			let	tmp;
+
+			tmp = data.phoneNumber;
 			if (data.phoneNumber === undefined || data.phoneNumber === null
 					|| data.phoneNumber === "undefined")
 					this.phoneNumber = true;
-			if (data.phoneNumber?.length < 10 || data.phoneNumber?.length > 10)
+			if (data.phoneNumber?.length < 10 || data.phoneNumber?.length > 15)
 				this.phoneNumber = true;
-			if (isNaN(Number(data.phoneNumber)))
+			if (tmp[0] === "+")
+				tmp = tmp.slice(1, tmp.length);
+			if (isNaN(Number(tmp)))
 				this.phoneNumber = true;
 		}
 		else

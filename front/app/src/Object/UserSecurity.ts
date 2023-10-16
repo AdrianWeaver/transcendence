@@ -21,7 +21,6 @@ class	UserSecurity
 		this.phoneNumber = this.form("phoneNumber");
 		this.doubleAuth = user.doubleAuth;
 		this.checker = new UserSecurityChecker();
-		console.log("dhdhdh ", this.phoneNumber);
 	}
 
 	public	check = () =>
