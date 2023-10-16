@@ -112,9 +112,10 @@ export class ChatSocketEvents
 					}
 					else
 					{
-						// affect socket id
 						this.logger.log("Userfounded");
+						const oldSocketId = client.id;
 						this.chatService.setSocketToUser(index, client);
+						this.chatService.checkOldSocketInChannels(client, oldSocketId);
 					}
 					console.log(this.chatService.getAllUsersArray());
 				}
