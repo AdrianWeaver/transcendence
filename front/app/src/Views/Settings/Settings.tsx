@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
+import EditProfile from "../MyProfile/components/EditProfile";
 
 const	Settings = () =>
 {
@@ -14,7 +15,8 @@ const	Settings = () =>
 	return (
 		<>
 			<MenuBar />
-			<p>{"<Settings>"}</p>
+			<EditProfile
+				setting={true} />
 		</>
 	);
 };

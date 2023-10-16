@@ -25,10 +25,10 @@ class	UserProfileEditChecker
 	public checkData(data: UserProfileEdit)
 	{
 		this.resetError();
-		if (data.emailAddress === undefined
+		if (data.emailAddress === undefined || data.emailAddress === "undefined"
 			|| data.emailAddress.length === 0)
 			this.email = true;
-		if (data.password === undefined
+		if (data.password === undefined || data.password === "undefined"
 			|| data.passwordConfirm === undefined
 			|| data.password.length === 0
 			|| data.passwordConfirm.length === 0
@@ -37,20 +37,19 @@ class	UserProfileEditChecker
 		if (data.uniquenessPassword !== "AgreeWithUniquenessOfPassword")
 			this.uniqueness = true;
 		// check username unique
-		if (data.username === undefined || data.username.length === 0 )
+		if (data.username === undefined || data.username === "undefined"
+			|| data.username.length === 0 )
 			this.username = true;
 		const	emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 		this.email = !(emailRegex.test(data.emailAddress));
 		if (data.doubleAuth)
 		{
-			if (data.phoneNumber === undefined)
+			if (data.phoneNumber === undefined || data.phoneNumber === null
+					|| data.phoneNumber === "undefined")
 					this.phoneNumber = true;
-			if (data.phoneNumber?.length > 0 && data.phoneNumber?.length < 12)
-			{
-				if (!Number(data.phoneNumber))
-					this.phoneNumber = true;
-			}
-			else
+			if (data.phoneNumber?.length < 10 || data.phoneNumber?.length > 10)
+				this.phoneNumber = true;
+			if (isNaN(Number(data.phoneNumber)))
 				this.phoneNumber = true;
 		}
 		else

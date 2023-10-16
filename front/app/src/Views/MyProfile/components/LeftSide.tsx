@@ -13,15 +13,7 @@ type	LeftSideProps =
 {
 	status: string,
 	pseudo: string,
-	imageUrl: string | {
-		link: string,
-		version: {
-			large: string,
-			medium: string,
-			small: string,
-			mini: string
-		}
-	}
+	imageUrl: string,
 	defaultUrl: string,
 	prevPage: string;
 };
@@ -48,7 +40,6 @@ const	LeftSide = (props: LeftSideProps) =>
 			<Grid container>
 				<Grid item xs={12} sm ={6}>
 					<MyAvatar
-						variant="square"
 						pseudo={props.pseudo}
 						defaultUrl={props.defaultUrl}
 						imageUrl={props.imageUrl} />

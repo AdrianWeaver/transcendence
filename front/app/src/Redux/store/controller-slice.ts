@@ -16,12 +16,24 @@ const	initialControllerState: ControllerModel = {
 	user:
 	{
 		isLoggedIn: false,
+		ftAvatar:
+		{
+			link: "https://thispersondoesnotexist.com/",
+			version:
+			{
+				large: "https://thispersondoesnotexist.com/",
+				medium: "https://thispersondoesnotexist.com/",
+				small: "https://thispersondoesnotexist.com/",
+				mini: "https://thispersondoesnotexist.com/"
+			}
+		},
 		avatar: "https://thispersondoesnotexist.com/",
 		registrationProcess: false,
 		registrationError: "undefined",
 		email: "",
 		id: -1,
 		username: "undefined",
+		login: "undefined",
 		firstName: "undefined",
 		lastName: "undefined",
 		bearerToken: "undefined",
@@ -44,7 +56,7 @@ const	initialControllerState: ControllerModel = {
 			{
 				name: "undefined",
 				id: "undefined",
-				avatar: "undefined",
+				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
 			}
 			],
@@ -249,6 +261,11 @@ const	controllerSlice = createSlice(
 			state.user.lastName = action.payload.user.lastName;
 			state.user.avatar = action.payload.user.avatar;
 		},
+		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.registrationProcess = action.payload.user.registrationProcess;
@@ -306,6 +323,7 @@ const	controllerSlice = createSlice(
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.avatar = action.payload.user.avatar;
+			state.user.ftAvatar = action.payload.user.ftAvatar;
 		},
 		setProfileEditView(state, action: PayloadAction<ControllerModel>)
 		{
@@ -342,6 +360,10 @@ const	controllerSlice = createSlice(
 		setEmail(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.email = action.payload.user.email;
+		},
+		setLogin(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.login = action.payload.user.login;
 		},
 	}
 });

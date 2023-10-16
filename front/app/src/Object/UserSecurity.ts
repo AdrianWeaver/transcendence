@@ -3,7 +3,9 @@
 /* eslint-disable max-statements */
 /* eslint-disable curly */
 
+import { UseMediaQueryOptions } from "@mui/material";
 import UserSecurityChecker from "./UserSecurityChecker";
+import { UserModel } from "../Redux/models/redux-models";
 
 /* eslint-disable max-len */
 class	UserSecurity
@@ -14,11 +16,11 @@ class	UserSecurity
 	public	checker: UserSecurityChecker;
 	public	valid: boolean;
 
-	public	constructor(data: FormData)
+	public	constructor(data: FormData, user: UserModel)
 	{
 		this.data = data;
-		this.doubleAuth = this.form("doubleAuth");
-		this.phoneNumber = this.form("phone-number");
+		this.doubleAuth = user.doubleAuth;
+		this.phoneNumber = this.form("phoneNumber");
 		if (this.phoneNumber === undefined)
 			this.phoneNumber = "undefined";
 		this.checker = new UserSecurityChecker();

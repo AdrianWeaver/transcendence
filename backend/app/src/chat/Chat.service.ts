@@ -84,7 +84,7 @@ export	class ChatService implements OnModuleInit
 					contents: dbString
 				}
 			})
-			.catch((error) =>
+			.catch((error: any) =>
 			{
 				this.log.error("On table Create error");
 				this.log.error(error);
@@ -134,7 +134,7 @@ export	class ChatService implements OnModuleInit
 				}
 			}
 			)
-			.then((data) =>
+			.then((data: any) =>
 			{
 				if (data === null)
 				{
@@ -267,7 +267,7 @@ export	class ChatService implements OnModuleInit
 					console.log(this.chat);
 				}
 			})
-			.catch((error) =>
+			.catch((error: any) =>
 			{
 				this.log.error(error);
 			});
@@ -298,7 +298,7 @@ export	class ChatService implements OnModuleInit
 				}
 			}
 		)
-		.catch((error) =>
+		.catch((error: any) =>
 		{
 			this.log.error(error);
 		});

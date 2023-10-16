@@ -1,3 +1,7 @@
+/* eslint-disable no-dupe-class-members */
+/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable init-declarations */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -6,8 +10,8 @@
 
 import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, } from "class-validator";
-import { Response } from "express";
+import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
+import { Request, Response } from "express";
 import	Api from "../Api";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
@@ -28,6 +32,16 @@ class	RegisterDto
 	// email: string;
 }
 
+class	UserDoubleAuthDto
+{
+	// @IsNumberString()
+	@IsNotEmpty()
+	numero: string;
+
+	// id or token ?
+	// @IsNotEmpty()
+	// id: any;
+}
 class UserLoginDto
 {
 	@IsNotEmpty()
@@ -56,6 +70,7 @@ export class UserController
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
+		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -116,17 +131,17 @@ export class UserController
 					userObject = {
 						registrationProcessEnded: false,
 						ftApi: newObject,
-						// Do we need it ?
 						retStatus: resData.status,
-						// Do we neet that ?
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
+						username: data.login,
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
 						url: data.url,
-						avatar: data.image,
+						avatar: data.image?.link,
+						ftAvatar: data.image,
 						location: data.location,
 						revokedConnectionRequest: false,
 						authService:
@@ -172,6 +187,8 @@ export class UserController
 	getAllUser()
 		: UserModel[]
 	{
+		this.logger.verbose("request user data");
+		this.logger.verbose(this.userService.getUserArray());
 		return (this.userService.getUserArray());
 	}
 
@@ -191,7 +208,6 @@ export class UserController
 	verifyToken(@Req() headers: any)
 		: UserVerifyTokenResModel
 	{
-		console.log(headers.authorization);
 		this.logger
 			.log("'verify-token' route request");
 		const	response: UserVerifyTokenResModel = {
@@ -209,4 +225,15 @@ export class UserController
 		return (this.userService.getMyInfo(97756));
 	}
 
+	@Post("double-auth")
+	@UseGuards(UserAuthorizationGuard)
+	GetTheNumber(
+		@Body() data: UserDoubleAuthDto,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'double-auth' route request");
+		return (this.userService.getPhoneNumber(data.numero, req.user.id));
+	}
 }

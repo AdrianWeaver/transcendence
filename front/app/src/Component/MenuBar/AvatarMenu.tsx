@@ -27,9 +27,6 @@ const	AvatarMenu = () =>
 	let myAvatar;
 
 	if (user.avatar !== undefined)
-		if (user.avatar.link)
-			myAvatar = user.avatar.link;
-		else
 			myAvatar = user.avatar;
 	else
 		myAvatar = "https://thispersondoesnotexist.com/";
