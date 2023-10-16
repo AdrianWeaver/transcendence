@@ -343,7 +343,7 @@ export class UserController
 		});
 	}
 
-	@Get("get-code")
+	@Post("get-code")
 	@UseGuards(UserAuthorizationGuard)
 	GetValidationCode(
 		@Body() body: any,
@@ -383,7 +383,9 @@ export class UserController
 					})
 				.then((verificationCheck) =>
 				{
-					console.log(verificationCheck.status);
+					if (verificationCheck.status === "approved")
+						this.userService.codeValidated(otpCode, req.user.id, true);
+					console.log(verificationCheck);
 				})
 				.then(() =>
 				{

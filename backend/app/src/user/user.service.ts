@@ -282,4 +282,17 @@ export class UserService
 			return (searchUser.authService.doubleAuth.phoneNumber);
 		return("undefined");
 	}
+
+	public	codeValidated(code: string, id: string, valid: boolean)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.validationCode = code;
+			searchUser.authService.doubleAuth.valid = valid;
+		}
+	}
 }

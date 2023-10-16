@@ -138,7 +138,7 @@ const	UserServices = {
 
 		return (
 			Api(hostname)
-			.get("/user/get-code", config)
+			.post("/user/get-code", config)
 			.then((data) =>
 			{
 				console.log("ft-api-service get code TWILIO ", data.data);

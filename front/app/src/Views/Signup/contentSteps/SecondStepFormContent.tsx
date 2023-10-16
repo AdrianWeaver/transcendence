@@ -10,6 +10,7 @@ import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	GetValidationCode,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setDoubleAuth,
@@ -212,6 +213,7 @@ const	SecondStepFormContent = () =>
 			{
 				console.log("mui phone ", muiPhone);
 				dispatch(receiveValidationCode(formattingPhoneNumber(muiPhone), user.bearerToken));
+				setSendSMS(true);
 			}
 		};
 
