@@ -10,6 +10,7 @@ import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setDoubleAuth,
 	setPhoneNumber,
@@ -199,7 +200,19 @@ const	SecondStepFormContent = () =>
 					valid = false;
 			}
 			if (valid)
+			{
+				dispatch(registerNumberForDoubleAuth(formattingPhoneNumber(muiPhone), user.bearerToken));
 				setNumberRegistered(true);
+			}
+		};
+
+		const	handleReceiveCode = () =>
+		{
+			if (numberRegistered && muiPhone)
+			{
+				console.log("mui phone ", muiPhone);
+				dispatch(receiveValidationCode(formattingPhoneNumber(muiPhone), user.bearerToken));
+			}
 		};
 
 		const sendTheCode = (
@@ -228,7 +241,7 @@ const	SecondStepFormContent = () =>
 					mt: 3,
 					mb: 2
 				}}
-				// onClick={handleReceiveCode}
+				onClick={handleReceiveCode}
 			>
 				Receive the code
 			</Button>

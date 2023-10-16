@@ -318,14 +318,16 @@ export class UserController
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
-		const	number = this.userService.getPhoneNumber(req.user.id);
-		if (number === "undefined" || !number)
+		// const	number = this.userService.getPhoneNumber(req.user.id);
+		// if (number === undefined)
+		// 	throw new InternalServerErrorException();
+		if (body.numero === "undefined" || !body.numero)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		client.verify.v2
 		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 		.verifications.create({
-			to: number,
+			to: body.numero,
 			channel: "sms" })
 		.then((verification) =>
 		{

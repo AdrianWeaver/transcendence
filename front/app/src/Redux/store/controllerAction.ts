@@ -794,6 +794,76 @@ export const registerNumberForDoubleAuth = (numero : string, token: string)
 	});
 };
 
+export const receiveValidationCode = (numero : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await UserServices.receiveValidationCodeFromTwilio(numero, token, "localhost");
+		if (data === "ERROR")
+		{
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		else
+		{
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					phoneNumber: numero
+				}
+			}
+			console.log("controller action 791  ", data);
+		}
+		dispatch(controllerActions.receiveValidationCode(response));
+		console.log("phone number enregistre");
+	});
+};
+
+// export const GetValidationCode = (otpCode : string, token: string)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return (async (dispatch, getState) =>
+// 	{
+// 		const 	prev = getState();
+// 		let		response: ControllerModel;
+
+// 		response = prev.controller;
+// 		if (prev.controller.user.isLoggedIn
+// 			|| prev.controller.user.registrationError !== "undefined")
+// 			return ;
+// 		const	data: any = await UserServices.getValidationCodeFromTwilio(otpCode, token, "localhost");
+// 		if (data === "ERROR")
+// 		{
+// 			dispatch(setRegistrationProcessError());
+// 			return ;
+// 		}
+// 		else
+// 		{
+// 			response = {
+// 				...prev.controller,
+// 				user:
+// 				{
+// 					...prev.controller.user,
+// 					otpCode: otpCode
+// 				}
+// 			}
+// 			console.log("controller action 791  ", data);
+// 		}
+// 		dispatch(controllerActions.getValidationCode(response));
+// 		console.log("phone number enregistre");
+// 	});
+// };
+
 export const	setDoubleAuth = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {

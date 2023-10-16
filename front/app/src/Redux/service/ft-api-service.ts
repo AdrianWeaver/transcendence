@@ -96,12 +96,12 @@ const	UserServices = {
 	},
 
 	async	receiveValidationCodeFromTwilio
-		(token: string, hostname: string, numero: string)
+		(numero: string, token: string, hostname: string)
 	{
 		console.log("receive validation code");
 		const	config: AxiosRequestConfig = {
 			headers: {
-				"Authorization": "Basic " + process.env.TWILIO_ACCOUNT_SID + ":" + process.env.TWILIO_AUTH_TOKEN,
+				"Authorization": token,
 				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
 			},
 		};
@@ -111,7 +111,7 @@ const	UserServices = {
 
 		return (
 			Api(hostname)
-			.post("/user/double-auth/twilio", data, config)
+			.post("/user/double-auth-twilio", data, config)
 			.then((data) =>
 			{
 				console.log("ft-api-service double auth TWILIO ", data.data);
@@ -120,6 +120,33 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.log("ft-api-service double auth TWILIO error: ", error);
+				return ("error");
+			})
+		);
+	},
+
+	async	getValidationCodeFromTwilio
+	(token: string, hostname: string)
+	{
+		console.log("get validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"Authorization": token,
+				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
+			},
+		};
+
+		return (
+			Api(hostname)
+			.get("/user/get-code", config)
+			.then((data) =>
+			{
+				console.log("ft-api-service get code TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service get code error: ", error);
 				return ("error");
 			})
 		);
