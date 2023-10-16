@@ -87,19 +87,31 @@ export class UserController
 		if (!this.env.parsed)
 			throw new InternalServerErrorException();
 		if (!this.env.parsed.TWILIO_ACCOUNT_SID
-			|| !this.env.parsed.TWILIO_AUTH_TOKEN)
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
-		client.messages
-		.create({
-			body: "Hello world",
-			messagingServiceSid: "MGb27c1e450cb8f255dc5ffaf1cd154d7a",
-			to: "+33622143240"
-		})
-		.then((message) =>
+		client.verify.v2
+		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+		.verifications.create({
+			to: "+33767406877",
+			channel: "sms" })
+		.then((verification) =>
 		{
-			console.log(message.sid);
+			console.log(verification.status);
 		})
+		// client.messages
+		// .create({
+		// 	body: "Hello world",
+		// 	messagingServiceSid: "MGb27c1e450cb8f255dc5ffaf1cd154d7a",
+		// 	to: "+33767406877",
+		// 	from: "+12293947099"
+		// })
+		// .then((message) =>
+		// {
+		// 	console.log(message.sid);
+		// 	console.log(message);
+		// })
 		.catch((error) =>
 		{
 			console.error("Boo", error);
