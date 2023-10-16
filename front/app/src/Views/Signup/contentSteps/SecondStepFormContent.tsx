@@ -90,20 +90,20 @@ const	SecondStepFormContent = () =>
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
-		const	data = new FormData(event.currentTarget);
-		const	userPhone = new UserSecurity(data, user);
+		// const	data = new FormData(event.currentTarget);
+		// const	userPhone = new UserSecurity(data, user);
 
-		userPhone.check();
-		setErrorValidation(userPhone.checker);
+		// userPhone.check();
+		// setErrorValidation(userPhone.checker);
 
-		const	isNotValid = userPhone.checker.getPhoneNumberCheck();
-		console.log("isNotValid", isNotValid);
+		// const	isNotValid = userPhone.checker.getPhoneNumberCheck();
+		// console.log("isNotValid", isNotValid);
 		if (user.doubleAuth)
 		{
 			dispatch(setDoubleAuth(true));
-			if (!isNotValid)
+			if (numberRegistered)
 			{
-				dispatch(setPhoneNumber(userPhone.phoneNumber));
+				dispatch(setPhoneNumber(muiPhone));
 				setDisplayInput(true);
 			}
 		}
@@ -178,8 +178,29 @@ const	SecondStepFormContent = () =>
 
 		const	handleRegisterNumber = () =>
 		{
-			setNumberRegistered(true);
-			dispatch(registerNumberForDoubleAuth(muiPhone, user.bearerToken));
+			let	tmp, valid;
+
+			valid = true;
+			tmp = muiPhone;
+			tmp = tmp.replace(/\s/g, "");
+			if (muiPhone === undefined || muiPhone === null
+					|| muiPhone.length === 0
+					|| muiPhone === "undefined")
+				valid = false;
+			else
+			{
+				if (tmp.length < 9
+						|| tmp.length > 15)
+					valid = false;
+				if (muiPhone[0] !== "+")
+					valid = false;
+				else
+					tmp = tmp.slice(1, tmp.length);
+				if (isNaN(Number(tmp)))
+					valid = false;
+			}
+			if (valid)
+				setNumberRegistered(true);
 		};
 
 		const sendTheCode = (
@@ -257,6 +278,7 @@ const	SecondStepFormContent = () =>
 						labelPlacement="start"
 					/>
 				</Grid>
+				<Grid item xs={12} sm={12}>
 				{
 					(required)
 					? fieldPhone
@@ -271,6 +293,7 @@ const	SecondStepFormContent = () =>
 							: sendTheCode
 					: <></>
 				}
+				</Grid>
 			</Grid>
 		</Box>
 	);
