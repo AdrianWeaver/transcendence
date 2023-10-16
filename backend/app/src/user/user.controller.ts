@@ -352,6 +352,9 @@ export class UserController
 	{
 		console.log("body ", body);
 		console.log("req ", req.user);
+		console.log("opt-code", body.otpCode);
+		if (body.otpCode === undefined)
+			throw new UnauthorizedException();
 		console.log(this.env);
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -361,36 +364,41 @@ export class UserController
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
-		const	number = this.userService.getPhoneNumber(req.user.id);
+		const	number = req.user.phoneNumber;
 		if (number === "undefined" || !number)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
-		const readLine = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout,
-			});
+		// const readLine = readline.createInterface({
+				// input: process.stdin,
+				// output: process.stdout,
+			// });
 		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
 		if (verify === undefined)
 			throw new InternalServerErrorException();
-		readLine.question("Please enter the OTP:", (otpCode: string) =>
-		{
-			client.verify.v2
-				.services(verify)
-				.verificationChecks.create(
-					{
-						to: number,
-						code: otpCode
-					})
-				.then((verificationCheck) =>
+		// readLine.question("Please enter the OTP:", (otpCode: string) =>
+		// {
+		client.verify.v2
+			.services(verify)
+			.verificationChecks.create(
 				{
-					if (verificationCheck.status === "approved")
-						this.userService.codeValidated(otpCode, req.user.id, true);
-					console.log(verificationCheck);
+					to: number,
+					code: body.otpCode
 				})
-				.then(() =>
+			.then((verificationCheck) =>
+			{
+				if (verificationCheck.status === "approved")
 				{
-					readLine.close();
-				});
-		});
+					this.userService.codeValidated(body.otpCode, req.user.id, true);
+					console.log(verificationCheck);
+					return ("okay");
+				}
+				else
+					throw new UnauthorizedException();
+			})
+			.catch((err) =>
+			{
+				throw new InternalServerErrorException();
+			});
+		// });
 	}
 }

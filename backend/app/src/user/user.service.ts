@@ -293,6 +293,7 @@ export class UserService
 		{
 			searchUser.authService.doubleAuth.validationCode = code;
 			searchUser.authService.doubleAuth.valid = valid;
+			searchUser.registrationProcessEnded = valid;
 		}
 	}
 }
