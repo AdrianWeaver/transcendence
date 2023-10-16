@@ -42,6 +42,7 @@ type	MembersModel =
 {
 	id: number,
 	name: string
+	profileId: string
 }
 
 type	FriendsModel =
@@ -76,6 +77,7 @@ export class ChatSocketEvents
 
 		afterInit(server: any)
 		{
+			this.chatService.getChat().setServer(this.server);
 		}
 
 		handleConnection(client: Socket)
@@ -100,6 +102,23 @@ export class ChatSocketEvents
 					console.log("Decoded Token ", decodedToken);
 					// decodedToken.id
 					profileId = decodedToken.id;
+
+					this.logger.warn("ProfileId: ", profileId);
+					const index = this.chatService.getIndexUserWithProfileId(profileId);
+					if (index === -1)
+					{
+						this.logger.log("User not founded");
+						const newUser = new User("test", client, profileId);
+						this.chatService.pushUser(newUser, client.id);
+					}
+					else
+					{
+						this.logger.log("Userfounded");
+						const oldSocketId = client.id;
+						this.chatService.setSocketToUser(index, client);
+						this.chatService.checkOldSocketInChannels(client, oldSocketId);
+					}
+					console.log(this.chatService.getAllUsersArray());
 				}
 				catch (error)
 				{
@@ -119,40 +138,40 @@ export class ChatSocketEvents
 				client.disconnect();
 				return ;
 			}
-
-			// rechercher en fonction de son profileId
-			// const searchUser = this.chatService.searchUser(client.id);
-			const searchUser = this.chatService.searchUserWithProfileId(profileId);
-			if (searchUser === undefined)
-			{
-				const newUser = new User("test", client, profileId);
-				this.chatService.pushUser(newUser, client.id);
-			}
-			else
-			{
-				const oldSocketId = searchUser.id;
-			}
-				this.chatService.updateDatabase();
-				const	action = {
-					type: "init-channels",
-					payload: {
-						channels: this.chatService.getChanMap(),
-						uniqueId: client.id,
-						privateMessage: this.chatService.getPrivateMessageMap()
-					}
-				};
-				client.emit("display-channels", action);
+			return ;
+			// const searchUser = this.chatService.searchUserWithProfileId(profileId);
+			// if (searchUser === undefined)
+			// {
+			// 	const newUser = new User("test", client, profileId);
+			// 	this.chatService.pushUser(newUser, client.id);
+			// }
+			// else
+			// {
+			// 	const oldSocketId = searchUser.id;
+			// 	searchUser.changeSocket(client);
+			// 	this.chatService.checkOldSocketInChannels(client, oldSocketId);
+			// }
+			// 	this.chatService.updateDatabase();
+			// 	const	action = {
+			// 		type: "init-channels",
+			// 		payload: {
+			// 			channels: this.chatService.getChanMap(),
+			// 			uniqueId: client.id,
+			// 			privateMessage: this.chatService.getPrivateMessageMap()
+			// 		}
+			// 	};
+			// 	client.emit("display-channels", action);
 		}
 
 		handleDisconnect(client: Socket)
 		{
-			const	userIndex = this.chatService.searchUserIndex(client.id);
-			const	socketIndex = this.chatService.searchSocketIndex(client.id);
-			if (userIndex !== undefined)
-			{
-				this.chatService.deleteUser(userIndex, socketIndex);
-				this.chatService.updateDatabase();
-			}
+			// const	userIndex = this.chatService.searchUserIndex(client.id);
+			// const	socketIndex = this.chatService.searchSocketIndex(client.id);
+			// if (userIndex !== undefined)
+			// {
+				// this.chatService.deleteUser(userIndex, socketIndex);
+				// this.chatService.updateDatabase();
+			// }
 		}
 
 		// @SubscribeMessage("display-conversation")
@@ -561,9 +580,13 @@ export class ChatSocketEvents
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
+					const profId = this.chatService.getProfileIdWithUserName(user);
+					if (profId === undefined)
+						return ;
 					const newMember: MembersModel = {
 						id: memberList.length + 1,
 						name: user,
+						profileId: profId,
 					};
 					memberList.push(newMember);
 				}

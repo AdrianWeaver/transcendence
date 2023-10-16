@@ -27,6 +27,12 @@ type MatchHistory = {
     moves: number,
     outStanding: boolean
 };
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
+
 class Chat
 {
 	public channels: Channel[] = [];
@@ -36,12 +42,14 @@ class Chat
 	public users: User[] = [];
 	public server: Server | undefined;
 	public activeMembers: number;
-	public memberSocketIds: string[] = [];
+	// public memberSocketIds: string[] = [];
+	public memberSocketIds: Array<MemberSocketIdModel> = [];
 	public message: Message[];
 	public matchHistory: MatchHistory[];
 	public deleteChannel: (name: string) => void;
 	public addUserToChannel: (name: string, id: string) => void;
 	public displayMessage: (message: Message) => void;
+	public setServer: (server: Server) => void;
 
 	public constructor ()
 	{
@@ -59,6 +67,11 @@ class Chat
 					this.channels.splice(chanIndex, 1);
 				}
 			}
+		};
+
+		this.setServer = (server: Server) =>
+		{
+			this.server = server;
 		};
 	}
 }
