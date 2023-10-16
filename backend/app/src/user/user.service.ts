@@ -22,6 +22,9 @@ import User from "src/chat/Objects/User";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import axios from "axios";
+import path from "path";
+import fs from "fs";
 
 @Injectable()
 export class UserService
@@ -126,6 +129,58 @@ export class UserService
 				}
 			}
 		};
+		const	urlImage = newUser.avatar;
+		this.logger.verbose(urlImage);
+		axios({
+			method: "get",
+			url: urlImage,
+			responseType: "stream"
+		})
+		.then((response) =>
+		{
+			const	tmpPictures = path.resolve(__dirname, "..", "..", "public", "tmp", newUser.id + ".jpg");
+			const	writer = fs.createWriteStream(tmpPictures);
+
+			response.data.pipe(writer);
+
+			return ( new Promise((resolve, reject) =>
+			{
+				writer.on("finish", resolve);
+				writer.on("error", reject);
+			}));
+		})
+		.catch((error: any) =>
+		{
+			console.log(error);
+		});
+		// console.log(urlImage);
+		// const	cfg = {
+		// 	method: "get",
+		// 	url: urlImage,
+		// 	header: {},
+		// };
+		// axios
+		// 	.request(cfg)
+		// 	.then((data : any) =>
+		// 	{
+		// 		this.logger.debug("This is the image from api ft");
+		// 		// this.logger.debug(data);
+		// 		console.log(data.data);
+		// 		const	tmpPictures = join(__dirname, "..", "..", "public", "tmp", newUser.id + ".jpg");
+		// 		console.log("this is the road to cdn ", tmpPictures);
+		// 		fs.writeFile(tmpPictures, data.data, (err) =>
+		// 		{
+		// 			if (err)
+		// 				this.logger.error(err);
+		// 			else
+		// 				this.logger.debug("File writed");
+		// 		});
+		// 	})
+		// 	.catch((error) =>
+		// 	{
+		// 		this.logger.error("Failed to load iage from api ft");
+		// 		this.logger.error(error);
+		// 	});
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
 			message: "Your session has been created, you must loggin",

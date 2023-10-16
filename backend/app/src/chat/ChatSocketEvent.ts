@@ -100,6 +100,7 @@ export class ChatSocketEvents
 					console.log("Decoded Token ", decodedToken);
 					// decodedToken.id
 					profileId = decodedToken.id;
+					// this.ser
 				}
 				catch (error)
 				{
