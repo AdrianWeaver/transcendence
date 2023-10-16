@@ -151,9 +151,7 @@ export	class ChatService implements OnModuleInit
 					rawobj.users.forEach((strobj: string) =>
 					{
 						const rawUser = JSON.parse(strobj);
-						// Channel[] not implemented
-						// Blocked[]
-						// Friend[]
+
 						const	newUserInstance = new User(
 							rawUser.name,
 							null,

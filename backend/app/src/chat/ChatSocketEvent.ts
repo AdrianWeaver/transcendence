@@ -77,6 +77,7 @@ export class ChatSocketEvents
 
 		afterInit(server: any)
 		{
+			this.chatService.getChat().setServer(this.server);
 		}
 
 		handleConnection(client: Socket)

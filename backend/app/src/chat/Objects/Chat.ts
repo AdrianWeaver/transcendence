@@ -49,6 +49,7 @@ class Chat
 	public deleteChannel: (name: string) => void;
 	public addUserToChannel: (name: string, id: string) => void;
 	public displayMessage: (message: Message) => void;
+	public setServer: (server: Server) => void;
 
 	public constructor ()
 	{
@@ -66,6 +67,11 @@ class Chat
 					this.channels.splice(chanIndex, 1);
 				}
 			}
+		};
+
+		this.setServer = (server: Server) =>
+		{
+			this.server = server;
 		};
 	}
 }
