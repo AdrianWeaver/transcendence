@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
@@ -99,11 +100,10 @@ const	UserServices = {
 	{
 		console.log("receive validation code");
 		const	config: AxiosRequestConfig = {
-			headers:
-			{
-				"Content-Type": "application/x-www-form-urlencoded",
-				Authorization: token
-			}
+			headers: {
+				"Authorization": "Basic " + process.env.TWILIO_ACCOUNT_SID + ":" + process.env.TWILIO_AUTH_TOKEN,
+				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
+			},
 		};
 		const	data = {
 			numero: numero

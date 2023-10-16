@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+/* eslint-disable max-len */
 import	axios from "axios";
 
 export default () =>

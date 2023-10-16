@@ -19,6 +19,7 @@ import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResp
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 
+import * as twilio from "twilio";
 
 class	RegisterDto
 {
@@ -65,13 +66,48 @@ class	TwilioResponseDto
 export class UserController
 {
 	private	readonly logger;
-	private	env;
+	private	readonly env;
 
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
 		this.env = dotenv.config();
+	}
+
+	@Post("test-double-auth")
+	testDoubleAuth(
+		@Body() body: any
+	)
+	{
+		console.log("body ", body);
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		client.messages
+		.create({
+			body: "Hello world",
+			messagingServiceSid: "MGb27c1e450cb8f255dc5ffaf1cd154d7a",
+			to: "+33622143240"
+		})
+		.then((message) =>
+		{
+			console.log(message.sid);
+		})
+		.catch((error) =>
+		{
+			console.error("Boo", error);
+		})
+		.finally(() =>
+		{
+			console.log("sms sent");
+		});
 	}
 
 	@Post("register")
@@ -247,7 +283,7 @@ export class UserController
 	}
 
 	@Post("double-auth-twilio")
-	@UseGuards(UserAuthorizationGuard)
+	// @UseGuards(UserAuthorizationGuard)
 	ReceiveValidationCodeTwilio(
 		@Body() body: TwilioResponseDto,
 		@Res() res: any)
@@ -263,35 +299,34 @@ export class UserController
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
-		let	retValue;
-		let	userObject: UserModel;
-		const dataAPI = new FormData();
-		dataAPI.append("To", body.To);
-		dataAPI.append("Channel", body.Channel);
-		dataAPI.append("sid", this.env.parsed.TWILIO_ACCOUNT_SID);
-		dataAPI.append("token", this.env.parsed.TWILIO_AUTH_TOKEN);
-		dataAPI.append("redirect_uri", "http://localhost:3001");
-
-		this.logger.debug(dataAPI);
+		const	data = {
+			To: "+33622143240",
+			Channel: "sms"
+		};
 		const config = {
 			method: "post",
 			maxBodyLength: Infinity,
 			url: "https://verify.twilio.com/v2/Services/VA96f27d7513b90f3f54774bfde0efd889/Verifications",
-			data: dataAPI
+			data: data
 		};
 		ApiTwilio()
-			.request(config)
-			.then((res) =>
-			{
-				const	data = res.data;
-				console.log(data);
-			})
-			.catch((error) =>
-			{
-				// this.logger.error("Get my information route", error);
-				// throw new InternalServerErrorException();
-					console.log("error ", error);
-			});
+		.request(config)
+		.then((res) =>
+		{
+			console.log(res.data);
+		});
+			// .request(config)
+			// .then((res) =>
+			// {
+			// 	const	data = res.data;
+			// 	console.log(data);
+			// })
+			// .catch((error) =>
+			// {
+			// 	// this.logger.error("Get my information route", error);
+			// 	// throw new InternalServerErrorException();
+			// 		console.log("error ", error);
+			// });
 		return ("code validation send");
 	}
 }
