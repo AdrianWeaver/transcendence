@@ -261,6 +261,11 @@ const	controllerSlice = createSlice(
 			state.user.lastName = action.payload.user.lastName;
 			state.user.avatar = action.payload.user.avatar;
 		},
+		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.registrationProcess = action.payload.user.registrationProcess;

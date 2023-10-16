@@ -6,6 +6,6 @@
 *.swo
 *tags
 
-
+node_modules
 front/app/package-lock.json
 backend/app/package-lock.json

@@ -4,12 +4,13 @@
 /* eslint-disable max-statements */
 import { Box, Button, FormControlLabel, Grid, Link, Switch, TextField } from "@mui/material";
 import UserRegistration from "../../../Object/UserRegistration";
-import { useState } from "react";
+import React, { useState } from "react";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	registerNumberForDoubleAuth,
 	setDoubleAuth,
 	setPhoneNumber,
 	setRegistered,
@@ -17,6 +18,13 @@ import {
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 import axios from "axios";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import MuiPhone from "../component/MuiPhone";
+// import MuiPhoneNumber from "mui-phone-number";
+
+
+// import "react-international-phone/style.css";
 
 /* eslint-disable max-lines-per-function */
 const	SecondStepFormContent = () =>
@@ -60,6 +68,25 @@ const	SecondStepFormContent = () =>
 		twoAuthCode,
 		setTwoAuthCode
 	] = useState("");
+
+	const
+	[
+		phoneInput,
+		setPhoneInput
+	] = useState("");
+
+	const
+	[
+		muiPhone,
+		setMuiPhone
+	] = useState("+33");
+
+	const
+	[
+		numberRegistered,
+		setNumberRegistered
+	] = useState(false);
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
@@ -106,23 +133,12 @@ const	SecondStepFormContent = () =>
 	};
 
 	let	fieldPhone;
+
 	if (displayInput === false)
 	{
 		fieldPhone = (
 			<Grid item xs={12} sm={12}>
-				<TextField
-					name="phoneNumber"
-					required={required}
-					fullWidth
-					id="phoneNumber"
-					label="Phone Number"
-					error={errorValidation.phoneNumber}
-					helperText={
-						errorValidation.phoneNumber
-							? "phone number is required"
-							: ""
-					}
-				/>
+				<MuiPhone value={muiPhone} onChange={setMuiPhone} />
 			</Grid>
 		);
 	}
@@ -152,6 +168,7 @@ const	SecondStepFormContent = () =>
 		{
 			console.log("the value of phone " + user.phoneNumber);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
+			setCodeValid(true);
 			if (codeValid)
 			{
 				dispatch(setUserLoggedIn());
@@ -159,9 +176,10 @@ const	SecondStepFormContent = () =>
 			}
 		};
 
-		const	handleSendSMS = () =>
+		const	handleRegisterNumber = () =>
 		{
-			setSendSMS(true);
+			setNumberRegistered(true);
+			dispatch(registerNumberForDoubleAuth(muiPhone, user.bearerToken));
 		};
 
 		const sendTheCode = (
@@ -179,7 +197,8 @@ const	SecondStepFormContent = () =>
 				finish the Authentification
 			</Button>
 		);
-		const sendButton = (
+
+		const sendSmsButton = (
 			<Button
 				type="submit"
 				fullWidth
@@ -189,9 +208,24 @@ const	SecondStepFormContent = () =>
 					mt: 3,
 					mb: 2
 				}}
-				onClick={handleSendSMS}
+				// onClick={handleReceiveCode}
 			>
-				Receive a SMS
+				Receive the code
+			</Button>
+		);
+		const registerNumButton = (
+			<Button
+				type="submit"
+				fullWidth
+				variant="contained"
+				sx={
+				{
+					mt: 3,
+					mb: 2
+				}}
+				onClick={handleRegisterNumber}
+			>
+				register phone number
 			</Button>
 		);
 		const finishButton = (
@@ -208,6 +242,7 @@ const	SecondStepFormContent = () =>
 					Finish to register
 				</Button>
 		);
+
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }} >
 			<Grid container spacing={2} textAlign="center">
@@ -229,9 +264,11 @@ const	SecondStepFormContent = () =>
 				}
 				{
 					(required)
-					? (!sendSMS)
-						? sendButton
-						: sendTheCode
+					? (!numberRegistered)
+						? registerNumButton
+						: (!sendSMS)
+							? sendSmsButton
+							: sendTheCode
 					: <></>
 				}
 			</Grid>
