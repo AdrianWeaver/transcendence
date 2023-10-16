@@ -13,6 +13,7 @@ import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
+import	ApiTwilio from "../Api-twilio";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
@@ -248,12 +249,49 @@ export class UserController
 	@Post("double-auth-twilio")
 	@UseGuards(UserAuthorizationGuard)
 	ReceiveValidationCodeTwilio(
-		@Body() data: TwilioResponseDto,
-		@Req() req: any)
+		@Body() body: TwilioResponseDto,
+		@Res() res: any)
 		: string
 	{
 		this.logger
 			.log("'double-auth-twilio' route request");
+			if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		let	retValue;
+		let	userObject: UserModel;
+		const dataAPI = new FormData();
+		dataAPI.append("To", body.To);
+		dataAPI.append("Channel", body.Channel);
+		dataAPI.append("sid", this.env.parsed.TWILIO_ACCOUNT_SID);
+		dataAPI.append("token", this.env.parsed.TWILIO_AUTH_TOKEN);
+		dataAPI.append("redirect_uri", "http://localhost:3001");
+
+		this.logger.debug(dataAPI);
+		const config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "https://verify.twilio.com/v2/Services/VA96f27d7513b90f3f54774bfde0efd889/Verifications",
+			data: dataAPI
+		};
+		ApiTwilio()
+			.request(config)
+			.then((res) =>
+			{
+				const	data = res.data;
+				console.log(data);
+			})
+			.catch((error) =>
+			{
+				// this.logger.error("Get my information route", error);
+				// throw new InternalServerErrorException();
+					console.log("error ", error);
+			});
 		return ("code validation send");
 	}
 }
