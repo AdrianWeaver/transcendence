@@ -333,6 +333,7 @@ export const setPseudo = (name: string)
 			if (elem.id === prevState.controller.user.id)
 				elem.username = name;
 		});
+		console.log("name ? ", name);
 		arrayChat.forEach((elem) =>
 		{
 			if (elem.name === prevState.controller.user.username)
@@ -648,7 +649,7 @@ export const registerClientWithCode = (code : string)
 					elem.email = data.email;
 					elem.firstName = data.firstName;
 					elem.lastName = data.lastName;
-					elem.username = data.login;
+					elem.username = data.username;
 					elem.avatar = data.avatar;
 				}
 			});
@@ -663,7 +664,7 @@ export const registerClientWithCode = (code : string)
 					email: data.email,
 					// our token
 					bearerToken: data.token,
-					username: data.login,
+					username: data.username,
 					firstName: data.firstName,
 					lastName: data.lastName,
 					avatar: data.avatar,
