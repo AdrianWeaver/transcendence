@@ -45,6 +45,7 @@ class User
 	public createProfile: (pseudo: string, data: any) => void;
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
+	public changeSocket: (client: Socket) => void;
 
     public constructor(name: string, client: Socket | null, profileId: string)
     {
@@ -59,7 +60,6 @@ class User
 		else
 			this.id = client.id;
         this.chat = undefined;
-		this.profileId = "undefined yet";
 		this.joinChannel = (chanName: string) =>
 		{
 			if (this.client === null)
@@ -145,6 +145,12 @@ class User
 		this.changeAvatar = (avatar: string) =>
 		{
 			this.profile.avatar = avatar;
+		};
+
+		this.changeSocket = (client: Socket) =>
+		{
+			this.client = client;
+			this.id = client.id;
 		};
     }
 

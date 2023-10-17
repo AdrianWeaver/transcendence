@@ -17,7 +17,6 @@ class Channel
 {
     public kind: string;
     public owner: string;
-    public admin: string | undefined;
     public admins: string[] = [];
     public banned: string[] = [];
     public name: string;
@@ -48,9 +47,11 @@ class Channel
         this.members++;
         if (client === null)
             return ;
-        this.owner = client.id;
         if (this.members === 1)
+        {
+            this.owner = client.id;
             this.admins.push(client.id);
+        }
         this.users.push(client.id);
         this.sockets.push(client);
         this.mode = mode;
@@ -135,7 +136,6 @@ class Channel
     public parseForDatabase()
     {
         const	dbObject = {
-            admin: this.admin,
             admins: this.admins,
             banned: this.banned,
             // chat: this.chat,
