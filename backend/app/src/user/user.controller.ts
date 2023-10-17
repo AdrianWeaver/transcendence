@@ -385,6 +385,7 @@ export class UserController
 				})
 			.then((verificationCheck) =>
 			{
+				console.log("status : ", verificationCheck.status);
 				if (verificationCheck.status === "approved")
 				{
 					this.userService.codeValidated(body.otpCode, req.user.id, true);

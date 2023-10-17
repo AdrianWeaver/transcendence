@@ -841,7 +841,7 @@ export const GetValidationCode = (otpCode : string, token: string)
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
-		const	data: any = await UserServices.getValidationCodeFromTwilio(otpCode, token);
+		const	data: any = await UserServices.getValidationCodeFromTwilio(prev.controller.user.phoneNumber, otpCode, token, "localhost");
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -854,13 +854,14 @@ export const GetValidationCode = (otpCode : string, token: string)
 				user:
 				{
 					...prev.controller.user,
-					otpCode: otpCode
+					otpCode: otpCode,
+					// registered, validate = true ?
 				}
 			}
 			console.log("controller action 791  ", data);
 		}
 		dispatch(controllerActions.getValidationCode(response));
-		console.log("phone number enregistre");
+		console.log("code enregistre");
 	});
 };
 

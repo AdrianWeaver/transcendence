@@ -169,11 +169,13 @@ const	SecondStepFormContent = () =>
 		{
 			console.log("the value of phone " + user.phoneNumber);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
-			setCodeValid(true);
-			if (codeValid)
+			console.log("code : ", twoAuthCode);
+			if (twoAuthCode.length)
 			{
-				dispatch(setUserLoggedIn());
-				dispatch(setRegistered(true));
+				dispatch(GetValidationCode(twoAuthCode, user.bearerToken));
+				console.log("OKAY ?");
+			//	dispatch(setUserLoggedIn());
+			//	dispatch(setRegistered(true));
 			}
 		};
 

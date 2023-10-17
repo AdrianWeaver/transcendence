@@ -126,7 +126,7 @@ const	UserServices = {
 	},
 
 	async	getValidationCodeFromTwilio
-	(token: string, hostname: string)
+	(numero: string, otpCode: string, token: string, hostname: string)
 	{
 		console.log("get validation code");
 		const	config: AxiosRequestConfig = {
@@ -136,9 +136,14 @@ const	UserServices = {
 			},
 		};
 
+		const	data = {
+			to: numero,
+			otpCode: otpCode
+		};
+
 		return (
 			Api(hostname)
-			.post("/user/get-code", config)
+			.post("/user/get-code", data, config)
 			.then((data) =>
 			{
 				console.log("ft-api-service get code TWILIO ", data.data);
