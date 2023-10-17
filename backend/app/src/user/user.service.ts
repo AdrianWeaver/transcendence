@@ -49,7 +49,7 @@ export class UserService
 		return (this.user);
 	}
 
-	public	getBackUserModelArray(): Array<BackUserModel>
+	public	getBackUserModelArray(): BackUserModel[]
 	{
 		const	users: BackUserModel[] = [];
 		let i: number;

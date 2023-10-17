@@ -1105,30 +1105,48 @@ export const	setAllUsers = ()
 	{
 		const	prev = getState();
 
-		const	data: any = await UserServices.getAllTheUsers("localhost");
+		const	data: BackUserModel[] | any = await UserServices.getAllTheUsers("localhost");
 		if (data === "error")
 		{
 			console.error("Error to get users");
 			return ;
 		}
 		console.log("here data", data);
-		// const	array: BackUserModel[] = [...prev.controller.allUsers];
-
-		// array.forEach((elem) =>
-		// {
-		// 	if (elem.id === data.id)
-		// 	{
-		// 		elem.id = data.id;
-		// 		elem.email = data.email;
-		// 		elem.firstName = data.firstName;
-		// 		elem.lastName = data.lastName;
-		// 		elem.username = data.login;
-		// 		elem.avatar = data.avatar;
-		// 	}
-		// });
+		let	array: BackUserModel[];
+		if (prev.controller.allUsers !== undefined)
+		{
+			array = [...prev.controller.allUsers];
+			array.forEach((elem) =>
+			{
+				if (elem.id === data.id)
+				{
+					elem.id = data.id;
+					elem.email = data.email;
+					elem.firstName = data.firstName;
+					elem.lastName = data.lastName;
+					elem.username = data.username;
+					elem.location = data.location;
+					elem.avatar = data.avatar;
+				}
+			});
+		}
+		else
+		{
+			array = [
+				{
+					id: data.id,
+					email: data.email,
+					firstName: data.firstName,
+					lastName: data.lastName,
+					location: data.location,
+					avatar: data.avatar,
+					username: data.username
+				}
+			];
+		}
 		const	response: ControllerModel = {
 			...prev.controller,
-			allUsers: data
+			allUsers: [...array]
 		}
 		dispatch(controllerActions.setAllUsers(response));
 	});
