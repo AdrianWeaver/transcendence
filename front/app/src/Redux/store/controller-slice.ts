@@ -39,6 +39,7 @@ const	initialControllerState: ControllerModel = {
 		bearerToken: "undefined",
 		rememberMe: false,
 		doubleAuth: false,
+		codeValidated: false,
 		otpCode: "undefined",
 		phoneNumber: "undefined",
 		registered: false,
@@ -274,6 +275,11 @@ const	controllerSlice = createSlice(
 		getValidationCode(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.otpCode = action.payload.user.otpCode;
+			state.user.codeValidated = action.payload.user.codeValidated;
+		},
+		setCodeValidated(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{

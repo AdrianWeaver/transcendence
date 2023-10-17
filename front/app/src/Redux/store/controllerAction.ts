@@ -841,8 +841,8 @@ export const GetValidationCode = (otpCode : string, token: string)
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
-		const	data: any = await UserServices.getValidationCodeFromTwilio(otpCode, token);
-		if (data === "ERROR")
+		const	data: any = await UserServices.getValidationCodeFromTwilio(prev.controller.user.phoneNumber, otpCode, token, "localhost");
+		if (data === "error")
 		{
 			dispatch(setRegistrationProcessError());
 			return ;
@@ -854,15 +854,35 @@ export const GetValidationCode = (otpCode : string, token: string)
 				user:
 				{
 					...prev.controller.user,
-					otpCode: otpCode
+					otpCode: otpCode,
+					codeValidated: data.data
 				}
 			}
-			console.log("controller action 791  ", data);
+			console.log("controller action 791  ", data.data);
 		}
 		dispatch(controllerActions.getValidationCode(response));
-		console.log("phone number enregistre");
+		console.log("code enregistre");
 	});
 };
+
+export const	setCodeValidated = (data: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				codeValidated: data,
+			}
+		}
+		dispatch(controllerActions.setCodeValidated(response));
+	});
+}
 
 export const	setDoubleAuth = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
