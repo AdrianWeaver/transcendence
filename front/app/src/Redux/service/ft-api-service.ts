@@ -68,32 +68,20 @@ const	UserServices = {
 	async	getAllTheUsers(hostname: string)
 	{
 		console.log("Get all users route");
-		Api(hostname)
-		.get("/user/get-all-users", {})
-		.then((data) =>
-		{
-			const	users: BackUserModel[] = data.data;
-			let i: number;
-			i = 0;
-			data.data.forEach((elem: any) =>
+		return (
+			Api(hostname)
+			.get("/user/get-all-users", {})
+			.then((data) =>
 			{
-				users[i].id = elem.id;
-				users[i].username = elem.username;
-				users[i].firstName = elem.firstName;
-				users[i].lastName = elem.lastName;
-				users[i].location = elem.location;
-				users[i].email = elem.email;
-				users[i].avatar = elem.avatar;
-				i++;
-			});
-			console.log("get all users route ", users);
-			return (users);
-		})
-		.catch((error) =>
-		{
-			console.error(error);
-			return ("error");
-		});
+				console.log("get all users route ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("error");
+			})
+		);
 	},
 	async	getNumberForDoubleAuth
 		(numero: string, token: string, hostname: string)

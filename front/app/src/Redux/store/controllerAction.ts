@@ -1105,28 +1105,29 @@ export const	setAllUsers = ()
 	{
 		const	prev = getState();
 
-		const	data: BackUserModel[] | any = await UserServices.getAllTheUsers("localhost");
-		if (data === "error")
+		const	theUsers: BackUserModel[] | any = await UserServices.getAllTheUsers("localhost");
+
+		if (theUsers === "error")
 		{
 			console.error("Error to get users");
 			return ;
 		}
-		console.log("here data", data);
+		console.log("here theUsers", theUsers);
 		let	array: BackUserModel[];
 		if (prev.controller.allUsers !== undefined)
 		{
 			array = [...prev.controller.allUsers];
 			array.forEach((elem) =>
 			{
-				if (elem.id === data.id)
+				if (elem.id === theUsers.id)
 				{
-					elem.id = data.id;
-					elem.email = data.email;
-					elem.firstName = data.firstName;
-					elem.lastName = data.lastName;
-					elem.username = data.username;
-					elem.location = data.location;
-					elem.avatar = data.avatar;
+					elem.id = theUsers.id;
+					elem.email = theUsers.email;
+					elem.firstName = theUsers.firstName;
+					elem.lastName = theUsers.lastName;
+					elem.username = theUsers.username;
+					elem.location = theUsers.location;
+					elem.avatar = theUsers.avatar;
 				}
 			});
 		}
@@ -1134,13 +1135,13 @@ export const	setAllUsers = ()
 		{
 			array = [
 				{
-					id: data.id,
-					email: data.email,
-					firstName: data.firstName,
-					lastName: data.lastName,
-					location: data.location,
-					avatar: data.avatar,
-					username: data.username
+					id: theUsers.id,
+					email: theUsers.email,
+					firstName: theUsers.firstName,
+					lastName: theUsers.lastName,
+					location: theUsers.location,
+					avatar: theUsers.avatar,
+					username: theUsers.username
 				}
 			];
 		}

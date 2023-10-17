@@ -65,6 +65,7 @@ export class UserService
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
+
 			};
 			i++;
 		});
