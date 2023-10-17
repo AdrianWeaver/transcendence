@@ -183,8 +183,21 @@ const	Signin = () =>
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				dispatch(setUserLoggedIn());
-				navigate("/");
+				const	searchUser = users.find((elem) =>
+				{
+					console.log("name ", elem.name === userLogIn.username);
+					console.log("pass ", elem.password === userLogIn.password);
+					return (elem.name === userLogIn.username
+						&& elem.password === userLogIn.password);
+				});
+				if (searchUser !== undefined)
+				{
+					dispatch(setUserLoggedIn());
+					navigate("/");
+				}
+				else
+					console.log("user doesnt exist");
+				// throw a user not found exception
 			}
 	};
 
