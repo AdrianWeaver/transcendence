@@ -1105,7 +1105,7 @@ export const	setAllUsers = ()
 	{
 		const	prev = getState();
 
-		const	theUsers: BackUserModel[] | any = await UserServices.getAllTheUsers("localhost");
+		const	theUsers: any = await UserServices.getAllTheUsers("localhost");
 
 		if (theUsers === "error")
 		{
@@ -1113,38 +1113,8 @@ export const	setAllUsers = ()
 			return ;
 		}
 		console.log("here theUsers", theUsers);
-		let	array: BackUserModel[];
-		if (prev.controller.allUsers !== undefined)
-		{
-			array = [...prev.controller.allUsers];
-			array.forEach((elem) =>
-			{
-				if (elem.id === theUsers.id)
-				{
-					elem.id = theUsers.id;
-					elem.email = theUsers.email;
-					elem.firstName = theUsers.firstName;
-					elem.lastName = theUsers.lastName;
-					elem.username = theUsers.username;
-					elem.location = theUsers.location;
-					elem.avatar = theUsers.avatar;
-				}
-			});
-		}
-		else
-		{
-			array = [
-				{
-					id: theUsers.id,
-					email: theUsers.email,
-					firstName: theUsers.firstName,
-					lastName: theUsers.lastName,
-					location: theUsers.location,
-					avatar: theUsers.avatar,
-					username: theUsers.username
-				}
-			];
-		}
+		const array: BackUserModel[] = theUsers;
+
 		const	response: ControllerModel = {
 			...prev.controller,
 			allUsers: [...array]

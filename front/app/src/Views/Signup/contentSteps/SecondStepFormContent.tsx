@@ -13,6 +13,7 @@ import {
 	GetValidationCode,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
+	setAllUsers,
 	setDoubleAuth,
 	setPhoneNumber,
 	setRegistered,
@@ -121,6 +122,7 @@ const	SecondStepFormContent = () =>
 			dispatch(setPhoneNumber("undefined"));
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
+			dispatch(setAllUsers());
 		}
 	};
 
@@ -185,6 +187,7 @@ const	SecondStepFormContent = () =>
 				{
 					dispatch(setUserLoggedIn());
 					dispatch(setRegistered(true));
+					dispatch(setAllUsers());
 				}
 			}
 		};

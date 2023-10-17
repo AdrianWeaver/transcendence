@@ -167,7 +167,6 @@ const	Signin = () =>
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
-		dispatch(setAllUsers());
 		const	data = new FormData(event.currentTarget);
 		const	userLogIn = new UserLogin(data);
 
