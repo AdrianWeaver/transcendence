@@ -4,16 +4,17 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, } from "class-validator";
+import { IsEmail, IsNotEmpty, isNotEmpty, } from "class-validator";
 import { Response } from "express";
 import	Api from "../Api";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
-
+// import { FileInterceptor } from "@nestjs/platform-express";
+// import {busboy} from "busboy";
 
 class	RegisterDto
 {
@@ -36,6 +37,12 @@ class UserLoginDto
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;
+}
+
+class UserUploadPhotoDto
+{
+	@IsNotEmpty()
+	image: any;
 }
 
 @Controller("user")
@@ -212,4 +219,18 @@ export class UserController
 		return (this.userService.getMyInfo(97756));
 	}
 
+
+	@Post("/update-photo")
+	// @UseGuards(UserAuthorizationGuard)
+	updatePhoto(
+		@Req() req: any,
+		@Body() body: any)
+	{
+		this.logger.debug("A user request update photo");
+		console.log(req.headers);
+
+		// console.log(body);
+		// console.log(file);
+		return ("okay");
+	}
 }

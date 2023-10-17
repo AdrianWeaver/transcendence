@@ -7,6 +7,7 @@ import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { UserModel } from "../../Redux/models/redux-models";
 import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
+import axios from "axios";
 
 type	MyAvatarCardProps = {
 	userInfo: UserModel,
@@ -296,6 +297,25 @@ const DropZoneImage = () =>
 
 	let dropContent;
 
+	const	sendImage = () =>
+	{
+		if (files.length === 0)
+			return ;
+		const	formData = new FormData();
+		formData.append("photo", files[0]);
+
+		axios
+		.post("http://localhost:3000/user/update-photo", { body: formData})
+		.then((response) =>
+		{
+			console.log(response.data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+	};
+
 	if (open)
 	{
 		dropContent = (
@@ -403,10 +423,7 @@ const DropZoneImage = () =>
 									xs={3}
 								>
 									<Button
-										onClick={() =>
-										{
-											window.alert("UnImplemented yet");
-										}}
+										onClick={sendImage}
 									>
 										Valider
 									</Button>
