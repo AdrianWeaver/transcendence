@@ -137,6 +137,10 @@ const	Signin = () =>
 	{
 		return (state.controller.user.chat.users);
 	});
+	const	allUsers = useAppSelector((state) =>
+	{
+		return (state.controller.allUsers);
+	});
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
@@ -163,6 +167,7 @@ const	Signin = () =>
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
+		dispatch(setAllUsers());
 		const	data = new FormData(event.currentTarget);
 		const	userLogIn = new UserLogin(data);
 
@@ -180,6 +185,7 @@ const	Signin = () =>
 				return (value === true);
 			});
 			console.log("filtered", filtered);
+			console.log("ici", allUsers);
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{

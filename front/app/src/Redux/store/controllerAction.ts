@@ -13,6 +13,7 @@ import { RootState } from "./index";
 import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
+import { AirlineSeatReclineNormalTwoTone } from "@mui/icons-material";
 type MessageModel =
 {
 	sender: string,
@@ -325,8 +326,21 @@ export const setPseudo = (name: string)
 	return ((dispatch, getState) =>
 	{
 		const prevState = getState();
+		const	array: BackUserModel[] = [...prevState.controller.allUsers];
+		const	arrayChat: ChatUserModel[] = [...prevState.controller.user.chat.users];
+		array.forEach((elem) =>
+		{
+			if (elem.id === prevState.controller.user.id)
+				elem.username = name;
+		});
+		arrayChat.forEach((elem) =>
+		{
+			if (elem.name === prevState.controller.user.username)
+				elem.name = name;
+		});
 		const response: ControllerModel = {
 			...prevState.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prevState.controller.user,
@@ -334,7 +348,9 @@ export const setPseudo = (name: string)
 				chat:
 				{
 					...prevState.controller.user.chat,
-					pseudo: name
+					// ca ca n'a pas de sens xD TEST
+					pseudo: name,
+					users: [...arrayChat]
 				}
 			}
 		};
@@ -474,126 +490,6 @@ export const setNumberOfChannels = (numberOfChannels: number)
 	});
 };
 
-// export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex !== -1)
-// 			prevState.controller.user.chat.users[userIndex].msgRoom = room;
-// 		else
-// 			console.log("Id not found");
-// 		const response: ControllerModel = {
-// 			...prevState.controller,
-// 			user:
-// 			{
-// 				...prevState.controller.user,
-// 				chat:
-// 				{
-// 					...prevState.controller.user.chat,
-// 					users: prevState.controller.user.chat.users,
-// 				}
-// 			}
-// 		};
-// 		dispatch(controllerActions.setMessageRoom(response));
-// 	});
-// };
-
-// export const setMessage = (message: MessageModelInterface[], clientId: string, msgIndex: number)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex === -1)
-// 			console.log("Id not found");
-// 		else
-// 		{
-// 			const response: ControllerModel = {
-// 				...prevState.controller,
-// 				user:
-// 				{
-// 					...prevState.controller.user,
-// 					chat:
-// 					{
-// 						...prevState.controller.user.chat,
-// 						users: [
-// 						{
-// 							...prevState.controller.user.chat.users[userIndex],
-// 							msgRoom: [
-// 								{
-// 									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-// 									content: message,
-// 								}
-// 							]
-// 						}
-// 						]
-// 					}
-// 				}
-// 			};
-// 			dispatch(controllerActions.setMessage(response));
-// 		}
-// 	});
-// };
-
-// export const addMessage = (clientId: string, msgIndex: number, text: string, index: number)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex === -1)
-// 			console.log("Id not found");
-// 		else
-// 		{
-// 			const response: ControllerModel = {
-// 				...prevState.controller,
-// 				user:
-// 				{
-// 					...prevState.controller.user,
-// 					chat:
-// 					{
-// 						...prevState.controller.user.chat,
-// 						users: [
-// 						{
-// 							...prevState.controller.user.chat.users[userIndex],
-// 							// msgRoom: [
-// 							// 	{
-// 							// 		...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-// 							// 		content: [
-// 							// 		{
-// 							// 			...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex].content[index],
-// 							// 			message: text
-// 							// 		}
-// 							// 		]
-// 							// 	}
-// 							// ]
-// 						}
-// 						]
-// 					}
-// 				}
-// 			};
-// 			dispatch(controllerActions.addMessage(response));
-// 		}
-// 	});
-// };
-
 export const setRegistrationProcessStart = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -660,8 +556,22 @@ export const	setUserData = (data: any)
 	{
 		const	prev = getState();
 
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
+
+		array.forEach((elem) =>
+		{
+			if (elem.id === data.id)
+			{
+				elem.id = data.id;
+				elem.email = data.email;
+				elem.firstName = data.firstName;
+				elem.lastName = data.lastName;
+				elem.username = data.login;
+			}
+		});
 		const	response: ControllerModel = {
 			...prev.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prev.controller.user,
@@ -683,8 +593,6 @@ export const verifyToken = ()
 	{
 		const prev = getState();
 
-		// console.log("Value of prevState");
-		// console.log(prev);
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
@@ -730,8 +638,24 @@ export const registerClientWithCode = (code : string)
 		}
 		else
 		{
+			const	array: BackUserModel[] = [...prev.controller.allUsers];
+
+			array.forEach((elem) =>
+			{
+				if (elem.id === data.id)
+				{
+					elem.id = data.id;
+					elem.email = data.email;
+					elem.firstName = data.firstName;
+					elem.lastName = data.lastName;
+					elem.username = data.login;
+					elem.avatar = data.avatar;
+				}
+			});
+
 			response = {
 				...prev.controller,
+				allUsers: [...array],
 				user:
 				{
 					...prev.controller.user,
@@ -890,7 +814,6 @@ export const	setDoubleAuth = (data: boolean)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -909,7 +832,6 @@ export const	setPhoneNumber = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -928,7 +850,6 @@ export const	setRegistered = (data: boolean)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -994,9 +915,16 @@ export const	setAvatar = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
 
+		array.forEach((elem) =>
+		{
+			if (elem.id === prev.controller.user.id)
+				elem.avatar = data;
+		});
 		const	response: ControllerModel = {
 			...prev.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prev.controller.user,
@@ -1113,7 +1041,6 @@ export const	setPassword = (password: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1132,14 +1059,21 @@ export const	setEmail = (email: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
 
+		array.forEach((elem) =>
+		{
+			if (elem.id === prev.controller.user.id)
+				elem.email = email;
+		});
 		const	response: ControllerModel = {
 			...prev.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prev.controller.user,
 				email: email
-			}
+			},
 		}
 		dispatch(controllerActions.setEmail(response));
 	});
@@ -1164,13 +1098,34 @@ export const	setLogin = (login: string)
 	});
 }
 
-export const	setAllUsers = (data: BackUserModel[])
+export const	setAllUsers = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch, getState) =>
+	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 
+		const	data: any = await UserServices.getAllTheUsers("localhost");
+		if (data === "error")
+		{
+			console.error("Error to get users");
+			return ;
+		}
+		console.log("here data", data);
+		// const	array: BackUserModel[] = [...prev.controller.allUsers];
+
+		// array.forEach((elem) =>
+		// {
+		// 	if (elem.id === data.id)
+		// 	{
+		// 		elem.id = data.id;
+		// 		elem.email = data.email;
+		// 		elem.firstName = data.firstName;
+		// 		elem.lastName = data.lastName;
+		// 		elem.username = data.login;
+		// 		elem.avatar = data.avatar;
+		// 	}
+		// });
 		const	response: ControllerModel = {
 			...prev.controller,
 			allUsers: data

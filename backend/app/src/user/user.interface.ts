@@ -37,14 +37,6 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
-	doubleAuth:
-	{
-		enable: boolean;
-		valid: boolean;
-		phoneNumber: string;
-		phoneRegistered: boolean;
-		lastIpClient: string;
-	}
 }
 export interface UserModel
 {

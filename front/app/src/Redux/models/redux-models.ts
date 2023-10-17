@@ -15,7 +15,6 @@ export	interface ChatUserModel
 
 export interface BackUserModel
 {
-	uuid: string;
 	id: number | string;
 	email: string;
 	username: string;
@@ -23,14 +22,6 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
-	doubleAuth:
-	{
-		enable: boolean;
-		valid: boolean;
-		phoneNumber: string;
-		phoneRegistered: boolean;
-		lastIpClient: string;
-	}
 }
 
 export interface ChatModel

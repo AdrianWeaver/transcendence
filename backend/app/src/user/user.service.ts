@@ -65,14 +65,6 @@ export class UserService
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
-				doubleAuth:
-				{
-					enable: elem.authService.doubleAuth.enable,
-					valid: elem.authService.doubleAuth.valid,
-					phoneNumber: elem.authService.doubleAuth.phoneNumber,
-					phoneRegistered: elem.authService.doubleAuth.phoneRegistered,
-					lastIpClient: elem.authService.doubleAuth.lastIpClient
-				}
 			};
 			i++;
 		});
