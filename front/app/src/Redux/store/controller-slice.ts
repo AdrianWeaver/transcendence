@@ -39,6 +39,7 @@ const	initialControllerState: ControllerModel = {
 		bearerToken: "undefined",
 		rememberMe: false,
 		doubleAuth: false,
+		otpCode: "undefined",
 		phoneNumber: "undefined",
 		registered: false,
 		chat:
@@ -265,6 +266,14 @@ const	controllerSlice = createSlice(
 		{
 			state.user.phoneNumber = action.payload.user.phoneNumber;
 			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
+		receiveValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
+		getValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.otpCode = action.payload.user.otpCode;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{

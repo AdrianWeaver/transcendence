@@ -10,6 +10,8 @@ import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	GetValidationCode,
+	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setDoubleAuth,
 	setPhoneNumber,
@@ -18,10 +20,7 @@ import {
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 import axios from "axios";
-import { PhoneInput } from "react-international-phone";
-import "react-international-phone/style.css";
 import MuiPhone from "../component/MuiPhone";
-// import MuiPhoneNumber from "mui-phone-number";
 
 
 // import "react-international-phone/style.css";
@@ -87,23 +86,26 @@ const	SecondStepFormContent = () =>
 		setNumberRegistered
 	] = useState(false);
 
+
+	const	formattingPhoneNumber = (num: string) =>
+	{
+		let	newNum;
+
+		newNum= num;
+		newNum = newNum.replace(/\s/g, "");
+		return (newNum);
+	};
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
-		const	data = new FormData(event.currentTarget);
-		const	userPhone = new UserSecurity(data, user);
-
-		userPhone.check();
-		setErrorValidation(userPhone.checker);
-
-		const	isNotValid = userPhone.checker.getPhoneNumberCheck();
-		console.log("isNotValid", isNotValid);
 		if (user.doubleAuth)
 		{
 			dispatch(setDoubleAuth(true));
-			if (!isNotValid)
+			if (numberRegistered)
 			{
-				dispatch(setPhoneNumber(userPhone.phoneNumber));
+				const numberFormat = formattingPhoneNumber(muiPhone);
+				dispatch(setPhoneNumber(numberFormat));
 				setDisplayInput(true);
 			}
 		}
@@ -120,7 +122,6 @@ const	SecondStepFormContent = () =>
 	{
 		const	checked = event.target?.checked;
 
-		// doesnt seem to set
 		setRequired(checked);
 		dispatch(setDoubleAuth(checked));
 	};
@@ -178,8 +179,42 @@ const	SecondStepFormContent = () =>
 
 		const	handleRegisterNumber = () =>
 		{
-			setNumberRegistered(true);
-			dispatch(registerNumberForDoubleAuth(muiPhone, user.bearerToken));
+			let	tmp, valid;
+
+			valid = true;
+			tmp = muiPhone;
+			tmp = tmp.replace(/\s/g, "");
+			if (muiPhone === undefined || muiPhone === null
+					|| muiPhone.length === 0
+					|| muiPhone === "undefined")
+				valid = false;
+			else
+			{
+				if (tmp.length < 9
+						|| tmp.length > 15)
+					valid = false;
+				if (muiPhone[0] !== "+")
+					valid = false;
+				else
+					tmp = tmp.slice(1, tmp.length);
+				if (isNaN(Number(tmp)))
+					valid = false;
+			}
+			if (valid)
+			{
+				dispatch(registerNumberForDoubleAuth(formattingPhoneNumber(muiPhone), user.bearerToken));
+				setNumberRegistered(true);
+			}
+		};
+
+		const	handleReceiveCode = () =>
+		{
+			if (numberRegistered && muiPhone)
+			{
+				console.log("mui phone ", muiPhone);
+				dispatch(receiveValidationCode(formattingPhoneNumber(muiPhone), user.bearerToken));
+				setSendSMS(true);
+			}
 		};
 
 		const sendTheCode = (
@@ -208,7 +243,7 @@ const	SecondStepFormContent = () =>
 					mt: 3,
 					mb: 2
 				}}
-				// onClick={handleReceiveCode}
+				onClick={handleReceiveCode}
 			>
 				Receive the code
 			</Button>
@@ -257,6 +292,7 @@ const	SecondStepFormContent = () =>
 						labelPlacement="start"
 					/>
 				</Grid>
+				<Grid item xs={12} sm={12}>
 				{
 					(required)
 					? fieldPhone
@@ -271,6 +307,7 @@ const	SecondStepFormContent = () =>
 							: sendTheCode
 					: <></>
 				}
+				</Grid>
 			</Grid>
 		</Box>
 	);

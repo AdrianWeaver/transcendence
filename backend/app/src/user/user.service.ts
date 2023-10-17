@@ -257,7 +257,7 @@ export class UserService
 		return (myInfo);
 	}
 
-	public	getPhoneNumber(numero: string, id: string)
+	public	registerPhoneNumber(numero: string, id: string)
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
@@ -270,5 +270,30 @@ export class UserService
 			searchUser.authService.doubleAuth.phoneRegistered = true;
 		}
 		return("ok");
+	}
+
+	public	getPhoneNumber(id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+			return (searchUser.authService.doubleAuth.phoneNumber);
+		return("undefined");
+	}
+
+	public	codeValidated(code: string, id: string, valid: boolean)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.validationCode = code;
+			searchUser.authService.doubleAuth.valid = valid;
+			searchUser.registrationProcessEnded = valid;
+		}
 	}
 }

@@ -13,11 +13,13 @@ import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
+import	ApiTwilio from "../Api-twilio";
 
 import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
-
+import * as readline from "readline";
+import * as twilio from "twilio";
 
 class	RegisterDto
 {
@@ -52,17 +54,78 @@ class UserLoginDto
 	email: string;
 }
 
+class	TwilioResponseDto
+{
+	@IsNotEmpty()
+	// numero format +33
+	To: string;
+	// Channel = sms
+	Channel: string;
+}
 @Controller("user")
 export class UserController
 {
 	private	readonly logger;
-	private	env;
+	private	readonly env;
 
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
 		this.env = dotenv.config();
+	}
+
+	@Post("test-double-auth")
+	@UseGuards(UserAuthorizationGuard)
+	testDoubleAuth(
+		@Body() body: any,
+		@Req() req: any
+	)
+	{
+		console.log("body ", body);
+		console.log("req ", req.user);
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		const	number = this.userService.getPhoneNumber(req.user.id);
+		if (number === "undefined" || !number)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		client.verify.v2
+		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+		.verifications.create({
+			to: number,
+			channel: "sms" })
+		.then((verification) =>
+		{
+			console.log(verification.status);
+		})
+		// client.messages
+		// .create({
+		// 	body: "Hello world",
+		// 	messagingServiceSid: "MGb27c1e450cb8f255dc5ffaf1cd154d7a",
+		// 	to: "+33767406877",
+		// 	from: "+12293947099"
+		// })
+		// .then((message) =>
+		// {
+		// 	console.log(message.sid);
+		// 	console.log(message);
+		// })
+		.catch((error) =>
+		{
+			console.error("Boo", error);
+		})
+		.finally(() =>
+		{
+			console.log("sms sent");
+		});
 	}
 
 	@Post("register")
@@ -234,6 +297,108 @@ export class UserController
 	{
 		this.logger
 			.log("'double-auth' route request");
-		return (this.userService.getPhoneNumber(data.numero, req.user.id));
+		return (this.userService.registerPhoneNumber(data.numero, req.user.id));
+	}
+
+	@Post("double-auth-twilio")
+	@UseGuards(UserAuthorizationGuard)
+	DoubleAuthSendSMS(
+		@Body() body: any,
+		@Req() req: any
+	)
+	{
+		console.log("body ", body);
+		console.log("req ", req.user);
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		// const	number = this.userService.getPhoneNumber(req.user.id);
+		// if (number === undefined)
+		// 	throw new InternalServerErrorException();
+		if (body.numero === "undefined" || !body.numero)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		client.verify.v2
+		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+		.verifications.create({
+			to: body.numero,
+			channel: "sms" })
+		.then((verification) =>
+		{
+			console.log(verification.status);
+		})
+		.catch((error) =>
+		{
+			console.error("Boo", error);
+		})
+		.finally(() =>
+		{
+			console.log("sms sent");
+		});
+	}
+
+	@Post("get-code")
+	@UseGuards(UserAuthorizationGuard)
+	GetValidationCode(
+		@Body() body: any,
+		@Req() req: any
+	)
+	{
+		console.log("body ", body);
+		console.log("req ", req.user);
+		console.log("opt-code", body.otpCode);
+		if (body.otpCode === undefined)
+			throw new UnauthorizedException();
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		const	number = req.user.phoneNumber;
+		if (number === "undefined" || !number)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		// const readLine = readline.createInterface({
+				// input: process.stdin,
+				// output: process.stdout,
+			// });
+		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
+		if (verify === undefined)
+			throw new InternalServerErrorException();
+		// readLine.question("Please enter the OTP:", (otpCode: string) =>
+		// {
+		client.verify.v2
+			.services(verify)
+			.verificationChecks.create(
+				{
+					to: number,
+					code: body.otpCode
+				})
+			.then((verificationCheck) =>
+			{
+				if (verificationCheck.status === "approved")
+				{
+					this.userService.codeValidated(body.otpCode, req.user.id, true);
+					console.log(verificationCheck);
+					return ("okay");
+				}
+				else
+					throw new UnauthorizedException();
+			})
+			.catch((err) =>
+			{
+				throw new InternalServerErrorException();
+			});
+		// });
 	}
 }

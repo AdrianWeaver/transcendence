@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
@@ -89,6 +90,63 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.log("ft-api-service double auth error", error);
+				return ("error");
+			})
+		);
+	},
+
+	async	receiveValidationCodeFromTwilio
+		(numero: string, token: string, hostname: string)
+	{
+		console.log("receive validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"Authorization": token,
+				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
+			},
+		};
+		const	data = {
+			numero: numero
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/double-auth-twilio", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service double auth TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service double auth TWILIO error: ", error);
+				return ("error");
+			})
+		);
+	},
+
+	async	getValidationCodeFromTwilio
+	(token: string, hostname: string)
+	{
+		console.log("get validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"Authorization": token,
+				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
+			},
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/get-code", config)
+			.then((data) =>
+			{
+				console.log("ft-api-service get code TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service get code error: ", error);
 				return ("error");
 			})
 		);

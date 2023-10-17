@@ -20,18 +20,31 @@ class	UserSecurityChecker
 		this.resetError();
 		if (data.doubleAuth)
 		{
+			let	tmp;
+			tmp = data.phoneNumber;
 			if (data.phoneNumber === undefined || data.phoneNumber === null
 					|| data.phoneNumber.length === 0
 					|| data.phoneNumber === "undefined")
 				this.phoneNumber = true;
-			if (data.phoneNumber?.length < 10
-					|| data.phoneNumber?.length > 10)
-				this.phoneNumber = true;
-			if (isNaN(Number(data.phoneNumber)))
-				this.phoneNumber = true;
+			else
+			{
+				if (data.phoneNumber?.length < 9
+						|| data.phoneNumber?.length > 15)
+					console.log("length");
+					this.phoneNumber = true;
+				if (data.phoneNumber[0] !== "+")
+				{
+					console.log("+ not here");
+					console.log("tmp usersecuritychecker 36 ", tmp);
+					tmp = tmp.slice(0, 1);
+					console.log("tmp usersecuritychecker 38", tmp);
+					this.phoneNumber = true;
+				}
+				if (isNaN(Number(tmp)))
+					console.log("NaN");
+					// this.phoneNumber = true;
+			}
 		}
-		else
-			data.valid = true;
 	}
 
 	// JE GARDE CETTE FONCTION POUR LES VERIFS TWILIO 
