@@ -351,7 +351,6 @@ export class UserController
 	)
 	{
 		console.log("body ", body);
-		console.log("req ", req.user);
 		console.log("opt-code", body.otpCode);
 		if (body.otpCode === undefined)
 			throw new UnauthorizedException();
@@ -364,8 +363,8 @@ export class UserController
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
-		const	number = req.user.phoneNumber;
-		if (number === "undefined" || !number)
+		const	number = body.to;
+		if (number === "undefined" || number === undefined)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		// const readLine = readline.createInterface({
@@ -397,6 +396,7 @@ export class UserController
 			})
 			.catch((err) =>
 			{
+				console.log("error", err);
 				throw new InternalServerErrorException();
 			});
 		// });
