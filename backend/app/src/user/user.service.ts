@@ -7,11 +7,13 @@ import
 	ForbiddenException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	NotFoundException
 } from "@nestjs/common";
 import
 {
 	AdminResponseModel,
+	BackUserModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -45,6 +47,36 @@ export class UserService
 	public	getUserArray(): Array<UserModel>
 	{
 		return (this.user);
+	}
+
+	public	getBackUserModelArray(): Array<BackUserModel>
+	{
+		const	users: BackUserModel[] = [];
+		let i: number;
+
+		i = 0;
+		const	searchUser = this.user.find((elem) =>
+		{
+			users[i] = {
+				id: elem.id,
+				email: elem.email,
+				username: elem.username,
+				firstName: elem.firstName,
+				lastName: elem.lastName,
+				avatar: elem.avatar,
+				location: elem.location,
+				doubleAuth:
+				{
+					enable: elem.authService.doubleAuth.enable,
+					valid: elem.authService.doubleAuth.valid,
+					phoneNumber: elem.authService.doubleAuth.phoneNumber,
+					phoneRegistered: elem.authService.doubleAuth.phoneRegistered,
+					lastIpClient: elem.authService.doubleAuth.lastIpClient
+				}
+			};
+			i++;
+		});
+		return (users);
 	}
 
 	public	getAdminArray(): AdminResponseModel

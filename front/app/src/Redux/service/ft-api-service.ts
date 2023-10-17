@@ -3,6 +3,7 @@
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
+import { BackUserModel } from "../models/redux-models";
 
 const	UserServices = {
 	async	register(code: string, hostname: string)
@@ -63,6 +64,21 @@ const	UserServices = {
 				return ("ERROR");
 			})
 		);
+	},
+	async	getAllTheUsers(hostname: string)
+	{
+		console.log("Get all users route");
+		Api(hostname)
+		.get("/user/get-all-users", {})
+		.then((data) =>
+		{
+			console.log("get all users route ", data.data);
+			return (data.data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
 	},
 	async	getNumberForDoubleAuth
 		(numero: string, token: string, hostname: string)

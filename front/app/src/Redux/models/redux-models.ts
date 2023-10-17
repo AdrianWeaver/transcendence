@@ -13,6 +13,26 @@ export	interface ChatUserModel
 	"password": string,
 }
 
+export interface BackUserModel
+{
+	uuid: string;
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
+	doubleAuth:
+	{
+		enable: boolean;
+		valid: boolean;
+		phoneNumber: string;
+		phoneRegistered: boolean;
+		lastIpClient: string;
+	}
+}
+
 export interface ChatModel
 {
 	"window":
@@ -133,6 +153,7 @@ export interface	CanvasModel
 
 export interface	ControllerModel
 {
+	"allUsers": BackUserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,

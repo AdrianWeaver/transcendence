@@ -19,7 +19,33 @@ export interface UserPublicResponseModel
 	lastName: string;
 	username: string;
 }
+export	interface ChatUserModel
+{
+	// name == pseudo
+	"name": string,
+	"id": string,
+	"avatar": string,
+	"password": string,
+}
 
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
+	doubleAuth:
+	{
+		enable: boolean;
+		valid: boolean;
+		phoneNumber: string;
+		phoneRegistered: boolean;
+		lastIpClient: string;
+	}
+}
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;

@@ -13,6 +13,26 @@ const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "light",
 	previousPage: "/",
+	allUsers:
+	[
+		{
+			id: -1,
+			email: "undefined",
+			username: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			avatar: "undefined",
+			location: "undefined",
+			doubleAuth:
+			{
+				enable: false,
+				valid: false,
+				phoneNumber: "undefined",
+				phoneRegistered: false,
+				lastIpClient: "undefined",
+			}
+		}
+	],
 	user:
 	{
 		isLoggedIn: false,
@@ -380,6 +400,10 @@ const	controllerSlice = createSlice(
 		{
 			state.user.login = action.payload.user.login;
 		},
+		setAllUsers(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		}
 	}
 });
 

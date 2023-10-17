@@ -10,7 +10,7 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
 type MessageModel =
@@ -1161,5 +1161,20 @@ export const	setLogin = (login: string)
 			}
 		}
 		dispatch(controllerActions.setLogin(response));
+	});
+}
+
+export const	setAllUsers = (data: BackUserModel[])
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: data
+		}
+		dispatch(controllerActions.setAllUsers(response));
 	});
 }
