@@ -101,8 +101,8 @@ const	UserServices = {
 		console.log("receive validation code");
 		const	config: AxiosRequestConfig = {
 			headers: {
+				"content-type": "application/x-www-form-urlencoded",
 				"Authorization": token,
-				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
 			},
 		};
 		const	data = {
@@ -131,8 +131,8 @@ const	UserServices = {
 		console.log("get validation code");
 		const	config: AxiosRequestConfig = {
 			headers: {
+				"content-type": "application/x-www-form-urlencoded",
 				"Authorization": token,
-				"content-type": "application/x-www-form-urlencoded;charset=utf-8"
 			},
 		};
 
@@ -146,8 +146,8 @@ const	UserServices = {
 			.post("/user/get-code", data, config)
 			.then((data) =>
 			{
-				console.log("ft-api-service get code TWILIO ", data.data);
-				return (data.data);
+				console.log("ft-api-service get code TWILIO ", data);
+				return (data);
 			})
 			.catch((error) =>
 			{

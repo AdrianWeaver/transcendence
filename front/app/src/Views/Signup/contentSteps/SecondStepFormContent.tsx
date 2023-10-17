@@ -64,6 +64,12 @@ const	SecondStepFormContent = () =>
 
 	const
 	[
+		sendCode,
+		setSendCode
+	] = useState(false);
+
+	const
+	[
 		twoAuthCode,
 		setTwoAuthCode
 	] = useState("");
@@ -170,12 +176,16 @@ const	SecondStepFormContent = () =>
 			console.log("the value of phone " + user.phoneNumber);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
 			console.log("code : ", twoAuthCode);
+			console.log("valid ", user.codeValidated);
 			if (twoAuthCode.length)
 			{
+				setSendCode(true);
 				dispatch(GetValidationCode(twoAuthCode, user.bearerToken));
-				console.log("OKAY ?");
-			//	dispatch(setUserLoggedIn());
-			//	dispatch(setRegistered(true));
+				if (user.codeValidated)
+				{
+					dispatch(setUserLoggedIn());
+					dispatch(setRegistered(true));
+				}
 			}
 		};
 
@@ -306,7 +316,9 @@ const	SecondStepFormContent = () =>
 						? registerNumButton
 						: (!sendSMS)
 							? sendSmsButton
-							: sendTheCode
+							: (sendCode)
+								? sendTheCode
+								: finishButton
 					: <></>
 				}
 				</Grid>

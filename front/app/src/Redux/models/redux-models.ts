@@ -53,6 +53,7 @@ export interface	UserModel
 	"registrationProcess": boolean,
 	"registrationError": string,
 	"doubleAuth": boolean,
+	"codeValidated": boolean,
 	"otpCode": string,
 	"phoneNumber": string,
 	"registered": boolean,

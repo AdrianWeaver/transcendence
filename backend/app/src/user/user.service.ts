@@ -295,5 +295,6 @@ export class UserService
 			searchUser.authService.doubleAuth.valid = valid;
 			searchUser.registrationProcessEnded = valid;
 		}
+		return (valid);
 	}
 }
