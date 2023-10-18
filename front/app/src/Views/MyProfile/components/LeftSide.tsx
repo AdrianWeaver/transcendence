@@ -51,7 +51,7 @@ const	LeftSide = (props: LeftSideProps) =>
 					{
 						(user.profile.myView)
 						? <>
-							♡ Hello myself ♡
+							♡ {props.pseudo}'s profile ♡
 						</>
 						: <Typography>
 							{

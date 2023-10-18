@@ -3,6 +3,7 @@
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
+import { BackUserModel } from "../models/redux-models";
 
 const	UserServices = {
 	async	register(code: string, hostname: string)
@@ -61,6 +62,24 @@ const	UserServices = {
 				console.error("error from verify token");
 				// console.error(error);
 				return ("ERROR");
+			})
+		);
+	},
+	async	getAllTheUsers(hostname: string)
+	{
+		console.log("Get all users route");
+		return (
+			Api(hostname)
+			.get("/user/get-all-users", {})
+			.then((data) =>
+			{
+				console.log("get all users route ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("error");
 			})
 		);
 	},
@@ -152,6 +171,37 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.log("ft-api-service get code error: ", error);
+				return ("error");
+			})
+		);
+	},
+	async	registerInfosInBack
+	(token: string, info: string, field: string, hostname: string)
+	{
+		console.log("register username in backend");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			info: info,
+			field: field
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/change-infos", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service register infos in backend ", data);
+				return ("okay");
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service register infos in backend error: ", error);
 				return ("error");
 			})
 		);

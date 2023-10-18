@@ -15,7 +15,7 @@ import { Request, Response } from "express";
 import	Api from "../Api";
 import	ApiTwilio from "../Api-twilio";
 
-import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as readline from "readline";
@@ -202,6 +202,15 @@ export class UserController
 		return (this.userService.getUserArray());
 	}
 
+	@Get("get-all-users")
+	getAllUsers()
+		: BackUserModel[]
+	{
+		console.log("request back users model data");
+		console.log(this.userService.getBackUserModelArray());
+		return (this.userService.getBackUserModelArray());
+	}
+
 	@Post("login")
 	userLogin(
 		@Body() body: UserLoginDto)
@@ -349,5 +358,18 @@ export class UserController
 				throw new InternalServerErrorException();
 			});
 		// });
+	}
+
+	@Post("change-infos")
+	@UseGuards(UserAuthorizationGuard)
+	ChangeUsername(
+		@Body() data: any,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'change-infos' route request");
+		console.log("data ", data);
+		return (this.userService.changeInfos(data, req.user.id));
 	}
 }

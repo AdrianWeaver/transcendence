@@ -25,6 +25,7 @@ class	UserProfileEditChecker
 	public checkData(data: UserProfileEdit)
 	{
 		this.resetError();
+		console.log("CHECK DATA");
 		if (data.emailAddress === undefined || data.emailAddress === "undefined"
 			|| data.emailAddress.length === 0)
 			this.email = true;
@@ -40,6 +41,9 @@ class	UserProfileEditChecker
 		if (data.username === undefined || data.username === "undefined"
 			|| data.username.length === 0 )
 			this.username = true;
+		const	validChar = /^[A-Za-z][A-Za-z0-9_]{7,29}$/;
+		this.username = !(validChar.test(data.username));
+		console.log("valid user ", validChar, " ", this.username);
 		const	emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 		this.email = !(emailRegex.test(data.emailAddress));
 		if (data.doubleAuth)
