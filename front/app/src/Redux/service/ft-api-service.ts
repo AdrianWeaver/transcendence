@@ -175,7 +175,6 @@ const	UserServices = {
 			})
 		);
 	},
-
 	async	registerInfosInBack
 	(token: string, info: string, field: string, hostname: string)
 	{
