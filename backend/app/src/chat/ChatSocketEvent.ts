@@ -91,15 +91,14 @@ export class ChatSocketEvents
 		handleConnection(client: Socket)
 		{
 			this.chatService.setServer(this.server);
-			this.logger.debug("This is socket id", client.id);
-			console.log(client.handshake.auth);
+			// console.log(client.handshake.auth);
 			// if (client.handshake.auth)
 			let profileId: string;
 			if (client.handshake.auth)
 			{
 				const	secret = this.userService.getSecret();
 				const	bearerToken: string = client.handshake.auth.token;
-				console.log(bearerToken);
+				// console.log(bearerToken);
 				const	token = bearerToken.split("Bearer ");
 				if (token.length !== 2)
 				{
@@ -453,7 +452,7 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join" && data.payload.kind === "channel")
+			if (data.type === "asked-join" && data.payload.kind !== "privateMessage")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
@@ -519,7 +518,10 @@ export class ChatSocketEvents
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel?.password === data.payload.password)
+				{
+					// console.log("CORRECT PASSWORD");
 					action.payload.correct = "true";
+				}
 				client.emit("display-channels", action);
 			}
 

@@ -82,7 +82,6 @@ class Chat
 
 		this.setServer = (server: Server) =>
 		{
-			console.log("YES WE CAN");
 			this.server = server;
 		};
 

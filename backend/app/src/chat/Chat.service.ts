@@ -172,7 +172,7 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					this.log.debug(rawobj);
+
 					const	newChatInstance = new Chat();
 
 					const arrayUser: User[] = [];
@@ -335,9 +335,9 @@ export	class ChatService implements OnModuleInit
 							searchUser.channels = chanArray;
 					});
 
-					console.log("End of parser check with serialized value ");
-					console.log( JSON.parse(this.parseForDatabase()));
-					console.log(this.chat);
+					// console.log("End of parser check with serialized value ");
+					// console.log( JSON.parse(this.parseForDatabase()));
+					// console.log(this.chat);
 				}
 			})
 			.catch((error: any) =>

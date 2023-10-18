@@ -572,7 +572,7 @@ const	ChatLayout = () =>
 			return;
 		}
 
-		if (selectedMode === "Protected" && chanPassword.trim() === "")
+		if (selectedMode === "protected" && chanPassword.trim() === "")
 		{
 			alert("There must be a password for a protected channel");
 			return;
@@ -584,6 +584,9 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
+		if (kindOfConversation === undefined)
+			console.log("LOL");
+		console.log("HELLO I AM HERE");
 		const	action = {
 			type: "asked-join",
 			payload: {
