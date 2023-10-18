@@ -177,7 +177,7 @@ const	UserServices = {
 	},
 
 	async	registerUsernameInBack
-	(token: string, username: string, hostname: string)
+	(token: string, info: string, type: string, hostname: string)
 	{
 		console.log("register username in backend");
 		const	config: AxiosRequestConfig = {
@@ -188,20 +188,21 @@ const	UserServices = {
 		};
 
 		const	data = {
-			username: username
+			info: info,
+			type: type
 		};
 
 		return (
 			Api(hostname)
-			.post("/user/change-username", data, config)
+			.post("/user/change-infos", data, config)
 			.then((data) =>
 			{
-				console.log("ft-api-service register username in backend ", data);
-				return (data);
+				console.log("ft-api-service register infos in backend ", data);
+				return ("okay");
 			})
 			.catch((error) =>
 			{
-				console.log("ft-api-service register username in backend error: ", error);
+				console.log("ft-api-service register infos in backend error: ", error);
 				return ("error");
 			})
 		);

@@ -359,4 +359,17 @@ export class UserController
 			});
 		// });
 	}
+
+	@Post("change-infos")
+	@UseGuards(UserAuthorizationGuard)
+	ChangeUsername(
+		@Body() data: any,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'change-infos' route request");
+		console.log("data ", data);
+		return (this.userService.changeInfos(data, req.user.id));
+	}
 }

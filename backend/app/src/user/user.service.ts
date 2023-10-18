@@ -322,4 +322,25 @@ export class UserService
 		}
 		return (valid);
 	}
+
+	public	changeInfos(data: any, id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			if (data.info?.length)
+				if (data.type === "username" && data.info !== searchUser.username)
+					searchUser.username = data.info;
+				else if (data.type === "email" && data.info !== searchUser.email)
+					searchUser.email = data.info;
+				else if (data.type === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
+					searchUser.authService.doubleAuth.phoneNumber = data.info;
+			return ("okay");
+		}
+		return ("user doesnt exist");
+	}
+
 }

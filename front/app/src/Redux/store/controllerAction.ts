@@ -1125,14 +1125,14 @@ export const	setAllUsers = ()
 	});
 }
 
-export const	registerInfosInBack = (username: string)
+export const	registerInfosInBack = (info: string, type: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 
-		const	data: any = await UserServices.registerUsernameInBack(prev.controller.user.bearerToken, username, "localhost");
+		const	data: any = await UserServices.registerUsernameInBack(prev.controller.user.bearerToken, info, type, "localhost");
 
 		if (data === "error")
 		{
@@ -1141,12 +1141,19 @@ export const	registerInfosInBack = (username: string)
 		}
 		console.log("here data", data);
 		const array: BackUserModel[] = [...prev.controller.allUsers];
-		array.forEach((elem) =>
+		if (info !== undefined)
 		{
-			if (elem.id === prev.controller.user.id)
-				elem.username = username
-		});
-
+			array.forEach((elem) =>
+			{
+				if (elem.id === prev.controller.user.id)
+				{
+					if (type === "username")
+						elem.username = info;
+					else if (type === "email")
+						elem.email = info;
+				}
+			});
+		}
 		const	response: ControllerModel = {
 			...prev.controller,
 			allUsers: [...array]

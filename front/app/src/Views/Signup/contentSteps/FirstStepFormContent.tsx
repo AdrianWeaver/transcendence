@@ -245,7 +245,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		if (filtered.length === 0)
 		{
 			// TEST
-			dispatch(registerInfosInBack(userSignup.username));
+			dispatch(registerInfosInBack(userSignup.username, "username"));
 			dispatch(setPseudo(userSignup.username));
 			dispatch(setPassword(userSignup.password));
 			dispatch(userRegistrationStepThree());
