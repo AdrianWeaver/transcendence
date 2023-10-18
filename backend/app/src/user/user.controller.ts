@@ -155,7 +155,13 @@ export class UserController
 							}
 						}
 					};
-					this.userService.downloadAvatar(userObject);
+					this.userService.downloadAvatar(userObject)
+					.then((data) =>
+					{
+						this.logger.debug("Data here");
+						this.logger.debug(data);
+					});
+					this.logger.error("new  user data");
 					retValue = this.userService.register(userObject);
 					res.status(200).send(retValue.res);
 					// mise a jour vers la database

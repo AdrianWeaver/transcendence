@@ -224,8 +224,8 @@ export class UserService
 	}
 
 	// image at this step if perfectly square
-	public	downloadAvatar(userObj: UserModel)
-	: UserModel
+	public async	downloadAvatar(userObj: UserModel)
+	: Promise<UserModel>
 	{
 		this.logger.debug("Starting the downmload of the avatar");
 		console.log(userObj);
