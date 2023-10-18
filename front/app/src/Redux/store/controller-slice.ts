@@ -13,6 +13,18 @@ const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "light",
 	previousPage: "/",
+	allUsers:
+	[
+		{
+			id: -1,
+			email: "undefined",
+			username: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			avatar: "undefined",
+			location: "undefined",
+		}
+	],
 	user:
 	{
 		isLoggedIn: false,
@@ -39,6 +51,8 @@ const	initialControllerState: ControllerModel = {
 		bearerToken: "undefined",
 		rememberMe: false,
 		doubleAuth: false,
+		codeValidated: false,
+		otpCode: "undefined",
 		phoneNumber: "undefined",
 		registered: false,
 		chat:
@@ -173,6 +187,8 @@ const	controllerSlice = createSlice(
 		{
 			state.user.username = action.payload.user.username;
 			state.user.chat.pseudo = action.payload.user.chat.pseudo;
+			state.user.chat.users = action.payload.user.chat.users;
+			state.allUsers = action.payload.allUsers;
 		},
 		setChatConnected(state, action: PayloadAction<ControllerModel>)
 		{
@@ -198,51 +214,6 @@ const	controllerSlice = createSlice(
 		{
 			state.user.chat.numberOfChannels = action.payload.user.chat.numberOfChannels;
 		},
-		// setMessageRoom(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
-		// 		i++;
-		// 	}
-		// },
-		// setMessage(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-		// 	let	j;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		j = 0;
-		// 		while (state.user.chat.users[i].msgRoom.length - 1)
-		// 		{
-		// 			state.user.chat.users[i].msgRoom[j] = action.payload.user.chat.users[i].msgRoom[j];
-		// 			j++;
-		// 		}
-		// 		i++;
-		// 	}
-		// },
-		// addMessage(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-		// 	let	j;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		j = 0;
-		// 		while (state.user.chat.users[i].msgRoom.length - 1)
-		// 		{
-		// 			state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
-		// 			j++;
-		// 		}
-		// 		i++;
-		// 	}
-		// },
 		setUserData(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.id = action.payload.user.id;
@@ -250,6 +221,7 @@ const	controllerSlice = createSlice(
 			state.user.bearerToken = action.payload.user.bearerToken;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
+			state.allUsers = action.payload.allUsers;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{
@@ -260,11 +232,25 @@ const	controllerSlice = createSlice(
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
 			state.user.avatar = action.payload.user.avatar;
+			state.allUsers = action.payload.allUsers;
 		},
 		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.phoneNumber = action.payload.user.phoneNumber;
 			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
+		receiveValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
+		getValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.otpCode = action.payload.user.otpCode;
+			state.user.codeValidated = action.payload.user.codeValidated;
+		},
+		setCodeValidated(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
@@ -324,6 +310,7 @@ const	controllerSlice = createSlice(
 		{
 			state.user.avatar = action.payload.user.avatar;
 			state.user.ftAvatar = action.payload.user.ftAvatar;
+			state.allUsers = action.payload.allUsers;
 		},
 		setProfileEditView(state, action: PayloadAction<ControllerModel>)
 		{
@@ -360,11 +347,20 @@ const	controllerSlice = createSlice(
 		setEmail(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.email = action.payload.user.email;
+			state.allUsers = action.payload.allUsers;
 		},
 		setLogin(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.login = action.payload.user.login;
 		},
+		setAllUsers(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		},
+		registerInfosInBack(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		}
 	}
 });
 

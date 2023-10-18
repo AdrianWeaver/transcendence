@@ -1,7 +1,9 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
+import { BackUserModel } from "../models/redux-models";
 
 const	UserServices = {
 	async	register(code: string, hostname: string)
@@ -63,6 +65,24 @@ const	UserServices = {
 			})
 		);
 	},
+	async	getAllTheUsers(hostname: string)
+	{
+		console.log("Get all users route");
+		return (
+			Api(hostname)
+			.get("/user/get-all-users", {})
+			.then((data) =>
+			{
+				console.log("get all users route ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("error");
+			})
+		);
+	},
 	async	getNumberForDoubleAuth
 		(numero: string, token: string, hostname: string)
 	{
@@ -89,6 +109,99 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.log("ft-api-service double auth error", error);
+				return ("error");
+			})
+		);
+	},
+
+	async	receiveValidationCodeFromTwilio
+		(numero: string, token: string, hostname: string)
+	{
+		console.log("receive validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		const	data = {
+			numero: numero
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/double-auth-twilio", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service double auth TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service double auth TWILIO error: ", error);
+				return ("error");
+			})
+		);
+	},
+
+	async	getValidationCodeFromTwilio
+	(numero: string, otpCode: string, token: string, hostname: string)
+	{
+		console.log("get validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			to: numero,
+			otpCode: otpCode
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/get-code", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service get code TWILIO ", data);
+				return (data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service get code error: ", error);
+				return ("error");
+			})
+		);
+	},
+	async	registerInfosInBack
+	(token: string, info: string, field: string, hostname: string)
+	{
+		console.log("register username in backend");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			info: info,
+			field: field
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/change-infos", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service register infos in backend ", data);
+				return ("okay");
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service register infos in backend error: ", error);
 				return ("error");
 			})
 		);

@@ -8,7 +8,7 @@ import { Alert, AlertTitle, Box, Button, Checkbox, FormControlLabel, Grid, List,
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { setAllUsers, setUserLoggedIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 type PasswordAlertProps ={
@@ -137,6 +137,10 @@ const	Signin = () =>
 	{
 		return (state.controller.user.chat.users);
 	});
+	const	allUsers = useAppSelector((state) =>
+	{
+		return (state.controller.allUsers);
+	});
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
@@ -180,11 +184,25 @@ const	Signin = () =>
 				return (value === true);
 			});
 			console.log("filtered", filtered);
+			console.log("ici", allUsers);
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				dispatch(setUserLoggedIn());
-				navigate("/");
+				const	searchUser = allUsers.find((elem) =>
+				{
+					console.log("name ", elem.username === userLogIn.username);
+					// console.log("pass ", elem.password === userLogIn.password);
+					return (elem.username === userLogIn.username);
+						// && elem.password === userLogIn.password);
+				});
+				if (searchUser !== undefined)
+				{
+					dispatch(setUserLoggedIn());
+					navigate("/");
+				}
+				else
+					console.log("user doesnt exist");
+				// throw a user not found exception
 			}
 	};
 

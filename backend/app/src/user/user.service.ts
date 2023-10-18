@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -7,11 +8,13 @@ import
 	ForbiddenException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	NotFoundException
 } from "@nestjs/common";
 import
 {
 	AdminResponseModel,
+	BackUserModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -50,6 +53,29 @@ export class UserService
 	public	getUserArray(): Array<UserModel>
 	{
 		return (this.user);
+	}
+
+	public	getBackUserModelArray(): BackUserModel[]
+	{
+		const	users: BackUserModel[] = [];
+		let i: number;
+
+		i = 0;
+		const	searchUser = this.user.find((elem) =>
+		{
+			users[i] = {
+				id: elem.id,
+				email: elem.email,
+				username: elem.username,
+				firstName: elem.firstName,
+				lastName: elem.lastName,
+				avatar: elem.avatar,
+				location: elem.location,
+
+			};
+			i++;
+		});
+		return (users);
 	}
 
 	public	getAdminArray(): AdminResponseModel
@@ -91,7 +117,7 @@ export class UserService
 			if (index !== -1)
 				this.user.splice(index, 1);
 		}
-		const newUser: UserModel = {
+		const newUser = {
 			registrationProcessEnded: false,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
@@ -262,7 +288,7 @@ export class UserService
 		return (myInfo);
 	}
 
-	public	getPhoneNumber(numero: string, id: string)
+	public	registerPhoneNumber(numero: string, id: string)
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
@@ -285,5 +311,52 @@ export class UserService
 		});
 		console.error(searchUser);
 		return (searchUser?.username);
+	}
+
+	public	getPhoneNumber(id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+			return (searchUser.authService.doubleAuth.phoneNumber);
+		return("undefined");
+	}
+
+	public	codeValidated(code: string, id: string, valid: boolean)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.validationCode = code;
+			searchUser.authService.doubleAuth.valid = valid;
+			searchUser.registrationProcessEnded = valid;
+		}
+		return (valid);
+	}
+
+	public	changeInfos(data: any, id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			if (data.info?.length)
+				if (data.field === "username" && data.info !== searchUser.username)
+					searchUser.username = data.info;
+				else if (data.field === "email" && data.info !== searchUser.email)
+					searchUser.email = data.info;
+				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
+					searchUser.authService.doubleAuth.phoneNumber = data.info;
+			console.log(searchUser);
+			return ("okay");
+		}
+		return ("user doesnt exist");
 	}
 }

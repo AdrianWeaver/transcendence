@@ -14,6 +14,17 @@ export	interface ChatUserModel
 	"password": string,
 }
 
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
+}
+
 export interface ChatModel
 {
 	"window":
@@ -54,6 +65,8 @@ export interface	UserModel
 	"registrationProcess": boolean,
 	"registrationError": string,
 	"doubleAuth": boolean,
+	"codeValidated": boolean,
+	"otpCode": string,
 	"phoneNumber": string,
 	"registered": boolean,
 	"avatar": string,
@@ -132,6 +145,7 @@ export interface	CanvasModel
 
 export interface	ControllerModel
 {
+	"allUsers": BackUserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,
