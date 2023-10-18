@@ -328,33 +328,50 @@ export const setPseudo = (name: string)
 {
 	return ((dispatch, getState) =>
 	{
-		const prevState = getState();
-		const	array: BackUserModel[] = [...prevState.controller.allUsers];
-		const	arrayChat: ChatUserModel[] = [...prevState.controller.user.chat.users];
-		array.forEach((elem) =>
+		const prev = getState();
+		const index = prev.controller.allUsers.findIndex((elem) =>
 		{
-			if (elem.id === prevState.controller.user.id)
-				elem.username = name;
+			return (elem.id === prev.controller.user.id);
 		});
-		console.log("name ? ", name);
-		arrayChat.forEach((elem) =>
+		const updatedUsers = prev.controller.allUsers.map((user, i) =>
 		{
-			if (elem.name === prevState.controller.user.username)
-				elem.name = name;
+			if (i === index)
+			{
+				return ({
+						...user,
+						username: name
+					});
+			}
+			else
+			{
+				return (user);
+			}
+		});
+		const updatedChatUsers = prev.controller.user.chat.users.map((user, i) =>
+		{
+			if (i === index)
+			{
+				return ({
+					...user,
+					username: name
+				});
+			}
+			else
+				return (user);
 		});
 		const response: ControllerModel = {
-			...prevState.controller,
-			allUsers: [...array],
+			...prev.controller,
+			allUsers: updatedUsers,
 			user:
 			{
-				...prevState.controller.user,
+				...prev.controller.user,
 				username: name,
 				chat:
 				{
-					...prevState.controller.user.chat,
+					...prev.controller.user.chat,
 					// ca ca n'a pas de sens xD TEST
 					pseudo: name,
-					users: [...arrayChat]
+					users: updatedChatUsers
 				}
 			}
 		};
@@ -1063,16 +1080,27 @@ export const	setEmail = (email: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
-
-		array.forEach((elem) =>
+		const	index = prev.controller.allUsers.findIndex((elem) =>
 		{
-			if (elem.id === prev.controller.user.id)
-				elem.email = email;
+			return (prev.controller.user.id === elem.id);
+		});
+		const updatedUsers = prev.controller.allUsers.map((user, i) =>
+		{
+			if (i === index)
+			{
+				return ({
+					...user,
+					email: email
+				});
+			}
+			else
+			{
+				return (user);
+			}
 		});
 		const	response: ControllerModel = {
 			...prev.controller,
-			allUsers: [...array],
+			allUsers: updatedUsers,
 			user:
 			{
 				...prev.controller.user,
@@ -1127,75 +1155,75 @@ export const	setAllUsers = ()
 	});
 }
 
-export const	editFieldUserName = (info: string)
-	: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const prev = getState();
-		let array: BackUserModel[] = [...prev.controller.allUsers];
-		if (info !== undefined)
-		{
-			const index = array.findIndex((elem) =>
-			{
-				return (elem.id === prev.controller.user.id);
-			});
-			array[index].username = info;
-		}
-		const	response: ControllerModel = {
-			...prev.controller,
-			allUsers: [...array]
-		};
-		dispatch(setPseudo(info));
-		dispatch(controllerActions.registerInfosInBack(response));
-	});
-}
+// export const	editFieldUserName = (info: string)
+// 	: ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const prev = getState();
 
-export const	editFieldEmail = (info: string)
-	: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const prev = getState();
-		let array: BackUserModel[] = [...prev.controller.allUsers];
-		if (info !== undefined)
-		{
-			const index = array.findIndex((elem) =>
-			{
-				return (elem.id === prev.controller.user.id);
-			});
-			array[index].email = info;
-		}
-		const	response: ControllerModel = {
-			...prev.controller,
-			allUsers: [...array]
-		};
-		dispatch(setEmail(info));
-		dispatch(controllerActions.registerInfosInBack(response));
-	});
-}
+// 		let array: BackUserModel[] = [...prev.controller.allUsers];
+// 		if (info !== undefined)
+// 		{
+// 			const index = array.findIndex((elem) =>
+// 			{
+// 				return (elem.id === prev.controller.user.id);
+// 			});
+// 			array[index].username = info;
+// 		}
+// 		const	response: ControllerModel = {
+// 			...prev.controller,
+// 			allUsers: [...array]
+// 		};
+// 		dispatch(setPseudo(info));
+// 		dispatch(controllerActions.registerInfosInBack(response));
+// 	});
+// }
+
+// export const	editFieldEmail = (info: string)
+// 	: ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const prev = getState();
+// 		let array: BackUserModel[] = [...prev.controller.allUsers];
+// 		if (info !== undefined)
+// 		{
+// 			const index = array.findIndex((elem) =>
+// 			{
+// 				return (elem.id === prev.controller.user.id);
+// 			});
+// 			array[index].email = info;
+// 		}
+// 		const	response: ControllerModel = {
+// 			...prev.controller,
+// 			allUsers: [...array]
+// 		};
+// 		dispatch(setEmail(info));
+// 		dispatch(controllerActions.registerInfosInBack(response));
+// 	});
+// }
 
 export const	registerInfosInBack = (info: string, field: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch, getState) =>
+	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-
-		UserServices.registerUsernameInBack(prev.controller.user.bearerToken, info, field, prev.server.serverLocation);
-		// .then((data) =>
-		// {
-		// 	console.log("ok", data);
-		// })
-		// .catch((error) =>
-		// {
-		// 	console.log("error", error);
-		// });
+		UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.serverLocation)
+		.then(() =>
+		{
+			console.log("okay");
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
 		if (field === "username")
-			dispatch(editFieldUserName(info));
-		if (field === "email")
-			dispatch(editFieldEmail(info));
-		if (field === "phoneNumber")
+			dispatch(setPseudo(info));
+		else if (field === "email")
+			dispatch(setEmail(info));
+		else if (field === "phoneNumber")
 			dispatch(setPhoneNumber(info));
 		dispatch(setAllUsers());
 	});

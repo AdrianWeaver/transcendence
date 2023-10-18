@@ -176,8 +176,8 @@ const	UserServices = {
 		);
 	},
 
-	async	registerUsernameInBack
-	(token: string, info: string, type: string, hostname: string)
+	async	registerInfosInBack
+	(token: string, info: string, field: string, hostname: string)
 	{
 		console.log("register username in backend");
 		const	config: AxiosRequestConfig = {
@@ -189,7 +189,7 @@ const	UserServices = {
 
 		const	data = {
 			info: info,
-			type: type
+			field: field
 		};
 
 		return (

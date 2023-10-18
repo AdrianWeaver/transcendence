@@ -22,8 +22,6 @@ import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
-	editFieldEmail,
-	editFieldUserName,
 	registerInfosInBack,
 	setDoubleAuth,
 	setEmail,
