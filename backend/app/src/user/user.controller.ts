@@ -1,10 +1,11 @@
+/* eslint-disable curly */
 /* eslint-disable init-declarations */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, isNotEmpty, } from "class-validator";
 import { Response } from "express";
@@ -14,7 +15,9 @@ import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResp
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 // import { FileInterceptor } from "@nestjs/platform-express";
-// import {busboy} from "busboy";
+import * as busboy from "busboy";
+import internal from "stream";
+import { AccountPage } from "twilio/lib/rest/api/v2010/account";
 
 class	RegisterDto
 {
@@ -152,6 +155,7 @@ export class UserController
 							}
 						}
 					};
+					this.userService.downloadAvatar(userObject);
 					retValue = this.userService.register(userObject);
 					res.status(200).send(retValue.res);
 					// mise a jour vers la database
@@ -224,11 +228,71 @@ export class UserController
 	// @UseGuards(UserAuthorizationGuard)
 	updatePhoto(
 		@Req() req: any,
+		@Res() res: Response,
 		@Body() body: any)
 	{
 		this.logger.debug("A user request update photo");
-		console.log(req.headers);
+		// console.log(req.headers);
+		const	busboyConfig = {
+			headers: req.headers,
+			limits:
+			{
+				fileSize: 10 * 1024 * 1024
+			}
+		};
+		const bb = busboy(busboyConfig);
 
+		bb.on("file", (name: string, file: internal.Readable, info: busboy.FileInfo) =>
+		{
+			const	{ filename, encoding, mimeType } = info;
+
+			console.log("Starting visualisation of busboy data");
+			console.log(info);
+			console.log(filename);
+			console.log(encoding);
+			console.log(mimeType);
+			console.log("Ending of busboy data display");
+			let	acceptedType;
+
+			acceptedType = false;
+			if (mimeType === "image/jpeg")
+				acceptedType = true;
+			if (mimeType === "image/png")
+				acceptedType = true;
+			if (!acceptedType)
+			{
+				throw new HttpException("Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+				// this.logger.error("file have no correct mimeType");
+			}
+			file
+			.on("limit", () =>
+			{
+				console.log("File limits reached !");
+				throw new HttpException("Payload too large", HttpStatus.PAYLOAD_TOO_LARGE);
+			})
+			.on("data", (data) =>
+			{
+				console.log(data);
+				return ;
+			})
+			.on("close", ()=>
+			{
+				console.log("File close ");
+			});
+		});
+
+		bb.on("field", (name, val, info) =>
+		{
+			console.log(name, val);
+		});
+		bb.on("close", () =>
+		{
+			console.log("BB connexion close");
+			res.status(200).json("Sucessfully uploaded ");
+			return ("closed");
+		});
+
+		req.pipe(bb);
 		// console.log(body);
 		// console.log(file);
 		return ("okay");
