@@ -357,6 +357,10 @@ const	controllerSlice = createSlice(
 		{
 			state.allUsers = action.payload.allUsers;
 		},
+		registerInfosInBack(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		}
 	}
 });
 

@@ -14,6 +14,7 @@ import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel } from "../m
 
 import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone } from "@mui/icons-material";
+import UserRegistration from "../../Object/UserRegistration";
 type MessageModel =
 {
 	sender: string,
@@ -1121,5 +1122,35 @@ export const	setAllUsers = ()
 			allUsers: [...array]
 		}
 		dispatch(controllerActions.setAllUsers(response));
+	});
+}
+
+export const	registerInfosInBack = (username: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	data: any = await UserServices.registerUsernameInBack(prev.controller.user.bearerToken, username, "localhost");
+
+		if (data === "error")
+		{
+			console.error("Error to get users");
+			return ;
+		}
+		console.log("here data", data);
+		const array: BackUserModel[] = [...prev.controller.allUsers];
+		array.forEach((elem) =>
+		{
+			if (elem.id === prev.controller.user.id)
+				elem.username = username
+		});
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: [...array]
+		}
+		dispatch(controllerActions.registerInfosInBack(response));
 	});
 }

@@ -174,6 +174,37 @@ const	UserServices = {
 				return ("error");
 			})
 		);
+	},
+
+	async	registerUsernameInBack
+	(token: string, username: string, hostname: string)
+	{
+		console.log("register username in backend");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			username: username
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/change-username", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service register username in backend ", data);
+				return (data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service register username in backend error: ", error);
+				return ("error");
+			})
+		);
 	}
 };
 

@@ -19,6 +19,7 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
+	registerInfosInBack,
 	setPassword,
 	setPseudo,
 	userRegistrationStepThree,
@@ -243,6 +244,8 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		// verifier toute les informations
 		if (filtered.length === 0)
 		{
+			// TEST
+			dispatch(registerInfosInBack(userSignup.username));
 			dispatch(setPseudo(userSignup.username));
 			dispatch(setPassword(userSignup.password));
 			dispatch(userRegistrationStepThree());
