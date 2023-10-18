@@ -22,6 +22,8 @@ import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	editFieldEmail,
+	editFieldUserName,
 	registerInfosInBack,
 	setDoubleAuth,
 	setEmail,
@@ -277,23 +279,14 @@ const	EditProfile = (props: EditProfileProps) =>
 		if (filtered.length === 0)
 		{
 			if (user.username !== userChanges.username)
-			{
-				// dispatch(registerInfosInBack(userChanges.username, "username"));
-				dispatch(setPseudo(userChanges.username));
-			}
+				dispatch(registerInfosInBack(userChanges.username, "username"));
 			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
 			if (user.password !== userChanges.password)
 				dispatch(setPassword(userChanges.password));
 			if (user.email !== userChanges.emailAddress)
-			{
-				// dispatch(registerInfosInBack(userChanges.emailAddress, "email"));
-				dispatch(setEmail(userChanges.emailAddress));
-			}
+				dispatch(registerInfosInBack(userChanges.emailAddress, "email"));
 			if (user.phoneNumber !== userChanges.phoneNumber)
-			{
-				// dispatch(registerInfosInBack(userChanges.phoneNumber, "phoneNumber"));
-				dispatch(setPhoneNumber(userChanges.phoneNumber));
-			}
+				dispatch(registerInfosInBack(userChanges.phoneNumber, "phoneNumber"));
 			if (props.setting)
 				navigate("/");
 			else
@@ -301,6 +294,7 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(setProfileMyView());
 				navigate("/me/profile");
 			}
+			console.log("num === ", user.phoneNumber);
 		}
 	};
 

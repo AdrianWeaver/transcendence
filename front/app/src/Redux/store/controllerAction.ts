@@ -1,3 +1,5 @@
+/* eslint-disable init-declarations */
+/* eslint-disable prefer-const */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable semi */
@@ -1125,39 +1127,76 @@ export const	setAllUsers = ()
 	});
 }
 
-export const	registerInfosInBack = (info: string, type: string)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
+export const	editFieldUserName = (info: string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return (async (dispatch, getState) =>
+	return ((dispatch, getState) =>
 	{
-		const	prev = getState();
-
-		const	data: any = await UserServices.registerUsernameInBack(prev.controller.user.bearerToken, info, type, "localhost");
-
-		if (data === "error")
-		{
-			console.error("Error to get users");
-			return ;
-		}
-		console.log("here data", data);
-		const array: BackUserModel[] = [...prev.controller.allUsers];
+		const prev = getState();
+		let array: BackUserModel[] = [...prev.controller.allUsers];
 		if (info !== undefined)
 		{
-			array.forEach((elem) =>
+			const index = array.findIndex((elem) =>
 			{
-				if (elem.id === prev.controller.user.id)
-				{
-					if (type === "username")
-						elem.username = info;
-					else if (type === "email")
-						elem.email = info;
-				}
+				return (elem.id === prev.controller.user.id);
 			});
+			array[index].username = info;
 		}
 		const	response: ControllerModel = {
 			...prev.controller,
 			allUsers: [...array]
-		}
+		};
+		dispatch(setPseudo(info));
 		dispatch(controllerActions.registerInfosInBack(response));
+	});
+}
+
+export const	editFieldEmail = (info: string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+		let array: BackUserModel[] = [...prev.controller.allUsers];
+		if (info !== undefined)
+		{
+			const index = array.findIndex((elem) =>
+			{
+				return (elem.id === prev.controller.user.id);
+			});
+			array[index].email = info;
+		}
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: [...array]
+		};
+		dispatch(setEmail(info));
+		dispatch(controllerActions.registerInfosInBack(response));
+	});
+}
+
+export const	registerInfosInBack = (info: string, field: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		UserServices.registerUsernameInBack(prev.controller.user.bearerToken, info, field, prev.server.serverLocation);
+		// .then((data) =>
+		// {
+		// 	console.log("ok", data);
+		// })
+		// .catch((error) =>
+		// {
+		// 	console.log("error", error);
+		// });
+		if (field === "username")
+			dispatch(editFieldUserName(info));
+		if (field === "email")
+			dispatch(editFieldEmail(info));
+		if (field === "phoneNumber")
+			dispatch(setPhoneNumber(info));
+		dispatch(setAllUsers());
 	});
 }

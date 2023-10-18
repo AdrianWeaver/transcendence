@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -111,7 +112,7 @@ export class UserService
 			if (index !== -1)
 				this.user.splice(index, 1);
 		}
-		const newUser: UserModel = {
+		const newUser = {
 			registrationProcessEnded: false,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
