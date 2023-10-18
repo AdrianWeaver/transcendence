@@ -52,6 +52,7 @@ class User
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
 	public changeSocket: (client: Socket) => void;
+	public isFriend: (socketId: string) => boolean;
 
     public constructor(name: string, client: Socket | null, profileId: string)
     {
@@ -157,6 +158,18 @@ class User
 		{
 			this.client = client;
 			this.id = client.id;
+		};
+
+		this.isFriend = (profileId: string) =>
+		{
+			let toReturn: boolean;
+			toReturn = false;
+			this.friends.forEach((friend) =>
+			{
+				if (friend.profileId === profileId)
+					toReturn = true;
+			});
+			return (toReturn);
 		};
     }
 

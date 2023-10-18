@@ -35,7 +35,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	username: string,
 }
 
 type	MembersModel =
@@ -159,28 +160,29 @@ export class ChatSocketEvents
 				client.disconnect();
 				return ;
 			}
-			// const searchUser = this.chatService.searchUserWithProfileId(profileId);
-			// if (searchUser === undefined)
-			// {
-			// 	const newUser = new User("test", client, profileId);
-			// 	this.chatService.pushUser(newUser, client.id);
-			// }
-			// else
-			// {
-			// 	const oldSocketId = searchUser.id;
-			// 	searchUser.changeSocket(client);
-			// 	this.chatService.checkOldSocketInChannels(client, oldSocketId);
-			// }
-			// 	this.chatService.updateDatabase();
+
+			// INIT CHANNELS, USERS, FRIENDS DISPLAY
+
+			const	userMe = this.chatService.getUserBySocketId(client.id);
+			if (userMe !== undefined)
+			{
+				const	friendsArr: string[] = [];
+
+				userMe.friends.forEach((friend) =>
+				{
+					friendsArr.push(friend.name);
+				});
 				const	action = {
 					type: "init-channels",
 					payload: {
 						channels: this.chatService.getChanMap(),
+						friends: friendsArr,
 						uniqueId: client.id,
-						privateMessage: this.chatService.getPrivateMessageMap()
+						privateMessage: this.chatService.getPrivateMessageMap(),
 					}
 				};
-				client.emit("display-channels", action);
+				client.emit("repopulate-on-reconnection", action);
+			}
 		}
 
 		handleDisconnect(client: Socket)
@@ -290,7 +292,8 @@ export class ChatSocketEvents
 				const newMessage: MessageModel = {
 					sender: client.id,
 					message: data.payload.message,
-					id: id
+					id: id,
+					username: this.chatService.getUsernameWithSocketId(client.id) as string,
 				};
 				channel.addNewMessage(newMessage);
 				this.chatService.updateDatabase();
@@ -481,7 +484,8 @@ export class ChatSocketEvents
 					const newMessage: MessageModel = {
 						sender: "server",
 						message: messageText,
-						id: id
+						id: id,
+						username: "server",
 					};
 					searchChannel.addNewMessage(newMessage);
 					const	messageAction = {
@@ -539,7 +543,7 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 						isInside: "",
 						chanMessages: channel?.messages,
-						kind: data.payload.kind
+						kind: data.payload.kind,
 					}
 				};
 				console.log(channel);
@@ -560,7 +564,8 @@ export class ChatSocketEvents
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: message,
-					id: id
+					id: id,
+					username: "server",
 				};
 				channel.addNewMessage(newMessage);
 				const	action = {
@@ -600,7 +605,8 @@ export class ChatSocketEvents
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: message,
-					id: id
+					id: id,
+					username: "server",
 				};
 				channel.addNewMessage(newMessage);
 				const	action = {
@@ -664,26 +670,34 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				const	id = userMe?.friends.length + 1;
+				let message: string;
+				message = "";
 				const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-				const newMember: FriendsModel = {
-					id: id,
-					name: newFriend,
-					profileId: profileId,
-				};
-				userMe?.friends.push(newMember);
-
 				const friendArray: string[] = [];
-				userMe.friends.forEach((friend) =>
+
+				if (userMe.isFriend(profileId) === true)
+					message = newFriend + " is already your friend";
+				else
 				{
-					friendArray.push(friend.name);
-				});
+					const	id = userMe?.friends.length + 1;
+					const newMember: FriendsModel = {
+						id: id,
+						name: newFriend,
+						profileId: profileId,
+					};
+					userMe?.friends.push(newMember);
+					userMe.friends.forEach((friend) =>
+					{
+						friendArray.push(friend.name);
+					});
+				}
 				const	action = {
 					type: "add-friend",
 					payload: {
 						friendList: friendArray,
-						newFriend: this.chatService.getUsernameWithSocketId(data.payload.friendName),
+						newFriend: newFriend,
+						alreadyFriend: message,
 					}
 				};
 				client.emit("user-info", action);
@@ -787,6 +801,7 @@ export class ChatSocketEvents
 						sender: "server",
 						message: targetClient.id + " has been added by " + client.id,
 						id: id,
+						username: "server",
 					};
 					channel.addNewMessage(newMessage);
 					const	messageAction = {
@@ -834,6 +849,7 @@ export class ChatSocketEvents
 						sender: "server",
 						message: targetClient.id + " is now an admin.",
 						id: id,
+						username: "server",
 					};
 					channel.addNewMessage(newMessage);
 					const	messageAction = {

@@ -30,9 +30,17 @@ type MatchHistory = {
     outStanding: boolean
 };
 
-type MemberSocketIdModel ={
+type MemberSocketIdModel = {
 	memberSocketId: string,
 	profileId: string
+};
+
+type MessageModel =
+{
+	sender: string,
+	message: string,
+	id: number,
+    username: string,
 };
 
 class Chat
@@ -156,6 +164,10 @@ class Chat
 			this.channels.forEach((channel) =>
 			{
 				channel.sockets.push(client);
+				channel.messages.forEach((message: MessageModel) =>
+				{
+					message.sender = client.id;
+				});
 			});
 		};
 

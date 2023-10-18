@@ -10,7 +10,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+    username: string,
 }
 
 // type profileSocketIdModel = {

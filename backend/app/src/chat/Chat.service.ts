@@ -38,7 +38,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	username: string
 }
 
 type ChanMapModel =
@@ -268,12 +269,13 @@ export	class ChatService implements OnModuleInit
 
 						const arrayMessages: Array<MessageModel> = [];
 
-						rawChan.admins.forEach((message: MessageModel) =>
+						rawChan.messages.forEach((message: MessageModel) =>
 						{
 							const objToMemory: MessageModel = {
 								sender: message.sender,
 								message: message.message,
-								id: message.id
+								id: message.id,
+								username: message.username,
 							};
 							arrayMessages.push(objToMemory);
 						});
@@ -702,5 +704,17 @@ export	class ChatService implements OnModuleInit
 	public setServer(server: Server)
 	{
 		this.chat.setServer(server);
+	}
+
+	public getUsernameWithProfileId(profileId: string)
+	{
+		let toReturn: string;
+		toReturn = "undefined";
+		this.chat.users.forEach((user) =>
+		{
+			if (user.profileId === profileId)
+				toReturn = user.name;
+		});
+		return (toReturn);
 	}
 }

@@ -63,7 +63,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	username: string
 }
 
 type MembersModel =
@@ -584,9 +585,6 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
-		if (kindOfConversation === undefined)
-			console.log("LOL");
-		console.log("HELLO I AM HERE");
 		const	action = {
 			type: "asked-join",
 			payload: {
@@ -735,7 +733,7 @@ const	ChatLayout = () =>
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
 						setChanMessages(data.payload.chanMessages);
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages(data.payload.chanMessages);
@@ -771,9 +769,14 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "add-friend")
 			{
-				setFriendList(data.payload.friendList);
-				const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-				alert(alertMessage);
+				if (data.payload.alreadyFriend !== "")
+					alert("ALERT" + data.payload.alreadyFriend);
+				else
+				{
+					setFriendList(data.payload.friendList);
+					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
+					alert(alertMessage);
+				}
 			}
 
 			if (data.type === "block-user")
@@ -801,6 +804,18 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	repopulateOnReconnection = (data: any) =>
+		{
+			if (data.type === "init-channels")
+			{
+				if (data.payload.channels !== undefined)
+					setChannels(data.payload.channels);
+				if (data.payload.friends !== undefined)
+					setFriendList(data.payload.friends);
+				setUniqueId(data.payload.uniqueId);
+			}
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -812,6 +827,7 @@ const	ChatLayout = () =>
 		socket.on("left-message", leftChannelMessage);
 		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
+		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
 
         socket.connect();
 
@@ -828,6 +844,7 @@ const	ChatLayout = () =>
 			socket.on("left-message", leftChannelMessage);
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
+			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
         });
     }, [
 		// dispatch,
@@ -1066,6 +1083,7 @@ const	ChatLayout = () =>
 
 	const	addUserToFriends = (userName: string) =>
 	{
+		console.log("I START ADDING A FRIEND");
 		const	action = {
 			type: "add-friend",
 			payload: {
@@ -1542,13 +1560,13 @@ const	ChatLayout = () =>
 						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
 						<List>
 							{
-								friendList.map((friend: any) =>
+								friendList.map((friend: any, index) =>
 								{
 									return (
-										<ListItem style={listItemStyle} key={friend.id}>
+										<ListItem style={listItemStyle} key={index}>
 											<ListItemText
 												style={listItemTextStyle}
-												primary={friend.name}
+												primary={friend}
 												// onClick={() =>
 												// {
 												// 	return (goToChannel(channel.name));
@@ -1592,7 +1610,7 @@ const	ChatLayout = () =>
 									<MessageItem
 										key={index}
 										sender={sender}
-										date={message.sender}
+										date={message.username}
 										message={message.message}
 									/>
 								);
