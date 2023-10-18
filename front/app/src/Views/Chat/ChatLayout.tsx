@@ -69,7 +69,9 @@ type MessageModel =
 type MembersModel =
 {
 	id: number,
-	name:string
+	name:string,
+	profileId: string,
+	userName: string,
 }
 
 type ChanMapModel = {
@@ -629,7 +631,6 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
-				setUniqueId(data.payload.uniqueId);
 			}
 
 			if(data.type === "add-new-channel")
@@ -743,6 +744,7 @@ const	ChatLayout = () =>
 			{
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
+				setUniqueId(data.payload.uniqueId);
 			}
 		};
 
@@ -1337,11 +1339,12 @@ const	ChatLayout = () =>
 																	channelMembers.map((member) =>
 																	{
 																		return (<li key={member.id}>
-																				{member.name}
+																				{member.userName}
 																				{isChannelAdmin && member.name !== uniqueId && (
 																				<>
 																					<Button onClick={() =>
 																					{
+																						alert(uniqueId);
 																						kickUserFromChannel(member.name, buttonSelection.name);
 																						handleMembersClose();
 																					}}>

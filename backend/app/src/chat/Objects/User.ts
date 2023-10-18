@@ -9,7 +9,8 @@ import { type } from "os";
 
 type	FriendsModel = {
 	id: number,
-	name: string
+	name: string,
+	profileId: string
 };
 
 type	ProfileModel = {
@@ -25,6 +26,11 @@ type	StatsModel = {
 	victories: number,
 	perfect: number
 };
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
 class User
 {
 	public profileId: string;
@@ -34,7 +40,7 @@ class User
     // socket id
 	public id: string;
     public channels: Channel[] = [];
-	public blocked: string[] = [];
+	public blocked: MemberSocketIdModel[] = [];
 	public friends: FriendsModel[] = [];
 	public chat: Chat | undefined;
 	// this one must be initialisez when reconstructed or when reconnected with id 
