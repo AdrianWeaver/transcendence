@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 
 import MessageItem from "./components/MessageItem";
-import CurrentlyTalkingFriend from "./components/CurrentlyTalkingFriend";
+import Myself from "./components/Myself";
 import FriendItem from "./components/FriendItem";
 
 const URL = "http://localhost:3000";
@@ -191,7 +191,7 @@ const FriendsList = (props: FriendsListProps) =>
 
 	return (
 		<>
-			<CurrentlyTalkingFriend />
+			<Myself />
 			<Divider />
 			<Grid
 				item
