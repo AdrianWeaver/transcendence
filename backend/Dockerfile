@@ -3,6 +3,7 @@ FROM node:18.18.1-bullseye
 RUN apt update && apt upgrade -y
 RUN apt install -y curl htop
 
+ARG PYTHON /usr/bin/python
 RUN npm install -g @nestjs/cli
 # RUN npm install -g pm2
 # RUN npm install -g pm2-monit
