@@ -40,6 +40,11 @@ export class UserService
 			+ this.getUuidInstance());
 	}
 
+	public getAllUserRaw () : Array<UserModel>
+	{
+		return (this.user);
+	}
+
 	public	getUuidInstance(): string
 	{
 		return (this.uuidInstance);
@@ -298,6 +303,16 @@ export class UserService
 		return("ok");
 	}
 
+	public	getUsernameByProfileId(profileId: string)
+	{
+		const searchUser = this.user.find((element) =>
+		{
+			return (element.id === profileId);
+		});
+		console.error(searchUser);
+		return (searchUser?.username);
+	}
+
 	public	getPhoneNumber(id: string)
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -344,5 +359,4 @@ export class UserService
 		}
 		return ("user doesnt exist");
 	}
-
 }

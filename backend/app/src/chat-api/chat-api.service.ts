@@ -16,6 +16,11 @@ export class ChatApiService
 		return (this.chatService.getAllUsers());
 	}
 
+	public	getChatData()
+	{
+		return this.chatService.parseForDatabase();
+	}
+
 	public getUuidInstance(): string
 	{
 		return (this.chatService.getChatInstanceId());

@@ -22,7 +22,8 @@ import { useNavigate } from "react-router-dom";
 type	FriendsModel =
 {
 	id: number,
-	name: string
+	name: string,
+	profileId: string,
 }
 
 type FriendsMapModel = {

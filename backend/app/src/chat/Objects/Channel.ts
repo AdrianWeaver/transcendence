@@ -10,17 +10,28 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+    username: string,
 }
+
+// type profileSocketIdModel = {
+//     socketId: string,
+//     profileId: string,
+// }
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
 
 class Channel
 {
     public kind: string;
-    public owner: string;
-    public admins: string[] = [];
-    public banned: string[] = [];
+    public owner: MemberSocketIdModel;
+    // public admins: string[] = [];
+    public admins: MemberSocketIdModel[] = [];
+    public banned: MemberSocketIdModel[] = [];
     public name: string;
-    public users: string[] = [];
+    public users: MemberSocketIdModel[] = [];
     public mode: string;
     public members: number;
     public password: string | undefined;
@@ -32,12 +43,19 @@ class Channel
     public isAdmin: (id: string) => boolean;
     public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
-    public addToBanned: (id: string) => void;
+    public addToBanned: (id: string, profileId: string) => void;
     public addNewMessage: (message: MessageModel) => void;
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
 
-    public constructor(name: string, client: Socket | null, mode: string, password: string, kind: string)
+    // eslint-disable-next-line max-params
+    public constructor(
+        name: string,
+        client: Socket | null,
+        mode: string,
+        password: string,
+        kind: string,
+        profileId: string)
     {
         this.kind = kind;
         this.name = name;
@@ -45,15 +63,25 @@ class Channel
         this.mode = mode;
         this.chat = undefined;
         this.members++;
-        if (client === null)
-            return ;
+
+        // this has caused us a lot of trouble
+        // if (client === null)
+        //     return ;
+
+        const memberSockId = client === null ? "undefined" : client.id;
+        const obj: MemberSocketIdModel = {
+            memberSocketId: memberSockId,
+            profileId: profileId
+        };
         if (this.members === 1)
         {
-            this.owner = client.id;
-            this.admins.push(client.id);
+            this.admins.push(obj);
+            this.owner = obj;
+            // this.admins.push(client.id, -1);
         }
-        this.users.push(client.id);
-        this.sockets.push(client);
+        this.users.push(obj);
+        if (client !== null)
+            this.sockets.push(client);
         this.mode = mode;
         if (password !== undefined)
             this.password = password;
@@ -64,7 +92,7 @@ class Channel
         {
             for (const user of this.admins)
             {
-                if (id === user)
+                if (id === user.memberSocketId)
                     return (true);
             }
             return (false);
@@ -72,7 +100,7 @@ class Channel
 
         this.isOwner = (id: string) =>
         {
-            if (id === this.owner)
+            if (id === this.owner.memberSocketId)
                 return (true);
             return (false);
         };
@@ -81,7 +109,7 @@ class Channel
         {
             for (const user of this.banned)
             {
-                if (id === user)
+                if (id === user.memberSocketId)
                     return (true);
             }
             return (false);
@@ -91,7 +119,7 @@ class Channel
         {
             for (const user of this.users)
             {
-                if (user === id)
+                if (user.memberSocketId === id)
                     return (true);
             }
             return (false);
@@ -99,12 +127,21 @@ class Channel
 
         this.addAdmin = (id: string) =>
         {
-            this.admins.push(id);
+            const obj: MemberSocketIdModel = {
+                memberSocketId: id,
+                profileId: this.chat?.getProfileIdFromSocketId(id) as string,
+            };
+
+            this.admins.push(obj);
         };
 
-        this.addToBanned = (id: string) =>
+        this.addToBanned = (id: string, profileId: string) =>
         {
-            this.banned.push(id);
+            const newBanned: MemberSocketIdModel = {
+                memberSocketId: id,
+                profileId: profileId,
+            };
+            this.banned.push(newBanned);
         };
 
         this.addNewMessage = (message: MessageModel) =>
@@ -117,7 +154,7 @@ class Channel
             this.members--;
             const index = this.users.findIndex((element) =>
             {
-                return (element === client.id);
+                return (element.memberSocketId === client.id);
             });
             this.users.splice(index, 1);
         };

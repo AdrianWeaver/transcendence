@@ -12,6 +12,12 @@ export class ChatApiController
 				+ this.chatApiService.getUuidInstance());
 	}
 
+	@Get("chat-data")
+	getChatData()
+	{
+		return (this.chatApiService.getChatData());
+	}
+
 	@Get("all-user")
 	getAllUsersConnected()
 	{

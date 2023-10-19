@@ -2,7 +2,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	mode: string
+	mode: string,
+	username: string,
 }
 export	interface ChatUserModel
 {

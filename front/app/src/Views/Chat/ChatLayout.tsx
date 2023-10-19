@@ -52,22 +52,28 @@ import {
 	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
+	// setMessageRoom,
 	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
+// import { MessageRoomModel } from "../../Redux/models/redux-models";
+
 import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
 
 type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	username: string
 }
 
 type MembersModel =
 {
 	id: number,
-	name:string
+	name:string,
+	profileId: string,
+	userName: string,
 }
 
 type ChanMapModel = {
@@ -476,7 +482,7 @@ const	ChatLayout = () =>
 			return;
 		}
 
-		if (selectedMode === "Protected" && chanPassword.trim() === "")
+		if (selectedMode === "protected" && chanPassword.trim() === "")
 		{
 			alert("There must be a password for a protected channel");
 			return;
@@ -535,7 +541,6 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
-				setUniqueId(data.payload.uniqueId);
 			}
 
 			if(data.type === "add-new-channel")
@@ -637,7 +642,7 @@ const	ChatLayout = () =>
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
 						setChanMessages(data.payload.chanMessages);
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages(data.payload.chanMessages);
@@ -649,6 +654,7 @@ const	ChatLayout = () =>
 			{
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
+				setUniqueId(data.payload.uniqueId);
 			}
 		};
 
@@ -672,9 +678,14 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "add-friend")
 			{
-				setFriendList(data.payload.friendList);
-				const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-				alert(alertMessage);
+				if (data.payload.alreadyFriend !== "")
+					alert("ALERT" + data.payload.alreadyFriend);
+				else
+				{
+					setFriendList(data.payload.friendList);
+					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
+					alert(alertMessage);
+				}
 			}
 
 			if (data.type === "block-user")
@@ -702,6 +713,18 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	repopulateOnReconnection = (data: any) =>
+		{
+			if (data.type === "init-channels")
+			{
+				if (data.payload.channels !== undefined)
+					setChannels(data.payload.channels);
+				if (data.payload.friends !== undefined)
+					setFriendList(data.payload.friends);
+				setUniqueId(data.payload.uniqueId);
+			}
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -713,6 +736,7 @@ const	ChatLayout = () =>
 		socket.on("left-message", leftChannelMessage);
 		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
+		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
 
         socket.connect();
 
@@ -729,6 +753,7 @@ const	ChatLayout = () =>
 			socket.on("left-message", leftChannelMessage);
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
+			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
         });
     },
 	[
@@ -968,6 +993,7 @@ const	ChatLayout = () =>
 
 	const	addUserToFriends = (userName: string) =>
 	{
+		console.log("I START ADDING A FRIEND");
 		const	action = {
 			type: "add-friend",
 			payload: {
@@ -1244,11 +1270,12 @@ const	ChatLayout = () =>
 																	channelMembers.map((member) =>
 																	{
 																		return (<li key={member.id}>
-																				{member.name}
+																				{member.userName}
 																				{isChannelAdmin && member.name !== uniqueId && (
 																				<>
 																					<Button onClick={() =>
 																					{
+																						alert(uniqueId);
 																						kickUserFromChannel(member.name, buttonSelection.name);
 																						handleMembersClose();
 																					}}>
@@ -1443,13 +1470,13 @@ const	ChatLayout = () =>
 						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
 						<List>
 							{
-								friendList.map((friend: any) =>
+								friendList.map((friend: any, index) =>
 								{
 									return (
-										<ListItem style={listItemStyle} key={friend.id}>
+										<ListItem style={listItemStyle} key={index}>
 											<ListItemText
 												style={listItemTextStyle}
-												primary={friend.name}
+												primary={friend}
 												// onClick={() =>
 												// {
 												// 	return (goToChannel(channel.name));
@@ -1493,7 +1520,7 @@ const	ChatLayout = () =>
 									<MessageItem
 										key={index}
 										sender={sender}
-										date={message.sender}
+										date={message.username}
 										message={message.message}
 									/>
 								);

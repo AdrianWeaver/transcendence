@@ -36,4 +36,5 @@ export class AdminsController
 			.log("A user request 'close-all-anonymous'");
 		return (this.anonymousUserService.adminCloseAllClient());
 	}
+
 }

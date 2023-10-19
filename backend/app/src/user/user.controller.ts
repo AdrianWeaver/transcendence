@@ -75,6 +75,13 @@ export class UserController
 		this.env = dotenv.config();
 	}
 
+	// to delete
+	@Get("all-user-Raw")
+	getAllUsersRaw()
+	{
+		return (this.userService.getAllUserRaw());
+	}
+
 	@Post("register")
 	getUserRegister(
 		@Body() body: RegisterDto,
@@ -145,7 +152,9 @@ export class UserController
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
+
 						username: data.login,
+
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
