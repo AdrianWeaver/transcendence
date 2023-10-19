@@ -145,7 +145,7 @@ endif
 
 attach_container_app_install: start_container
 	@echo "Installation in progress... please wait"
-	@echo "cd /app && npm install --no-bin-links" | docker exec $(LOG) backend /bin/bash
+	@echo "cd /app && npm install --unsafe-perm" | docker exec $(LOG) backend /bin/bash
 
 install_app: 
 ifeq ($(DEV_APP_INSTALLED), 0)

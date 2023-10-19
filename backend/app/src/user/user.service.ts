@@ -26,7 +26,6 @@ import	* as jwt from "jsonwebtoken";
 import axios from "axios";
 import path, { join } from "path";
 import * as fs from "fs";
-
 import * as sharp from "sharp";
 
 @Injectable()
@@ -163,63 +162,63 @@ export class UserService
 		const	destSize = this.getOutputSize(size);
 		console.log("dest size:" + destSize);
 
-		const	sourceImage = sharp(srcFilename);
-		sourceImage
-			.metadata()
-			.then((metadata) =>
-			{
-				console.log("Meta-data");
-				// console.log(metadata);
-				if (metadata.width === undefined)
-					throw new InternalServerErrorException();
-				const	coef = this.getCoefResize(metadata.width, destSize);
-				console.log(coef);
-				if (coef.operator === "divide")
-				{
-					sourceImage
-						.resize(Math.floor(metadata.width / coef.value))
-						.toFile(destFilename)
-						.then((info) =>
-						{
-							this.logger.verbose("Successfull create image size : " + size);
-						})
-						.catch((error) =>
-						{
-							console.log(error);
-						});
-				}
-				else if (coef.operator === "multiply")
-				{
-					sourceImage
-						.resize(Math.floor(metadata.width * coef.value))
-						.toFile(destFilename)
-						.then((info) =>
-						{
-							this.logger.verbose("Successfull create image size : " + size);
-						})
-						.catch((error) =>
-						{
-							console.log(error);
-						});
-				}
-				else
-				{
-					sourceImage
-						.toFile(destFilename)
-						.then((info) =>
-						{
-							this.logger.verbose("Successfull create image size : " + size);
-						})
-						.catch((error) =>
-						{
-							console.log(error);
-						});
-				}
-			})
-			.catch((error) =>
-			{
-				this.logger.error(error);
-			});
+		// const	sourceImage = sharp(srcFilename);
+		// sourceImage
+		// 	.metadata()
+		// 	.then((metadata) =>
+		// 	{
+		// 		console.log("Meta-data");
+		// 		// console.log(metadata);
+		// 		if (metadata.width === undefined)
+		// 			throw new InternalServerErrorException();
+		// 		const	coef = this.getCoefResize(metadata.width, destSize);
+		// 		console.log(coef);
+		// 		if (coef.operator === "divide")
+		// 		{
+		// 			sourceImage
+		// 				.resize(Math.floor(metadata.width / coef.value))
+		// 				.toFile(destFilename)
+		// 				.then((info) =>
+		// 				{
+		// 					this.logger.verbose("Successfull create image size : " + size);
+		// 				})
+		// 				.catch((error) =>
+		// 				{
+		// 					console.log(error);
+		// 				});
+		// 		}
+		// 		else if (coef.operator === "multiply")
+		// 		{
+		// 			sourceImage
+		// 				.resize(Math.floor(metadata.width * coef.value))
+		// 				.toFile(destFilename)
+		// 				.then((info) =>
+		// 				{
+		// 					this.logger.verbose("Successfull create image size : " + size);
+		// 				})
+		// 				.catch((error) =>
+		// 				{
+		// 					console.log(error);
+		// 				});
+		// 		}
+		// 		else
+		// 		{
+		// 			sourceImage
+		// 				.toFile(destFilename)
+		// 				.then((info) =>
+		// 				{
+		// 					this.logger.verbose("Successfull create image size : " + size);
+		// 				})
+		// 				.catch((error) =>
+		// 				{
+		// 					console.log(error);
+		// 				});
+		// 		}
+		// 	})
+		// 	.catch((error) =>
+		// 	{
+		// 		this.logger.error(error);
+		// 	});
 		this.logger.debug("Ending resize image");
 	}
 
@@ -237,37 +236,29 @@ export class UserService
 		const filenameSmall = this.publicPathSmall + "/" + userObj.username + ".jpeg";
 		const filenameMicro = this.publicPathMicro + "/" + userObj.username + ".jpeg";
 		this.logger.verbose("This is the target file: " + filename);
-		axios
-		.get(targetUrl,
+		try
+		{
+			this.logger.verbose("Starting fetching the data from 42 api");
+			const response = await axios
+				.get(targetUrl, { responseType: "arraybuffer"});
+			
+			const data = response.data;
+			this.logger.verbose("Start: The data is ready to be stored inside a file");
+			try
 			{
-				responseType: "arraybuffer"}
-			)
-			.then((res) =>
-			{
-				return (res.data);
-			})
-			.then((data) =>
-			{
-				this.logger.verbose("The data is ready to be stored inside a file");
-				// console.log(data);
-				fs.writeFile(filename, data, () =>
-				{
-					this.logger.verbose("Successfully download and write file");
-					fs.writeFile(filenameLarge, data, () =>
-					{
-						this.logger.verbose("Successfully write file Large");
-						this.createResizedImage(filename, filenameMedium, "medium");
-						this.createResizedImage(filename, filenameSmall, "small");
-						this.createResizedImage(filename, filenameMicro, "micro");
-					});
-				});
-			})
-			.catch((error) =>
+				fs.writeFileSync(filename, data);
+				this.logger.log("Successfully store the avatar");
+			}
+			catch (error)
 			{
 				this.logger.error(error);
-			});
-
-		this.logger.debug("Ending the downmload of the avatar");
+			}
+			this.logger.verbose("End: The data is ready to be stored inside a file");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
 		return (userObj);
 	}
 
@@ -329,23 +320,6 @@ export class UserService
 				}
 			}
 		};
-		// const	urlImage = newUser.avatar;
-		// this.logger.verbose(urlImage);
-		// const	tmpPictures = join(__dirname, "..", "..", "public", "tmp", newUser.id + ".jpg");
-		// const	dl = new DownloaderHelper(urlImage, tmpPictures);
-		// dl.on("end", () =>
-		// {
-		// 	this.logger.log("Succcessfull download image from api");
-		// });
-		// dl.on("error", (error) =>
-		// {
-		// 	this.logger.error("Download Failed", error);
-		// });
-		// dl.start().catch((error) =>
-		// {
-		// 	this.logger.error("error", error);
-		// });
-		// this.logger.log("End of download ");
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
 			message: "Your session has been created, you must loggin",

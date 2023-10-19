@@ -121,7 +121,7 @@ export class UserController
 				};
 				Api()
 				.request(config)
-				.then((resData) =>
+				.then(async (resData) =>
 				{
 					const	data = resData.data;
 					userObject = {
@@ -155,16 +155,18 @@ export class UserController
 							}
 						}
 					};
-					this.userService.downloadAvatar(userObject)
-					.then((data) =>
-					{
+					this.logger.warn("Starting processing image");
+					const newUser = await this.userService.downloadAvatar(userObject);
+					// .then((data) =>
+					// {
 						this.logger.debug("Data here");
-						this.logger.debug(data);
-					});
-					this.logger.error("new  user data");
+						// this.logger.debug(newUser);
+					// });
+					// this.logger.error("new  user data");
 					retValue = this.userService.register(userObject);
 					res.status(200).send(retValue.res);
 					// mise a jour vers la database
+					this.logger.warn("Ending processing image");
 				})
 				.catch((error) =>
 				{
