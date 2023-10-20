@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable consistent-return */
 /* eslint-disable max-statements */
 import { useNavigate } from "react-router-dom";
 import MenuBar from "../../Component/MenuBar/MenuBar";
@@ -20,8 +22,8 @@ const	Logout = () =>
 
 	const	logUserOut = () =>
 	{
-		dispatch(logOffUser());
-		dispatch(reinitialiseUser());
+		dispatch(reinitialiseUser(true));
+		// dispatch(logOffUser());
 		navigate("/");
 	};
 

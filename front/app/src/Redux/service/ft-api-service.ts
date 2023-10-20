@@ -38,7 +38,7 @@ const	UserServices = {
 	},
 	async	verifyToken(token: string, hostname: string)
 	{
-		console.log("Hello token");
+		console.log("verify token");
 		const	config: AxiosRequestConfig = {
 			headers:
 			{
@@ -52,15 +52,38 @@ const	UserServices = {
 			.post("/user/verify-token", {}, config)
 			.then((data) =>
 			{
-				// console.log("register front");
-				// console.log(data.data);
+				console.log(data);
+				return ("OKay");
+			})
+			.catch(() =>
+			{
+				console.error("error from verify token");
+				return ("ERROR");
+			})
+		);
+	},
+	async	revokeToken(token: string, hostname: string)
+	{
+		console.log("Revoke token");
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/revoke-token", {}, config)
+			.then((data) =>
+			{
 				console.log(data);
 				return ("OKay");
 			})
 			.catch((error) =>
 			{
-				console.error("error from verify token");
-				// console.error(error);
+				console.error("error from verify token", error);
 				return ("ERROR");
 			})
 		);

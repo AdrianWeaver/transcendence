@@ -117,7 +117,8 @@ export class UserService
 			if (index !== -1)
 				this.user.splice(index, 1);
 		}
-		const newUser = {
+		// const	secretToken = randomBytes(64).toString("hex");
+		const newUser : UserModel= {
 			registrationProcessEnded: false,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
@@ -155,7 +156,8 @@ export class UserService
 					validationCode: data.authService.doubleAuth.validationCode,
 					valid: data.authService.doubleAuth.valid,
 				}
-			}
+			},
+			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
@@ -234,6 +236,29 @@ export class UserService
 		if (!user)
 			throw new InternalServerErrorException();
 		user.revokedConnectionRequest = true;
+	}
+
+	public	getUserExpById(id: any)
+	: number
+	{
+		const searchUser = this.user.find((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchUser === undefined)
+			return (-1);
+		return (searchUser.authService.expAt);
+	}
+
+	public	revokeUserTokenExpById(id: any)
+	{
+		const searchIndex = this.user.findIndex((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchIndex === -1)
+			return ;
+		this.user[searchIndex].authService.expAt = Date.now();
 	}
 
 	public	getUserById(id: any)

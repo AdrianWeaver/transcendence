@@ -334,20 +334,6 @@ export const setPseudo = (name: string)
 		{
 			return (elem.id === prev.controller.user.id);
 		});
-		// const updatedUsers = prev.controller.allUsers.map((user, i) =>
-		// {
-		// 	if (i === index)
-		// 	{
-		// 		return ({
-		// 				...user,
-		// 				username: name
-		// 			});
-		// 	}
-		// 	else
-		// 	{
-		// 		return (user);
-		// 	}
-		// });
 		const updatedChatUsers = prev.controller.user.chat.users.map((user, i) =>
 		{
 			if (i === index)
@@ -362,7 +348,6 @@ export const setPseudo = (name: string)
 		});
 		const response: ControllerModel = {
 			...prev.controller,
-			// allUsers: updatedUsers,
 			user:
 			{
 				...prev.controller.user,
@@ -624,6 +609,7 @@ export const verifyToken = ()
 		{
 			dispatch(setRegistrationProcessError());
 			dispatch(resetRegistration);
+			dispatch(reinitialiseUser(false));
 			return ;
 		}
 
@@ -652,7 +638,8 @@ export const registerClientWithCode = (code : string)
 		}
 		dispatch(setRegistrationProcessStart())
 		// console.log("Code is equals to : ", code);
-		const	data: any = await UserServices.register(code, "localhost");
+		const	data: any = await UserServices.register(
+			code, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -717,7 +704,9 @@ export const registerNumberForDoubleAuth = (numero : string, token: string)
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
-		const	data: any = await UserServices.getNumberForDoubleAuth(numero, token, "localhost");
+		const	data: any = await
+			UserServices.getNumberForDoubleAuth(
+				numero, token, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -752,7 +741,9 @@ export const receiveValidationCode = (numero : string, token: string)
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
-		const	data: any = await UserServices.receiveValidationCodeFromTwilio(numero, token, "localhost");
+		const	data: any = await
+			UserServices.receiveValidationCodeFromTwilio(
+				numero, token, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -787,7 +778,8 @@ export const GetValidationCode = (otpCode : string, token: string)
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
-		const	data: any = await UserServices.getValidationCodeFromTwilio(prev.controller.user.phoneNumber, otpCode, token, "localhost");
+		const	data: any = await UserServices.getValidationCodeFromTwilio(
+			prev.controller.user.phoneNumber, otpCode, token, prev.server.serverLocation);
 		if (data === "error")
 		{
 			dispatch(setRegistrationProcessError());
@@ -884,50 +876,23 @@ export const	setRegistered = (data: boolean)
 	});
 }
 
-export const	reinitialiseUser = ()
+export const	reinitialiseUser = (logout: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch, getState) =>
+	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 
-		const	response: ControllerModel = {
-			...prev.controller,
-			registration:
-			{
-				startedRegister: false,
-				step: 0,
-				codeOauthFT: "undefined",
-				abortRequested: false,
-				requestHomeLink: false
-			},
-			user:
-			{
-				...prev.controller.user,
-				isLoggedIn: false,
-				id: -1,
-				rememberMe: false,
-				email: "undefined",
-				bearerToken: "undefined",
-				firstName: "undefined",
-				lastName: "undefined",
-				username: "undefined",
-				login: "undefined",
-				registrationProcess: false,
-				registrationError: "undefined",
-				doubleAuth: false,
-				phoneNumber: "undefined",
-				registered: false,
-				avatar: "https://thispersondoesnotexist.com/",
-				password: "undefined",
-				chat:
-				{
-					...prev.controller.user.chat,
-					pseudo: "undefined"
-				}
-			}
+		if (prev.controller.user.bearerToken === "undefined")
+			return ;
+		if (logout)
+		{
+			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+			console.log("coucou");
+			dispatch(logOffUser());
+			dispatch(resetRegistration);
 		}
-		dispatch(controllerActions.reinitialiseUser(response));
+		dispatch(controllerActions.reinitialiseUser());
 	});
 }
 
@@ -1081,24 +1046,6 @@ export const	setEmail = (email: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-		// const	index = prev.controller.allUsers.findIndex((elem) =>
-		// {
-		// 	return (prev.controller.user.id === elem.id);
-		// });
-		// const updatedUsers = prev.controller.allUsers.map((user, i) =>
-		// {
-		// 	if (i === index)
-		// 	{
-		// 		return ({
-		// 			...user,
-		// 			email: email
-		// 		});
-		// 	}
-		// 	else
-		// 	{
-		// 		return (user);
-		// 	}
-		// });
 		const	response: ControllerModel = {
 			...prev.controller,
 			// allUsers: updatedUsers,
@@ -1138,7 +1085,7 @@ export const	setAllUsers = ()
 	{
 		const	prev = getState();
 
-		const	theUsers: any = await UserServices.getAllTheUsers("localhost");
+		const	theUsers: any = await UserServices.getAllTheUsers(prev.server.serverLocation);
 
 		if (theUsers === "error")
 		{

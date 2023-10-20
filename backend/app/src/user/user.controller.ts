@@ -378,7 +378,15 @@ export class UserController
 	{
 		this.logger
 			.log("'change-infos' route request");
-		console.log("data ", data);
+		// console.log("data ", data);
 		return (this.userService.changeInfos(data, req.user.id));
+	}
+
+	@Post("revoke-token")
+	@UseGuards(UserAuthorizationGuard)
+	RevokeToken(@Req() req: any)
+	{
+		this.userService.revokeTokenById(req.user.id);
+		return ("token revoked");
 	}
 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 
@@ -33,10 +34,10 @@ const	initialControllerState: ControllerModel = {
 			link: "https://thispersondoesnotexist.com/",
 			version:
 			{
-				large: "https://thispersondoesnotexist.com/",
-				medium: "https://thispersondoesnotexist.com/",
-				small: "https://thispersondoesnotexist.com/",
-				mini: "https://thispersondoesnotexist.com/"
+				large: "undefined",
+				medium: "undefined",
+				small: "undefined",
+				mini: "undefined"
 			}
 		},
 		avatar: "https://thispersondoesnotexist.com/",
@@ -78,6 +79,7 @@ const	initialControllerState: ControllerModel = {
 			currentChannel: "undefined",
 			chanMessages: [
 				{
+					username: "undefined",
 					sender: "undefined",
 					message: "undefined",
 					mode: "undefined",
@@ -89,8 +91,8 @@ const	initialControllerState: ControllerModel = {
 		profile: {
 			editView: false,
 			friendView: false,
-			publicView: false,
-			myView: true
+			publicView: true,
+			myView: false
 		},
 		password: "undefined"
 	},
@@ -98,7 +100,7 @@ const	initialControllerState: ControllerModel = {
 	{
 		startedRegister: false,
 		step: 0,
-		codeOauthFT: "unsetted",
+		codeOauthFT: "undefined",
 		abortRequested: false,
 		requestHomeLink: false
 	},
@@ -228,6 +230,7 @@ const	controllerSlice = createSlice(
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.login = action.payload.user.username;
 			state.user.username = action.payload.user.username;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
@@ -282,29 +285,32 @@ const	controllerSlice = createSlice(
 		{
 			state.user.registered = action.payload.user.registered;
 		},
-		reinitialiseUser(state, action: PayloadAction<ControllerModel>)
+		reinitialiseUser(state)
+		// , action: PayloadAction<ControllerModel>)
 		{
-			state.registration.startedRegister = action.payload.registration.startedRegister;
-			state.registration.codeOauthFT = action.payload.registration.codeOauthFT;
-			state.registration.abortRequested = action.payload.registration.abortRequested;
-			state.registration.requestHomeLink = action.payload.registration.requestHomeLink;
-			state.registration.step = action.payload.registration.step;
-			state.user.bearerToken = action.payload.user.bearerToken;
-			state.user.doubleAuth = action.payload.user.doubleAuth;
-			state.user.email = action.payload.user.email;
-			state.user.firstName = action.payload.user.firstName;
-			state.user.lastName = action.payload.user.lastName;
-			state.user.id = action.payload.user.id;
-			state.user.isLoggedIn = action.payload.user.isLoggedIn;
-			state.user.phoneNumber = action.payload.user.phoneNumber;
-			state.user.registered = action.payload.user.registered;
-			state.user.username = action.payload.user.username;
-			state.user.registrationProcess = action.payload.user.registrationProcess;
-			state.user.registrationError = action.payload.user.registrationError;
-			state.user.rememberMe = action.payload.user.rememberMe;
-			state.user.avatar = action.payload.user.avatar;
-			state.user.chat.pseudo = action.payload.user.chat.pseudo;
-			state.user.password = action.payload.user.password;
+			state.registration = initialControllerState.registration;
+			state.user = initialControllerState.user;
+			// state.user.login = action.payload.user.login;
+			// state.user.bearerToken = action.payload.user.bearerToken;
+			// state.user.doubleAuth = action.payload.user.doubleAuth;
+			// state.user.email = action.payload.user.email;
+			// state.user.firstName = action.payload.user.firstName;
+			// state.user.lastName = action.payload.user.lastName;
+			// state.user.id = action.payload.user.id;
+			// state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			// state.user.phoneNumber = action.payload.user.phoneNumber;
+			// state.user.registered = action.payload.user.registered;
+			// state.user.username = action.payload.user.username;
+			// state.user.registrationProcess = action.payload.user.registrationProcess;
+			// state.user.registrationError = action.payload.user.registrationError;
+			// state.user.rememberMe = action.payload.user.rememberMe;
+			// state.user.avatar = action.payload.user.avatar;
+			// state.user.chat.pseudo = action.payload.user.chat.pseudo;
+			// state.user.password = action.payload.user.password;
+			// state.user.profile = action.payload.user.profile;
+			// state.user.ftAvatar = action.payload.user.ftAvatar;
+			// state.user.otpCode = action.payload.user.otpCode;
+			// state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
