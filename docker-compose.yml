@@ -14,7 +14,8 @@ services:
     ports:
       - 3000:3000
     networks:
-      - transcendence
+      transcendence:
+        ipv4_address: 172.19.0.40
     mem_limit: 4G
 
   front:
@@ -29,7 +30,8 @@ services:
     ports:
       - 3001:3000
     networks:
-      - transcendence
+      transcendence:
+        ipv4_address: 172.19.0.41
     links:
       - backend
 
@@ -50,7 +52,8 @@ services:
     volumes: 
       - postgres:/var/lib/postgresql/data
     networks:
-      - transcendence
+      transcendence:
+        ipv4_address: 172.19.0.42
 
   # postgres_admin:
   #   image: dpage/pgadmin4:7.6
@@ -71,10 +74,6 @@ networks:
       config:
         - subnet: 172.19.0.0/16
           gateway: 172.19.0.1
-          aux_addresses:
-            postgres: 172.19.0.8
-            front: 172.19.0.3
-            backend: 172.19.0.4
 
 volumes:
   postgres:

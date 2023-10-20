@@ -26,6 +26,7 @@ import User from "src/chat/Objects/User";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
+import bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService
@@ -158,6 +159,7 @@ export class UserService
 					valid: data.authService.doubleAuth.valid,
 				}
 			},
+			password: data.password
 			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
@@ -365,6 +367,21 @@ export class UserService
 		return (valid);
 	}
 
+	public	decodePassword(password: string, id: any)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id.toString() === id.toString());
+		});
+		if (searchUser === undefined)
+			return ("User not found");
+		bcrypt.compare(password, searchUser.password, function(err: any, result: any)
+		{
+			console.log("lol", err, " ", result);
+		});
+		return ("ok");
+	}
+
 	public	changeInfos(data: any, id: string)
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -380,6 +397,8 @@ export class UserService
 					searchUser.email = data.info;
 				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
 					searchUser.authService.doubleAuth.phoneNumber = data.info;
+				else if (data.field === "password")
+					this.decodePassword(data.info, id);
 			console.log(searchUser);
 			return ("okay");
 		}

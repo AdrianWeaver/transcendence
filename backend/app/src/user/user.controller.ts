@@ -176,7 +176,8 @@ export class UserController
 								validationCode: "undefined",
 								valid: false,
 							}
-						}
+						},
+						password: "undefined"
 					};
 					retValue = this.userService.register(userObject);
 					res.status(200).send(retValue.res);

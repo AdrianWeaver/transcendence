@@ -80,6 +80,7 @@ export interface UserModel
 		}
 	};
 	registrationProcessEnded: boolean;
+	password: string,
 	// tokenSecret: string
 	// revokeConnectionRequest: boolean;
 }
