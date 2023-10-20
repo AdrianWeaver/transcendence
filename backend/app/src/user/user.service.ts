@@ -25,6 +25,7 @@ import User from "src/chat/Objects/User";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 
 @Injectable()
 export class UserService
@@ -384,4 +385,22 @@ export class UserService
 		}
 		return ("user doesnt exist");
 	}
+	public	addUserAsFriend(friendId: string, id: string)
+	{
+		const	searchFriend = this.user.find((elem) =>
+		{
+			return (elem.id === friendId);
+		});
+		const	searchUserIndex = this.user.findIndex((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUserIndex !== -1)
+			return ("User doesnt exist");
+		if (searchFriend === undefined)
+			return ("This new friend doesnt exist");
+		// this.user[searchUserIndex].friends.push(searchFriend);
+		return (searchFriend.username + " added as friend");
+	}
+
 }

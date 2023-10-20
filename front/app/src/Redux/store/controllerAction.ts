@@ -1127,3 +1127,23 @@ export const	registerInfosInBack = (info: string, field: string)
 		dispatch(setAllUsers());
 	});
 }
+
+export const	addUserAsFriend = (friendId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
+			friendId, prev.server.serverLocation)
+		.then((data) =>
+		{
+			console.log("okay", data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+		// dispatch update friends that we dont have yet
+	});
+}

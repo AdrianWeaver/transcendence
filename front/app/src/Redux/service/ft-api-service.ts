@@ -228,7 +228,35 @@ const	UserServices = {
 				return ("error");
 			})
 		);
-	}
+	},
+	async	addUserAsFriend(token: string, friendId: string, hostname: string)
+	{
+		console.log("Add User as friend");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			friendId: friendId
+		};
+		return (
+			Api(hostname)
+			.post("user/add-friend", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return ("OK");
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;

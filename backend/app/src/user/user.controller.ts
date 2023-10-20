@@ -389,4 +389,15 @@ export class UserController
 		this.userService.revokeTokenById(req.user.id);
 		return ("token revoked");
 	}
+
+	@Post("add-friend")
+	@UseGuards(UserAuthorizationGuard)
+	AddFriend(
+		@Body() body: any,
+		@Req() req: any)
+	{
+		this.logger
+			.log("'add-friend' route requested");
+		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
+	}
 }

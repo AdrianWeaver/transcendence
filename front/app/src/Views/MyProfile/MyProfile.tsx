@@ -15,7 +15,7 @@ import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
 import EditProfile from "./components/EditProfile";
-import { setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
+import { addUserAsFriend, setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
 import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
 import { useNavigate } from "react-router-dom";
 
@@ -239,9 +239,13 @@ const	MyProfile = () =>
 
 	const	editOrFriendRequest = () =>
 	{
-		// if (user.profile.publicView)
-		// 	addUserToFriends();
-		// else
+		if (user.profile.publicView)
+		{
+			// How can I get the friend Id ?
+			dispatch(addUserAsFriend(activeId));
+			console.log(activeId, " active id ", user.id, " id");
+		}
+		else
 			dispatch(setProfileEditView());
 		console.log("edit view: ", user.profile.editView);
 		console.log("friend view", user.profile.friendView);
