@@ -28,6 +28,19 @@ import path, { join } from "path";
 import * as fs from "fs";
 import * as sharp from "sharp";
 
+type PictureConfigModel = {
+	path:
+	{
+		normal: string;
+		large: string;
+		medium: string;
+		small: string;
+		micro: string;
+	},
+	tmpFolder: string;
+	size: number[];
+}
+
 @Injectable()
 export class UserService
 {
@@ -49,6 +62,9 @@ export class UserService
 	// mmicro is eq to 25 X 25
 	private readonly	publicPathMicro = "/app/public/profilePictures/micro";
 
+	// upload tempt storage 
+	private readonly	publicPathTemp = "/app/public/tmp";
+
 	private	readonly	avatarArraySize = [
 		700,
 		350,
@@ -65,6 +81,25 @@ export class UserService
 		this.checkIOAccessPath(this.publicPathMedium);
 		this.checkIOAccessPath(this.publicPathSmall);
 		this.checkIOAccessPath(this.publicPathMicro);
+		this.checkIOAccessPath(this.publicPathTemp);
+	}
+
+	public	getConfig()
+		: PictureConfigModel
+	{
+		const	obj: PictureConfigModel = {
+			path:
+			{
+				normal: this.publicPath,
+				large: this.publicPathLarge,
+				medium: this.publicPathMedium,
+				micro: this.publicPathMicro,
+				small: this.publicPathSmall
+			},
+			size: this.avatarArraySize,
+			tmpFolder: this.publicPathTemp
+		};
+		return (obj);
 	}
 
 	private	checkIOAccessPath(path: string)
@@ -152,74 +187,49 @@ export class UserService
 		}
 	}
 
-	private	createResizedImage(srcFilename:string, destFilename: string, size: string)
+	private	async	createResizeImage(srcFilename:string, destFilename: string, size: string)
 	{
-		this.logger.debug("Starting resize image");
-		console.log("Src filename: ", srcFilename);
-		console.log("Dest filename: ", destFilename);
-		console.log("Size requested: ", size);
-
 		const	destSize = this.getOutputSize(size);
-		console.log("dest size:" + destSize);
+		// debug helper
+		this.logger.debug("Starting resize image");
+		this.logger.debug("Src filename: ", srcFilename);
+		this.logger.debug("Dest filename: ", destFilename);
+		this.logger.debug("Size requested: ", size);
+		this.logger.debug("Dest size:" + destSize);
 
-		// const	sourceImage = sharp(srcFilename);
-		// sourceImage
-		// 	.metadata()
-		// 	.then((metadata) =>
-		// 	{
-		// 		console.log("Meta-data");
-		// 		// console.log(metadata);
-		// 		if (metadata.width === undefined)
-		// 			throw new InternalServerErrorException();
-		// 		const	coef = this.getCoefResize(metadata.width, destSize);
-		// 		console.log(coef);
-		// 		if (coef.operator === "divide")
-		// 		{
-		// 			sourceImage
-		// 				.resize(Math.floor(metadata.width / coef.value))
-		// 				.toFile(destFilename)
-		// 				.then((info) =>
-		// 				{
-		// 					this.logger.verbose("Successfull create image size : " + size);
-		// 				})
-		// 				.catch((error) =>
-		// 				{
-		// 					console.log(error);
-		// 				});
-		// 		}
-		// 		else if (coef.operator === "multiply")
-		// 		{
-		// 			sourceImage
-		// 				.resize(Math.floor(metadata.width * coef.value))
-		// 				.toFile(destFilename)
-		// 				.then((info) =>
-		// 				{
-		// 					this.logger.verbose("Successfull create image size : " + size);
-		// 				})
-		// 				.catch((error) =>
-		// 				{
-		// 					console.log(error);
-		// 				});
-		// 		}
-		// 		else
-		// 		{
-		// 			sourceImage
-		// 				.toFile(destFilename)
-		// 				.then((info) =>
-		// 				{
-		// 					this.logger.verbose("Successfull create image size : " + size);
-		// 				})
-		// 				.catch((error) =>
-		// 				{
-		// 					console.log(error);
-		// 				});
-		// 		}
-		// 	})
-		// 	.catch((error) =>
-		// 	{
-		// 		this.logger.error(error);
-		// 	});
-		this.logger.debug("Ending resize image");
+		const	sourceImage = sharp(srcFilename);
+		this.logger.log("Extracting meta-data...");
+		try
+		{
+			const	metadata = await sourceImage.metadata();
+			// console.log(metadata);
+			if ((metadata.width === undefined || metadata.height === undefined)
+				|| metadata.width !== metadata.height)
+				throw new InternalServerErrorException();
+			const	coef = this.getCoefResize(metadata.width, destSize);
+			// this.logger.log(coef);
+			if (coef.operator === "divide")
+			{
+				const resizedImage = sourceImage.resize(Math.floor(metadata.width / coef.value));
+				await resizedImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file " + size);
+			}
+			else if (coef.operator === "multiply")
+			{
+				const resizedImage = sourceImage.resize(Math.floor(metadata.width * coef.value));
+				await resizedImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file " + size);
+			}
+			else
+			{
+				await sourceImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file" + size);
+			}
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
 	}
 
 	// image at this step if perfectly square
@@ -227,7 +237,7 @@ export class UserService
 	: Promise<UserModel>
 	{
 		this.logger.debug("Starting the downmload of the avatar");
-		console.log(userObj);
+		// console.log(userObj);
 		const	targetUrl = userObj.ftAvatar.link;
 		this.logger.verbose("This is the target downlad: " + targetUrl);
 		const filename = this.publicPath + "/" + userObj.username + ".jpeg";
@@ -241,13 +251,43 @@ export class UserService
 			this.logger.verbose("Starting fetching the data from 42 api");
 			const response = await axios
 				.get(targetUrl, { responseType: "arraybuffer"});
-			
 			const data = response.data;
 			this.logger.verbose("Start: The data is ready to be stored inside a file");
 			try
 			{
 				fs.writeFileSync(filename, data);
 				this.logger.log("Successfully store the avatar");
+				try
+				{
+					fs.writeFileSync(filenameLarge, data);
+					this.logger.log("Succesfully save Large file");
+					await this.createResizeImage(filename, filenameMedium, "medium");
+					this.logger.log("Succesfully save medium file");
+					await this.createResizeImage(filename, filenameSmall, "small");
+					this.logger.log("Succesfully save small file");
+					await this.createResizeImage(filename, filenameMicro, "micro");
+					this.logger.log("Succesfully save micro file");
+					const newUserObj: UserModel = {
+						...userObj,
+						avatar: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+						ftAvatar:
+						{
+							link: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+							version:
+							{
+								large: "http://localhost:3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
+								medium: "http://localhost:3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
+								mini: "http://localhost:3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
+								small: "http://localhost:3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
+							}
+						}
+					};
+					return (newUserObj);
+				}
+				catch (error)
+				{
+					this.logger.error(error);
+				}
 			}
 			catch (error)
 			{
@@ -259,7 +299,56 @@ export class UserService
 		{
 			this.logger.error(error);
 		}
+		this.logger.error("Must not be here !");
 		return (userObj);
+	}
+
+	private	async convertPNGToJPEG(oldTmpFilePath: string, destTmpFilePath: string)
+	{
+		this.logger.debug("input file: " + oldTmpFilePath);
+		this.logger.debug("output file: " + destTmpFilePath);
+	
+		try
+		{
+			const	imagePng = sharp(oldTmpFilePath);
+			const metadata = await imagePng.metadata();
+			console.log(metadata);
+			// const	outputBuffer = await imagePng.jpeg().toBuffer();
+			this.logger.verbose("buffer ready to be writted");
+			// fs.writeFileSync(destTmpFilePath, outputBuffer);
+			this.logger.log("Convertion okay");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	public	async uploadPhoto(tmpFilePath: string, userObj: UserModel)
+	: Promise<UserModel>
+	{
+		this.logger.verbose("Starting resize Process");
+		this.logger.log("The tmpfilepath is : ", tmpFilePath);
+		const	splittedFilepath = tmpFilePath.split(".");
+		// console.log(splittedFilepath);
+		if (splittedFilepath[splittedFilepath.length - 1] !== "jpeg")
+		{
+			try
+			{
+				this.logger.log("Starting convertion of the file");
+				await this.convertPNGToJPEG(tmpFilePath, splittedFilepath[0] + ".jpeg");
+				this.logger.log("Ending convertion of the file");
+			}
+			catch (error)
+			{
+				this.logger.error(error);
+			}
+		}
+		const	newUserObj: UserModel = {
+			...userObj
+		};
+		this.logger.verbose("End resize Process");
+		return (newUserObj);
 	}
 
 	public	register(data: UserModel)
