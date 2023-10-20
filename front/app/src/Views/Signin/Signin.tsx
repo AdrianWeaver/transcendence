@@ -201,7 +201,7 @@ const	Signin = () =>
 				});
 				if (searchUser !== undefined)
 				{
-					dispatch(decodePassword(searchUser.id, userLogIn.password));
+					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
 					// dispatch(setUserLoggedIn());
 					if (user.isLoggedIn)
 						navigate("/");

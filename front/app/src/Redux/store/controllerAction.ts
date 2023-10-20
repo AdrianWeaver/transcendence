@@ -15,7 +15,7 @@ import { RootState } from "./index";
 import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
-import { AirlineSeatReclineNormalTwoTone } from "@mui/icons-material";
+import { AirlineSeatReclineNormalTwoTone, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
 type MessageModel =
 {
@@ -1147,17 +1147,36 @@ export const	hashPassword = (password: string)
 	});
 }
 
-export const	decodePassword = (id: any, password: string)
+export const	setNewToken = (newToken: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel =	{
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				bearerToken: newToken
+			}
+		}
+		dispatch(controllerActions.setNewToken(response));
+	});
+}
+
+export const	decodePassword = (id: any, password: string, email: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 		await UserServices.decodePassword(prev.controller.user.bearerToken,
-			password, id, prev.server.serverLocation)
+			password, id, email, prev.server.serverLocation)
 		.then((data) =>
 		{
 			console.log("okay", data);
+			dispatch(setNewToken(data.ret.token));
 			dispatch(setUserLoggedIn());
 		})
 		.catch(() =>

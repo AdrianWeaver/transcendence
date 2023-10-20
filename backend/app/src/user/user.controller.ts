@@ -411,7 +411,7 @@ export class UserController
 	{
 		this.logger
 			.log("'decode-password' route requested");
-		return (this.userService.decodePassword(body.password, body.id));
+		return (this.userService.decodePassword(body.password, body.id, body.email));
 	}
 
 

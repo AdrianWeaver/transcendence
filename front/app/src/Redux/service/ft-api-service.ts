@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -257,7 +258,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	decodePassword(token: string, password: string, id: any, hostname: string)
+	async	decodePassword(token: string, password: string, id: any, email: string, hostname: string)
 	{
 		console.log("Decode password");
 		const	config: AxiosRequestConfig = {
@@ -269,7 +270,8 @@ const	UserServices = {
 
 		const	data = {
 			password: password,
-			id: id
+			id: id,
+			email: email
 		};
 		return (
 			Api(hostname)
@@ -277,14 +279,12 @@ const	UserServices = {
 			.then((data) =>
 			{
 				console.log(data);
-				if (data.data === "User not found" || data.data === false)
-					return ("ERROR");
-				return ("ok");
+				return (data.data);
 			})
 			.catch((error) =>
 			{
 				console.error(error);
-				return ("ERROR");
+				return ("error");
 			})
 		);
 	},

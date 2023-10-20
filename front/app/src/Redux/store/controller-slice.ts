@@ -366,7 +366,11 @@ const	controllerSlice = createSlice(
 		registerInfosInBack(state, action: PayloadAction<ControllerModel>)
 		{
 			state.allUsers = action.payload.allUsers;
-		}
+		},
+		setNewToken(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.bearerToken = action.payload.user.bearerToken;
+		},
 	}
 });
 

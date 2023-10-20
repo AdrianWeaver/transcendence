@@ -390,7 +390,7 @@ export class UserService
 		return (searchUser.password);
 	}
 
-	public	decodePassword(password: string, id: any)
+	public	decodePassword(password: string, id: any, email: any)
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
@@ -400,9 +400,23 @@ export class UserService
 			return ("User not found");
 		bcrypt.compare(password, searchUser.password, function(err: any, result: boolean)
 		{
-			return (result);
+			const	ret: any = {
+				token: "Bearer " + jwt.sign(
+					{
+						id: id,
+						email: email
+					},
+					this.getSecret(),
+					{
+						expiresIn: "1d"
+					}),
+				expAt: Date.now() + (1000 * 60 * 60 * 24)
+			};
+			if (ret === undefined)
+				return ("error");
+			return (ret);
 		});
-		return (true);
+		return ("error");
 	}
 
 	public	changeInfos(data: any, id: string)
@@ -421,7 +435,8 @@ export class UserService
 				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
 					searchUser.authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id);
+					this.decodePassword(data.info, id, searchUser.email);
+
 			console.log(searchUser);
 			return ("okay");
 		}
