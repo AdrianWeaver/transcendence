@@ -391,6 +391,30 @@ export class UserController
 		return ("token revoked");
 	}
 
+	@Post("hash-password")
+	@UseGuards(UserAuthorizationGuard)
+	HashPassword(
+		@Body() body: any,
+		@Req() req: any)
+	: string
+	{
+		this.logger
+			.log("'hash-password' route requested");
+		return (this.userService.hashPassword(body.password, req.user.id));
+	}
+
+	@Post("decode-password")
+	// @UseGuards(UserAuthorizationGuard)
+	DecodePassword(
+		@Body() body: any)
+	: string
+	{
+		this.logger
+			.log("'decode-password' route requested");
+		return (this.userService.decodePassword(body.password, body.id));
+	}
+
+
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
 	AddFriend(

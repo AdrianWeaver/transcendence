@@ -8,7 +8,7 @@ import { Alert, AlertTitle, Box, Button, Checkbox, FormControlLabel, Grid, List,
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { setAllUsers, setProfileMyView, setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { decodePassword, setAllUsers, setProfileMyView, setUserLoggedIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 type PasswordAlertProps ={
@@ -133,6 +133,10 @@ const	Signin = () =>
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -197,8 +201,10 @@ const	Signin = () =>
 				});
 				if (searchUser !== undefined)
 				{
-					dispatch(setUserLoggedIn());
-					navigate("/");
+					dispatch(decodePassword(userLogIn.password));
+					// dispatch(setUserLoggedIn());
+					if (user.isLoggedIn)
+						navigate("/");
 				}
 				else
 					console.log("user doesnt exist");

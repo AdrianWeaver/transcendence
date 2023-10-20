@@ -22,6 +22,7 @@ import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
+	hashPassword,
 	registerInfosInBack,
 	setDoubleAuth,
 	setEmail,
@@ -227,6 +228,10 @@ const	EditProfile = (props: EditProfileProps) =>
 	) =>
 	{
 		event.preventDefault();
+		if (event.target.value.length)
+			setPasswordModified(true);
+		else
+			setPasswordModified(false);
 		setPasswordValue(event.target.value);
 		setPasswordFirstTrigger(true);
 	};
@@ -268,10 +273,6 @@ const	EditProfile = (props: EditProfileProps) =>
 			key;
 			return (value === true);
 		});
-		if (userChanges.password.length && filtered.length === 0)
-			setPasswordModified(true);
-		else
-			setPasswordModified(false);
 		console.log("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
@@ -280,7 +281,10 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(registerInfosInBack(userChanges.username, "username"));
 			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
 			if (user.password !== userChanges.password)
+			{
 				dispatch(setPassword(userChanges.password));
+				dispatch(hashPassword(userChanges.password));
+			}
 			if (user.email !== userChanges.emailAddress)
 				dispatch(registerInfosInBack(userChanges.emailAddress, "email"));
 			if (user.phoneNumber !== userChanges.phoneNumber)

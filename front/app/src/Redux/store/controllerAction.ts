@@ -1128,6 +1128,45 @@ export const	registerInfosInBack = (info: string, field: string)
 	});
 }
 
+export const	hashPassword = (password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.hashPassword(prev.controller.user.bearerToken,
+			password, prev.server.serverLocation)
+		.then((data) =>
+		{
+			console.log("okay", data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+	});
+}
+
+export const	decodePassword = (password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.decodePassword(prev.controller.user.bearerToken,
+			password, prev.controller.user.bearerToken, prev.server.serverLocation)
+		.then((data) =>
+		{
+			console.log("okay", data);
+			dispatch(setUserLoggedIn());
+		})
+		.catch(() =>
+		{
+			console.error("error");
+		});
+	});
+}
+
 export const	addUserAsFriend = (friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {

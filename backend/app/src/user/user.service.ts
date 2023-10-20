@@ -26,7 +26,7 @@ import User from "src/chat/Objects/User";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService
@@ -367,6 +367,29 @@ export class UserService
 		return (valid);
 	}
 
+	public	hashPassword(password: string, id: any)
+	{
+		const	saltRounds = 10;
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id.toString() === id.toString());
+		});
+		if (searchUser === undefined)
+			return ("User not found");
+		bcrypt.hash(password, saltRounds)
+		.then((hash) =>
+		{
+			console.log(hash);
+			searchUser.password = hash;
+		})
+		.catch((err) =>
+		{
+			console.log(err);
+			return ("error");
+		});
+		return (searchUser.password);
+	}
+
 	public	decodePassword(password: string, id: any)
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -375,6 +398,7 @@ export class UserService
 		});
 		if (searchUser === undefined)
 			return ("User not found");
+		console.log("COUCOUCOUOUOUOU");
 		bcrypt.compare(password, searchUser.password, function(err: any, result: any)
 		{
 			console.log("lol", err, " ", result);

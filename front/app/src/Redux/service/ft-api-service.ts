@@ -229,6 +229,63 @@ const	UserServices = {
 			})
 		);
 	},
+	async	hashPassword(token: string, password: string, hostname: string)
+	{
+		console.log("Hash password");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			password: password
+		};
+		return (
+			Api(hostname)
+			.post("user/hash-password", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+	async	decodePassword(token: string, password: string, id: any, hostname: string)
+	{
+		console.log("Decode password");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			password: password,
+			id: id
+		};
+		return (
+			Api(hostname)
+			.post("user/decode-password", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return ("ok");
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 	async	addUserAsFriend(token: string, friendId: string, hostname: string)
 	{
 		console.log("Add User as friend");
