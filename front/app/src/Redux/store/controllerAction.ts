@@ -1147,14 +1147,14 @@ export const	hashPassword = (password: string)
 	});
 }
 
-export const	decodePassword = (password: string)
+export const	decodePassword = (id: any, password: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 		await UserServices.decodePassword(prev.controller.user.bearerToken,
-			password, prev.controller.user.bearerToken, prev.server.serverLocation)
+			password, id, prev.server.serverLocation)
 		.then((data) =>
 		{
 			console.log("okay", data);

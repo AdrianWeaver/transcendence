@@ -398,12 +398,11 @@ export class UserService
 		});
 		if (searchUser === undefined)
 			return ("User not found");
-		console.log("COUCOUCOUOUOUOU");
-		bcrypt.compare(password, searchUser.password, function(err: any, result: any)
+		bcrypt.compare(password, searchUser.password, function(err: any, result: boolean)
 		{
-			console.log("lol", err, " ", result);
+			return (result);
 		});
-		return ("ok");
+		return (true);
 	}
 
 	public	changeInfos(data: any, id: string)

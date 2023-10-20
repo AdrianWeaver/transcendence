@@ -407,7 +407,7 @@ export class UserController
 	// @UseGuards(UserAuthorizationGuard)
 	DecodePassword(
 		@Body() body: any)
-	: string
+	: string | boolean
 	{
 		this.logger
 			.log("'decode-password' route requested");

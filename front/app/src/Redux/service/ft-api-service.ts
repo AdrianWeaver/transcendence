@@ -277,6 +277,8 @@ const	UserServices = {
 			.then((data) =>
 			{
 				console.log(data);
+				if (data.data === "User not found" || data.data === false)
+					return ("ERROR");
 				return ("ok");
 			})
 			.catch((error) =>
