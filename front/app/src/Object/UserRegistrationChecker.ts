@@ -46,7 +46,7 @@ class	UserRegistrationChecker
 		// check username unique
 		if (data.username === undefined || data.username.length === 0 )
 			this.username = true;
-		const	validChar = /^[A-Za-z][A-Za-z0-9_]{7,29}$/;
+		const	validChar = /^[A-Za-z][A-Za-z0-9_]{3,8}$/;
 		this.username = !(validChar.test(data.username));
 		const	emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 		this.email = !(emailRegex.test(data.emailAddress));
