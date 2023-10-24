@@ -235,7 +235,7 @@ export class UserController
 		@Res() res: Response,
 		@Body() body: any)
 	{
-		console.log(req.headers);
+		// console.log(req);
 		this.logger.error("NOT AN ERROR: start update photo");
 		try
 		{
@@ -256,6 +256,7 @@ export class UserController
 
 			const	processBusboy = (): Promise<string> =>
 			{
+				this.logger.debug("start the busboy event listener");
 				return (
 					new Promise<string>((resolve, reject)=>
 					{

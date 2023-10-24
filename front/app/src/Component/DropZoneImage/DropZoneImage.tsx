@@ -307,7 +307,7 @@ const DropZoneImage = () =>
 				// showPreviews={true}
 				showFileNames={false}
 				maxFileSize={10000000}
-				clearOnUnmount={true}
+				clearOnUnmount={false}
 			/>);
 	}
 
@@ -322,7 +322,7 @@ const DropZoneImage = () =>
 
 		axios.post("http://localhost:3000/user/update-photo", formData, {
 			headers: {
-				"Content-Type": "multipart/form-data",
+				// "Content-Type": "multipart/form-data",
 				"Authorization": token
 			}
 		})
