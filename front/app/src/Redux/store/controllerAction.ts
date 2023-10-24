@@ -773,7 +773,7 @@ export const GetValidationCode = (otpCode : string, token: string)
 	{
 		const 	prev = getState();
 		let		response: ControllerModel;
-
+		console.log("TEST ");
 		response = prev.controller;
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
@@ -782,11 +782,13 @@ export const GetValidationCode = (otpCode : string, token: string)
 			prev.controller.user.phoneNumber, otpCode, token, prev.server.serverLocation);
 		if (data === "error")
 		{
+			console.log("TEST error");
 			dispatch(setRegistrationProcessError());
 			return ;
 		}
 		else
 		{
+			console.log("TEST data validated cde", data.data);
 			response = {
 				...prev.controller,
 				user:
