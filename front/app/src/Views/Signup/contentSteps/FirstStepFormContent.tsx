@@ -158,10 +158,10 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 
 type	FirstStepFormContentProps =
 {
-	username: string
-	email: string
-	lastName: string
-	firstName: string
+	readonly username: string
+	readonly email: string
+	readonly lastName: string
+	readonly firstName: string
 };
 
 const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
@@ -220,12 +220,47 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		setPasswordFirstTriggerConfirm(true);
 	};
 
+
+	// const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
+	// {
+	// 	event.preventDefault();
+	// 	const	data = new FormData(event.currentTarget);
+	// 	const	userSignup = new UserRegistration(data);
+	// 	console.error(userSignup.getPlainObject());
+	// 	userSignup.check();
+	// 	setErrorValidation(userSignup.errorTable);
+	// 	// console.log(errorValidation);
+	// 	const	asArray
+	// 		= Object.entries(userSignup.errorTable.getPlainObject());
+	// 	const	filtered = asArray.filter(
+	// 	([
+	// 		key,
+	// 		value
+	// 	]
+	// 	) =>
+	// 	{
+	// 		key;
+	// 		return (value === true);
+	// 	});
+	// 	console.debug("filtered", filtered);
+	// 	// verifier toute les informations
+	// 	if (filtered.length === 0)
+	// 	{
+	// 		// TEST
+	// 		dispatch(registerInfosInBack(userSignup.username, "username"));
+	// 		// dispatch(setPseudo(userSignup.username));
+	// 		dispatch(setPassword(userSignup.password));
+	// 		dispatch(hashPassword(userSignup.password));
+	// 		dispatch(userRegistrationStepThree());
+	// 	}
+	// };
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	userSignup = new UserRegistration(data);
-		// console.log(userSignup.getPlainObject());
+		console.error(userSignup.getPlainObject());
 		userSignup.check();
 		setErrorValidation(userSignup.errorTable);
 		// console.log(errorValidation);
@@ -241,16 +276,18 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			key;
 			return (value === true);
 		});
-		console.log("filtered", filtered);
+		// this is error filter 
+		console.debug("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
 		{
-			// TEST
-			dispatch(registerInfosInBack(userSignup.username, "username"));
-			// dispatch(setPseudo(userSignup.username));
-			dispatch(setPassword(userSignup.password));
-			dispatch(hashPassword(userSignup.password));
-			dispatch(userRegistrationStepThree());
+			
+			// // TEST
+			// dispatch(registerInfosInBack(userSignup.username, "username"));
+			// // dispatch(setPseudo(userSignup.username));
+			// dispatch(setPassword(userSignup.password));
+			// dispatch(hashPassword(userSignup.password));
+			// dispatch(userRegistrationStepThree());
 		}
 	};
 
@@ -266,6 +303,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 						fullWidth
 						id="username"
 						label="Username"
+						defaultValue={props.username}
 						// value={props.username}
 						error={errorValidation.username}
 						helperText={
@@ -292,6 +330,8 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 								? "First name is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6}>
@@ -309,6 +349,8 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 								? "Last name is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12}>
@@ -326,6 +368,8 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 								? "Email is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12}>

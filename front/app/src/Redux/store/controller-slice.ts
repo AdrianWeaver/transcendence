@@ -8,97 +8,14 @@ import
 	PayloadAction
 }	from "@reduxjs/toolkit";
 import	{ ControllerModel } from "../models/redux-models";
-import	{ NIL as NILUUID } from "uuid";
+// import	{ NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "light",
 	previousPage: "/",
-	allUsers:
-	[
-		{
-			id: -1,
-			email: "undefined",
-			username: "undefined",
-			firstName: "undefined",
-			lastName: "undefined",
-			avatar: "undefined",
-			location: "undefined",
-		}
-	],
-	allFrontUsers:
-	[
-		{
-			isLoggedIn: false,
-			ftAvatar:
-			{
-				link: "https://thispersondoesnotexist.com/",
-				version:
-				{
-					large: "undefined",
-					medium: "undefined",
-					small: "undefined",
-					mini: "undefined"
-				}
-			},
-			avatar: "https://thispersondoesnotexist.com/",
-			registrationProcess: false,
-			registrationError: "undefined",
-			email: "",
-			id: -1,
-			username: "undefined",
-			login: "undefined",
-			firstName: "undefined",
-			lastName: "undefined",
-			bearerToken: "undefined",
-			rememberMe: false,
-			doubleAuth: false,
-			codeValidated: false,
-			otpCode: "undefined",
-			phoneNumber: "undefined",
-			registered: false,
-			chat:
-			{
-				window:
-				{
-					bigWindow: false,
-					hiddenWindow: false,
-					miniWindow: true,
-				},
-				pseudo: "undefined",
-				connected: false,
-				users:
-				[
-				{
-					name: "undefined",
-					id: "undefined",
-					avatar: "https://thispersondoesnotexist.com/",
-					password: "undefined",
-				}
-				],
-				activeConversationId: "undefined",
-				currentChannel: "undefined",
-				chanMessages: [
-					{
-						username: "undefined",
-						sender: "undefined",
-						message: "undefined",
-						mode: "undefined",
-					}
-				],
-				kindOfConversation: "undefined",
-				numberOfChannels: -1
-			},
-			profile: {
-				editView: false,
-				friendView: false,
-				publicView: true,
-				myView: false
-			},
-			password: "undefined",
-			location: "undefined"
-		}
-	],
+	allUsers: [],
+	allFrontUsers: [],
 	user:
 	{
 		isLoggedIn: false,

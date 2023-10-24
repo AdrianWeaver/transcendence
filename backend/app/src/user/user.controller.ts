@@ -21,6 +21,26 @@ import * as dotenv from "dotenv";
 import * as readline from "readline";
 import * as twilio from "twilio";
 
+class	RegisterStepOneDto
+{
+	@IsEmail()
+	@IsNotEmpty()
+	emailAddress: string;
+
+	//minmax
+	@IsNotEmpty()
+	firstName: string;
+	@IsNotEmpty()
+	lastName: string;
+	@IsNotEmpty()
+	password: string;
+	@IsNotEmpty()
+	passwordConfirm: string;
+	@IsNotEmpty()
+	uniquenessPassword: "AgreeWithUniquenessOfPassword";
+	@IsNotEmpty()
+	username: string;
+}
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -48,7 +68,7 @@ class UserLoginDto
 {
 	@IsNotEmpty()
 	id: any;
-
+	// getUserRegiste
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;
@@ -80,6 +100,15 @@ export class UserController
 	getAllUsersRaw()
 	{
 		return (this.userService.getAllUserRaw());
+	}
+
+	@Post("register/step-one")
+	@UseGuards(UserAuthorizationGuard)
+	getUserRegisterStepOne(
+		@Body() body: RegisterDto,
+		@Res() res: Response)
+	{
+		return ("okay");
 	}
 
 	@Post("register")
@@ -212,6 +241,9 @@ export class UserController
 		return (this.userService.getUserArray());
 	}
 
+	/**
+	 * @returns the list of user filtered
+	 */
 	@Get("get-all-users")
 	getAllUsers()
 		: BackUserModel[]
@@ -247,11 +279,12 @@ export class UserController
 	}
 
 	@Get("my-info")
-	getMyInfo()
+	@UseGuards(UserAuthorizationGuard)
+	getMyInfo(@Req() req: any)
 		: UserPublicResponseModel
 	{
 		// NEED TO FIND A WAY TO KNOW THE USER ID
-		return (this.userService.getMyInfo(97756));
+		return (this.userService.getMyInfo(req.user.id));
 	}
 
 	@Post("double-auth")
