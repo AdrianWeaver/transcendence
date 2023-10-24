@@ -274,16 +274,15 @@ const	UserServices = {
 			email: email
 		};
 		return (
-			Api(hostname)
+			await Api(hostname)
 			.post("user/decode-password", data, config)
 			.then((data) =>
 			{
 				console.log(data);
 				return (data.data);
 			})
-			.catch((error) =>
+			.catch(() =>
 			{
-				console.error(error);
 				return ("error");
 			})
 		);

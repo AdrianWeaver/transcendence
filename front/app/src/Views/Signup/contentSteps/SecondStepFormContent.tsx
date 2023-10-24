@@ -11,6 +11,7 @@ import {
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	GetValidationCode,
+	addUser,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setAllUsers,
@@ -125,6 +126,7 @@ const	SecondStepFormContent = () =>
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
 			dispatch(setAllUsers());
+			dispatch(addUser(user));
 		}
 	};
 
@@ -242,6 +244,7 @@ const	SecondStepFormContent = () =>
 				dispatch(setUserLoggedIn());
 				dispatch(setRegistered(true));
 				dispatch(setAllUsers());
+				dispatch(addUser(user));
 			}
 		};
 

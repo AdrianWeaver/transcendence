@@ -26,6 +26,79 @@ const	initialControllerState: ControllerModel = {
 			location: "undefined",
 		}
 	],
+	allFrontUsers:
+	[
+		{
+			isLoggedIn: false,
+			ftAvatar:
+			{
+				link: "https://thispersondoesnotexist.com/",
+				version:
+				{
+					large: "undefined",
+					medium: "undefined",
+					small: "undefined",
+					mini: "undefined"
+				}
+			},
+			avatar: "https://thispersondoesnotexist.com/",
+			registrationProcess: false,
+			registrationError: "undefined",
+			email: "",
+			id: -1,
+			username: "undefined",
+			login: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			bearerToken: "undefined",
+			rememberMe: false,
+			doubleAuth: false,
+			codeValidated: false,
+			otpCode: "undefined",
+			phoneNumber: "undefined",
+			registered: false,
+			chat:
+			{
+				window:
+				{
+					bigWindow: false,
+					hiddenWindow: false,
+					miniWindow: true,
+				},
+				pseudo: "undefined",
+				connected: false,
+				users:
+				[
+				{
+					name: "undefined",
+					id: "undefined",
+					avatar: "https://thispersondoesnotexist.com/",
+					password: "undefined",
+				}
+				],
+				activeConversationId: "undefined",
+				currentChannel: "undefined",
+				chanMessages: [
+					{
+						username: "undefined",
+						sender: "undefined",
+						message: "undefined",
+						mode: "undefined",
+					}
+				],
+				kindOfConversation: "undefined",
+				numberOfChannels: -1
+			},
+			profile: {
+				editView: false,
+				friendView: false,
+				publicView: true,
+				myView: false
+			},
+			password: "undefined",
+			location: "undefined"
+		}
+	],
 	user:
 	{
 		isLoggedIn: false,
@@ -94,7 +167,8 @@ const	initialControllerState: ControllerModel = {
 			publicView: true,
 			myView: false
 		},
-		password: "undefined"
+		password: "undefined",
+		location: "undefined"
 	},
 	registration:
 	{
@@ -109,7 +183,6 @@ const	initialControllerState: ControllerModel = {
 		height: window.innerHeight,
 		width: window.innerWidth
 	},
-
 };
 
 const	controllerSlice = createSlice(
@@ -370,6 +443,22 @@ const	controllerSlice = createSlice(
 		setNewToken(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			state.user.login = action.payload.user.login;
+			state.user.username = action.payload.user.username;
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.registered = action.payload.user.registered;
+			state.user.avatar = action.payload.user.avatar;
+			state.user.ftAvatar = action.payload.user.ftAvatar;
+			state.user.password = action.payload.user.password;
+		},
+		addUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allFrontUsers = action.payload.allFrontUsers;
 		},
 	}
 });

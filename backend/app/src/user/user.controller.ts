@@ -404,14 +404,17 @@ export class UserController
 	}
 
 	@Post("decode-password")
-	// @UseGuards(UserAuthorizationGuard)
-	DecodePassword(
+	async DecodePassword(
 		@Body() body: any)
-	: string | boolean
+	: Promise<any>
 	{
 		this.logger
 			.log("'decode-password' route requested");
-		return (this.userService.decodePassword(body.password, body.id, body.email));
+		const	ret = await this.userService.decodePassword(body.password, body.id, body.email);
+		console.log(ret);
+		if (!ret)
+			return ("error");
+		return (ret);
 	}
 
 

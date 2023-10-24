@@ -12,10 +12,10 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
-import { AirlineSeatReclineNormalTwoTone, JoinFullTwoTone } from "@mui/icons-material";
+import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
 type MessageModel =
 {
@@ -682,9 +682,34 @@ export const registerClientWithCode = (code : string)
 				}
 			});
 
+			const	arrayFront: UserModel[] = [...prev.controller.allFrontUsers];
+
+			arrayFront.forEach((elem) =>
+			{
+				if (elem.id === data.id)
+				{
+					elem.id= data.id,
+					elem.email= data.email,
+					// our token
+					elem.bearerToken = data.token,
+					elem.username = data.username,
+					elem.firstName = data.firstName,
+					elem.lastName = data.lastName,
+					elem.avatar = data.avatar,
+					elem.profile = {
+						editView: false,
+						friendView: false,
+						publicView: false,
+						myView: true
+					}
+				}
+			});
+
+
 			response = {
 				...prev.controller,
 				allUsers: [...array],
+				allFrontUsers: [...arrayFront],
 				user:
 				{
 					...prev.controller.user,
@@ -1173,18 +1198,41 @@ export const	decodePassword = (id: any, password: string, email: string)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.decodePassword(prev.controller.user.bearerToken,
-			password, id, email, prev.server.serverLocation)
-		.then((data) =>
+		try
 		{
-			console.log("okay", data);
-			dispatch(setNewToken(data.ret.token));
-			dispatch(setUserLoggedIn());
-		})
-		.catch(() =>
+			const	data = await UserServices.decodePassword(
+				prev.controller.user.bearerToken,
+				password, id, email,
+				prev.server.serverLocation
+			);
+			console.log("data: ", data);
+			const	newUser = {...prev.controller.allFrontUsers[data.index]};
+
+			newUser.bearerToken = data.token;
+			newUser.isLoggedIn = true;
+
+			const	response: ControllerModel =	{
+				...prev.controller,
+				user: newUser
+			}
+			dispatch(controllerActions.setNewToken(response));
+		}
+		catch (error)
 		{
-			console.error("error");
-		});
+			dispatch(controllerActions.setNewToken({...prev.controller}))
+			console.log(error);
+			return ;
+		}
+		// .then((data) =>
+		// {
+		// 	console.log("okay", data);
+		// 	dispatch(setNewToken(data.ret.token));
+		// 	dispatch(setUserLoggedIn());
+		// })
+		// .catch((error) =>
+		// {
+		// 	console.error("error", error);
+		// });
 	});
 }
 
@@ -1205,5 +1253,25 @@ export const	addUserAsFriend = (friendId: string)
 			console.error(error);
 		});
 		// dispatch update friends that we dont have yet
+	});
+}
+
+export const	addUser = (user: UserModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	array = [...prev.controller.allFrontUsers];
+		if (array.length === 1)
+		{
+			array[0] = user;
+		}
+		const	response: ControllerModel = {
+			...prev.controller,
+			allFrontUsers: array
+		}
+		dispatch(controllerActions.addUser(response));
 	});
 }

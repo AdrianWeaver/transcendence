@@ -1,3 +1,5 @@
+/* eslint-disable no-label-var */
+/* eslint-disable no-unused-labels */
 /* eslint-disable prefer-const */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -390,33 +392,41 @@ export class UserService
 		return (searchUser.password);
 	}
 
-	public	decodePassword(password: string, id: any, email: any)
+	async	decodePassword(password: string, id: any, email: any)
 	{
-		const	searchUser = this.user.find((elem) =>
+		const	index = this.user.findIndex((elem) =>
 		{
-			return (elem.id.toString() === id.toString());
+			return (elem.id.toString() === id.toString() && elem.email === email);
 		});
-		if (searchUser === undefined)
+		if (index === -1)
 			return ("User not found");
-		bcrypt.compare(password, searchUser.password, function(err: any, result: boolean)
+		console.log(password, " ", this.user[index].password);
+		const	valid = await bcrypt.compare(password, this.user[index].password)
+		.then(() =>
 		{
-			const	ret: any = {
+			const ret =	{
 				token: "Bearer " + jwt.sign(
-					{
-						id: id,
-						email: email
-					},
-					this.getSecret(),
-					{
-						expiresIn: "1d"
-					}),
-				expAt: Date.now() + (1000 * 60 * 60 * 24)
+				{
+					id: id,
+					email: email
+				},
+				this.getSecret(),
+				{
+					expiresIn: "1d"
+				}),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				index: index
 			};
 			if (ret === undefined)
 				return ("error");
 			return (ret);
+		})
+		.catch((err) =>
+		{
+			console.log(err);
+			return ("error");
 		});
-		return ("error");
+		return (valid);
 	}
 
 	public	changeInfos(data: any, id: string)

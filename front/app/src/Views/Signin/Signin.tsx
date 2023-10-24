@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -148,7 +149,21 @@ const	Signin = () =>
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
-	});
+	}, []);
+
+	useEffect(() =>
+	{
+		if (user.isLoggedIn === true)
+		{
+			console.log("Navigate executed");
+			navigate("/");
+		}
+		else
+			console.log("unlogged");
+	}, [
+		user.isLoggedIn,
+		navigate
+	]);
 
 	const	[
 		errorValidation,
@@ -203,8 +218,8 @@ const	Signin = () =>
 				{
 					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
 					// dispatch(setUserLoggedIn());
-					if (user.isLoggedIn)
-						navigate("/");
+					// if (user.isLoggedIn)
+					// 	navigate("/");
 				}
 				else
 					console.log("user doesnt exist");
