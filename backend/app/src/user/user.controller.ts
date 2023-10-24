@@ -176,7 +176,8 @@ export class UserController
 								validationCode: "undefined",
 								valid: false,
 							}
-						}
+						},
+						password: "undefined"
 					};
 					retValue = this.userService.register(userObject);
 					res.status(200).send(retValue.res);
@@ -378,7 +379,53 @@ export class UserController
 	{
 		this.logger
 			.log("'change-infos' route request");
-		console.log("data ", data);
+		// console.log("data ", data);
 		return (this.userService.changeInfos(data, req.user.id));
+	}
+
+	@Post("revoke-token")
+	@UseGuards(UserAuthorizationGuard)
+	RevokeToken(@Req() req: any)
+	{
+		this.userService.revokeTokenById(req.user.id);
+		return ("token revoked");
+	}
+
+	@Post("hash-password")
+	@UseGuards(UserAuthorizationGuard)
+	HashPassword(
+		@Body() body: any,
+		@Req() req: any)
+	: string
+	{
+		this.logger
+			.log("'hash-password' route requested");
+		return (this.userService.hashPassword(body.password, req.user.id));
+	}
+
+	@Post("decode-password")
+	async DecodePassword(
+		@Body() body: any)
+	: Promise<any>
+	{
+		this.logger
+			.log("'decode-password' route requested");
+		const	ret = await this.userService.decodePassword(body.password, body.id, body.email);
+		console.log(ret);
+		if (!ret)
+			return ("error");
+		return (ret);
+	}
+
+
+	@Post("add-friend")
+	@UseGuards(UserAuthorizationGuard)
+	AddFriend(
+		@Body() body: any,
+		@Req() req: any)
+	{
+		this.logger
+			.log("'add-friend' route requested");
+		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
 }

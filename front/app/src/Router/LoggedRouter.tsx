@@ -68,6 +68,10 @@ const	LoggedRouter = () =>
 				/>
 
 				<Route
+					path="/signin"
+					element={<Navigate to="/"/>}
+				/>
+				<Route
 					path="/signup"
 					element={<Navigate to="/me/profile"/>}
 				/>

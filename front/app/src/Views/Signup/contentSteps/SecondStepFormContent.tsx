@@ -11,6 +11,7 @@ import {
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	GetValidationCode,
+	addUser,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setAllUsers,
@@ -21,7 +22,7 @@ import {
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
 import axios from "axios";
-// import { PhoneInput } from "react-international-phone";
+import { PhoneInput } from "react-international-phone";
 
 import MuiPhone from "../component/MuiPhone";
 
@@ -125,6 +126,7 @@ const	SecondStepFormContent = () =>
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
 			dispatch(setAllUsers());
+			dispatch(addUser(user));
 		}
 	};
 
@@ -185,12 +187,12 @@ const	SecondStepFormContent = () =>
 			{
 				setSendCode(true);
 				dispatch(GetValidationCode(twoAuthCode, user.bearerToken));
-				if (user.codeValidated)
-				{
-					dispatch(setUserLoggedIn());
-					dispatch(setRegistered(true));
-					dispatch(setAllUsers());
-				}
+				// if (user.codeValidated)
+				// {
+				// 	dispatch(setUserLoggedIn());
+				// 	dispatch(setRegistered(true));
+				// 	dispatch(setAllUsers());
+				// }
 			}
 		};
 
@@ -231,6 +233,18 @@ const	SecondStepFormContent = () =>
 				console.log("mui phone ", muiPhone);
 				dispatch(receiveValidationCode(formattingPhoneNumber(muiPhone), user.bearerToken));
 				setSendSMS(true);
+			}
+		};
+
+		const handleFinishToRegister = () =>
+		{
+			console.log("valid ", user.codeValidated);
+			if (user.codeValidated)
+			{
+				dispatch(setUserLoggedIn());
+				dispatch(setRegistered(true));
+				dispatch(setAllUsers());
+				dispatch(addUser(user));
 			}
 		};
 
@@ -290,6 +304,7 @@ const	SecondStepFormContent = () =>
 						mt: 3,
 						mb: 2
 					}}
+					onClick={handleFinishToRegister}
 				>
 					Finish to register
 				</Button>
@@ -321,7 +336,7 @@ const	SecondStepFormContent = () =>
 						? registerNumButton
 						: (!sendSMS)
 							? sendSmsButton
-							: (sendCode)
+							: (!sendCode)
 								? sendTheCode
 								: finishButton
 					: <></>

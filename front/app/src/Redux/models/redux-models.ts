@@ -80,7 +80,8 @@ export interface	UserModel
 		}
 	},
 	"profile": ProfileModel,
-	"password": string
+	"password": string,
+	"location": string;
 }
 
 export interface	AnonymousUserModel
@@ -146,6 +147,7 @@ export interface	CanvasModel
 export interface	ControllerModel
 {
 	"allUsers": BackUserModel[],
+	"allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,

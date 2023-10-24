@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -38,7 +39,7 @@ const	UserServices = {
 	},
 	async	verifyToken(token: string, hostname: string)
 	{
-		console.log("Hello token");
+		console.log("verify token");
 		const	config: AxiosRequestConfig = {
 			headers:
 			{
@@ -52,15 +53,38 @@ const	UserServices = {
 			.post("/user/verify-token", {}, config)
 			.then((data) =>
 			{
-				// console.log("register front");
-				// console.log(data.data);
+				console.log(data);
+				return ("OKay");
+			})
+			.catch(() =>
+			{
+				console.error("error from verify token");
+				return ("ERROR");
+			})
+		);
+	},
+	async	revokeToken(token: string, hostname: string)
+	{
+		console.log("Revoke token");
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/revoke-token", {}, config)
+			.then((data) =>
+			{
 				console.log(data);
 				return ("OKay");
 			})
 			.catch((error) =>
 			{
-				console.error("error from verify token");
-				// console.error(error);
+				console.error("error from verify token", error);
 				return ("ERROR");
 			})
 		);
@@ -205,7 +229,92 @@ const	UserServices = {
 				return ("error");
 			})
 		);
-	}
+	},
+	async	hashPassword(token: string, password: string, hostname: string)
+	{
+		console.log("Hash password");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			password: password
+		};
+		return (
+			Api(hostname)
+			.post("user/hash-password", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+	async	decodePassword(token: string, password: string, id: any, email: string, hostname: string)
+	{
+		console.log("Decode password");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			password: password,
+			id: id,
+			email: email
+		};
+		return (
+			await Api(hostname)
+			.post("user/decode-password", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return (data.data);
+			})
+			.catch(() =>
+			{
+				return ("error");
+			})
+		);
+	},
+	async	addUserAsFriend(token: string, friendId: string, hostname: string)
+	{
+		console.log("Add User as friend");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			friendId: friendId
+		};
+		return (
+			Api(hostname)
+			.post("user/add-friend", data, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return ("OK");
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;

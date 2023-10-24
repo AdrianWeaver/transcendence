@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -8,7 +9,7 @@ import { Alert, AlertTitle, Box, Button, Checkbox, FormControlLabel, Grid, List,
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { setAllUsers, setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { decodePassword, setAllUsers, setProfileMyView, setUserLoggedIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 type PasswordAlertProps ={
@@ -133,6 +134,10 @@ const	Signin = () =>
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -144,7 +149,21 @@ const	Signin = () =>
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
-	});
+	}, []);
+
+	useEffect(() =>
+	{
+		if (user.isLoggedIn === true)
+		{
+			console.log("Navigate executed");
+			navigate("/");
+		}
+		else
+			console.log("unlogged");
+	}, [
+		user.isLoggedIn,
+		navigate
+	]);
 
 	const	[
 		errorValidation,
@@ -197,8 +216,10 @@ const	Signin = () =>
 				});
 				if (searchUser !== undefined)
 				{
-					dispatch(setUserLoggedIn());
-					navigate("/");
+					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
+					// dispatch(setUserLoggedIn());
+					// if (user.isLoggedIn)
+					// 	navigate("/");
 				}
 				else
 					console.log("user doesnt exist");

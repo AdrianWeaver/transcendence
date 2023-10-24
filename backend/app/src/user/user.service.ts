@@ -1,3 +1,5 @@
+/* eslint-disable no-label-var */
+/* eslint-disable no-unused-labels */
 /* eslint-disable prefer-const */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
@@ -25,6 +27,8 @@ import User from "src/chat/Objects/User";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService
@@ -117,7 +121,8 @@ export class UserService
 			if (index !== -1)
 				this.user.splice(index, 1);
 		}
-		const newUser = {
+		// const	secretToken = randomBytes(64).toString("hex");
+		const newUser : UserModel= {
 			registrationProcessEnded: false,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
@@ -155,7 +160,9 @@ export class UserService
 					validationCode: data.authService.doubleAuth.validationCode,
 					valid: data.authService.doubleAuth.valid,
 				}
-			}
+			},
+			password: data.password
+			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
@@ -234,6 +241,29 @@ export class UserService
 		if (!user)
 			throw new InternalServerErrorException();
 		user.revokedConnectionRequest = true;
+	}
+
+	public	getUserExpById(id: any)
+	: number
+	{
+		const searchUser = this.user.find((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchUser === undefined)
+			return (-1);
+		return (searchUser.authService.expAt);
+	}
+
+	public	revokeUserTokenExpById(id: any)
+	{
+		const searchIndex = this.user.findIndex((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchIndex === -1)
+			return ;
+		this.user[searchIndex].authService.expAt = Date.now();
 	}
 
 	public	getUserById(id: any)
@@ -339,6 +369,66 @@ export class UserService
 		return (valid);
 	}
 
+	public	hashPassword(password: string, id: any)
+	{
+		const	saltRounds = 10;
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id.toString() === id.toString());
+		});
+		if (searchUser === undefined)
+			return ("User not found");
+		bcrypt.hash(password, saltRounds)
+		.then((hash) =>
+		{
+			console.log(hash);
+			searchUser.password = hash;
+		})
+		.catch((err) =>
+		{
+			console.log(err);
+			return ("error");
+		});
+		return (searchUser.password);
+	}
+
+	async	decodePassword(password: string, id: any, email: any)
+	{
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (elem.id.toString() === id.toString() && elem.email === email);
+		});
+		if (index === -1)
+			return ("User not found");
+		console.log(password, " ", this.user[index].password);
+		const	valid = await bcrypt.compare(password, this.user[index].password)
+		.then(() =>
+		{
+			const ret =	{
+				token: "Bearer " + jwt.sign(
+				{
+					id: id,
+					email: email
+				},
+				this.getSecret(),
+				{
+					expiresIn: "1d"
+				}),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				index: index
+			};
+			if (ret === undefined)
+				return ("error");
+			return (ret);
+		})
+		.catch((err) =>
+		{
+			console.log(err);
+			return ("error");
+		});
+		return (valid);
+	}
+
 	public	changeInfos(data: any, id: string)
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -354,9 +444,30 @@ export class UserService
 					searchUser.email = data.info;
 				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
 					searchUser.authService.doubleAuth.phoneNumber = data.info;
+				else if (data.field === "password")
+					this.decodePassword(data.info, id, searchUser.email);
+
 			console.log(searchUser);
 			return ("okay");
 		}
 		return ("user doesnt exist");
 	}
+	public	addUserAsFriend(friendId: string, id: string)
+	{
+		const	searchFriend = this.user.find((elem) =>
+		{
+			return (elem.id === friendId);
+		});
+		const	searchUserIndex = this.user.findIndex((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUserIndex !== -1)
+			return ("User doesnt exist");
+		if (searchFriend === undefined)
+			return ("This new friend doesnt exist");
+		// this.user[searchUserIndex].friends.push(searchFriend);
+		return (searchFriend.username + " added as friend");
+	}
+
 }

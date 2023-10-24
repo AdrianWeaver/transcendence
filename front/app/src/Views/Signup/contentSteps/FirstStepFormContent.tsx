@@ -19,6 +19,7 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 import {
+	hashPassword,
 	registerInfosInBack,
 	setPassword,
 	setPseudo,
@@ -248,6 +249,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			dispatch(registerInfosInBack(userSignup.username, "username"));
 			// dispatch(setPseudo(userSignup.username));
 			dispatch(setPassword(userSignup.password));
+			dispatch(hashPassword(userSignup.password));
 			dispatch(userRegistrationStepThree());
 		}
 	};

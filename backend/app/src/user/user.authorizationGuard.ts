@@ -53,7 +53,25 @@ export	class UserAuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			console.log("Valid Signature :", response);
+
+			if (response.exp && response.exp * 1000 < Date.now())
+			{
+				console.log("ICIIII ");
+				this.service.revokeUserTokenExpById(response.id);
+				const	bearerTwo = token.split("Bearer ");
+				const decode = jwt.verify(bearerTwo[1], secret) as JWTDecoded;
+
+				response = {
+					validTokenSignature: true,
+					id: decode.id,
+					email: decode.email,
+					iat: decode.iat,
+					exp: decode.exp,
+					token: token
+				};
+				// console.log("here ?", response);
+				return (response);
+			}
 			return (response);
 		}
 		catch (error)
