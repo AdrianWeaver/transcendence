@@ -176,6 +176,38 @@ export const	setCanvasSize = (size: CanvasModel)
 	});
 };
 
+export const	resetRegistration = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		if (prevState.controller.registration.startedRegister === true)
+			dispatch(controllerActions.resetRegistration());
+	});
+};
+
+export const	reinitialiseUser = (logout: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		if (prev.controller.user.bearerToken === "undefined")
+			return ;
+		if (logout)
+		{
+			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+			console.log("coucou");
+			dispatch(logOffUser());
+			dispatch(resetRegistration);
+		}
+		dispatch(controllerActions.reinitialiseUser());
+	});
+}
+
 export const	setAbortRequestedValue = (value: boolean)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -191,18 +223,6 @@ export const	setAbortRequestedValue = (value: boolean)
 			}
 		};
 		dispatch(controllerActions.setAbortRequestedValue(reponse));
-	});
-};
-
-export const	resetRegistration = ()
-	: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const	prevState = getState();
-
-		if (prevState.controller.registration.startedRegister === true)
-			dispatch(controllerActions.resetRegistration());
 	});
 };
 
@@ -875,26 +895,6 @@ export const	setRegistered = (data: boolean)
 			}
 		}
 		dispatch(controllerActions.setRegistered(response));
-	});
-}
-
-export const	reinitialiseUser = (logout: boolean)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return (async (dispatch, getState) =>
-	{
-		const	prev = getState();
-
-		if (prev.controller.user.bearerToken === "undefined")
-			return ;
-		if (logout)
-		{
-			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
-			console.log("coucou");
-			dispatch(logOffUser());
-			dispatch(resetRegistration);
-		}
-		dispatch(controllerActions.reinitialiseUser());
 	});
 }
 
