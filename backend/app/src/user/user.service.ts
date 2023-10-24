@@ -27,8 +27,9 @@ import axios from "axios";
 import path, { join } from "path";
 import * as fs from "fs";
 import * as sharp from "sharp";
+import FileConfig from "./Object/FileConfig";
 
-type PictureConfigModel = {
+export type PictureConfigModel = {
 	path:
 	{
 		normal: string;
@@ -94,7 +95,7 @@ export class UserService
 				large: this.publicPathLarge,
 				medium: this.publicPathMedium,
 				micro: this.publicPathMicro,
-				small: this.publicPathSmall
+				small: this.publicPathSmall,
 			},
 			size: this.avatarArraySize,
 			tmpFolder: this.publicPathTemp
@@ -307,15 +308,15 @@ export class UserService
 	{
 		this.logger.debug("input file: " + oldTmpFilePath);
 		this.logger.debug("output file: " + destTmpFilePath);
-	
+
 		try
 		{
 			const	imagePng = sharp(oldTmpFilePath);
-			const metadata = await imagePng.metadata();
+			const	metadata = await imagePng.metadata();
 			console.log(metadata);
-			// const	outputBuffer = await imagePng.jpeg().toBuffer();
+			const	outputBuffer = await imagePng.jpeg().toBuffer();
 			this.logger.verbose("buffer ready to be writted");
-			// fs.writeFileSync(destTmpFilePath, outputBuffer);
+			fs.writeFileSync(destTmpFilePath, outputBuffer);
 			this.logger.log("Convertion okay");
 		}
 		catch (error)
@@ -324,19 +325,112 @@ export class UserService
 		}
 	}
 
-	public	async uploadPhoto(tmpFilePath: string, userObj: UserModel)
+	private	async	deletePicture(src: string)
+	{
+		try
+		{
+			fs.unlinkSync(src);
+			this.logger.verbose("PNG file deleted");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	private async	cropImageIfNeeded(filecfg: FileConfig)
+	{
+		this.logger.log("Start crop if needed");
+
+		try
+		{
+			const	image = sharp(filecfg.getPathTmpConverted());
+
+			const	metadata = await image.metadata();
+			// console.log(metadata);
+			if (metadata.height === metadata.width
+				|| metadata.width === undefined
+				|| metadata.height === undefined)
+				return ;
+			const	requestedSize = Math.min(metadata.height, metadata.width);
+			console.log("requested size: ", requestedSize);
+			const	cropedImage = await image.extract(
+				{
+					width: requestedSize,
+					height: requestedSize,
+					left: 0,
+					top: 0,
+				}
+			)
+			.toBuffer();
+			this.logger.verbose("Sucessfull write to buffer the croped image");
+			fs.writeFileSync(filecfg.getPathTmpConverted(), cropedImage);
+			this.logger.log("Image cropped writed to disk");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	private async	resizeAllUploadedPictures(fileCfg: FileConfig)
+	{
+		this.logger.verbose("Starting resize all pictures");
+		try
+		{
+			await	this.cropImageIfNeeded(fileCfg);
+
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathNormal(),
+				"large"
+			);
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathLarge(),
+				"large"
+			);
+			this.logger.log("resized to large");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathMedium(),
+				"medium"
+			);
+			this.logger.log("resized to medium");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathSmall(),
+				"small"
+			);
+			this.logger.log("resized to small");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathMicro(),
+				"micro"
+			);
+			this.logger.log("resized to micro");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	public	async	uploadPhoto(fileCfg: FileConfig, userObj: UserModel)
 	: Promise<UserModel>
 	{
 		this.logger.verbose("Starting resize Process");
-		this.logger.log("The tmpfilepath is : ", tmpFilePath);
-		const	splittedFilepath = tmpFilePath.split(".");
-		// console.log(splittedFilepath);
-		if (splittedFilepath[splittedFilepath.length - 1] !== "jpeg")
+		this.logger.log("The tmpfilepath is : ", fileCfg.fullPath());
+		fileCfg.setPictureConfig(this.getConfig());
+		// console.log(this.getConfig());
+		if (fileCfg.needConvertToJPEG())
 		{
 			try
 			{
 				this.logger.log("Starting convertion of the file");
-				await this.convertPNGToJPEG(tmpFilePath, splittedFilepath[0] + ".jpeg");
+				await this.convertPNGToJPEG(fileCfg.fullPath(), fileCfg.getPathTmpConverted());
+				await this.deletePicture(fileCfg.fullPath());
+				await this.resizeAllUploadedPictures(fileCfg);
 				this.logger.log("Ending convertion of the file");
 			}
 			catch (error)
@@ -344,10 +438,29 @@ export class UserService
 				this.logger.error(error);
 			}
 		}
+		else
+		{
+			try
+			{
+				await this.resizeAllUploadedPictures(fileCfg);
+			}
+			catch (error)
+			{
+				this.logger.error(error);
+			}
+		}
+		this.deletePicture(fileCfg.getPathTmpConverted());
 		const	newUserObj: UserModel = {
-			...userObj
+			...userObj,
+			avatar: fileCfg.getCDNConfig().avatar,
+			ftAvatar: fileCfg.getCDNConfig().ftAvatar,
 		};
 		this.logger.verbose("End resize Process");
+		// const index = this.user.findIndex((user) =>
+		// {
+		// 	return (user.id === newUserObj.id);
+		// });
+		// this.user[index] = newUserObj;
 		return (newUserObj);
 	}
 
@@ -528,7 +641,6 @@ export class UserService
 			return (elem.id === id);
 		});
 		if (searchUser !== undefined)
-
 			myInfo = {
 				id: searchUser.id,
 				email: searchUser.email,

@@ -29,7 +29,7 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.error("error from api redux ");
-				// console.error(error);
+				console.error(error);
 				return ("ERROR");
 			})
 		);
@@ -57,8 +57,8 @@ const	UserServices = {
 			})
 			.catch((error) =>
 			{
-				console.error("error from verify token");
-				// console.error(error);
+				// console.error("error from verify token");
+				console.error(error);
 				return ("ERROR");
 			})
 		);

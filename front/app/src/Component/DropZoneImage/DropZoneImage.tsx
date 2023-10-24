@@ -1,7 +1,18 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import {Backdrop, Button, Card, CardContent, CardHeader, CardMedia, Grid, Paper, Slider, Typography } from "@mui/material";
+import {
+	Backdrop,
+	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardMedia,
+	Grid,
+	Paper,
+	Slider,
+	Typography
+} from "@mui/material";
 import {DropzoneAreaBase, FileObject, readFile} from "mui-file-dropzone";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { UserModel } from "../../Redux/models/redux-models";
@@ -246,6 +257,11 @@ const DropZoneImage = () =>
 		setReadyExport
 	] = useState(false);
 
+	const	token = useAppSelector((state) =>
+	{
+		return (state.controller.user.bearerToken);
+	});
+
 	const	handleAddFile = (newFile: any) =>
 	{
 		console.log(newFile);
@@ -302,10 +318,14 @@ const DropZoneImage = () =>
 		if (files.length === 0)
 			return ;
 		const	formData = new FormData();
-		formData.append("photo", files[0]);
+		formData.append("image", files[0]);
 
-		axios
-		.post("http://localhost:3000/user/update-photo", { body: formData})
+		axios.post("http://localhost:3000/user/update-photo", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				"Authorization": token
+			}
+		})
 		.then((response) =>
 		{
 			console.log(response.data);

@@ -20,6 +20,7 @@ import * as fs from "fs";
 import * as sharp from "sharp";
 import internal from "stream";
 import { AccountPage } from "twilio/lib/rest/api/v2010/account";
+import FileConfig from "./Object/FileConfig";
 
 class	RegisterDto
 {
@@ -234,6 +235,7 @@ export class UserController
 		@Res() res: Response,
 		@Body() body: any)
 	{
+		console.log(req.headers);
 		this.logger.error("NOT AN ERROR: start update photo");
 		try
 		{
@@ -244,6 +246,12 @@ export class UserController
 					fileSize: 10 * 1024 * 1024
 				}
 			};
+
+			const	fileCfg = new FileConfig();
+			fileCfg.setTempFolder(this.userService.getConfig().tmpFolder);
+			fileCfg.setFilename(req.user.username);
+			console.log(req.user);
+
 			const bb = busboy(busboyConfig);
 
 			const	processBusboy = (): Promise<string> =>
@@ -253,8 +261,6 @@ export class UserController
 					{
 						bb.on("file", async (name: string, file: internal.Readable, info: busboy.FileInfo) =>
 						{
-							let		acceptedType;
-							let		extension;
 							const	{ filename, encoding, mimeType } = info;
 							console.log("Starting visualisation of busboy data");
 							console.log(info);
@@ -262,45 +268,20 @@ export class UserController
 							console.log(encoding);
 							console.log(mimeType);
 							console.log("Ending of busboy data display");
-							acceptedType = false;
-							if (mimeType === "image/jpeg")
-							{
-								extension = ".jpeg";
-								acceptedType = true;
-							}
-							if (mimeType === "image/png")
-							{
-								extension = ".png";
-								acceptedType = true;
-							}
-							if (!acceptedType)
+							fileCfg.configMimeType(mimeType);
+							if (!fileCfg.isAccepted())
 								reject(new HttpException("Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
 							// console.log(file);
-							try
+							file.on("data", (data) =>
 							{
-								const	tmpFolder = this.userService.getConfig().tmpFolder;
-								const	filename = req.user.username;
-								const fullPath = tmpFolder + "/" + filename + extension;
-								file.pipe(fs.createWriteStream(fullPath));
-								
-								// ...error here 
-								this.logger.verbose("Successfully write to tmp");
-								resolve(fullPath);
-							}
-							catch (error)
+								console.log("buffer", typeof data);
+								fileCfg.addToBuffer(data);
+							});
+							file.on("end", () =>
 							{
-								reject(error);
-							}
-						});
-						bb.on("finish", () =>
-						{
-							// this.logger.verbose("finished bb");
-							resolve("what");
-						});
-						bb.on("close", () =>
-						{
-							// this.logger.verbose("closed bb");
-							reject("connection Closed");
+								console.log("finish");
+								resolve(fileCfg.fullPath());
+							});
 						});
 						bb.on("error", (error) =>
 						{
@@ -311,10 +292,29 @@ export class UserController
 				);
 			};
 			this.logger.verbose("Start processing");
-			const tmpFile = await processBusboy();
-			// this.logger.verbose(tmpFile);
-			await this.userService.uploadPhoto(tmpFile, req.user);
+			await processBusboy().then((filename) =>
+			{
+				this.logger.verbose(filename);
+				try
+				{
+					fs.writeFileSync(fileCfg.fullPath(), fileCfg.getBuffer());
+				}
+				catch (error)
+				{
+					return (res.status(500).json({error: true}));
+				}
+				return (fileCfg.fullPath());
+			})
+			.catch((error) =>
+			{
+				res.status(500).json({error: true});
+				console.log(error);
+				return ;
+			});
+			this.logger.log("Test");
+			await this.userService.uploadPhoto(fileCfg, req.user);
 			res.status(200).json({message: "Success"});
+			// console.log("buffer", fileCfg.getBuffer());
 			this.logger.error("NOT AN ERROR: end update photo");
 		}
 		catch (error)
@@ -323,79 +323,4 @@ export class UserController
 			res.status(500).json({error: true});
 		}
 	}
-
-	// @Post("/update-photo")
-	// // @UseGuards(UserAuthorizationGuard)
-	// updatePhoto(
-	// 	@Req() req: any,
-	// 	@Res() res: Response,
-	// 	@Body() body: any)
-	// {
-	// 	this.logger.error("NOT AN ERROR: A user request update photo");
-	// 	// console.log(req.headers);
-	// 	const	busboyConfig = {
-	// 		headers: req.headers,
-	// 		limits:
-	// 		{
-	// 			fileSize: 10 * 1024 * 1024
-	// 		}
-	// 	};
-	// 	const bb = busboy(busboyConfig);
-
-	// 	bb.on("file", (name: string, file: internal.Readable, info: busboy.FileInfo) =>
-	// 	{
-	// 		const	{ filename, encoding, mimeType } = info;
-
-	// 		console.log("Starting visualisation of busboy data");
-	// 		console.log(info);
-	// 		console.log(filename);
-	// 		console.log(encoding);
-	// 		console.log(mimeType);
-	// 		console.log("Ending of busboy data display");
-	// 		let	acceptedType;
-
-	// 		acceptedType = false;
-	// 		if (mimeType === "image/jpeg")
-	// 			acceptedType = true;
-	// 		if (mimeType === "image/png")
-	// 			acceptedType = true;
-	// 		if (!acceptedType)
-	// 		{
-	// 			throw new HttpException("Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-	// 			// this.logger.error("file have no correct mimeType");
-	// 		}
-	// 		file
-	// 		.on("limit", () =>
-	// 		{
-	// 			console.log("File limits reached !");
-	// 			throw new HttpException("Payload too large", HttpStatus.PAYLOAD_TOO_LARGE);
-	// 		})
-	// 		.on("data", (data) =>
-	// 		{
-	// 			console.log(data);
-	// 			return ;
-	// 		})
-	// 		.on("close", ()=>
-	// 		{
-	// 			console.log("File close ");
-	// 		});
-	// 	});
-
-	// 	bb.on("field", (name, val, info) =>
-	// 	{
-	// 		console.log(name, val);
-	// 	});
-	// 	bb.on("close", () =>
-	// 	{
-	// 		console.log("BB connexion close");
-	// 		res.status(200).json("Sucessfully uploaded ");
-	// 		return ("closed");
-	// 	});
-
-	// 	req.pipe(bb);
-	// 	this.logger.error("NOT AN ERROR: A user request update photo");
-	// 	// console.log(body);
-	// 	// console.log(file);
-	// 	return ("okay");
-	// }
 }
