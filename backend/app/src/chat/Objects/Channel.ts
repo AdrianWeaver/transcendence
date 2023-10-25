@@ -78,7 +78,7 @@ class Channel
         {
             if (this.id === "undefined" || this.id === undefined)
             {
-                const newId = randomBytes(64).toString("hex");
+                const newId = randomBytes(16).toString("hex");
                 this.id = newId;
             }
         };
@@ -218,6 +218,7 @@ class Channel
                 owner: this.owner,
                 password: this.password,
                 users: this.users,
+                id: this.id
             };
             // const retValue = JSON.stringify(dbObject);
             return (dbObject);
