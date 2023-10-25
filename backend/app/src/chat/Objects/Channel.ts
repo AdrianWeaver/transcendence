@@ -2,6 +2,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
+import { randomBytes } from "crypto";
 import Chat from "./Chat";
 import User from "./User";
 import { Server, Socket } from "socket.io";
@@ -25,6 +26,7 @@ type MemberSocketIdModel ={
 
 class Channel
 {
+    public id: string;
     public kind: string;
     public owner: MemberSocketIdModel;
     // public admins: string[] = [];
@@ -52,6 +54,7 @@ class Channel
     public setMode: (mode: string) => void;
     public setKind: (kind: string) => void;
     public setPassword: (password: string) => void;
+    public setId: () => void;
 
     /**
      * 
@@ -70,6 +73,15 @@ class Channel
         this.members = 0;
         this.chat = undefined;
         this.members++;
+        // this.setId();
+        this.setId = () =>
+        {
+            if (this.id === "undefined" || this.id === undefined)
+            {
+                const newId = randomBytes(64).toString("hex");
+                this.id = newId;
+            }
+        };
         this.setName = (name: string) =>
         {
             this.name = name;
@@ -90,6 +102,7 @@ class Channel
             {
                 this.admins.push(obj);
                 this.owner = obj;
+                this.setId();
             }
             this.users.push(obj);
             if (client !== null)

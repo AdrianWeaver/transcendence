@@ -61,6 +61,7 @@ class User
 		this.profileId = profileId;
 		if (client === null)
 		{
+			// NEED TO SEE WHAT WE DO HERE
 			this.id = "to_implement";
 			this.client = null;
 		}
