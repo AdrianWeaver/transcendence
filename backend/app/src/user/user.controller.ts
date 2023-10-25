@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable no-dupe-class-members */
 /* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -21,6 +22,26 @@ import * as dotenv from "dotenv";
 import * as readline from "readline";
 import * as twilio from "twilio";
 
+export class	RegisterStepOneDto
+{
+	@IsEmail()
+	@IsNotEmpty()
+	emailAddress: string;
+
+	// minmax
+	@IsNotEmpty()
+	firstName: string;
+	@IsNotEmpty()
+	lastName: string;
+	@IsNotEmpty()
+	password: string;
+	@IsNotEmpty()
+	passwordConfirm: string;
+	@IsNotEmpty()
+	uniquenessPassword: "AgreeWithUniquenessOfPassword";
+	@IsNotEmpty()
+	username: string;
+}
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -48,7 +69,7 @@ class UserLoginDto
 {
 	@IsNotEmpty()
 	id: any;
-
+	// getUserRegiste
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;
@@ -82,12 +103,55 @@ export class UserController
 		return (this.userService.getAllUserRaw());
 	}
 
+	@Post("register/step-one")
+	@UseGuards(UserAuthorizationGuard)
+	async getUserRegisterStepOne(
+		@Body() body: RegisterStepOneDto,
+		@Req() req: any,
+		@Res() res: Response)
+	{
+		this.logger.verbose("Next information is the previous user");
+		console.log(req.user);
+
+		const	unauthorized = (errCode: number, info: string) =>
+		{
+			res.status(errCode).json(
+				{
+					message: "Unauthorized",
+					info: info,
+					error: true
+				});
+		};
+		this.logger.verbose("Next information is the updated user");
+		// console.log(body);
+		if (body.password !== body.passwordConfirm)
+			return (unauthorized(401, "You are an hacker go off"), void(0));
+		this.logger.verbose("password okay and are the same");
+		const count = this.userService
+			.getNumberOfUserWithUsername(body.username);
+		if (count > 1)
+			return (unauthorized(401, "Username already taken"), void(0));
+		this.logger.verbose("username count okay");
+		const user = req.user;
+		console.log(user, " ", body);
+		if (body.emailAddress !== user.email
+			|| body.firstName !== user.firstName
+			|| body.lastName !== user.lastName)
+			return (unauthorized(401, "You are an hacker go off"), void(0));
+		this.logger.verbose("verification okay");
+		this.logger.debug("Number of user with this username: " + count);
+		const	update = await this.userService.updateUser(user.id, body);
+		if (update === "ERROR")
+			return (unauthorized(500, "try again later"), void(0));
+		return (res.status(200).json({message: "okay"}), void(0));
+	}
+
 	@Post("register")
 	getUserRegister(
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
-		this.logger.log("A User want to register");
+		this.logger.error("NOT AN ERROR :: A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -212,6 +276,9 @@ export class UserController
 		return (this.userService.getUserArray());
 	}
 
+	/**
+	 * @returns the list of user filtered
+	 */
 	@Get("get-all-users")
 	getAllUsers()
 		: BackUserModel[]
@@ -247,11 +314,12 @@ export class UserController
 	}
 
 	@Get("my-info")
-	getMyInfo()
+	@UseGuards(UserAuthorizationGuard)
+	getMyInfo(@Req() req: any)
 		: UserPublicResponseModel
 	{
 		// NEED TO FIND A WAY TO KNOW THE USER ID
-		return (this.userService.getMyInfo(97756));
+		return (this.userService.getMyInfo(req.user.id));
 	}
 
 	@Post("double-auth")
@@ -400,7 +468,8 @@ export class UserController
 	{
 		this.logger
 			.log("'hash-password' route requested");
-		return (this.userService.hashPassword(body.password, req.user.id));
+		this.userService.hashPassword(body.password, body.id);
+		return ("okay");
 	}
 
 	@Post("decode-password")

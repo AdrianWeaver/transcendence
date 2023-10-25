@@ -29,6 +29,7 @@ import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
+import { RegisterStepOneDto } from "./user.controller";
 
 @Injectable()
 export class UserService
@@ -75,7 +76,6 @@ export class UserService
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
-
 			};
 			i++;
 		});
@@ -369,27 +369,28 @@ export class UserService
 		return (valid);
 	}
 
-	public	hashPassword(password: string, id: any)
+	async	hashPassword(password: string, id: number)
 	{
 		const	saltRounds = 10;
-		const	searchUser = this.user.find((elem) =>
+		const	index = this.user.findIndex((elem) =>
 		{
-			return (elem.id.toString() === id.toString());
+			return (id === elem.id);
 		});
-		if (searchUser === undefined)
-			return ("User not found");
-		bcrypt.hash(password, saltRounds)
-		.then((hash) =>
-		{
-			console.log(hash);
-			searchUser.password = hash;
-		})
-		.catch((err) =>
-		{
-			console.log(err);
-			return ("error");
-		});
-		return (searchUser.password);
+		const	hashed = await bcrypt.hash(password, saltRounds);
+		if (hashed)
+			this.user[index].password = hashed;
+		// .then((hash) =>
+		// {
+		// 	this.user[index].password = hash;
+		// 	return (hash);
+		// })
+		// .catch((err) =>
+		// {
+		// 	console.log(err);
+		// 	return ("ERROR");
+		// });
+		console.log("le test ", hashed);
+		return (hashed);
 	}
 
 	async	decodePassword(password: string, id: any, email: any)
@@ -399,7 +400,7 @@ export class UserService
 			return (elem.id.toString() === id.toString() && elem.email === email);
 		});
 		if (index === -1)
-			return ("User not found");
+			return ("ERROR");
 		console.log(password, " ", this.user[index].password);
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
@@ -418,13 +419,13 @@ export class UserService
 				index: index
 			};
 			if (ret === undefined)
-				return ("error");
+				return ("ERROR");
 			return (ret);
 		})
 		.catch((err) =>
 		{
 			console.log(err);
-			return ("error");
+			return ("ERROR");
 		});
 		return (valid);
 	}
@@ -470,4 +471,36 @@ export class UserService
 		return (searchFriend.username + " added as friend");
 	}
 
+	public getNumberOfUserWithUsername(username : string)
+		: number
+	{
+		this.logger.debug("username: " + username);
+		// this.logger.error("NOT an error");
+		// console.log("here is data ", this.user);
+		// this.logger.error("NOT an error");
+		const count = this.user.filter((obj) =>
+		{
+			return (obj.username === username);
+		}).length;
+		// console.log("count array : ", count);
+		return (
+			count
+		);
+	}
+
+	public	async updateUser(userId: number, body: RegisterStepOneDto)
+		: Promise<string>
+	{
+		const index = this.user.findIndex((user) =>
+		{
+			return (userId === user.id);
+		});
+		if (index === -1)
+			return ("ERROR");
+		this.user[index].username = body.username;
+		await this.hashPassword(body.password, this.user[index].id);
+		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
+			return ("ERROR");
+		return ("okay");
+	}
 }

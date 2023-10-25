@@ -1264,10 +1264,14 @@ export const	addUser = (user: UserModel)
 		const	prev = getState();
 
 		const	array = [...prev.controller.allFrontUsers];
-		if (array.length === 1)
+		const	index = array.findIndex((elem) =>
 		{
-			array[0] = user;
-		}
+			return (elem.id === user.id);
+		});
+		if (index === -1)
+			array.push(user);
+		else
+			array[index] = user;
 		const	response: ControllerModel = {
 			...prev.controller,
 			allFrontUsers: array
