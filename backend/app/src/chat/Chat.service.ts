@@ -70,7 +70,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-6";
+	private readonly chatID = "id-chat-service-v-7";
 
 	constructor()
 	{
@@ -245,69 +245,69 @@ export	class ChatService implements OnModuleInit
 					// RETRIEVING CHANNELS
 					const arrayChannels: Channel[] = [];
 					// console.log(rawobj.channels);
-					rawobj.channels.forEach((strchan : string) =>
-					{
-						const	rawChan = JSON.parse(strchan);
+					// rawobj.channels.forEach((strchan : string) =>
+					// {
+					// 	const	rawChan = JSON.parse(strchan);
 
-						const	channel = new Channel(
-							rawChan.name,
-							null,
-							rawChan.mode,
-							rawChan.password,
-							rawChan.kind,
-							rawChan.profileId,
-						);
-						// console.log("INSTANCE: ");
-						// console.log(channel instanceof Channel);
-						// console.log(channel);
-						channel.members = rawChan.members;
-						channel.owner = rawChan.owner;
-						rawChan.admins.forEach((admin: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: admin.memberSocketId,
-								profileId: admin.profileId,
-							};
-							channel.admins.push(obj);
-						});
-						rawChan.banned.forEach((banned: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: banned.memberSocketId,
-								profileId: banned.profileId,
-							};
-							channel.banned.push(obj);
-						});
+					// 	const	channel = new Channel(
+					// 		rawChan.name,
+					// 		null,
+					// 		rawChan.mode,
+					// 		rawChan.password,
+					// 		rawChan.kind,
+					// 		rawChan.profileId,
+					// 	);
+					// 	// console.log("INSTANCE: ");
+					// 	// console.log(channel instanceof Channel);
+					// 	// console.log(channel);
+					// 	channel.members = rawChan.members;
+					// 	channel.owner = rawChan.owner;
+					// 	rawChan.admins.forEach((admin: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: admin.memberSocketId,
+					// 			profileId: admin.profileId,
+					// 		};
+					// 		channel.admins.push(obj);
+					// 	});
+					// 	rawChan.banned.forEach((banned: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: banned.memberSocketId,
+					// 			profileId: banned.profileId,
+					// 		};
+					// 		channel.banned.push(obj);
+					// 	});
 
-						const arrayMessages: Array<MessageModel> = [];
+					// 	const arrayMessages: Array<MessageModel> = [];
 
-						rawChan.messages.forEach((message: MessageModel) =>
-						{
-							const objToMemory: MessageModel = {
-								sender: message.sender,
-								message: message.message,
-								id: message.id,
-								username: message.username,
-							};
-							arrayMessages.push(objToMemory);
-						});
-						channel.messages = arrayMessages;
-						// channel.chat = this.chat;
+					// 	rawChan.messages.forEach((message: MessageModel) =>
+					// 	{
+					// 		const objToMemory: MessageModel = {
+					// 			sender: message.sender,
+					// 			message: message.message,
+					// 			id: message.id,
+					// 			username: message.username,
+					// 		};
+					// 		arrayMessages.push(objToMemory);
+					// 	});
+					// 	channel.messages = arrayMessages;
+					// 	// channel.chat = this.chat;
 
-						const	arrayUsers: MemberSocketIdModel[] = [];
-						rawChan.users.forEach((elem: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: elem.memberSocketId,
-								profileId: elem.profileId,
-							};
-							arrayUsers.push(obj);
-						});
-						channel.users = arrayUsers;
+					// 	const	arrayUsers: MemberSocketIdModel[] = [];
+					// 	rawChan.users.forEach((elem: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: elem.memberSocketId,
+					// 			profileId: elem.profileId,
+					// 		};
+					// 		arrayUsers.push(obj);
+					// 	});
+					// 	channel.users = arrayUsers;
 
-						arrayChannels.push(channel);
-					});
-					newChatInstance.channels = arrayChannels;
+					// 	arrayChannels.push(channel);
+					// });
+					// newChatInstance.channels = arrayChannels;
 
 					const	arrMemberSocketIds: Array<MemberSocketIdModel> = [];
 					rawobj.memberSocketIds.forEach((elem: MemberSocketIdModel) =>

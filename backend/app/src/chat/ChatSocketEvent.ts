@@ -349,14 +349,11 @@ export class ChatSocketEvents
 						const profileId = this.chatService.getProfileIdFromSocketId(client.id);
 						if (profileId === "undefined")
 							console.error("Error profile chat socket  event");
-						const newChannel = new Channel(
-							chanName,
-							client,
-							data.payload.chanMode,
-							data.payload.chanPassword,
-							kind,
-							profileId
-						);
+						const	newChannel = new Channel(chanName);
+						newChannel.setClient(client, profileId);
+						newChannel.setKind(kind);
+						newChannel.setPassword(data.payload.chanPassword);
+						newChannel.setMode(data.payload.chanMode);
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
 						// const userToChannel: MemberSocketIdModel = {
@@ -381,14 +378,12 @@ export class ChatSocketEvents
 					{
 						if (searchConv === undefined && alreadyCreated === false)
 						{
-							const newPrivateMsg = new Channel(
-								chanName,
-								client,
-								"",
-								"",
-								kind,
-								this.chatService.getProfileIdFromSocketId(client.id)
-							);
+							// NEED envoyer private au lieu de "" pour que les autres puissent pas vnenir 
+							const newPrivateMsg = new Channel(chanName);
+							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
+							newPrivateMsg.setPassword("");
+							newPrivateMsg.setKind(kind);
+							newPrivateMsg.setMode("");
 							newPrivateMsg.chat = this.chatService.getChat();
 							const obj: MemberSocketIdModel = {
 								memberSocketId: data.payload.activeId,

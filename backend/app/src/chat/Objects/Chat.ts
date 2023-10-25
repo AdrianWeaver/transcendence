@@ -225,7 +225,11 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
-				// const	c
+				const	newChannel = new Channel(raw.name);
+				newChannel.setClient(null, raw.profileId);
+				newChannel.setKind(raw.kind);
+				newChannel.setPassword(raw.password);
+				newChannel.setMode(raw.mode);
 				console.log(raw);
 			});
 		};

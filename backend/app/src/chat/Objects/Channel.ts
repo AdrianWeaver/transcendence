@@ -47,6 +47,11 @@ class Channel
     public addNewMessage: (message: MessageModel) => void;
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
+    public setName: (name: string) => void;
+    public setClient: (client: Socket | null, profileId: string) => void;
+    public setMode: (mode: string) => void;
+    public setKind: (kind: string) => void;
+    public setPassword: (password: string) => void;
 
     /**
      * 
@@ -58,44 +63,53 @@ class Channel
      * @param profileId 
      */
     // eslint-disable-next-line max-params
-    public constructor(
-        name: string,
-        client: Socket | null,
-        mode: string,
-        password: string,
-        kind: string,
-        profileId: string)
+    public constructor(name: string)
     {
-        this.kind = kind;
+        // this.kind = kind;
         this.name = name;
         this.members = 0;
-        this.mode = mode;
         this.chat = undefined;
         this.members++;
-
-        // this has caused us a lot of trouble
-        // if (client === null)
-        //     return ;
-
-        const memberSockId = client === null ? "undefined" : client.id;
-        const obj: MemberSocketIdModel = {
-            memberSocketId: memberSockId,
-            profileId: profileId
-        };
-        if (this.members === 1)
+        this.setName = (name: string) =>
         {
-            this.admins.push(obj);
-            this.owner = obj;
-            // this.admins.push(client.id, -1);
-        }
-        this.users.push(obj);
-        if (client !== null)
-            this.sockets.push(client);
-        this.mode = mode;
-        if (password !== undefined)
-            this.password = password;
-        else
-            this.password = undefined;
+            this.name = name;
+        };
+        this.setMode = (mode: string) =>
+        {
+            this.mode = mode;
+        };
+        this.setClient = (client: Socket | null, profileId: string) =>
+        {
+            const obj: MemberSocketIdModel = {
+                memberSocketId: "undefined",
+                profileId: profileId,
+            };
+            if (client !== null)
+                obj.memberSocketId = client.id;
+            if (this.members === 1)
+            {
+                this.admins.push(obj);
+                this.owner = obj;
+            }
+            this.users.push(obj);
+            if (client !== null)
+            {
+                this.sockets.push(client);
+                // this.client = client;
+            }
+        };
+        this.setPassword = (password: string) =>
+        {
+            // NEED TO HASH
+            if (password !== undefined)
+                this.password = password;
+            else
+                this.password = undefined;
+        };
+        this.setKind = (kind: string) =>
+        {
+            this.kind = kind;
+        };
 
         this.isAdmin = (id: string) =>
         {
@@ -178,24 +192,23 @@ class Channel
             return (undefined);
         };
     }
-
-    public parseForDatabase()
-    {
-        const	dbObject = {
-            admins: this.admins,
-            banned: this.banned,
-            kind: this.kind,
-            members: this.members,
-            messages: this.messages,
-            mode: this.mode,
-            name: this.name,
-            owner: this.owner,
-            password: this.password,
-            users: this.users,
-        };
-        // const retValue = JSON.stringify(dbObject);
-        return (dbObject);
-    }
+        public parseForDatabase()
+        {
+            const	dbObject = {
+                admins: this.admins,
+                banned: this.banned,
+                kind: this.kind,
+                members: this.members,
+                messages: this.messages,
+                mode: this.mode,
+                name: this.name,
+                owner: this.owner,
+                password: this.password,
+                users: this.users,
+            };
+            // const retValue = JSON.stringify(dbObject);
+            return (dbObject);
+        }
 }
 
 export default Channel;
