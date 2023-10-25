@@ -56,7 +56,7 @@ export	class UserAuthorizationGuard implements CanActivate
 
 			if (response.exp && response.exp * 1000 < Date.now())
 			{
-				console.log("ICIIII ");
+				// console.log("ICIIII ");
 				this.service.revokeUserTokenExpById(response.id);
 				const	bearerTwo = token.split("Bearer ");
 				const decode = jwt.verify(bearerTwo[1], secret) as JWTDecoded;
@@ -131,8 +131,6 @@ export	class UserAuthorizationGuard implements CanActivate
 
 		const isValid = this.checkTokenPayloadAuthenticity(user, token);
 		request.user = user;
-
-
 		return (isValid);
 	}
 }
