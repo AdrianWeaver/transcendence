@@ -175,15 +175,15 @@ class User
 
 	public parseForDatabase()
 	{
-		const	channelsSerialized: string[] = [];
+		const	channels: any[] = [];
 
-		this.channels.forEach((channels) =>
+		this.channels.forEach((channel) =>
 		{
-			console.log(channels.parseForDatabase());
-			channelsSerialized.push(channels.parseForDatabase());
+			const	data = channel.parseForDatabase();
+			channels.push(data);
 		});
-		const	serializedObject = {
-			channels: channelsSerialized,
+		const	dbObject = {
+			channels: channels,
 			name: this.name,
 			profile: this.profile,
 			stats: this.stats,
@@ -192,8 +192,8 @@ class User
 			friends: this.friends,
 			profileId: this.profileId,
 		};
-		const	retValue = JSON.stringify(serializedObject);
-		return (retValue);
+		// const	retValue = JSON.stringify(serializedObject);
+		return (dbObject);
 	}
 }
 

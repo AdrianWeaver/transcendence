@@ -43,11 +43,20 @@ class Channel
     public isAdmin: (id: string) => boolean;
     public isBanned: (id: string) => boolean;
     public addAdmin: (id: string) => void;
-    public addToBanned: (id: string, profileId: string) => void;
+    public addToBanned: (id: string, proarrayfileId: string) => void;
     public addNewMessage: (message: MessageModel) => void;
     public leaveChannel: (client: Socket) => void;
     public findClientById: (socketId: string) => Socket | undefined;
 
+    /**
+     * 
+     * @param name 
+     * @param client 
+     * @param mode 
+     * @param password 
+     * @param kind 
+     * @param profileId 
+     */
     // eslint-disable-next-line max-params
     public constructor(
         name: string,
@@ -175,7 +184,6 @@ class Channel
         const	dbObject = {
             admins: this.admins,
             banned: this.banned,
-            // chat: this.chat,
             kind: this.kind,
             members: this.members,
             messages: this.messages,
@@ -185,8 +193,8 @@ class Channel
             password: this.password,
             users: this.users,
         };
-        const retValue = JSON.stringify(dbObject);
-        return (retValue);
+        // const retValue = JSON.stringify(dbObject);
+        return (dbObject);
     }
 }
 

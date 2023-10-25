@@ -83,8 +83,10 @@ export	class ChatService implements OnModuleInit
 
 	private onTableCreate()
 	{
+		this.log.verbose("Creating a new version inside database");
 		const	dbString = this.parseForDatabase();
-		this.prisma.chatJson
+		this.prisma
+			.chatJson
 			.create(
 			{
 				data:
@@ -122,37 +124,47 @@ export	class ChatService implements OnModuleInit
 
 	public parseForDatabase() : string
 	{
-		const	channelsDB: string[] = [];
-		const	usersToDB: string[] = [];
-
-		this.chat.channels.forEach((channel) =>
-		{
-			// console.log(channel.parseForDatabase());
-			channelsDB.push(channel.parseForDatabase());
-		});
-
-		this.chat.users.forEach((user) =>
-		{
-			// console.log(user.parseForDatabase());
-			usersToDB.push(user.parseForDatabase());
-		});
-		const toDBObject = {
-			activeMembers: this.chat.activeMembers,
-			chanMap: this.chat.chanMap,
-			channels: channelsDB,
-			matchHistory: this.chat.matchHistory,
-			memberSocketIds: this.chat.memberSocketIds,
-			message: this.chat.message,
-			users: usersToDB,
-			privateMessage: this.chat.privateMessage,
-			privateMessageMap: this.chat.privateMessageMap,
-		};
+		const toDBObject = this.chat.parseForDatabase();
 		// console.log(toDBObject);
 		// this.log.verbose(JSON.stringify(toDBObject));
 		return (JSON.stringify(toDBObject));
 	}
 
 	private	loadTableToMemory()
+	{
+		this.prisma
+			.chatJson
+			.findUnique(
+			{
+				where:
+				{
+					chatJsonID: this.chatID,
+				}
+			}
+			)
+			.then((data: any) =>
+			{
+				if (data === null)
+				{
+					this.onTableCreate();
+					this.loadTableToMemory();
+				}
+				else
+				{
+					const rawobj = JSON.parse(data.contents);
+					// console.log(rawobj);
+					const	newChatInstance = new Chat();
+					newChatInstance.databaseToObject(rawobj);
+					// console.log(rawobj);
+				}
+			})
+			.catch((error: any) =>
+			{
+				console.log(error);
+			});
+	}
+
+	private	loadTableToMemoryOld()
 	{
 		this.prisma.chatJson
 			.findUnique(
@@ -337,9 +349,9 @@ export	class ChatService implements OnModuleInit
 							searchUser.channels = chanArray;
 					});
 
-					// console.log("End of parser check with serialized value ");
-					// console.log( JSON.parse(this.parseForDatabase()));
-					// console.log(this.chat);
+					console.log("End of parser check with serialized value ");
+					console.log( JSON.parse(this.parseForDatabase()));
+					console.log(this.chat);
 				}
 			})
 			.catch((error: any) =>
@@ -356,9 +368,9 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
-		// this.log.verbose("Updating all Chat Object");
+		this.log.verbose("Updating all Chat Object");
 		const dbString = this.parseForDatabase();
-		// this.log.verbose(JSON.parse(dbString));
+		this.log.verbose(JSON.parse(dbString));
 		this.prisma.chatJson
 		.update(
 			{
