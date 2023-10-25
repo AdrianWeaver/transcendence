@@ -2,7 +2,7 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 import { DropzoneAreaBase, FileObject } from "mui-file-dropzone";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Spacer from "./extra/Spacer";
 import ButtonGroup from "./ButtonGroup";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
@@ -19,13 +19,14 @@ import {
 	Typography
 } from "@mui/material";
 import { UserModel } from "../../Redux/models/redux-models";
-import { CoPresentSharp } from "@mui/icons-material";
+import AvatarEditor from "react-avatar-editor";
 
 type	MyAvatarCardProps = {
 	userInfo: UserModel,
-	remplacementFile?: FileObject[],
-	isImageSquare: boolean,
-	// readyExport: boolean
+	remplacementFile?: FileObject[]
+	isImageSquare?: boolean,
+	setIsImageSquare: React.Dispatch<React.SetStateAction<boolean>>
+	// // readyExport: boolean
 };
 const	getText = (props: MyAvatarCardProps) =>
 {
@@ -67,12 +68,6 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 			borderRadius: "50%"
 		}
 	};
-	const
-	[
-		isImageSquare,
-		setIsImageSquare
-	] = useState(false);
-
 	const	data = getText(props);
 
 	return (
@@ -101,10 +96,10 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 							console.log(img.naturalHeight, img.naturalWidth);
 							if (img.naturalHeight !== img.naturalWidth)
 							{
-								setIsImageSquare(false);
+								props.setIsImageSquare(false);
 							}
 							else
-								setIsImageSquare(true);
+								props.setIsImageSquare(true);
 						}}
 					/>
 			<CardContent>
@@ -116,10 +111,129 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 	);
 };
 
+type	CropMyImageProps = {
+	userInfo: UserModel,
+	remplacement: FileObject[],
+	setFiles: React.Dispatch<React.SetStateAction<FileObject[]>>
+	readyExport: boolean;
+	setReadyExport: React.Dispatch<React.SetStateAction<boolean>>
+};
+
+const CropMyImage = (props: CropMyImageProps) =>
+{
+	const
+	[
+		zoom,
+		setZoom
+	] =  useState(1);
+
+	const	editor: React.RefObject<AvatarEditor> | null = useRef(null);
+	const	borderColor = [
+		255,
+		50,
+		50,
+		0.3
+	];
+
+	const	dataURLtoFile = (
+		dataURL: string,
+		filename: string,
+		mimeType : string) =>
+	{
+		const	array = dataURL.split(",");
+		const	bstr = atob(array[array.length - 1]);
+		let		n;
+		n = bstr.length;
+		const	u8array = new Uint8Array(n);
+		while (n--)
+			u8array[n] = bstr.charCodeAt(n);
+		return (new File([u8array], filename, {type: mimeType}));
+	};
+
+	return (
+		<>
+			<Card
+				sx={{scale: "1", }}
+			>
+				<CardHeader
+					title="Changement d'avatar"
+					subheader="recadrage"
+				/>
+				<AvatarEditor
+					ref={editor}
+					image={props.remplacement[0].file}
+					width={300}
+					height={300}
+					border={10}
+					color={borderColor}
+					scale={zoom}
+					rotate={0}
+				/>
+				<CardContent>
+					<Slider
+						size="small"
+						value={zoom}
+						defaultValue={1}
+						valueLabelDisplay="auto"
+						min={1}
+						max={4}
+						step={0.01}
+						onChange={(event: any) =>
+						{
+							// console.log(event.target.value);
+							setZoom(event.target.value);
+						}}
+					/>
+					<Typography variant="body2" color="text.secondary">
+						"faites glisser puis validez"
+					</Typography>
+					<Button
+						onClick={() =>
+						{
+							if (editor.current !== null)
+							{
+								const	oldImage = props.remplacement[0];
+								// console.log("next value is old images");
+								// console.log(oldImage);
+
+								const dataURL = editor
+									.current?.getImageScaledToCanvas()
+									.toDataURL(oldImage.file.type);
+								// props.setFiles([scaled]);
+								// console.log("Next value is scalled ");
+								// console.log(dataURL);
+								const	fileData = dataURLtoFile(
+									dataURL,
+									oldImage.file.name,
+									oldImage.file.type
+								);
+								const file : FileObject = {
+									data: dataURL,
+									file: fileData
+								};
+								console.log("New file created: ");
+								console.log(file);
+								props.setFiles([file]);
+								// dataURLtgoFile
+								// console.log(props.remplaceement[0]);
+								props.setReadyExport(true);
+							}
+						}}
+					>
+						Valider le redimensionnement
+					</Button>
+				</CardContent>
+			</Card>
+		</>
+	);
+}
+
 type	DisplayAreaProps = {
 	remplacementFile?: FileObject[],
 	setFiles: React.Dispatch<React.SetStateAction<FileObject[]>>;
 	// readyExport: boolean
+	readyExport: boolean;
+	setReadyExport: React.Dispatch<React.SetStateAction<boolean>>
 };
 const	DisplayArea = (props: DisplayAreaProps) =>
 {
@@ -127,6 +241,39 @@ const	DisplayArea = (props: DisplayAreaProps) =>
 	{
 		return (state.controller.user);
 	});
+
+	const
+	[
+		isImageSquare,
+		setIsImageSquare
+	] = useState(true);
+
+	let		content;
+
+	if (isImageSquare === true || props.readyExport)
+	{
+		content = (
+			<MyAvatarCard
+				userInfo={userInfo}
+				remplacementFile={props.remplacementFile}
+				setIsImageSquare={setIsImageSquare}
+				isImageSquare={isImageSquare}
+				// readyExport={readyExport}
+			/>
+		);
+	}
+	else
+	{
+		content = (
+			<CropMyImage
+				remplacement={props.remplacementFile as FileObject[]}
+				setFiles={props.setFiles}
+				userInfo={userInfo}
+				readyExport={props.readyExport}
+				setReadyExport={props.setReadyExport}
+			/>
+		);
+	}
 
 	return (
 		<>
@@ -153,11 +300,7 @@ const	DisplayArea = (props: DisplayAreaProps) =>
 							textAlign: "center"
 						}}
 					>
-						<MyAvatarCard
-							userInfo={userInfo}
-							remplacementFile={props.remplacementFile}
-							// readyExport={readyExport}
-						/>
+						{content}
 						{/* <CropMyImage
 							userInfo={userInfo}
 							remplacement={files}
@@ -268,6 +411,8 @@ const	ModalBox = (props: ModalBoxProps) =>
 						<DisplayArea
 							remplacementFile={props.files}
 							setFiles={props.setFiles}
+							readyExport={props.readyExport}
+							setReadyExport={props.setReadyExport}
 						/>
 						<DropArea
 							files={props.files}

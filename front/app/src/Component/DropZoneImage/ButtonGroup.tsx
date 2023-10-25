@@ -80,6 +80,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 				onClick={() =>
 				{
 					sendImage(props.files, token);
+					props.setDisplayModalBox(false);
 				}}
 				disabled={false}
 			>
