@@ -90,7 +90,8 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 					onLoad={(event) =>
 						{
 							const img = event.target as HTMLImageElement;
-							// console.log("image cast");
+							console.log("image cast");
+							console.log(img);
 							console.log(img.naturalHeight, img.naturalWidth);
 							if (img.naturalHeight !== img.naturalWidth)
 							{
