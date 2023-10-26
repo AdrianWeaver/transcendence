@@ -83,7 +83,8 @@ class User
 				return ;
 			if (this.chat && this.chat.server)
 			{
-				for (const channel of this.channels)
+				// TEST it was this.channels, was it a mistake ?
+				for (const channel of this.chat.channels)
 				{
 					if (channel.name === chanName)
 					{
@@ -93,6 +94,7 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
+							this.channels.push(channel);
 						}
 					}
 				}
