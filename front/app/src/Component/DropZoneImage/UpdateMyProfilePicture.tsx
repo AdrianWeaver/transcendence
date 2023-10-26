@@ -296,7 +296,7 @@ const	DisplayArea = (props: DisplayAreaProps) =>
 						xs={10}
 						sx={
 						{
-							border: "1px solid #000",
+							// border: "1px solid #000",
 							textAlign: "center"
 						}}
 					>

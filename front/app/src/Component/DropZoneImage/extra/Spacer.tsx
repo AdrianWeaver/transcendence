@@ -7,7 +7,7 @@ export type	SpacerProps = {
 const	Spacer = (props: SpacerProps) =>
 {
 	return (
-		<Grid item xs={props.space} ></Grid>
+		<Grid item xs={props.space}></Grid>
 	);
 };
 

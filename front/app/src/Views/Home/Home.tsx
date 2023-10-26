@@ -26,7 +26,6 @@ const	Home = () =>
 		<>
 			{header}
 			{body}
-			<UpdateMyProfilePicture />
 		</>
 	);
 };
