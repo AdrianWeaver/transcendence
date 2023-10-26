@@ -43,7 +43,7 @@ services:
     # depends_on:
     #   - backend
     env_file:
-      - backend/app/.env
+      - ./backend/app/.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 

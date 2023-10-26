@@ -225,11 +225,15 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
+				// const profileId = 
 				const	newChannel = new Channel(raw.name);
-				newChannel.setClient(null, raw.profileId);
+				// newChannel.setClient(null, raw.profileId);
+				newChannel.setOwner(raw.owner);
+				newChannel.setFromDatabaseAdmins(raw.admins);
 				newChannel.setKind(raw.kind);
 				newChannel.setPassword(raw.password);
 				newChannel.setMode(raw.mode);
+				console.log("priofile ", raw.owner.profileId);
 				console.log(raw);
 			});
 		};

@@ -59,6 +59,7 @@ class User
         this.name = name;
 		this.client = client;
 		this.profileId = profileId;
+		// console.log("")
 		if (client === null)
 		{
 			// NEED TO SEE WHAT WE DO HERE
