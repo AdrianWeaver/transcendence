@@ -225,6 +225,7 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
+				console.log("here !");
 				const	newChannel = new Channel(raw.name);
 				newChannel.setOwner(raw.owner);
 				newChannel.setFromDatabaseAdmins(raw.admins);
@@ -247,7 +248,7 @@ class Chat
 			});
 			rawUsers.forEach((raw: any) =>
 			{
-				console.log("RAW", raw);
+				console.log("RAW !", raw);
 				const	newUser = new User(raw.name, raw.profileId);
 				newUser.id = raw.id;
 				newUser.blocked = raw.blocked;

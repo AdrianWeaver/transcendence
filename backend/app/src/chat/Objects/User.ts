@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
@@ -39,7 +40,8 @@ class User
 	public stats: StatsModel;
     // socket id
 	public id: string;
-    public channels: Channel[] = [];
+    // public channels: Channel[] = [];
+	public channels: string[] = [];
 	public blocked: MemberSocketIdModel[] = [];
 	public friends: FriendsModel[] = [];
 	public chat: Chat | undefined;
@@ -94,7 +96,14 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
-							this.channels.push(channel);
+							console.log("Hola");
+							const	index = this.channels.findIndex((elem) =>
+							{
+								return (elem === channel.id);
+							});
+							if (index === -1)
+								this.channels.push(channel.id);
+							console.log("Les channels du user", this.channels);
 						}
 					}
 				}
@@ -106,7 +115,7 @@ class User
 				return ;
 			if (this.chat)
 			{
-				for (const channel of this.channels)
+				for (const channel of this.chat.channels)
 				{
 					if (channel.name === chanName)
 					{
@@ -114,6 +123,12 @@ class User
 						this.client.leave(chanName);
 						if (channel.members === 0)
 							this.chat.deleteChannel(chanName);
+						const	index = this.channels.findIndex((elem) =>
+						{
+							return (elem === channel.id);
+						});
+						if (index !== -1)
+							this.channels.slice(index, 1);
 						break ;
 					}
 				}
@@ -133,6 +148,12 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
+							const	indexChan = this.channels.findIndex((elem) =>
+							{
+								return (elem === channel.id);
+							});
+							if (indexChan === -1)
+								this.channels.push(channel.id);
 						}
 					}
                 }
@@ -187,24 +208,16 @@ class User
 
 	public parseForDatabase()
 	{
-		const	channels: any[] = [];
-
-		this.channels.forEach((channel) =>
-		{
-			const	data = channel.parseForDatabase();
-			channels.push(data);
-		});
 		const	dbObject = {
-			channels: channels,
+			channels: [...this.channels],
 			name: this.name,
 			profile: this.profile,
 			stats: this.stats,
 			id: this.id,
-			blocked: this.blocked,
-			friends: this.friends,
+			blocked: [...this.blocked],
+			friends: [...this.friends],
 			profileId: this.profileId,
 		};
-		// const	retValue = JSON.stringify(serializedObject);
 		return (dbObject);
 	}
 }

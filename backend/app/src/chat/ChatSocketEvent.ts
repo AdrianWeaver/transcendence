@@ -349,7 +349,16 @@ export class ChatSocketEvents
 					{
 						const profileId = this.chatService.getProfileIdFromSocketId(client.id);
 						if (profileId === "undefined")
+						{
+							// NEED TO RETURN ?
 							console.error("Error profile chat socket  event");
+						}
+						const	searchUser = this.chatService.getUserWithProfileId(profileId);
+						if (searchUser === undefined)
+						{
+							// NEED TO RETURN ?
+							console.error("Error profile chat socket  event");
+						}
 						const	newChannel = new Channel(chanName);
 						newChannel.setClient(client, profileId);
 						newChannel.setKind(kind);
@@ -357,6 +366,7 @@ export class ChatSocketEvents
 						newChannel.setMode(data.payload.chanMode);
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
+						searchUser?.channels.push(newChannel.id);
 						// const userToChannel: MemberSocketIdModel = {
 						// 	memberSocketId: client.id,
 						// 	profileId: this.chatService.getProfileIdFromSocketId(client.id),

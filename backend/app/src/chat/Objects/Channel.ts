@@ -65,7 +65,6 @@ class Channel
 		this.members = 0;
 		this.chat = undefined;
 		this.members++;
-		// this.setId();
 		this.setId = () =>
 		{
 			if (this.id === "undefined" || this.id === undefined)

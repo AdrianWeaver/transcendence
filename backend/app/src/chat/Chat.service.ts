@@ -331,7 +331,8 @@ export	class ChatService implements OnModuleInit
 					rawobj.users.forEach((strobj: string) =>
 					{
 						const rawUser = JSON.parse(strobj);
-						const chanArray: Channel[] = [];
+						// const chanArray: Channel[] = [];
+						const chanArray: string[] = [];
 						rawUser.channels.forEach((chan: string) =>
 						{
 							const tmpChan = JSON.parse(chan);
@@ -340,7 +341,7 @@ export	class ChatService implements OnModuleInit
 								return (chanToFind.name === tmpChan.name);
 							});
 							if(searchChan !== undefined)
-								chanArray.push(searchChan);
+								chanArray.push(searchChan.id);
 						});
 						const searchUser = this.chat.users.find((element) =>
 						{
@@ -630,7 +631,7 @@ export	class ChatService implements OnModuleInit
 		{
 			const	searchConv = this.chat.users[userIndex].channels.find((element) =>
 			{
-				return (element.name === convId);
+				return (element === convId);
 			});
 			if (searchConv !== undefined)
 				return searchConv;
@@ -639,7 +640,7 @@ export	class ChatService implements OnModuleInit
 		{
 			const	searchConv = this.chat.users[userIndex1].channels.find((element) =>
 			{
-				return (element.name === convId);
+				return (element === convId);
 			});
 			if (searchConv !== undefined)
 				return searchConv;
