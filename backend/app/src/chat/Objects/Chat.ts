@@ -227,8 +227,9 @@ class Chat
 			{
 				console.log("here !!");
 				const	newChannel = new Channel(raw.name);
-				newChannel.setOwner(raw.owner);
-				newChannel.setFromDatabaseAdmins(raw.admins);
+				// newChannel.setClient(null, raw.owner.profileId);
+				newChannel.setOwner({...raw.owner});
+				newChannel.setFromDatabaseAdmins([...raw.admins]);
 				newChannel.setKind(raw.kind);
 				newChannel.setPassword(raw.password);
 				newChannel.setMode(raw.mode);
@@ -248,6 +249,7 @@ class Chat
 				newPrivateMessage.setMode(raw.mode);
 				console.log("profile private msg ", raw.owner.profileId);
 				console.log(raw);
+				this.privateMessage.push(newPrivateMessage);
 			});
 			rawUsers.forEach((raw: any) =>
 			{
@@ -260,7 +262,11 @@ class Chat
 				newUser.channels = raw.channels;
 				console.log("new user", newUser);
 				// console.log(raw);
+				this.users.push(newUser);
 			});
+			this.chanMap = [...rawObj.chanMap];
+			this.privateMessageMap = [...rawObj.privateMessageMap];
+			this.memberSocketIds = [...rawObj.memberSocketIds];
 		};
 	}
 }

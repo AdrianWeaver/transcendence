@@ -70,7 +70,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-7";
+	private readonly chatID = "id-chat-service-v-8";
 
 	constructor()
 	{
@@ -152,9 +152,10 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					// console.log(rawobj);
+					console.log("raw object from db", rawobj);
 					const	newChatInstance = new Chat();
 					newChatInstance.databaseToObject(rawobj);
+					this.chat = {...newChatInstance};
 					// console.log(rawobj);
 				}
 			})

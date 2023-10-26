@@ -475,7 +475,13 @@ export class ChatSocketEvents
 				};
 				if (searchChannel === undefined)
 					return ;
-
+				const	searchUser = this.chatService.getUserBySocketId(data.payload.id);
+				if (searchUser === undefined)
+				{
+					// NEED TO RETURN ?
+					console.error("Error profile chat socket  event 482", data.payload);
+				}
+				searchUser?.channels.push(searchChannel.id);
 				if (searchChannel.isMember(client.id) === true)
 					action.payload.message = "You are already in this channel";
 				if (searchChannel.mode === "private")
