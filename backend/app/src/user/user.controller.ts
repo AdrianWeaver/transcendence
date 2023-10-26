@@ -551,6 +551,7 @@ export class UserController
 			this.logger.error(error);
 			res.status(500).json({error: true});
 		}
+	}
 	@Post("change-infos")
 	@UseGuards(UserAuthorizationGuard)
 	ChangeUsername(
