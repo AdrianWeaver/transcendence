@@ -53,22 +53,30 @@ class User
 	public changeAvatar: (avatar: string) => void;
 	public changeSocket: (client: Socket) => void;
 	public isFriend: (socketId: string) => boolean;
+	public setClient: (clientSocket: Socket | null) => void;
+	public setId: (id: string) => void;
 
-    public constructor(name: string, client: Socket | null, profileId: string)
+    public constructor(name: string, profileId: string)
     {
         this.name = name;
-		this.client = client;
 		this.profileId = profileId;
-		// console.log("")
-		if (client === null)
+		this.chat = undefined;
+		this.setClient = (clientSocket: Socket | null) =>
 		{
-			// NEED TO SEE WHAT WE DO HERE
-			this.id = "to_implement";
-			this.client = null;
-		}
-		else
-			this.id = client.id;
-        this.chat = undefined;
+			if (clientSocket === null)
+			{
+				// NEED TO SEE WHAT WE DO HERE
+				this.id = "to_implement";
+				this.client = null;
+			}
+			else
+				this.id = clientSocket.id;
+		};
+		// TEST NOT SURE IF NECESSARY
+		this.setId = (id: string) =>
+		{
+			this.id = id;
+		};
 		this.joinChannel = (chanName: string) =>
 		{
 			if (this.client === null)

@@ -245,16 +245,18 @@ class Chat
 				console.log("profile private msg ", raw.owner.profileId);
 				console.log(raw);
 			});
-			// rawUsers.forEach((raw: any) =>
-			// {
-			// 	const	newUser = new 
-			// 	newUser.set
-			// 	newUser.set
-			// 	newUser.set
-			// 	newUser.set
-			// 	newUser.set
-			// 	console.log(raw);
-			// });
+			rawUsers.forEach((raw: any) =>
+			{
+				console.log("RAW", raw);
+				const	newUser = new User(raw.name, raw.profileId);
+				newUser.id = raw.id;
+				newUser.blocked = raw.blocked;
+				newUser.friends = raw.friends;
+				// TEST do we need to reconstruct all the channels here ?
+				newUser.channels = raw.channels;
+				console.log("new user", newUser);
+				// console.log(raw);
+			});
 		};
 	}
 }

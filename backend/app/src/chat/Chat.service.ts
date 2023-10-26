@@ -195,8 +195,9 @@ export	class ChatService implements OnModuleInit
 
 						const	newUserInstance = new User(
 							rawUser.name,
-							null,
 							rawUser.profileId);
+						// NEED TO KNOW WHAT TO DO WITH null SOCKET
+						newUserInstance.setClient(null);
 						newUserInstance.chat = this.chat;
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
