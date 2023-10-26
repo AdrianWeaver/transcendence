@@ -14,17 +14,13 @@ class	UserSecurity
 	public	phoneNumber: string;
 	public	doubleAuth: boolean;
 	public	checker: UserSecurityChecker;
-	public	valid: boolean;
 
 	public	constructor(data: FormData, user: UserModel)
 	{
 		this.data = data;
-		this.doubleAuth = user.doubleAuth;
 		this.phoneNumber = this.form("phoneNumber");
-		if (this.phoneNumber === undefined)
-			this.phoneNumber = "undefined";
+		this.doubleAuth = user.doubleAuth;
 		this.checker = new UserSecurityChecker();
-		this.valid = false;
 	}
 
 	public	check = () =>
@@ -34,7 +30,7 @@ class	UserSecurity
 
 	public	form = (field: string) =>
 	{
-		return (this.data.get(field) as any);
+		return (this.data.get(field) as string);
 	};
 
 	public	getPlainObject = () =>
@@ -43,7 +39,6 @@ class	UserSecurity
 		{
 			phoneNumber: this.phoneNumber,
 			doubleAuth: this.doubleAuth,
-			valid: this.valid
 		});
 	};
 }

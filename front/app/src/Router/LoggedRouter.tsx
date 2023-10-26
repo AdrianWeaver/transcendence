@@ -60,7 +60,8 @@ const	LoggedRouter = () =>
 				/>
 				<Route
 					path="/play-game"
-					element={<PlayGame />}
+					element={<TestBall />}
+					// element={<PlayGame />}
 				/>
 				<Route
 					path="/starter-pack"
@@ -68,12 +69,17 @@ const	LoggedRouter = () =>
 				/>
 
 				<Route
+					path="/signin"
+					element={<Navigate to="/"/>}
+				/>
+				<Route
 					path="/signup"
 					element={<Navigate to="/me/profile"/>}
 				/>
 				<Route
 					path="the-game"
-					element={<GameCanvas />}
+					element={<TestBall />}
+					// element={<GameCanvas />}
 				/>
 				<Route
 					path="game-setup"

@@ -1,3 +1,5 @@
+/* eslint-disable init-declarations */
+/* eslint-disable prefer-const */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable semi */
@@ -10,14 +12,17 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { CanvasModel, ChatUserModel, ControllerModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
+import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
+import UserRegistration from "../../Object/UserRegistration";
 type MessageModel =
 {
 	sender: string,
 	message: string,
-	mode: string
+	mode: string,
+	username: string,
 }
 
 export const	controllerActions = controllerSlice.actions;
@@ -171,6 +176,38 @@ export const	setCanvasSize = (size: CanvasModel)
 	});
 };
 
+export const	resetRegistration = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		if (prevState.controller.registration.startedRegister === true)
+			dispatch(controllerActions.resetRegistration());
+	});
+};
+
+export const	reinitialiseUser = (logout: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		if (prev.controller.user.bearerToken === "undefined")
+			return ;
+		if (logout)
+		{
+			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+			console.log("coucou");
+			dispatch(logOffUser());
+			dispatch(resetRegistration);
+		}
+		dispatch(controllerActions.reinitialiseUser());
+	});
+}
+
 export const	setAbortRequestedValue = (value: boolean)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -186,18 +223,6 @@ export const	setAbortRequestedValue = (value: boolean)
 			}
 		};
 		dispatch(controllerActions.setAbortRequestedValue(reponse));
-	});
-};
-
-export const	resetRegistration = ()
-	: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const	prevState = getState();
-
-		if (prevState.controller.registration.startedRegister === true)
-			dispatch(controllerActions.resetRegistration());
 	});
 };
 
@@ -324,17 +349,35 @@ export const setPseudo = (name: string)
 {
 	return ((dispatch, getState) =>
 	{
-		const prevState = getState();
+		const prev = getState();
+		const index = prev.controller.allUsers.findIndex((elem) =>
+		{
+			return (elem.id === prev.controller.user.id);
+		});
+		const updatedChatUsers = prev.controller.user.chat.users.map((user, i) =>
+		{
+			if (i === index)
+			{
+				return ({
+					...user,
+					username: name
+				});
+			}
+			else
+				return (user);
+		});
 		const response: ControllerModel = {
-			...prevState.controller,
+			...prev.controller,
 			user:
 			{
-				...prevState.controller.user,
+				...prev.controller.user,
 				username: name,
 				chat:
 				{
-					...prevState.controller.user.chat,
-					pseudo: name
+					...prev.controller.user.chat,
+					// ca ca n'a pas de sens xD TEST
+					pseudo: name,
+					users: updatedChatUsers
 				}
 			}
 		};
@@ -474,126 +517,6 @@ export const setNumberOfChannels = (numberOfChannels: number)
 	});
 };
 
-// export const setMessageRoom = (room: MessageRoomModel[], clientId: string)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex !== -1)
-// 			prevState.controller.user.chat.users[userIndex].msgRoom = room;
-// 		else
-// 			console.log("Id not found");
-// 		const response: ControllerModel = {
-// 			...prevState.controller,
-// 			user:
-// 			{
-// 				...prevState.controller.user,
-// 				chat:
-// 				{
-// 					...prevState.controller.user.chat,
-// 					users: prevState.controller.user.chat.users,
-// 				}
-// 			}
-// 		};
-// 		dispatch(controllerActions.setMessageRoom(response));
-// 	});
-// };
-
-// export const setMessage = (message: MessageModelInterface[], clientId: string, msgIndex: number)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex === -1)
-// 			console.log("Id not found");
-// 		else
-// 		{
-// 			const response: ControllerModel = {
-// 				...prevState.controller,
-// 				user:
-// 				{
-// 					...prevState.controller.user,
-// 					chat:
-// 					{
-// 						...prevState.controller.user.chat,
-// 						users: [
-// 						{
-// 							...prevState.controller.user.chat.users[userIndex],
-// 							msgRoom: [
-// 								{
-// 									...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-// 									content: message,
-// 								}
-// 							]
-// 						}
-// 						]
-// 					}
-// 				}
-// 			};
-// 			dispatch(controllerActions.setMessage(response));
-// 		}
-// 	});
-// };
-
-// export const addMessage = (clientId: string, msgIndex: number, text: string, index: number)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const prevState = getState();
-// 		console.log(prevState);
-// 		const	userIndex = prevState.controller.user.chat.users.findIndex((elem) =>
-// 		{
-// 			return (elem.id === clientId);
-// 		});
-// 		if (userIndex === -1)
-// 			console.log("Id not found");
-// 		else
-// 		{
-// 			const response: ControllerModel = {
-// 				...prevState.controller,
-// 				user:
-// 				{
-// 					...prevState.controller.user,
-// 					chat:
-// 					{
-// 						...prevState.controller.user.chat,
-// 						users: [
-// 						{
-// 							...prevState.controller.user.chat.users[userIndex],
-// 							// msgRoom: [
-// 							// 	{
-// 							// 		...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex],
-// 							// 		content: [
-// 							// 		{
-// 							// 			...prevState.controller.user.chat.users[userIndex].msgRoom[msgIndex].content[index],
-// 							// 			message: text
-// 							// 		}
-// 							// 		]
-// 							// 	}
-// 							// ]
-// 						}
-// 						]
-// 					}
-// 				}
-// 			};
-// 			dispatch(controllerActions.addMessage(response));
-// 		}
-// 	});
-// };
-
 export const setRegistrationProcessStart = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -660,8 +583,22 @@ export const	setUserData = (data: any)
 	{
 		const	prev = getState();
 
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
+
+		array.forEach((elem) =>
+		{
+			if (elem.id === data.id)
+			{
+				elem.id = data.id;
+				elem.email = data.email;
+				elem.firstName = data.firstName;
+				elem.lastName = data.lastName;
+				elem.username = data.login;
+			}
+		});
 		const	response: ControllerModel = {
 			...prev.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prev.controller.user,
@@ -683,8 +620,6 @@ export const verifyToken = ()
 	{
 		const prev = getState();
 
-		// console.log("Value of prevState");
-		// console.log(prev);
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
@@ -694,6 +629,7 @@ export const verifyToken = ()
 		{
 			dispatch(setRegistrationProcessError());
 			dispatch(resetRegistration);
+			dispatch(reinitialiseUser(false));
 			return ;
 		}
 
@@ -722,7 +658,8 @@ export const registerClientWithCode = (code : string)
 		}
 		dispatch(setRegistrationProcessStart())
 		// console.log("Code is equals to : ", code);
-		const	data: any = await UserServices.register(code, "localhost");
+		const	data: any = await UserServices.register(
+			code, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -730,8 +667,49 @@ export const registerClientWithCode = (code : string)
 		}
 		else
 		{
+			const	array: BackUserModel[] = [...prev.controller.allUsers];
+
+			array.forEach((elem) =>
+			{
+				if (elem.id === data.id)
+				{
+					elem.id = data.id;
+					elem.email = data.email;
+					elem.firstName = data.firstName;
+					elem.lastName = data.lastName;
+					elem.username = data.username;
+					elem.avatar = data.avatar;
+				}
+			});
+
+			const	arrayFront: UserModel[] = [...prev.controller.allFrontUsers];
+
+			arrayFront.forEach((elem) =>
+			{
+				if (elem.id === data.id)
+				{
+					elem.id= data.id,
+					elem.email= data.email,
+					// our token
+					elem.bearerToken = data.token,
+					elem.username = data.username,
+					elem.firstName = data.firstName,
+					elem.lastName = data.lastName,
+					elem.avatar = data.avatar,
+					elem.profile = {
+						editView: false,
+						friendView: false,
+						publicView: false,
+						myView: true
+					}
+				}
+			});
+
+
 			response = {
 				...prev.controller,
+				allUsers: [...array],
+				allFrontUsers: [...arrayFront],
 				user:
 				{
 					...prev.controller.user,
@@ -739,7 +717,7 @@ export const registerClientWithCode = (code : string)
 					email: data.email,
 					// our token
 					bearerToken: data.token,
-					username: data.login,
+					username: data.username,
 					firstName: data.firstName,
 					lastName: data.lastName,
 					avatar: data.avatar,
@@ -752,7 +730,6 @@ export const registerClientWithCode = (code : string)
 					}
 				}
 			}
-			console.log("controller action 745  ", data);
 		}
 		dispatch(controllerActions.registerClientWithCode(response));
 		// dispatch(controllerActions.verifyToken());
@@ -760,6 +737,137 @@ export const registerClientWithCode = (code : string)
 	});
 };
 
+export const registerNumberForDoubleAuth = (numero : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await
+			UserServices.getNumberForDoubleAuth(
+				numero, token, prev.server.serverLocation);
+		if (data === "ERROR")
+		{
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		else
+		{
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					phoneNumber: numero
+				}
+			}
+			console.log("controller action 791  ", data);
+		}
+		dispatch(controllerActions.registerNumberForDoubleAuth(response));
+		console.log("phone number enregistre");
+	});
+};
+
+export const receiveValidationCode = (numero : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await
+			UserServices.receiveValidationCodeFromTwilio(
+				numero, token, prev.server.serverLocation);
+		if (data === "ERROR")
+		{
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		else
+		{
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					phoneNumber: numero
+				}
+			}
+			console.log("controller action 791  ", data);
+		}
+		dispatch(controllerActions.receiveValidationCode(response));
+		console.log("phone number enregistre");
+	});
+};
+
+export const GetValidationCode = (otpCode : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+		console.log("TEST ");
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await UserServices.getValidationCodeFromTwilio(
+			prev.controller.user.phoneNumber, otpCode, token, prev.server.serverLocation);
+		if (data === "error")
+		{
+			console.log("TEST error");
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		else
+		{
+			console.log("TEST data validated cde", data.data);
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					otpCode: otpCode,
+					codeValidated: data.data
+				}
+			}
+			console.log("controller action 791  ", data.data);
+		}
+		dispatch(controllerActions.getValidationCode(response));
+		console.log("code enregistre");
+	});
+};
+
+export const	setCodeValidated = (data: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				codeValidated: data,
+			}
+		}
+		dispatch(controllerActions.setCodeValidated(response));
+	});
+}
 
 export const	setDoubleAuth = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -767,7 +875,6 @@ export const	setDoubleAuth = (data: boolean)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -786,7 +893,6 @@ export const	setPhoneNumber = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -805,7 +911,6 @@ export const	setRegistered = (data: boolean)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -818,62 +923,22 @@ export const	setRegistered = (data: boolean)
 	});
 }
 
-export const	reinitialiseUser = ()
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const	prev = getState();
-
-		const	response: ControllerModel = {
-			...prev.controller,
-			registration:
-			{
-				startedRegister: false,
-				step: 0,
-				codeOauthFT: "undefined",
-				abortRequested: false,
-				requestHomeLink: false
-			},
-			user:
-			{
-				...prev.controller.user,
-				isLoggedIn: false,
-				id: -1,
-				rememberMe: false,
-				email: "undefined",
-				bearerToken: "undefined",
-				firstName: "undefined",
-				lastName: "undefined",
-				username: "undefined",
-				login: "undefined",
-				registrationProcess: false,
-				registrationError: "undefined",
-				doubleAuth: false,
-				phoneNumber: "undefined",
-				registered: false,
-				avatar: "https://thispersondoesnotexist.com/",
-				password: "undefined",
-				chat:
-				{
-					...prev.controller.user.chat,
-					pseudo: "undefined"
-				}
-			}
-		}
-		dispatch(controllerActions.reinitialiseUser(response));
-	});
-}
-
 export const	setAvatar = (data: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
 
+		array.forEach((elem) =>
+		{
+			if (elem.id === prev.controller.user.id)
+				elem.avatar = data;
+		});
 		const	response: ControllerModel = {
 			...prev.controller,
+			allUsers: [...array],
 			user:
 			{
 				...prev.controller.user,
@@ -990,7 +1055,6 @@ export const	setPassword = (password: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1009,14 +1073,14 @@ export const	setEmail = (email: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	response: ControllerModel = {
 			...prev.controller,
+			// allUsers: updatedUsers,
 			user:
 			{
 				...prev.controller.user,
 				email: email
-			}
+			},
 		}
 		dispatch(controllerActions.setEmail(response));
 	});
@@ -1038,5 +1102,180 @@ export const	setLogin = (login: string)
 			}
 		}
 		dispatch(controllerActions.setLogin(response));
+	});
+}
+
+export const	setAllUsers = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	theUsers: any = await UserServices.getAllTheUsers(prev.server.serverLocation);
+
+		if (theUsers === "error")
+		{
+			console.error("Error to get users");
+			return ;
+		}
+		console.log("here theUsers", theUsers);
+		const array: BackUserModel[] = theUsers;
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: [...array]
+		}
+		dispatch(controllerActions.setAllUsers(response));
+	});
+}
+
+export const	registerInfosInBack = (info: string, field: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.serverLocation)
+		.then(() =>
+		{
+			console.log("okay");
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+		if (field === "username")
+			dispatch(setPseudo(info));
+		else if (field === "email")
+			dispatch(setEmail(info));
+		else if (field === "phoneNumber")
+			dispatch(setPhoneNumber(info));
+		dispatch(setAllUsers());
+	});
+}
+
+export const	hashPassword = (password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.hashPassword(prev.controller.user.bearerToken,
+			password, prev.server.serverLocation)
+		.then((data) =>
+		{
+			console.log("okay", data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+	});
+}
+
+export const	setNewToken = (newToken: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel =	{
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				bearerToken: newToken
+			}
+		}
+		dispatch(controllerActions.setNewToken(response));
+	});
+}
+
+export const	decodePassword = (id: any, password: string, email: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		try
+		{
+			const	data = await UserServices.decodePassword(
+				prev.controller.user.bearerToken,
+				password, id, email,
+				prev.server.serverLocation
+			);
+			console.log("data: ", data);
+			const	newUser = {...prev.controller.allFrontUsers[data.index]};
+
+			newUser.bearerToken = data.token;
+			newUser.isLoggedIn = true;
+
+			const	response: ControllerModel =	{
+				...prev.controller,
+				user: newUser
+			}
+			dispatch(controllerActions.setNewToken(response));
+		}
+		catch (error)
+		{
+			dispatch(controllerActions.setNewToken({...prev.controller}))
+			console.log(error);
+			return ;
+		}
+		// .then((data) =>
+		// {
+		// 	console.log("okay", data);
+		// 	dispatch(setNewToken(data.ret.token));
+		// 	dispatch(setUserLoggedIn());
+		// })
+		// .catch((error) =>
+		// {
+		// 	console.error("error", error);
+		// });
+	});
+}
+
+export const	addUserAsFriend = (friendId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
+			friendId, prev.server.serverLocation)
+		.then((data) =>
+		{
+			console.log("okay", data);
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+		// dispatch update friends that we dont have yet
+	});
+}
+
+export const	addUser = (user: UserModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	array = [...prev.controller.allFrontUsers];
+		const	index = array.findIndex((elem) =>
+		{
+			return (elem.id === user.id);
+		});
+		if (index === -1)
+			array.push(user);
+		else
+			array[index] = user;
+		const	response: ControllerModel = {
+			...prev.controller,
+			allFrontUsers: array
+		}
+		dispatch(controllerActions.addUser(response));
 	});
 }

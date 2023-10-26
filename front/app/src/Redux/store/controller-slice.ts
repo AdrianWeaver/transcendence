@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 
@@ -7,12 +8,14 @@ import
 	PayloadAction
 }	from "@reduxjs/toolkit";
 import	{ ControllerModel } from "../models/redux-models";
-import	{ NIL as NILUUID } from "uuid";
+// import	{ NIL as NILUUID } from "uuid";
 
 const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "light",
 	previousPage: "/",
+	allUsers: [],
+	allFrontUsers: [],
 	user:
 	{
 		isLoggedIn: false,
@@ -21,10 +24,10 @@ const	initialControllerState: ControllerModel = {
 			link: "https://thispersondoesnotexist.com/",
 			version:
 			{
-				large: "https://thispersondoesnotexist.com/",
-				medium: "https://thispersondoesnotexist.com/",
-				small: "https://thispersondoesnotexist.com/",
-				mini: "https://thispersondoesnotexist.com/"
+				large: "undefined",
+				medium: "undefined",
+				small: "undefined",
+				mini: "undefined"
 			}
 		},
 		avatar: "https://thispersondoesnotexist.com/",
@@ -39,6 +42,8 @@ const	initialControllerState: ControllerModel = {
 		bearerToken: "undefined",
 		rememberMe: false,
 		doubleAuth: false,
+		codeValidated: false,
+		otpCode: "undefined",
 		phoneNumber: "undefined",
 		registered: false,
 		chat:
@@ -64,6 +69,7 @@ const	initialControllerState: ControllerModel = {
 			currentChannel: "undefined",
 			chanMessages: [
 				{
+					username: "undefined",
 					sender: "undefined",
 					message: "undefined",
 					mode: "undefined",
@@ -75,16 +81,17 @@ const	initialControllerState: ControllerModel = {
 		profile: {
 			editView: false,
 			friendView: false,
-			publicView: false,
-			myView: true
+			publicView: true,
+			myView: false
 		},
-		password: "undefined"
+		password: "undefined",
+		location: "undefined"
 	},
 	registration:
 	{
 		startedRegister: false,
 		step: 0,
-		codeOauthFT: "unsetted",
+		codeOauthFT: "undefined",
 		abortRequested: false,
 		requestHomeLink: false
 	},
@@ -93,7 +100,6 @@ const	initialControllerState: ControllerModel = {
 		height: window.innerHeight,
 		width: window.innerWidth
 	},
-
 };
 
 const	controllerSlice = createSlice(
@@ -173,6 +179,8 @@ const	controllerSlice = createSlice(
 		{
 			state.user.username = action.payload.user.username;
 			state.user.chat.pseudo = action.payload.user.chat.pseudo;
+			state.user.chat.users = action.payload.user.chat.users;
+			state.allUsers = action.payload.allUsers;
 		},
 		setChatConnected(state, action: PayloadAction<ControllerModel>)
 		{
@@ -198,51 +206,6 @@ const	controllerSlice = createSlice(
 		{
 			state.user.chat.numberOfChannels = action.payload.user.chat.numberOfChannels;
 		},
-		// setMessageRoom(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		state.user.chat.users[i].msgRoom = action.payload.user.chat.users[i].msgRoom;
-		// 		i++;
-		// 	}
-		// },
-		// setMessage(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-		// 	let	j;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		j = 0;
-		// 		while (state.user.chat.users[i].msgRoom.length - 1)
-		// 		{
-		// 			state.user.chat.users[i].msgRoom[j] = action.payload.user.chat.users[i].msgRoom[j];
-		// 			j++;
-		// 		}
-		// 		i++;
-		// 	}
-		// },
-		// addMessage(state, action: PayloadAction<ControllerModel>)
-		// {
-		// 	let	i;
-		// 	let	j;
-
-		// 	i = 0;
-		// 	while (state.user.chat.users.length - 1)
-		// 	{
-		// 		j = 0;
-		// 		while (state.user.chat.users[i].msgRoom.length - 1)
-		// 		{
-		// 			state.user.chat.users[i].msgRoom[j].content = action.payload.user.chat.users[i].msgRoom[j].content;
-		// 			j++;
-		// 		}
-		// 		i++;
-		// 	}
-		// },
 		setUserData(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.id = action.payload.user.id;
@@ -250,16 +213,37 @@ const	controllerSlice = createSlice(
 			state.user.bearerToken = action.payload.user.bearerToken;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
+			state.allUsers = action.payload.allUsers;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.login = action.payload.user.username;
 			state.user.username = action.payload.user.username;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
 			state.user.avatar = action.payload.user.avatar;
+			state.allUsers = action.payload.allUsers;
+		},
+		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+		},
+		receiveValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+		},
+		getValidationCode(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.otpCode = action.payload.user.otpCode;
+			state.user.codeValidated = action.payload.user.codeValidated;
+		},
+		setCodeValidated(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setRegistrationProcessStart(state, action: PayloadAction<ControllerModel>)
 		{
@@ -291,34 +275,38 @@ const	controllerSlice = createSlice(
 		{
 			state.user.registered = action.payload.user.registered;
 		},
-		reinitialiseUser(state, action: PayloadAction<ControllerModel>)
+		reinitialiseUser(state)
+		// , action: PayloadAction<ControllerModel>)
 		{
-			state.registration.startedRegister = action.payload.registration.startedRegister;
-			state.registration.codeOauthFT = action.payload.registration.codeOauthFT;
-			state.registration.abortRequested = action.payload.registration.abortRequested;
-			state.registration.requestHomeLink = action.payload.registration.requestHomeLink;
-			state.registration.step = action.payload.registration.step;
-			state.user.bearerToken = action.payload.user.bearerToken;
-			state.user.doubleAuth = action.payload.user.doubleAuth;
-			state.user.email = action.payload.user.email;
-			state.user.firstName = action.payload.user.firstName;
-			state.user.lastName = action.payload.user.lastName;
-			state.user.id = action.payload.user.id;
-			state.user.isLoggedIn = action.payload.user.isLoggedIn;
-			state.user.phoneNumber = action.payload.user.phoneNumber;
-			state.user.registered = action.payload.user.registered;
-			state.user.username = action.payload.user.username;
-			state.user.registrationProcess = action.payload.user.registrationProcess;
-			state.user.registrationError = action.payload.user.registrationError;
-			state.user.rememberMe = action.payload.user.rememberMe;
-			state.user.avatar = action.payload.user.avatar;
-			state.user.chat.pseudo = action.payload.user.chat.pseudo;
-			state.user.password = action.payload.user.password;
+			state.registration = initialControllerState.registration;
+			state.user = initialControllerState.user;
+			// state.user.login = action.payload.user.login;
+			// state.user.bearerToken = action.payload.user.bearerToken;
+			// state.user.doubleAuth = action.payload.user.doubleAuth;
+			// state.user.email = action.payload.user.email;
+			// state.user.firstName = action.payload.user.firstName;
+			// state.user.lastName = action.payload.user.lastName;
+			// state.user.id = action.payload.user.id;
+			// state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			// state.user.phoneNumber = action.payload.user.phoneNumber;
+			// state.user.registered = action.payload.user.registered;
+			// state.user.username = action.payload.user.username;
+			// state.user.registrationProcess = action.payload.user.registrationProcess;
+			// state.user.registrationError = action.payload.user.registrationError;
+			// state.user.rememberMe = action.payload.user.rememberMe;
+			// state.user.avatar = action.payload.user.avatar;
+			// state.user.chat.pseudo = action.payload.user.chat.pseudo;
+			// state.user.password = action.payload.user.password;
+			// state.user.profile = action.payload.user.profile;
+			// state.user.ftAvatar = action.payload.user.ftAvatar;
+			// state.user.otpCode = action.payload.user.otpCode;
+			// state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.avatar = action.payload.user.avatar;
 			state.user.ftAvatar = action.payload.user.ftAvatar;
+			state.allUsers = action.payload.allUsers;
 		},
 		setProfileEditView(state, action: PayloadAction<ControllerModel>)
 		{
@@ -355,10 +343,39 @@ const	controllerSlice = createSlice(
 		setEmail(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.email = action.payload.user.email;
+			state.allUsers = action.payload.allUsers;
 		},
 		setLogin(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.login = action.payload.user.login;
+		},
+		setAllUsers(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		},
+		registerInfosInBack(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allUsers = action.payload.allUsers;
+		},
+		setNewToken(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			state.user.login = action.payload.user.login;
+			state.user.username = action.payload.user.username;
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.registered = action.payload.user.registered;
+			state.user.avatar = action.payload.user.avatar;
+			state.user.ftAvatar = action.payload.user.ftAvatar;
+			state.user.password = action.payload.user.password;
+		},
+		addUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.allFrontUsers = action.payload.allFrontUsers;
 		},
 	}
 });

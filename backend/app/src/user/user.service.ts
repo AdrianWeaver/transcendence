@@ -1,4 +1,7 @@
 /* eslint-disable curly */
+/* eslint-disable no-label-var */
+/* eslint-disable no-unused-labels */
+/* eslint-disable prefer-const */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -8,11 +11,13 @@ import
 	ForbiddenException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	NotFoundException
 } from "@nestjs/common";
 import
 {
 	AdminResponseModel,
+	BackUserModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -41,6 +46,9 @@ export type PictureConfigModel = {
 	tmpFolder: string;
 	size: number[];
 }
+import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
+import * as bcrypt from "bcrypt";
+import { RegisterStepOneDto } from "./user.controller";
 
 @Injectable()
 export class UserService
@@ -114,6 +122,11 @@ export class UserService
 		});
 	}
 
+	public getAllUserRaw () : Array<UserModel>
+	{
+		return (this.user);
+	}
+
 	public	getUuidInstance(): string
 	{
 		return (this.uuidInstance);
@@ -122,6 +135,28 @@ export class UserService
 	public	getUserArray(): Array<UserModel>
 	{
 		return (this.user);
+	}
+
+	public	getBackUserModelArray(): BackUserModel[]
+	{
+		const	users: BackUserModel[] = [];
+		let i: number;
+
+		i = 0;
+		const	searchUser = this.user.find((elem) =>
+		{
+			users[i] = {
+				id: elem.id,
+				email: elem.email,
+				username: elem.username,
+				firstName: elem.firstName,
+				lastName: elem.lastName,
+				avatar: elem.avatar,
+				location: elem.location,
+			};
+			i++;
+		});
+		return (users);
 	}
 
 	public	getAdminArray(): AdminResponseModel
@@ -482,7 +517,8 @@ export class UserService
 			if (index !== -1)
 				this.user.splice(index, 1);
 		}
-		const newUser: UserModel = {
+		// const	secretToken = randomBytes(64).toString("hex");
+		const newUser : UserModel= {
 			registrationProcessEnded: false,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
@@ -520,7 +556,9 @@ export class UserService
 					validationCode: data.authService.doubleAuth.validationCode,
 					valid: data.authService.doubleAuth.valid,
 				}
-			}
+			},
+			password: data.password
+			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
@@ -601,6 +639,29 @@ export class UserService
 		user.revokedConnectionRequest = true;
 	}
 
+	public	getUserExpById(id: any)
+	: number
+	{
+		const searchUser = this.user.find((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchUser === undefined)
+			return (-1);
+		return (searchUser.authService.expAt);
+	}
+
+	public	revokeUserTokenExpById(id: any)
+	{
+		const searchIndex = this.user.findIndex((user) =>
+		{
+			return (id.toString() === user.id.toString());
+		});
+		if (searchIndex === -1)
+			return ;
+		this.user[searchIndex].authService.expAt = Date.now();
+	}
+
 	public	getUserById(id: any)
 		: UserModel | undefined
 	{
@@ -650,5 +711,191 @@ export class UserService
 				username: searchUser.username
 			};
 		return (myInfo);
+	}
+
+	public	registerPhoneNumber(numero: string, id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.enable = true;
+			searchUser.authService.doubleAuth.phoneNumber = numero;
+			searchUser.authService.doubleAuth.phoneRegistered = true;
+		}
+		return("ok");
+	}
+
+	public	getUsernameByProfileId(profileId: string)
+	{
+		const searchUser = this.user.find((element) =>
+		{
+			return (element.id === profileId);
+		});
+		console.error(searchUser);
+		return (searchUser?.username);
+	}
+
+	public	getPhoneNumber(id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+			return (searchUser.authService.doubleAuth.phoneNumber);
+		return("undefined");
+	}
+
+	public	codeValidated(code: string, id: string, valid: boolean)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			searchUser.authService.doubleAuth.validationCode = code;
+			searchUser.authService.doubleAuth.valid = valid;
+			searchUser.registrationProcessEnded = valid;
+		}
+		return (valid);
+	}
+
+	async	hashPassword(password: string, id: number)
+	{
+		const	saltRounds = 10;
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (id === elem.id);
+		});
+		const	hashed = await bcrypt.hash(password, saltRounds);
+		if (hashed)
+			this.user[index].password = hashed;
+		// .then((hash) =>
+		// {
+		// 	this.user[index].password = hash;
+		// 	return (hash);
+		// })
+		// .catch((err) =>
+		// {
+		// 	console.log(err);
+		// 	return ("ERROR");
+		// });
+		console.log("le test ", hashed);
+		return (hashed);
+	}
+
+	async	decodePassword(password: string, id: any, email: any)
+	{
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (elem.id.toString() === id.toString() && elem.email === email);
+		});
+		if (index === -1)
+			return ("ERROR");
+		console.log(password, " ", this.user[index].password);
+		const	valid = await bcrypt.compare(password, this.user[index].password)
+		.then(() =>
+		{
+			const ret =	{
+				token: "Bearer " + jwt.sign(
+				{
+					id: id,
+					email: email
+				},
+				this.getSecret(),
+				{
+					expiresIn: "1d"
+				}),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				index: index
+			};
+			if (ret === undefined)
+				return ("ERROR");
+			return (ret);
+		})
+		.catch((err) =>
+		{
+			console.log(err);
+			return ("ERROR");
+		});
+		return (valid);
+	}
+
+	public	changeInfos(data: any, id: string)
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUser !== undefined)
+		{
+			if (data.info?.length)
+				if (data.field === "username" && data.info !== searchUser.username)
+					searchUser.username = data.info;
+				else if (data.field === "email" && data.info !== searchUser.email)
+					searchUser.email = data.info;
+				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
+					searchUser.authService.doubleAuth.phoneNumber = data.info;
+				else if (data.field === "password")
+					this.decodePassword(data.info, id, searchUser.email);
+
+			console.log(searchUser);
+			return ("okay");
+		}
+		return ("user doesnt exist");
+	}
+	public	addUserAsFriend(friendId: string, id: string)
+	{
+		const	searchFriend = this.user.find((elem) =>
+		{
+			return (elem.id === friendId);
+		});
+		const	searchUserIndex = this.user.findIndex((elem) =>
+		{
+			return (elem.id === id);
+		});
+		if (searchUserIndex !== -1)
+			return ("User doesnt exist");
+		if (searchFriend === undefined)
+			return ("This new friend doesnt exist");
+		// this.user[searchUserIndex].friends.push(searchFriend);
+		return (searchFriend.username + " added as friend");
+	}
+
+	public getNumberOfUserWithUsername(username : string)
+		: number
+	{
+		this.logger.debug("username: " + username);
+		// this.logger.error("NOT an error");
+		// console.log("here is data ", this.user);
+		// this.logger.error("NOT an error");
+		const count = this.user.filter((obj) =>
+		{
+			return (obj.username === username);
+		}).length;
+		// console.log("count array : ", count);
+		return (
+			count
+		);
+	}
+
+	public	async updateUser(userId: number, body: RegisterStepOneDto)
+		: Promise<string>
+	{
+		const index = this.user.findIndex((user) =>
+		{
+			return (userId === user.id);
+		});
+		if (index === -1)
+			return ("ERROR");
+		this.user[index].username = body.username;
+		await this.hashPassword(body.password, this.user[index].id);
+		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
+			return ("ERROR");
+		return ("okay");
 	}
 }

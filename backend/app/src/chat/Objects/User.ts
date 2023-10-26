@@ -9,7 +9,8 @@ import { type } from "os";
 
 type	FriendsModel = {
 	id: number,
-	name: string
+	name: string,
+	profileId: string
 };
 
 type	ProfileModel = {
@@ -25,6 +26,11 @@ type	StatsModel = {
 	victories: number,
 	perfect: number
 };
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
 class User
 {
 	public profileId: string;
@@ -34,7 +40,7 @@ class User
     // socket id
 	public id: string;
     public channels: Channel[] = [];
-	public blocked: string[] = [];
+	public blocked: MemberSocketIdModel[] = [];
 	public friends: FriendsModel[] = [];
 	public chat: Chat | undefined;
 	// this one must be initialisez when reconstructed or when reconnected with id 
@@ -45,6 +51,8 @@ class User
 	public createProfile: (pseudo: string, data: any) => void;
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
+	public changeSocket: (client: Socket) => void;
+	public isFriend: (socketId: string) => boolean;
 
     public constructor(name: string, client: Socket | null, profileId: string)
     {
@@ -59,7 +67,6 @@ class User
 		else
 			this.id = client.id;
         this.chat = undefined;
-		this.profileId = "undefined yet";
 		this.joinChannel = (chanName: string) =>
 		{
 			if (this.client === null)
@@ -145,6 +152,24 @@ class User
 		this.changeAvatar = (avatar: string) =>
 		{
 			this.profile.avatar = avatar;
+		};
+
+		this.changeSocket = (client: Socket) =>
+		{
+			this.client = client;
+			this.id = client.id;
+		};
+
+		this.isFriend = (profileId: string) =>
+		{
+			let toReturn: boolean;
+			toReturn = false;
+			this.friends.forEach((friend) =>
+			{
+				if (friend.profileId === profileId)
+					toReturn = true;
+			});
+			return (toReturn);
 		};
     }
 

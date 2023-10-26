@@ -1,4 +1,8 @@
 /* eslint-disable curly */
+/* eslint-disable no-dupe-class-members */
+/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable init-declarations */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
@@ -7,21 +11,43 @@
 
 import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, isNotEmpty, } from "class-validator";
-import { Response } from "express";
+import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
+import { Request, Response } from "express";
 import	Api from "../Api";
+import	ApiTwilio from "../Api-twilio";
 
-import { ApplicationUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
-// import { FileInterceptor } from "@nestjs/platform-express";
 import * as busboy from "busboy";
 import * as fs from "fs";
 import * as sharp from "sharp";
 import internal from "stream";
 import { AccountPage } from "twilio/lib/rest/api/v2010/account";
 import FileConfig from "./Object/FileConfig";
+import * as readline from "readline";
+import * as twilio from "twilio";
 
+export class	RegisterStepOneDto
+{
+	@IsEmail()
+	@IsNotEmpty()
+	emailAddress: string;
+
+	// minmax
+	@IsNotEmpty()
+	firstName: string;
+	@IsNotEmpty()
+	lastName: string;
+	@IsNotEmpty()
+	password: string;
+	@IsNotEmpty()
+	passwordConfirm: string;
+	@IsNotEmpty()
+	uniquenessPassword: "AgreeWithUniquenessOfPassword";
+	@IsNotEmpty()
+	username: string;
+}
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -35,15 +61,26 @@ class	RegisterDto
 	// email: string;
 }
 
+class	UserDoubleAuthDto
+{
+	// @IsNumberString()
+	@IsNotEmpty()
+	numero: string;
+
+	// id or token ?
+	// @IsNotEmpty()
+	// id: any;
+}
 class UserLoginDto
 {
 	@IsNotEmpty()
 	id: any;
-
+	// getUserRegiste
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;
 }
+
 
 class UserUploadPhotoDto
 {
@@ -51,11 +88,21 @@ class UserUploadPhotoDto
 	image: any;
 }
 
+
+class	TwilioResponseDto
+{
+	@IsNotEmpty()
+	// numero format +33
+	To: string;
+	// Channel = sms
+	Channel: string;
+}
+
 @Controller("user")
 export class UserController
 {
 	private	readonly logger;
-	private	env;
+	private	readonly env;
 
 	constructor(private readonly userService: UserService)
 	{
@@ -64,12 +111,62 @@ export class UserController
 		this.env = dotenv.config();
 	}
 
+	// to delete
+	@Get("all-user-Raw")
+	getAllUsersRaw()
+	{
+		return (this.userService.getAllUserRaw());
+	}
+
+	@Post("register/step-one")
+	@UseGuards(UserAuthorizationGuard)
+	async getUserRegisterStepOne(
+		@Body() body: RegisterStepOneDto,
+		@Req() req: any,
+		@Res() res: Response)
+	{
+		this.logger.verbose("Next information is the previous user");
+		console.log(req.user);
+
+		const	unauthorized = (errCode: number, info: string) =>
+		{
+			res.status(errCode).json(
+				{
+					message: "Unauthorized",
+					info: info,
+					error: true
+				});
+		};
+		this.logger.verbose("Next information is the updated user");
+		// console.log(body);
+		if (body.password !== body.passwordConfirm)
+			return (unauthorized(401, "You are an hacker go off"), void(0));
+		this.logger.verbose("password okay and are the same");
+		const count = this.userService
+			.getNumberOfUserWithUsername(body.username);
+		if (count > 1)
+			return (unauthorized(401, "Username already taken"), void(0));
+		this.logger.verbose("username count okay");
+		const user = req.user;
+		console.log(user, " ", body);
+		if (body.emailAddress !== user.email
+			|| body.firstName !== user.firstName
+			|| body.lastName !== user.lastName)
+			return (unauthorized(401, "You are an hacker go off"), void(0));
+		this.logger.verbose("verification okay");
+		this.logger.debug("Number of user with this username: " + count);
+		const	update = await this.userService.updateUser(user.id, body);
+		if (update === "ERROR")
+			return (unauthorized(500, "try again later"), void(0));
+		return (res.status(200).json({message: "okay"}), void(0));
+	}
+
 	@Post("register")
 	getUserRegister(
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
-		this.logger.log("A User want to register");
+		this.logger.error("NOT AN ERROR :: A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -134,7 +231,9 @@ export class UserController
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
+
 						username: data.login,
+
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,
@@ -156,7 +255,8 @@ export class UserController
 								validationCode: "undefined",
 								valid: false,
 							}
-						}
+						},
+						password: "undefined"
 					};
 					this.logger.error("NOT AN ERROR: Starting processing image");
 					const newUserObj = await this.userService.downloadAvatar(userObject);
@@ -194,6 +294,18 @@ export class UserController
 		return (this.userService.getUserArray());
 	}
 
+	/**
+	 * @returns the list of user filtered
+	 */
+	@Get("get-all-users")
+	getAllUsers()
+		: BackUserModel[]
+	{
+		console.log("request back users model data");
+		console.log(this.userService.getBackUserModelArray());
+		return (this.userService.getBackUserModelArray());
+	}
+
 	@Post("login")
 	userLogin(
 		@Body() body: UserLoginDto)
@@ -210,7 +322,6 @@ export class UserController
 	verifyToken(@Req() headers: any)
 		: UserVerifyTokenResModel
 	{
-		console.log(headers.authorization);
 		this.logger
 			.log("'verify-token' route request");
 		const	response: UserVerifyTokenResModel = {
@@ -221,11 +332,128 @@ export class UserController
 	}
 
 	@Get("my-info")
-	getMyInfo()
+	@UseGuards(UserAuthorizationGuard)
+	getMyInfo(@Req() req: any)
 		: UserPublicResponseModel
 	{
 		// NEED TO FIND A WAY TO KNOW THE USER ID
-		return (this.userService.getMyInfo(97756));
+		return (this.userService.getMyInfo(req.user.id));
+	}
+
+	@Post("double-auth")
+	@UseGuards(UserAuthorizationGuard)
+	GetTheNumber(
+		@Body() data: UserDoubleAuthDto,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'double-auth' route request");
+		return (this.userService.registerPhoneNumber(data.numero, req.user.id));
+	}
+
+	@Post("double-auth-twilio")
+	@UseGuards(UserAuthorizationGuard)
+	DoubleAuthSendSMS(
+		@Body() body: any,
+		@Req() req: any
+	)
+	{
+		console.log("body ", body);
+		console.log("req ", req.user);
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		// const	number = this.userService.getPhoneNumber(req.user.id);
+		// if (number === undefined)
+		// 	throw new InternalServerErrorException();
+		if (body.numero === "undefined" || !body.numero)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		client.verify.v2
+		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+		.verifications.create({
+			to: body.numero,
+			channel: "sms" })
+		.then((verification) =>
+		{
+			console.log(verification.status);
+		})
+		.catch((error) =>
+		{
+			console.error("Boo", error);
+		})
+		.finally(() =>
+		{
+			console.log("sms sent");
+		});
+	}
+
+	@Post("get-code")
+	@UseGuards(UserAuthorizationGuard)
+	GetValidationCode(
+		@Body() body: any,
+		@Req() req: any,
+		@Res() res: Response
+	)
+	{
+		console.log("body ", body);
+		console.log("opt-code", body.otpCode);
+		if (body.otpCode === undefined)
+			throw new UnauthorizedException();
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		const	number = body.to;
+		if (number === "undefined" || number === undefined)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		// const readLine = readline.createInterface({
+				// input: process.stdin,
+				// output: process.stdout,
+			// });
+		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
+		if (verify === undefined)
+			throw new InternalServerErrorException();
+		// readLine.question("Please enter the OTP:", (otpCode: string) =>
+		// {
+		client.verify.v2
+			.services(verify)
+			.verificationChecks.create(
+				{
+					to: number,
+					code: body.otpCode
+				})
+			.then((verificationCheck) =>
+			{
+				console.log("status : ", verificationCheck.status);
+				console.log("VERIF : ", verificationCheck);
+				if (verificationCheck.status === "approved")
+				{
+					res.send(true);
+					return (this.userService.codeValidated(body.otpCode, req.user.id, true));
+				}
+				else
+					throw new UnauthorizedException();
+			})
+			.catch((err) =>
+			{
+				console.log("err");
+				throw new InternalServerErrorException();
+			});
+		// });
 	}
 
 	@Post("/update-photo")
@@ -323,5 +551,63 @@ export class UserController
 			this.logger.error(error);
 			res.status(500).json({error: true});
 		}
+	@Post("change-infos")
+	@UseGuards(UserAuthorizationGuard)
+	ChangeUsername(
+		@Body() data: any,
+		@Req() req: any)
+		: string
+	{
+		this.logger
+			.log("'change-infos' route request");
+		// console.log("data ", data);
+		return (this.userService.changeInfos(data, req.user.id));
+	}
+
+	@Post("revoke-token")
+	@UseGuards(UserAuthorizationGuard)
+	RevokeToken(@Req() req: any)
+	{
+		this.userService.revokeTokenById(req.user.id);
+		return ("token revoked");
+	}
+
+	@Post("hash-password")
+	@UseGuards(UserAuthorizationGuard)
+	HashPassword(
+		@Body() body: any,
+		@Req() req: any)
+	: string
+	{
+		this.logger
+			.log("'hash-password' route requested");
+		this.userService.hashPassword(body.password, body.id);
+		return ("okay");
+	}
+
+	@Post("decode-password")
+	async DecodePassword(
+		@Body() body: any)
+	: Promise<any>
+	{
+		this.logger
+			.log("'decode-password' route requested");
+		const	ret = await this.userService.decodePassword(body.password, body.id, body.email);
+		console.log(ret);
+		if (!ret)
+			return ("error");
+		return (ret);
+	}
+
+
+	@Post("add-friend")
+	@UseGuards(UserAuthorizationGuard)
+	AddFriend(
+		@Body() body: any,
+		@Req() req: any)
+	{
+		this.logger
+			.log("'add-friend' route requested");
+		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
 }

@@ -29,6 +29,7 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 	[
 		AdminsModule,
 		ChatModule,
+		GameSocketModule,
 		AnonymousUserModule,
 		UserModule,
 		ServeStaticModule

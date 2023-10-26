@@ -12,11 +12,31 @@ export interface ApplicationUserModel
 export interface UserPublicResponseModel
 {
 	id: any;
+	// phoneNumber: string;
 	email: string;
 	login: string;
 	firstName: string;
 	lastName: string;
 	username: string;
+}
+export	interface ChatUserModel
+{
+	// name == pseudo
+	"name": string,
+	"id": string,
+	"avatar": string,
+	"password": string,
+}
+
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
 }
 export interface UserModel
 {
@@ -60,6 +80,8 @@ export interface UserModel
 		}
 	};
 	registrationProcessEnded: boolean;
+	password: string,
+	// tokenSecret: string
 	// revokeConnectionRequest: boolean;
 }
 

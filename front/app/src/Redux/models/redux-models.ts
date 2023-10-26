@@ -2,7 +2,8 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	mode: string
+	mode: string,
+	username: string,
 }
 export	interface ChatUserModel
 {
@@ -11,6 +12,17 @@ export	interface ChatUserModel
 	"id": string,
 	"avatar": string,
 	"password": string,
+}
+
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
 }
 
 export interface ChatModel
@@ -53,6 +65,8 @@ export interface	UserModel
 	"registrationProcess": boolean,
 	"registrationError": string,
 	"doubleAuth": boolean,
+	"codeValidated": boolean,
+	"otpCode": string,
 	"phoneNumber": string,
 	"registered": boolean,
 	"avatar": string,
@@ -66,7 +80,8 @@ export interface	UserModel
 		}
 	},
 	"profile": ProfileModel,
-	"password": string
+	"password": string,
+	"location": string;
 }
 
 export interface	AnonymousUserModel
@@ -131,6 +146,8 @@ export interface	CanvasModel
 
 export interface	ControllerModel
 {
+	"allUsers": BackUserModel[],
+	"allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,
