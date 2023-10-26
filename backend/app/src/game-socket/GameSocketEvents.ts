@@ -73,6 +73,7 @@ type	ActionSocket = {
 
 @WebSocketGateway(
 {
+	path: "/socket-game/random",
 	cors:
 	{
 		origin: "*"

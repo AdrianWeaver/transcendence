@@ -26,6 +26,7 @@ import { UserModule } from "./user/user.module";
 	[
 		AdminsModule,
 		ChatModule,
+		GameSocketModule,
 		AnonymousUserModule,
 		UserModule
 	],
