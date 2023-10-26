@@ -75,6 +75,8 @@ class Channel
 		};
 		this.setOwner = (owner: MemberSocketIdModel) =>
 		{
+			if (owner.profileId === undefined)
+				throw new Error("this.setOwner = (owner: MemberSocketIdModel) =>");
 			this.owner = owner;
 		};
 		this.setName = (name: string) =>
@@ -163,7 +165,8 @@ class Channel
 				memberSocketId: id,
 				profileId: this.chat?.getProfileIdFromSocketId(id) as string,
 			};
-
+			if (obj.profileId === undefined)
+				throw new Error("this.addAdmin = (id: string) =>");
 			this.admins.push(obj);
 		};
 
@@ -173,6 +176,8 @@ class Channel
 				memberSocketId: id,
 				profileId: profileId,
 			};
+			if (newBanned.profileId === undefined)
+				throw new Error("this.addToBanned = (id: string, profileId: string) =>");
 			this.banned.push(newBanned);
 		};
 

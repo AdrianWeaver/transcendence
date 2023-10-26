@@ -128,7 +128,7 @@ class User
 							return (elem === channel.id);
 						});
 						if (index !== -1)
-							this.channels.slice(index, 1);
+							this.channels.splice(index, 1);
 						break ;
 					}
 				}
@@ -211,8 +211,8 @@ class User
 		const	dbObject = {
 			channels: [...this.channels],
 			name: this.name,
-			profile: this.profile,
-			stats: this.stats,
+			profile: {...this.profile},
+			stats: {...this.stats},
 			id: this.id,
 			blocked: [...this.blocked],
 			friends: [...this.friends],
