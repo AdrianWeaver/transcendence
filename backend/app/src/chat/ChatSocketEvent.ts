@@ -62,6 +62,7 @@ type MemberSocketIdModel ={
 
 @WebSocketGateway(
 {
+	path: "/socket-chat",
 	cors:
 	{
 		origin: "*"
@@ -118,7 +119,7 @@ export class ChatSocketEvents
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
-						this.logger.log("User not founded");
+						this.logger.log("User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
 						const newUser = new User(userName, profileId);
 						newUser.setClient(client);
@@ -126,7 +127,7 @@ export class ChatSocketEvents
 					}
 					else
 					{
-						this.logger.log("Userfounded");
+						this.logger.log("User found");
 						this.chatService.setSocketToUser(index, client);
 						this.chatService.updateUserSocketInChannels(client);
 

@@ -18,6 +18,7 @@ import EditProfile from "./components/EditProfile";
 import { addUserAsFriend, setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
 import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
 import { useNavigate } from "react-router-dom";
+import UpdateMyProfilePicture from "../../Component/DropZoneImage/UpdateMyProfilePicture";
 
 type	FriendsModel =
 {
@@ -296,6 +297,7 @@ const	MyProfile = () =>
 					}
 				</div>
 			}
+			<UpdateMyProfilePicture />
 		</>
 	);
 };

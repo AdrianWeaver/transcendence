@@ -32,7 +32,7 @@ const	UserServices = {
 			.catch((error) =>
 			{
 				console.error("error from api redux ");
-				// console.error(error);
+				console.error(error);
 				return ("ERROR");
 			})
 		);

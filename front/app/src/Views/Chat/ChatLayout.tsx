@@ -30,7 +30,7 @@ import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
 import FriendItem from "./components/FriendItem";
 
-const URL = "http://localhost:3000";
+const URL = "http://localhost:3000/";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -57,8 +57,6 @@ import {
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
-
-import { ClosedCaptionDisabledTwoTone, LocalConvenienceStoreOutlined } from "@mui/icons-material";
 
 type MessageModel =
 {
@@ -509,6 +507,7 @@ const	ChatLayout = () =>
 	{
 		const socket = io(URL,
 			{
+				path: "/socket-chat",
 				autoConnect: false,
 				reconnectionAttempts: 5,
 				auth:

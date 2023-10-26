@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable no-label-var */
 /* eslint-disable no-unused-labels */
 /* eslint-disable prefer-const */
@@ -25,8 +26,26 @@ import
 import { v4 as uuidv4 } from "uuid";
 import User from "src/chat/Objects/User";
 
-import { randomBytes } from "crypto";
+import { privateDecrypt, randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import axios from "axios";
+import path, { join } from "path";
+import * as fs from "fs";
+import * as sharp from "sharp";
+import FileConfig from "./Object/FileConfig";
+
+export type PictureConfigModel = {
+	path:
+	{
+		normal: string;
+		large: string;
+		medium: string;
+		small: string;
+		micro: string;
+	},
+	tmpFolder: string;
+	size: number[];
+}
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
@@ -36,13 +55,71 @@ export class UserService
 {
 	private	user: Array<UserModel> = [];
 	private	secret = randomBytes(64).toString("hex");
-	private readonly logger = new Logger("user-service itself");
-	private readonly uuidInstance = uuidv4();
+	private readonly	logger = new Logger("user-service itself");
+	private readonly	uuidInstance = uuidv4();
+
+	// image cdn Large is eq to publicPath 700 X 700
+	private	readonly	publicPath = "/app/public/profilePictures";
+	private readonly	publicPathLarge = "/app/public/profilePictures/large";
+
+	// mediumm is eq to 350 X 350
+	private readonly	publicPathMedium = "/app/public/profilePictures/medium";
+
+	// small is eq to 175 X 175
+	private readonly	publicPathSmall = "/app/public/profilePictures/small";
+
+	// mmicro is eq to 25 X 25
+	private readonly	publicPathMicro = "/app/public/profilePictures/micro";
+
+	// upload tempt storage 
+	private readonly	publicPathTemp = "/app/public/tmp";
+
+	private	readonly	avatarArraySize = [
+		700,
+		350,
+		175,
+		25
+	];
 
 	public constructor()
 	{
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
+		this.checkIOAccessPath(this.publicPath);
+		this.checkIOAccessPath(this.publicPathLarge);
+		this.checkIOAccessPath(this.publicPathMedium);
+		this.checkIOAccessPath(this.publicPathSmall);
+		this.checkIOAccessPath(this.publicPathMicro);
+		this.checkIOAccessPath(this.publicPathTemp);
+	}
+
+	public	getConfig()
+		: PictureConfigModel
+	{
+		const	obj: PictureConfigModel = {
+			path:
+			{
+				normal: this.publicPath,
+				large: this.publicPathLarge,
+				medium: this.publicPathMedium,
+				micro: this.publicPathMicro,
+				small: this.publicPathSmall,
+			},
+			size: this.avatarArraySize,
+			tmpFolder: this.publicPathTemp
+		};
+		return (obj);
+	}
+
+	private	checkIOAccessPath(path: string)
+	{
+		fs.access(path, fs.constants.R_OK | fs.constants.W_OK, (error) =>
+		{
+			if (error)
+				this.logger.error("You need to check files and directory permission X and  W");
+			else
+				this.logger.verbose("The path for public storage is okay and accessible");
+		});
 	}
 
 	public getAllUserRaw () : Array<UserModel>
@@ -101,6 +178,325 @@ export class UserService
 	public	getSecret() : string
 	{
 		return (this.secret);
+	}
+
+	private	getCoefResize(inputSize: number, outputSize: number)
+	{
+		const coef = {
+			value: 1,
+			operator: ""
+		};
+		// operator division
+		if (inputSize > outputSize)
+		{
+			coef.operator = "divide";
+			coef.value = inputSize / outputSize;
+		}
+		// operator multiplication
+		else if (outputSize > inputSize)
+		{
+			coef.operator = "multiply";
+			coef.value = outputSize / inputSize;
+		}
+		else
+		{
+			coef.operator = "nothing";
+			coef.value = 1;
+		}
+		return (coef);
+	}
+
+	private	getOutputSize(size: string)
+	{
+		switch (size)
+		{
+			case "large":
+				return (this.avatarArraySize[0]);
+			case "medium":
+				return (this.avatarArraySize[1]);
+			case "small":
+				return (this.avatarArraySize[2]);
+			case "micro":
+				return (this.avatarArraySize[3]);
+			default:
+				return (this.avatarArraySize[0]);
+		}
+	}
+
+	private	async	createResizeImage(srcFilename:string, destFilename: string, size: string)
+	{
+		const	destSize = this.getOutputSize(size);
+		// debug helper
+		this.logger.debug("Starting resize image");
+		this.logger.debug("Src filename: ", srcFilename);
+		this.logger.debug("Dest filename: ", destFilename);
+		this.logger.debug("Size requested: ", size);
+		this.logger.debug("Dest size:" + destSize);
+
+		const	sourceImage = sharp(srcFilename);
+		this.logger.log("Extracting meta-data...");
+		try
+		{
+			const	metadata = await sourceImage.metadata();
+			// console.log(metadata);
+			if ((metadata.width === undefined || metadata.height === undefined)
+				|| metadata.width !== metadata.height)
+				throw new InternalServerErrorException();
+			const	coef = this.getCoefResize(metadata.width, destSize);
+			// this.logger.log(coef);
+			if (coef.operator === "divide")
+			{
+				const resizedImage = sourceImage.resize(Math.floor(metadata.width / coef.value));
+				await resizedImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file " + size);
+			}
+			else if (coef.operator === "multiply")
+			{
+				const resizedImage = sourceImage.resize(Math.floor(metadata.width * coef.value));
+				await resizedImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file " + size);
+			}
+			else
+			{
+				await sourceImage.toFile(destFilename);
+				this.logger.verbose("Successfull write file" + size);
+			}
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	// image at this step if perfectly square
+	public async	downloadAvatar(userObj: UserModel)
+	: Promise<UserModel>
+	{
+		this.logger.debug("Starting the downmload of the avatar");
+		// console.log(userObj);
+		const	targetUrl = userObj.ftAvatar.link;
+		this.logger.verbose("This is the target downlad: " + targetUrl);
+		const filename = this.publicPath + "/" + userObj.username + ".jpeg";
+		const filenameLarge = this.publicPathLarge + "/" + userObj.username + ".jpeg";
+		const filenameMedium = this.publicPathMedium + "/" + userObj.username + ".jpeg";
+		const filenameSmall = this.publicPathSmall + "/" + userObj.username + ".jpeg";
+		const filenameMicro = this.publicPathMicro + "/" + userObj.username + ".jpeg";
+		this.logger.verbose("This is the target file: " + filename);
+		try
+		{
+			this.logger.verbose("Starting fetching the data from 42 api");
+			const response = await axios
+				.get(targetUrl, { responseType: "arraybuffer"});
+			const data = response.data;
+			this.logger.verbose("Start: The data is ready to be stored inside a file");
+			try
+			{
+				fs.writeFileSync(filename, data);
+				this.logger.log("Successfully store the avatar");
+				try
+				{
+					fs.writeFileSync(filenameLarge, data);
+					this.logger.log("Succesfully save Large file");
+					await this.createResizeImage(filename, filenameMedium, "medium");
+					this.logger.log("Succesfully save medium file");
+					await this.createResizeImage(filename, filenameSmall, "small");
+					this.logger.log("Succesfully save small file");
+					await this.createResizeImage(filename, filenameMicro, "micro");
+					this.logger.log("Succesfully save micro file");
+					const newUserObj: UserModel = {
+						...userObj,
+						avatar: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+						ftAvatar:
+						{
+							link: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+							version:
+							{
+								large: "http://localhost:3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
+								medium: "http://localhost:3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
+								mini: "http://localhost:3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
+								small: "http://localhost:3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
+							}
+						}
+					};
+					return (newUserObj);
+				}
+				catch (error)
+				{
+					this.logger.error(error);
+				}
+			}
+			catch (error)
+			{
+				this.logger.error(error);
+			}
+			this.logger.verbose("End: The data is ready to be stored inside a file");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+		this.logger.error("Must not be here !");
+		return (userObj);
+	}
+
+	private	async convertPNGToJPEG(oldTmpFilePath: string, destTmpFilePath: string)
+	{
+		this.logger.debug("input file: " + oldTmpFilePath);
+		this.logger.debug("output file: " + destTmpFilePath);
+
+		try
+		{
+			const	imagePng = sharp(oldTmpFilePath);
+			const	metadata = await imagePng.metadata();
+			console.log(metadata);
+			const	outputBuffer = await imagePng.jpeg().toBuffer();
+			this.logger.verbose("buffer ready to be writted");
+			fs.writeFileSync(destTmpFilePath, outputBuffer);
+			this.logger.log("Convertion okay");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	private	async	deletePicture(src: string)
+	{
+		try
+		{
+			fs.unlinkSync(src);
+			this.logger.verbose("PNG file deleted");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	private async	cropImageIfNeeded(filecfg: FileConfig)
+	{
+		this.logger.log("Start crop if needed");
+
+		try
+		{
+			const	image = sharp(filecfg.getPathTmpConverted());
+
+			const	metadata = await image.metadata();
+			// console.log(metadata);
+			if (metadata.height === metadata.width
+				|| metadata.width === undefined
+				|| metadata.height === undefined)
+				return ;
+			const	requestedSize = Math.min(metadata.height, metadata.width);
+			console.log("requested size: ", requestedSize);
+			const	cropedImage = await image.extract(
+				{
+					width: requestedSize,
+					height: requestedSize,
+					left: 0,
+					top: 0,
+				}
+			)
+			.toBuffer();
+			this.logger.verbose("Sucessfull write to buffer the croped image");
+			fs.writeFileSync(filecfg.getPathTmpConverted(), cropedImage);
+			this.logger.log("Image cropped writed to disk");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	private async	resizeAllUploadedPictures(fileCfg: FileConfig)
+	{
+		this.logger.verbose("Starting resize all pictures");
+		try
+		{
+			await	this.cropImageIfNeeded(fileCfg);
+
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathNormal(),
+				"large"
+			);
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathLarge(),
+				"large"
+			);
+			this.logger.log("resized to large");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathMedium(),
+				"medium"
+			);
+			this.logger.log("resized to medium");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathSmall(),
+				"small"
+			);
+			this.logger.log("resized to small");
+			await this.createResizeImage(
+				fileCfg.getPathTmpConverted(),
+				fileCfg.getPathMicro(),
+				"micro"
+			);
+			this.logger.log("resized to micro");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+		}
+	}
+
+	public	async	uploadPhoto(fileCfg: FileConfig, userObj: UserModel)
+	: Promise<UserModel>
+	{
+		this.logger.verbose("Starting resize Process");
+		this.logger.log("The tmpfilepath is : ", fileCfg.fullPath());
+		fileCfg.setPictureConfig(this.getConfig());
+		// console.log(this.getConfig());
+		if (fileCfg.needConvertToJPEG())
+		{
+			try
+			{
+				this.logger.log("Starting convertion of the file");
+				await this.convertPNGToJPEG(fileCfg.fullPath(), fileCfg.getPathTmpConverted());
+				await this.deletePicture(fileCfg.fullPath());
+				await this.resizeAllUploadedPictures(fileCfg);
+				this.logger.log("Ending convertion of the file");
+			}
+			catch (error)
+			{
+				this.logger.error(error);
+			}
+		}
+		else
+		{
+			try
+			{
+				await this.resizeAllUploadedPictures(fileCfg);
+			}
+			catch (error)
+			{
+				this.logger.error(error);
+			}
+		}
+		this.deletePicture(fileCfg.getPathTmpConverted());
+		const	newUserObj: UserModel = {
+			...userObj,
+			avatar: fileCfg.getCDNConfig().avatar,
+			ftAvatar: fileCfg.getCDNConfig().ftAvatar,
+		};
+		this.logger.verbose("End resize Process");
+		// const index = this.user.findIndex((user) =>
+		// {
+		// 	return (user.id === newUserObj.id);
+		// });
+		// this.user[index] = newUserObj;
+		return (newUserObj);
 	}
 
 	public	register(data: UserModel)
@@ -306,7 +702,6 @@ export class UserService
 			return (elem.id === id);
 		});
 		if (searchUser !== undefined)
-
 			myInfo = {
 				id: searchUser.id,
 				email: searchUser.email,
