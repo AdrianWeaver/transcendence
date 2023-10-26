@@ -233,7 +233,20 @@ class Chat
 				newChannel.setKind(raw.kind);
 				newChannel.setPassword(raw.password);
 				newChannel.setMode(raw.mode);
-				console.log("priofile ", raw.owner.profileId);
+				console.log("profile  ", raw.owner.profileId);
+				console.log(raw);
+			});
+			rawPrivateMessages.forEach((raw: any) =>
+			{
+				// const profileId = 
+				const	newPrivateMessage = new Channel(raw.name);
+				// newPrivateMessages.setClient(null, raw.profileId);
+				newPrivateMessage.setOwner(raw.owner);
+				newPrivateMessage.setFromDatabaseAdmins(raw.admins);
+				newPrivateMessage.setKind(raw.kind);
+				newPrivateMessage.setPassword(raw.password);
+				newPrivateMessage.setMode(raw.mode);
+				console.log("profile private msg ", raw.owner.profileId);
 				console.log(raw);
 			});
 		};
