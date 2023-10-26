@@ -9,7 +9,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
@@ -19,6 +19,12 @@ import	ApiTwilio from "../Api-twilio";
 import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
+import * as busboy from "busboy";
+import * as fs from "fs";
+import * as sharp from "sharp";
+import internal from "stream";
+import { AccountPage } from "twilio/lib/rest/api/v2010/account";
+import FileConfig from "./Object/FileConfig";
 import * as readline from "readline";
 import * as twilio from "twilio";
 
@@ -75,6 +81,14 @@ class UserLoginDto
 	email: string;
 }
 
+
+class UserUploadPhotoDto
+{
+	@IsNotEmpty()
+	image: any;
+}
+
+
 class	TwilioResponseDto
 {
 	@IsNotEmpty()
@@ -83,6 +97,7 @@ class	TwilioResponseDto
 	// Channel = sms
 	Channel: string;
 }
+
 @Controller("user")
 export class UserController
 {
@@ -206,7 +221,7 @@ export class UserController
 				};
 				Api()
 				.request(config)
-				.then((resData) =>
+				.then(async (resData) =>
 				{
 					const	data = resData.data;
 					userObject = {
@@ -243,9 +258,12 @@ export class UserController
 						},
 						password: "undefined"
 					};
-					retValue = this.userService.register(userObject);
+					this.logger.error("NOT AN ERROR: Starting processing image");
+					const newUserObj = await this.userService.downloadAvatar(userObject);
+					retValue = this.userService.register(newUserObj);
 					res.status(200).send(retValue.res);
 					// mise a jour vers la database
+					this.logger.error("NOT AN ERROR: Ending processing image");
 				})
 				.catch((error) =>
 				{
@@ -438,6 +456,101 @@ export class UserController
 		// });
 	}
 
+	@Post("/update-photo")
+	@UseGuards(UserAuthorizationGuard)
+	async updatePhoto(
+		@Req() req: any,
+		@Res() res: Response,
+		@Body() body: any)
+	{
+		// console.log(req);
+		this.logger.error("NOT AN ERROR: start update photo");
+		try
+		{
+			const	busboyConfig = {
+				headers: req.headers,
+				limits:
+				{
+					fileSize: 10 * 1024 * 1024
+				}
+			};
+
+			const	fileCfg = new FileConfig();
+			fileCfg.setTempFolder(this.userService.getConfig().tmpFolder);
+			fileCfg.setFilename(req.user.username);
+			console.log(req.user);
+
+			const bb = busboy(busboyConfig);
+
+			const	processBusboy = (): Promise<string> =>
+			{
+				this.logger.debug("start the busboy event listener");
+				return (
+					new Promise<string>((resolve, reject)=>
+					{
+						bb.on("file", async (name: string, file: internal.Readable, info: busboy.FileInfo) =>
+						{
+							const	{ filename, encoding, mimeType } = info;
+							console.log("Starting visualisation of busboy data");
+							console.log(info);
+							console.log(filename);
+							console.log(encoding);
+							console.log(mimeType);
+							console.log("Ending of busboy data display");
+							fileCfg.configMimeType(mimeType);
+							if (!fileCfg.isAccepted())
+								reject(new HttpException("Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+							// console.log(file);
+							file.on("data", (data) =>
+							{
+								console.log("buffer", typeof data);
+								fileCfg.addToBuffer(data);
+							});
+							file.on("end", () =>
+							{
+								console.log("finish");
+								resolve(fileCfg.fullPath());
+							});
+						});
+						bb.on("error", (error) =>
+						{
+							reject(error);
+						});
+						req.pipe(bb);
+					})
+				);
+			};
+			this.logger.verbose("Start processing");
+			await processBusboy().then((filename) =>
+			{
+				this.logger.verbose(filename);
+				try
+				{
+					fs.writeFileSync(fileCfg.fullPath(), fileCfg.getBuffer());
+				}
+				catch (error)
+				{
+					return (res.status(500).json({error: true}));
+				}
+				return (fileCfg.fullPath());
+			})
+			.catch((error) =>
+			{
+				res.status(500).json({error: true});
+				console.log(error);
+				return ;
+			});
+			this.logger.log("Test");
+			await this.userService.uploadPhoto(fileCfg, req.user);
+			res.status(200).json({message: "Success"});
+			// console.log("buffer", fileCfg.getBuffer());
+			this.logger.error("NOT AN ERROR: end update photo");
+		}
+		catch (error)
+		{
+			this.logger.error(error);
+			res.status(500).json({error: true});
+		}
 	@Post("change-infos")
 	@UseGuards(UserAuthorizationGuard)
 	ChangeUsername(

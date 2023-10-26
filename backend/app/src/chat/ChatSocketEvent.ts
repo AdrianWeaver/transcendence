@@ -119,14 +119,14 @@ export class ChatSocketEvents
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
-						this.logger.log("User not founded");
+						this.logger.log("User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
 						const newUser = new User(userName, client, profileId);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else
 					{
-						this.logger.log("Userfounded");
+						this.logger.log("User found");
 						this.chatService.setSocketToUser(index, client);
 						this.chatService.updateUserSocketInChannels(client);
 
