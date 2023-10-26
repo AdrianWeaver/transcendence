@@ -2,6 +2,7 @@
 import
 {
 	BrowserRouter,
+	Navigate,
 	Route,
 	Routes,
 }	from "react-router-dom";
@@ -55,10 +56,10 @@ const	VisitorRouter = () =>
 					path="/cancel"
 					element={<CancelRegister />}
 				/>
-				
+
 				<Route
 					path="the-chat"
-					element={<ChatLayout />}
+					element={<Navigate to="/"/>}
 				/>
 				{/* show 404 when route not found */}
 				<Route

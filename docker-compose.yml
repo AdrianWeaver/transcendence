@@ -13,6 +13,7 @@ services:
       - ./backend/app/:/app
     ports:
       - 3000:3000
+      - 5555:5555
     networks:
       transcendence:
         ipv4_address: 172.19.0.40

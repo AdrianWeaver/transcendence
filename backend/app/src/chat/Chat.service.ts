@@ -70,7 +70,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-6";
+	private readonly chatID = "id-chat-service-v-7";
 
 	constructor()
 	{
@@ -83,8 +83,10 @@ export	class ChatService implements OnModuleInit
 
 	private onTableCreate()
 	{
+		this.log.verbose("Creating a new version inside database");
 		const	dbString = this.parseForDatabase();
-		this.prisma.chatJson
+		this.prisma
+			.chatJson
 			.create(
 			{
 				data:
@@ -122,37 +124,47 @@ export	class ChatService implements OnModuleInit
 
 	public parseForDatabase() : string
 	{
-		const	channelsDB: string[] = [];
-		const	usersToDB: string[] = [];
-
-		this.chat.channels.forEach((channel) =>
-		{
-			// console.log(channel.parseForDatabase());
-			channelsDB.push(channel.parseForDatabase());
-		});
-
-		this.chat.users.forEach((user) =>
-		{
-			// console.log(user.parseForDatabase());
-			usersToDB.push(user.parseForDatabase());
-		});
-		const toDBObject = {
-			activeMembers: this.chat.activeMembers,
-			chanMap: this.chat.chanMap,
-			channels: channelsDB,
-			matchHistory: this.chat.matchHistory,
-			memberSocketIds: this.chat.memberSocketIds,
-			message: this.chat.message,
-			users: usersToDB,
-			privateMessage: this.chat.privateMessage,
-			privateMessageMap: this.chat.privateMessageMap,
-		};
+		const toDBObject = this.chat.parseForDatabase();
 		// console.log(toDBObject);
 		// this.log.verbose(JSON.stringify(toDBObject));
 		return (JSON.stringify(toDBObject));
 	}
 
 	private	loadTableToMemory()
+	{
+		this.prisma
+			.chatJson
+			.findUnique(
+			{
+				where:
+				{
+					chatJsonID: this.chatID,
+				}
+			}
+			)
+			.then((data: any) =>
+			{
+				if (data === null)
+				{
+					this.onTableCreate();
+					this.loadTableToMemory();
+				}
+				else
+				{
+					const rawobj = JSON.parse(data.contents);
+					// console.log(rawobj);
+					const	newChatInstance = new Chat();
+					newChatInstance.databaseToObject(rawobj);
+					// console.log(rawobj);
+				}
+			})
+			.catch((error: any) =>
+			{
+				console.log(error);
+			});
+	}
+
+	private	loadTableToMemoryOld()
 	{
 		this.prisma.chatJson
 			.findUnique(
@@ -183,8 +195,9 @@ export	class ChatService implements OnModuleInit
 
 						const	newUserInstance = new User(
 							rawUser.name,
-							null,
 							rawUser.profileId);
+						// NEED TO KNOW WHAT TO DO WITH null SOCKET
+						newUserInstance.setClient(null);
 						newUserInstance.chat = this.chat;
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
@@ -233,69 +246,69 @@ export	class ChatService implements OnModuleInit
 					// RETRIEVING CHANNELS
 					const arrayChannels: Channel[] = [];
 					// console.log(rawobj.channels);
-					rawobj.channels.forEach((strchan : string) =>
-					{
-						const	rawChan = JSON.parse(strchan);
+					// rawobj.channels.forEach((strchan : string) =>
+					// {
+					// 	const	rawChan = JSON.parse(strchan);
 
-						const	channel = new Channel(
-							rawChan.name,
-							null,
-							rawChan.mode,
-							rawChan.password,
-							rawChan.kind,
-							rawChan.profileId,
-						);
-						// console.log("INSTANCE: ");
-						// console.log(channel instanceof Channel);
-						// console.log(channel);
-						channel.members = rawChan.members;
-						channel.owner = rawChan.owner;
-						rawChan.admins.forEach((admin: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: admin.memberSocketId,
-								profileId: admin.profileId,
-							};
-							channel.admins.push(obj);
-						});
-						rawChan.banned.forEach((banned: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: banned.memberSocketId,
-								profileId: banned.profileId,
-							};
-							channel.banned.push(obj);
-						});
+					// 	const	channel = new Channel(
+					// 		rawChan.name,
+					// 		null,
+					// 		rawChan.mode,
+					// 		rawChan.password,
+					// 		rawChan.kind,
+					// 		rawChan.profileId,
+					// 	);
+					// 	// console.log("INSTANCE: ");
+					// 	// console.log(channel instanceof Channel);
+					// 	// console.log(channel);
+					// 	channel.members = rawChan.members;
+					// 	channel.owner = rawChan.owner;
+					// 	rawChan.admins.forEach((admin: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: admin.memberSocketId,
+					// 			profileId: admin.profileId,
+					// 		};
+					// 		channel.admins.push(obj);
+					// 	});
+					// 	rawChan.banned.forEach((banned: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: banned.memberSocketId,
+					// 			profileId: banned.profileId,
+					// 		};
+					// 		channel.banned.push(obj);
+					// 	});
 
-						const arrayMessages: Array<MessageModel> = [];
+					// 	const arrayMessages: Array<MessageModel> = [];
 
-						rawChan.messages.forEach((message: MessageModel) =>
-						{
-							const objToMemory: MessageModel = {
-								sender: message.sender,
-								message: message.message,
-								id: message.id,
-								username: message.username,
-							};
-							arrayMessages.push(objToMemory);
-						});
-						channel.messages = arrayMessages;
-						// channel.chat = this.chat;
+					// 	rawChan.messages.forEach((message: MessageModel) =>
+					// 	{
+					// 		const objToMemory: MessageModel = {
+					// 			sender: message.sender,
+					// 			message: message.message,
+					// 			id: message.id,
+					// 			username: message.username,
+					// 		};
+					// 		arrayMessages.push(objToMemory);
+					// 	});
+					// 	channel.messages = arrayMessages;
+					// 	// channel.chat = this.chat;
 
-						const	arrayUsers: MemberSocketIdModel[] = [];
-						rawChan.users.forEach((elem: MemberSocketIdModel) =>
-						{
-							const obj: MemberSocketIdModel = {
-								memberSocketId: elem.memberSocketId,
-								profileId: elem.profileId,
-							};
-							arrayUsers.push(obj);
-						});
-						channel.users = arrayUsers;
+					// 	const	arrayUsers: MemberSocketIdModel[] = [];
+					// 	rawChan.users.forEach((elem: MemberSocketIdModel) =>
+					// 	{
+					// 		const obj: MemberSocketIdModel = {
+					// 			memberSocketId: elem.memberSocketId,
+					// 			profileId: elem.profileId,
+					// 		};
+					// 		arrayUsers.push(obj);
+					// 	});
+					// 	channel.users = arrayUsers;
 
-						arrayChannels.push(channel);
-					});
-					newChatInstance.channels = arrayChannels;
+					// 	arrayChannels.push(channel);
+					// });
+					// newChatInstance.channels = arrayChannels;
 
 					const	arrMemberSocketIds: Array<MemberSocketIdModel> = [];
 					rawobj.memberSocketIds.forEach((elem: MemberSocketIdModel) =>
@@ -318,7 +331,8 @@ export	class ChatService implements OnModuleInit
 					rawobj.users.forEach((strobj: string) =>
 					{
 						const rawUser = JSON.parse(strobj);
-						const chanArray: Channel[] = [];
+						// const chanArray: Channel[] = [];
+						const chanArray: string[] = [];
 						rawUser.channels.forEach((chan: string) =>
 						{
 							const tmpChan = JSON.parse(chan);
@@ -327,7 +341,7 @@ export	class ChatService implements OnModuleInit
 								return (chanToFind.name === tmpChan.name);
 							});
 							if(searchChan !== undefined)
-								chanArray.push(searchChan);
+								chanArray.push(searchChan.id);
 						});
 						const searchUser = this.chat.users.find((element) =>
 						{
@@ -337,9 +351,9 @@ export	class ChatService implements OnModuleInit
 							searchUser.channels = chanArray;
 					});
 
-					// console.log("End of parser check with serialized value ");
-					// console.log( JSON.parse(this.parseForDatabase()));
-					// console.log(this.chat);
+					console.log("End of parser check with serialized value ");
+					console.log( JSON.parse(this.parseForDatabase()));
+					console.log(this.chat);
 				}
 			})
 			.catch((error: any) =>
@@ -356,9 +370,9 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
-		// this.log.verbose("Updating all Chat Object");
+		this.log.verbose("Updating all Chat Object");
 		const dbString = this.parseForDatabase();
-		// this.log.verbose(JSON.parse(dbString));
+		this.log.verbose(JSON.parse(dbString));
 		this.prisma.chatJson
 		.update(
 			{
@@ -617,7 +631,7 @@ export	class ChatService implements OnModuleInit
 		{
 			const	searchConv = this.chat.users[userIndex].channels.find((element) =>
 			{
-				return (element.name === convId);
+				return (element === convId);
 			});
 			if (searchConv !== undefined)
 				return searchConv;
@@ -626,7 +640,7 @@ export	class ChatService implements OnModuleInit
 		{
 			const	searchConv = this.chat.users[userIndex1].channels.find((element) =>
 			{
-				return (element.name === convId);
+				return (element === convId);
 			});
 			if (searchConv !== undefined)
 				return searchConv;

@@ -9,7 +9,7 @@ import Message from "./Message";
 import User from "./User";
 import { Server, Socket } from "socket.io";
 import { UserModel } from "src/user/user.interface";
-import { Public } from "@prisma/client/runtime/library";
+import { Public, raw } from "@prisma/client/runtime/library";
 
 type ChanMapModel = {
 	id: number,
@@ -54,7 +54,7 @@ class Chat
 	public activeMembers: number;
 	// public memberSocketIds: string[] = [];
 	public memberSocketIds: Array<MemberSocketIdModel> = [];
-	public message: Message[];
+	// public message: Message[];
 	public matchHistory: MatchHistory[];
 	public deleteChannel: (name: string) => void;
 	public addUserToChannel: (name: string, id: string) => void;
@@ -69,6 +69,8 @@ class Chat
 	public updateUserSocketInChannels: (client: Socket) => void;
 	public updateFriendList: (newSocketId: string, profileId: string) => void;
 	public updateBannedInChannel: (newSocketId: string, profileId: string) => void;
+	public parseForDatabase: () => void;
+	public databaseToObject: (rawObj: any) => void;
 
 	public constructor ()
 	{
@@ -182,7 +184,84 @@ class Chat
 				});
 			});
 		};
-		// this.parseForDatabase()
+		this.parseForDatabase = () =>
+		{
+			const	channels: any = [];
+			const	privateMessage: any = [];
+			const	users: any= [];
+
+			this.channels.forEach((channel) =>
+			{
+				const data = channel.parseForDatabase();
+				channels.push(data);
+			});
+			this.privateMessage.forEach((elem) =>
+			{
+				const	data = elem.parseForDatabase();
+				privateMessage.push(data);
+			});
+			this.users.forEach((elem) =>
+			{
+				const	data = elem.parseForDatabase();
+				users.push(data);
+			});
+			const	databaseObj = {
+				channels: channels,
+				privateMessage: privateMessage,
+				chanMap: this.chanMap,
+				privateMessageMap: this.privateMessageMap,
+				users: users,
+				activeMembers: this.activeMembers,
+				memberSocketIds: this.memberSocketIds,
+				matchHistory: this.matchHistory,
+			};
+			return (databaseObj);
+		};
+		this.databaseToObject = (rawObj: any) =>
+		{
+			const	rawChannels = rawObj.channels;
+			const	rawPrivateMessages = rawObj.privateMessage;
+			const	rawUsers = rawObj.users;
+
+			rawChannels.forEach((raw: any) =>
+			{
+				console.log("here !!");
+				const	newChannel = new Channel(raw.name);
+				newChannel.setOwner(raw.owner);
+				newChannel.setFromDatabaseAdmins(raw.admins);
+				newChannel.setKind(raw.kind);
+				newChannel.setPassword(raw.password);
+				newChannel.setMode(raw.mode);
+				newChannel.users = [...raw.users];
+				console.log("profile  ", raw.owner.profileId);
+				console.log(raw);
+				console.log("new channel : ", newChannel);
+				this.channels.push(newChannel);
+			});
+			rawPrivateMessages.forEach((raw: any) =>
+			{
+				const	newPrivateMessage = new Channel(raw.name);
+				newPrivateMessage.setOwner(raw.owner);
+				newPrivateMessage.setFromDatabaseAdmins(raw.admins);
+				newPrivateMessage.setKind(raw.kind);
+				newPrivateMessage.setPassword(raw.password);
+				newPrivateMessage.setMode(raw.mode);
+				console.log("profile private msg ", raw.owner.profileId);
+				console.log(raw);
+			});
+			rawUsers.forEach((raw: any) =>
+			{
+				console.log("RAW !", raw);
+				const	newUser = new User(raw.name, raw.profileId);
+				newUser.id = raw.id;
+				newUser.blocked = raw.blocked;
+				newUser.friends = raw.friends;
+				// TEST do we need to reconstruct all the channels here ?
+				newUser.channels = raw.channels;
+				console.log("new user", newUser);
+				// console.log(raw);
+			});
+		};
 	}
 }
 
