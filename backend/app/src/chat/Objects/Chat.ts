@@ -234,6 +234,8 @@ class Chat
 				newChannel.setMode(raw.mode);
 				console.log("profile  ", raw.owner.profileId);
 				console.log(raw);
+				console.log(newChannel);
+				this.channels.push(newChannel);
 			});
 			rawPrivateMessages.forEach((raw: any) =>
 			{
