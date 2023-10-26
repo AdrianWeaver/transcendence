@@ -204,16 +204,16 @@ class Channel
 	public parseForDatabase()
 	{
 		const	dbObject = {
-			admins: this.admins,
-			banned: this.banned,
+			admins: [...this.admins],
+			banned: [...this.banned],
 			kind: this.kind,
 			members: this.members,
-			messages: this.messages,
+			messages: [...this.messages],
 			mode: this.mode,
 			name: this.name,
 			owner: this.owner,
 			password: this.password,
-			users: this.users,
+			users: [...this.users],
 			id: this.id
 		};
 		// const retValue = JSON.stringify(dbObject);

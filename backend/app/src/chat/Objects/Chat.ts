@@ -225,16 +225,17 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
-				console.log("here !");
+				console.log("here !!");
 				const	newChannel = new Channel(raw.name);
 				newChannel.setOwner(raw.owner);
 				newChannel.setFromDatabaseAdmins(raw.admins);
 				newChannel.setKind(raw.kind);
 				newChannel.setPassword(raw.password);
 				newChannel.setMode(raw.mode);
+				newChannel.users = [...raw.users];
 				console.log("profile  ", raw.owner.profileId);
 				console.log(raw);
-				console.log(newChannel);
+				console.log("new channel : ", newChannel);
 				this.channels.push(newChannel);
 			});
 			rawPrivateMessages.forEach((raw: any) =>
