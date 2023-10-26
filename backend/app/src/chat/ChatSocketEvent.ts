@@ -62,6 +62,7 @@ type MemberSocketIdModel ={
 
 @WebSocketGateway(
 {
+	path: "/socket-chat",
 	cors:
 	{
 		origin: "*"

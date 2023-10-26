@@ -92,6 +92,7 @@ const	TestBall = () =>
 	{
 		const socket = io(url,
 		{
+			path: "/socket-game/random",
 			autoConnect: false,
 			reconnectionAttempts: 5,
 		});
