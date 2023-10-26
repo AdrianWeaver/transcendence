@@ -3,7 +3,8 @@
 
 import { buffer } from "stream/consumers";
 import { PictureConfigModel } from "../user.service";
-import serverConfig from "../../serverConfig";
+import ServerConfig from "../../serverConfig";
+
 
 type CDNConfig = {
 	avatar: string;
@@ -28,6 +29,7 @@ class FileConfig
 	private	filename: string;
 	private	buffer: Buffer[];
 	private	pictureConfiguration: PictureConfigModel;
+	private	serverConfig: ServerConfig;
 
 	public	fullPath: () => string;
 	public	configMimeType: (mimetype: string) => void;
@@ -48,6 +50,7 @@ class FileConfig
 	// eslint-disable-next-line max-statements
 	constructor()
 	{
+		this.serverConfig = new ServerConfig();
 		this.acceptedType = false;
 		this.extension = "";
 		this.tempFolder = "";
@@ -151,9 +154,9 @@ class FileConfig
 		};
 		this.getCDNConfig = () =>
 		{
-			const basecdn = serverConfig.protocol
-				+ "://" + serverConfig.location
-				+ ":" + serverConfig.port + "/cdn/image/profile/";
+			const basecdn = this.serverConfig.protocol
+				+ "://" + this.serverConfig.location
+				+ ":" + this.serverConfig.port + "/cdn/image/profile/";
 			return ({
 				avatar: basecdn + this.filename + ".jpeg",
 				ftAvatar:
