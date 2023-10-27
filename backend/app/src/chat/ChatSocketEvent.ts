@@ -110,8 +110,6 @@ export class ChatSocketEvents
 				try
 				{
 					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
-					console.log("Decoded Token ", decodedToken);
-					// decodedToken.id
 					profileId = decodedToken.id;
 
 					this.logger.warn("ProfileId: ", profileId);
@@ -139,10 +137,8 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
-						// this.chatService.checkOldSocketInChannels(client, oldSocketId);
 					}
 					this.chatService.updateDatabase();
-					// console.log(this.chatService.getAllUsersArray());
 				}
 				catch (error)
 				{
@@ -198,27 +194,6 @@ export class ChatSocketEvents
 			// }
 		}
 
-		// @SubscribeMessage("display-conversation")
-		// handleDisplayConversationWindow(
-		// 	@MessageBody() data: ActionSocket,
-		// 	@ConnectedSocket() client: Socket
-		// )
-		// {
-		// 	if (data.type === "display-conversation")
-		// 	{
-		// 		const action = {
-		// 			type: "conversation",
-		// 			payload:
-		// 			{
-		// 				sender: client.id,
-		// 				// conversationId: chanName
-		// 				privMsgMap: this.chatService.getPrivateMessageMap()
-		// 			}
-		// 		};
-		// 		this.server.to(data.payload.chanName).emit("display-conversation", action);
-		// 	}
-		// }
-
 		@SubscribeMessage("sending-message")
 		handleSendingMessageToUser(
 			@MessageBody() data: ActionSocket,
@@ -260,12 +235,12 @@ export class ChatSocketEvents
 				{
 					return (client.id === elem.id);
 				});
-				copyUsers.splice(searchUser, 1);
+				if (searchUser !== -1)
+					copyUsers.splice(searchUser, 1);
 				const action = {
 					type: "sending-list-user",
 					payload:
 					{
-						// arrayListUsers: this.chatService.getAllUsers(),
 						arrayListUsers: copyUsers,
 						kind: "privateMessage"
 					}
@@ -350,16 +325,10 @@ export class ChatSocketEvents
 					{
 						const profileId = this.chatService.getProfileIdFromSocketId(client.id);
 						if (profileId === "undefined")
-						{
-							// NEED TO RETURN ?
-							console.error("Error profile chat socket  event");
-						}
+							throw new Error("'create-channel' ChatSocketEvent");
 						const	searchUser = this.chatService.getUserWithProfileId(profileId);
 						if (searchUser === undefined)
-						{
-							// NEED TO RETURN ?
-							console.error("Error profile chat socket  event");
-						}
+							throw new Error("'create-channel' ChatSocketEvent");
 						const	newChannel = new Channel(chanName);
 						newChannel.setClient(client, profileId);
 						newChannel.setKind(kind);
@@ -368,11 +337,6 @@ export class ChatSocketEvents
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
 						searchUser?.channels.push(newChannel.id);
-						// const userToChannel: MemberSocketIdModel = {
-						// 	memberSocketId: client.id,
-						// 	profileId: this.chatService.getProfileIdFromSocketId(client.id),
-						// };
-						// newChannel.users.push(userToChannel);
 						this.chatService.addNewChannel(newChannel, data.payload.chanId, kind);
 						this.chatService.updateDatabase();
 						const	action = {
@@ -390,22 +354,18 @@ export class ChatSocketEvents
 					{
 						if (searchConv === undefined && alreadyCreated === false)
 						{
-							// NEED envoyer private au lieu de "" pour que les autres puissent pas vnenir 
 							const newPrivateMsg = new Channel(chanName);
 							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
 							newPrivateMsg.setPassword("");
 							newPrivateMsg.setKind(kind);
-							newPrivateMsg.setMode("");
+							newPrivateMsg.setMode("private");
 							newPrivateMsg.chat = this.chatService.getChat();
 							const obj: MemberSocketIdModel = {
 								memberSocketId: data.payload.activeId,
 								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
 							};
 							newPrivateMsg?.users.push(obj);
-							// newPrivateMsg?.users.push(client.id);
 							newPrivateMsg?.addAdmin(data.payload.activeId);
-							// newPrivateMsg?.addAdmin(client.id);
-							// we do not need to add the person who initiated the channel because the contructor does that already
 							client.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
@@ -477,10 +437,7 @@ export class ChatSocketEvents
 					return ;
 				const	searchUser = this.chatService.getUserBySocketId(data.payload.id);
 				if (searchUser === undefined)
-				{
-					// NEED TO RETURN ?
-					console.error("Error profile chat socket  event 482", data.payload);
-				}
+					throw new Error("'asked-join ChatSocketEvent");
 				searchUser?.channels.push(searchChannel.id);
 				if (searchChannel.isMember(client.id) === true)
 					action.payload.message = "You are already in this channel";
@@ -509,9 +466,6 @@ export class ChatSocketEvents
 							socketId: client.id,
 						}
 					};
-					// const room = this.server.sockets.adapter.rooms.get(searchChannel.name);
-					// if (room)
-					// 	console.log("room members: " + room.size);
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
 
 					searchChannel.members++;
@@ -536,7 +490,6 @@ export class ChatSocketEvents
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel?.password === data.payload.password)
 				{
-					// console.log("CORRECT PASSWORD");
 					action.payload.correct = "true";
 				}
 				client.emit("display-channels", action);
@@ -559,7 +512,6 @@ export class ChatSocketEvents
 						kind: data.payload.kind,
 					}
 				};
-				console.log(channel);
 				if (channel.isMember(client.id) === false)
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);
@@ -687,6 +639,9 @@ export class ChatSocketEvents
 				message = "";
 				const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
+				if (newFriend === "undefined" || profileId === "undefined")
+					return ;
+					// throw new Error("'add-friend' ChatSocketEvent");
 				const friendArray: string[] = [];
 
 				if (userMe.isFriend(profileId) === true)
@@ -723,6 +678,8 @@ export class ChatSocketEvents
 				if (userMe === undefined)
 					return ;
 				const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
+				if (profId === "undefined")
+					return ;
 				const blockedToAdd: MemberSocketIdModel = {
 					memberSocketId: data.payload.blockedName,
 					profileId: profId,
