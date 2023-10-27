@@ -776,16 +776,6 @@ export class UserService
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
-		// .then((hash) =>
-		// {
-		// 	this.user[index].password = hash;
-		// 	return (hash);
-		// })
-		// .catch((err) =>
-		// {
-		// 	console.log(err);
-		// 	return ("ERROR");
-		// });
 		console.log("le test ", hashed);
 		return (hashed);
 	}
@@ -872,17 +862,11 @@ export class UserService
 		: number
 	{
 		this.logger.debug("username: " + username);
-		// this.logger.error("NOT an error");
-		// console.log("here is data ", this.user);
-		// this.logger.error("NOT an error");
 		const count = this.user.filter((obj) =>
 		{
 			return (obj.username === username);
 		}).length;
-		// console.log("count array : ", count);
-		return (
-			count
-		);
+		return (count);
 	}
 
 	public	async updateUser(userId: number, body: RegisterStepOneDto)

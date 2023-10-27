@@ -433,9 +433,10 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 					}
 				};
+				console.log("ASKED-JOIN ", data.payload);
 				if (searchChannel === undefined)
 					return ;
-				const	searchUser = this.chatService.getUserBySocketId(data.payload.id);
+				const	searchUser = this.chatService.getUserWithProfileId(data.payload.id);
 				if (searchUser === undefined)
 					throw new Error("'asked-join ChatSocketEvent");
 				searchUser?.channels.push(searchChannel.id);

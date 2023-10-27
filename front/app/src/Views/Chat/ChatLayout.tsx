@@ -264,9 +264,9 @@ const	ChatLayout = () =>
 	});
 	const currentChannelRef = useRef(currentChannel);
 
-	const	kindOfConv = useAppSelector((state) =>
+	const	user = useAppSelector((state) =>
 	{
-		return (state.controller.user.chat.kindOfConversation);
+		return (state.controller.user);
 	});
 
 	const	activeId = useAppSelector((state) =>
@@ -497,7 +497,8 @@ const	ChatLayout = () =>
 			payload: {
 				chanName: chanName,
 				activeId: activeId,
-				kind: kindOfConversation
+				kind: kindOfConversation,
+				id: user.id
 			}
 		};
 		socketRef.current.emit("channel-info", action);
@@ -599,20 +600,20 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
-		const sendMessageToUser = (data: any) =>
-		{
-			const msgRoom: MessageRoomModel[] = [
-				{
-					id: data.payload.msgRoom.id,
-					roomName: data.payload.msgRoom.roomName,
-					privateConv: data.payload.msgRoom.privateConv,
-					content: data.payload.msgRoom.messageContent
-				}
-			];
-			dispatch(setMessageRoom(msgRoom, data.payload.sender));
-			// dispatch(setMessageContent(data.payload.messageContent));
-			console.log("test send Message: ", data);
-		};
+		// const sendMessageToUser = (data: any) =>
+		// {
+		// 	const msgRoom: MessageRoomModel[] = [
+		// 		{
+		// 			id: data.payload.msgRoom.id,
+		// 			roomName: data.payload.msgRoom.roomName,
+		// 			privateConv: data.payload.msgRoom.privateConv,
+		// 			content: data.payload.msgRoom.messageContent
+		// 		}
+		// 	];
+		// 	dispatch(setMessageRoom(msgRoom, data.payload.sender));
+		// 	// dispatch(setMessageContent(data.payload.messageContent));
+		// 	console.log("test send Message: ", data);
+		// };
 
 		const	updateMessages = (data: any) =>
 		{
@@ -728,7 +729,7 @@ const	ChatLayout = () =>
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("info", serverInfo);
-		socket.on("send-message", sendMessageToUser);
+		// socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
 		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
@@ -745,7 +746,7 @@ const	ChatLayout = () =>
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
 			socket.off("info", serverInfo);
-			socket.off("sending-message", sendMessageToUser);
+			// socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
 			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
