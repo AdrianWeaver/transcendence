@@ -12,7 +12,9 @@ import
 	Injectable,
 	InternalServerErrorException,
 	Logger,
-	NotFoundException
+	NotFoundException,
+	OnModuleDestroy,
+	OnModuleInit
 } from "@nestjs/common";
 import
 {
@@ -49,15 +51,20 @@ export type PictureConfigModel = {
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
+import ServerConfig from "../serverConfig";
+import { PrismaClient } from "@prisma/client";
+import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
 
 @Injectable()
-export class UserService
+export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
 	private	secret = randomBytes(64).toString("hex");
 	private readonly	logger = new Logger("user-service itself");
 	private readonly	uuidInstance = uuidv4();
+	private	readonly	cdnConfig = new ServerConfig();
+	private			shutdown$ = new Subject<string>();
 
 	// image cdn Large is eq to publicPath 700 X 700
 	private	readonly	publicPath = "/app/public/profilePictures";
@@ -86,12 +93,34 @@ export class UserService
 	{
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
+	}
+
+	async onModuleInit()
+	{
+		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
 		this.checkIOAccessPath(this.publicPathLarge);
 		this.checkIOAccessPath(this.publicPathMedium);
 		this.checkIOAccessPath(this.publicPathSmall);
 		this.checkIOAccessPath(this.publicPathMicro);
 		this.checkIOAccessPath(this.publicPathTemp);
+	}
+
+	public	triggerShutDown(stringReason: string)
+	{
+		this.logger.error("Server will shuting down reason: " + stringReason);
+		this.shutdown$.next(stringReason);
+	}
+
+	public	getShutdown$()
+	{
+		return (this.shutdown$);
+	}
+
+	public onModuleDestroy()
+	{
+		//  cleaning here
+		this.logger.debug("The application is closing connection");
 	}
 
 	public	getConfig()
@@ -121,6 +150,97 @@ export class UserService
 			else
 				this.logger.verbose("The path for public storage is okay and accessible");
 		});
+	}
+
+	private async isHavingPreviousPermalinks(actualServerCfg: ServerConfig): Promise<boolean>
+	{
+		const	prisma = new PrismaClient();
+		const	permalinkVersion = "prod-v2";
+		// console.log(prisma.permalinks);
+		try
+		{
+			const permalinks = await prisma.permalinks.findUnique(
+				{
+					where:
+					{
+						version: permalinkVersion
+					}
+				});
+			this.logger.verbose("permalink setted ?: " + (permalinks !== null));
+			if (permalinks === null)
+			{
+				try
+				{
+					await prisma.permalinks.create(
+					{
+
+						data: {
+							version: permalinkVersion,
+							contents: actualServerCfg.serialize()
+						}
+					}
+					);
+					await this.isHavingPreviousPermalinks(actualServerCfg);
+				}
+				catch (error)
+				{
+					this.logger.error(error);
+				}
+			}
+			else
+			{
+				const compareFromDB = await JSON.parse(permalinks.contents);
+				console.log(compareFromDB);
+				const requestedCmp = await JSON.parse(actualServerCfg.serialize());
+				console.log(requestedCmp);
+				if (compareFromDB === requestedCmp)
+				{
+					this.logger.error("Permalink already set but environnement changing");
+					return (false);
+				}
+				this.logger.warn("Permalinks already set, must not change until drop table");
+			}
+			this.logger.verbose(JSON.stringify(permalinks));
+		}
+		catch(error)
+		{
+			this.logger.error(error);
+			return (false);
+		}
+		return (true);
+	}
+	private	async checkPermalinks()
+	{
+		const test = new ServerConfig();
+		this.logger.verbose("Permalinks verifications from environement:");
+		this.logger.verbose("Location: " + test.location);
+		this.logger.verbose("Protocol: " + test.protocol);
+		this.logger.verbose("Port: " + test.port);
+		if (!test.port || !test.location || !test.protocol)
+		{
+			this.logger.error("Production file must have server config environnement");
+			// this.triggerShutDown("ENVIRONNEMENT UNSETTED");
+		}
+		else
+		{
+			// await this.isHavingPreviousPermalinks(test);
+			// prisma.
+			// prisma
+			// prisma.secretTable
+			// 	.create(
+			// 		{
+			// 			data: toDB
+			// 		}
+			// 	).then(() =>
+			// 	{
+			// 		this.loadSecretFromDB();
+			// 	})
+			// 	.catch((error: any) =>
+			// 	{
+			// 		this.logger.error(error);
+			// 	});
+		}
+		this.logger.verbose("Permalinks check ending");
 	}
 
 	public getAllUserRaw () : Array<UserModel>

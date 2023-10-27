@@ -19,6 +19,8 @@ import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 import { UserModule } from "./user/user.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { dirname, join } from "path";
+import { GracefulShutdownModule } from "nestjs-graceful-shutdown";
+import { UserService } from "./user/user.service";
 
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
@@ -40,6 +42,17 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 				{
 					index: false
 				}
+			}),
+		GracefulShutdownModule
+			.forRoot({
+				cleanup: async (app) =>
+				{
+					// releasing ressources
+					console.log("Releasing ressources");
+				},
+				gracefulShutdownTimeout:
+					Number(process.env.GRACEFULL_SHUTDOWN_TIMEOUT ?? 10000),
+				keepNodeProcessAlive: true,
 			}),
 	],
 	controllers: [

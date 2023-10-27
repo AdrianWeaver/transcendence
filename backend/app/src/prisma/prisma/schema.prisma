@@ -21,3 +21,8 @@ model ChatJson {
   chatJsonID String @id @default(uuid())
   contents   String
 }
+
+model Permalinks {
+  version  String @id
+  contents String
+}
