@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import { useState } from "react";
@@ -17,8 +18,15 @@ import {
 
 import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
-import { userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
+import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import {
+	hashPassword,
+	registerInfosInBack,
+	setPassword,
+	setPseudo,
+	userRegistrationStepThree,
+	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
+import axios from "axios";
 
 type PasswordAlertProps ={
 	password: string,
@@ -150,7 +158,15 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 		return (<></>);
 };
 
-const	FirstStepFormContent = () =>
+type	FirstStepFormContentProps =
+{
+	readonly username: string
+	readonly email: string
+	readonly lastName: string
+	readonly firstName: string
+};
+
+const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 {
 	const	dispatch = useAppDispatch();
 
@@ -170,13 +186,30 @@ const	FirstStepFormContent = () =>
 
 	const	[
 		passwordValue,
-		setPassword
+		setPasswordValue
 	] = useState("");
+
+	const	[
+		usernameValue,
+		setUsernameValue
+	] = useState(props.username);
 
 	const	[
 		uniquePassword,
 		setUniquePassword
 	] = useState(false);
+
+	const
+	[
+		hasError,
+		setHasError
+	]	= useState(false);
+
+	const
+	[
+		errorMessage,
+		setErrorMessage
+	]	= useState("An error");
 
 	const	handleUniquePassword = () =>
 	{
@@ -188,8 +221,16 @@ const	FirstStepFormContent = () =>
 	) =>
 	{
 		event.preventDefault();
-		setPassword(event.target.value);
+		setPasswordValue(event.target.value);
 		setPasswordFirstTrigger(true);
+	};
+
+	const	handleUsernameChangeValue = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) =>
+	{
+		event.preventDefault();
+		setUsernameValue(event.target.value);
 	};
 
 	const	[
@@ -206,12 +247,18 @@ const	FirstStepFormContent = () =>
 		setPasswordFirstTriggerConfirm(true);
 	};
 
+	const token = useAppSelector((state) =>
+	{
+		return (state.controller.user.bearerToken);
+	});
+
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
 		event.preventDefault();
+		setHasError(false);
+		setErrorMessage("");
 		const	data = new FormData(event.currentTarget);
 		const	userSignup = new UserRegistration(data);
-		// console.log(userSignup.getPlainObject());
 		userSignup.check();
 		setErrorValidation(userSignup.errorTable);
 		// console.log(errorValidation);
@@ -227,17 +274,63 @@ const	FirstStepFormContent = () =>
 			key;
 			return (value === true);
 		});
-		console.log("filtered", filtered);
+		// this is error filter 
+		// console.debug("filtered", filtered);
 		// verifier toute les informations
 		if (filtered.length === 0)
-			dispatch(userRegistrationStepTwo());
+		{
+			const objToSend = userSignup.getPlainObject();
+			const	config = {
+				headers: {
+					"Authorization": token
+				}
+			};
+			axios
+			.post("http://localhost:3000/user/register/step-one",
+				objToSend,
+				config
+			)
+			.then((response) =>
+			{
+				console.log(response);
+				// // TEST
+				// dispatch(registerInfosInBack(userSignup.username, "username"));
+				dispatch(setPassword(userSignup.password));
+				// dispatch(hashPassword(userSignup.password));
+				dispatch(userRegistrationStepThree());
+			})
+			.catch((error: any) =>
+			{
+				setErrorMessage(error.response.data.info);
+				setHasError(true);
+			});
+		}
 	};
 
 	const	disclamer = "Je suis sur de ne pas utiliser"
-		+ "le meme mot de passe de connexion a l'intra 42";
+		+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
+			<Grid item xs={12}>
+					<TextField
+						name="username"
+						required
+						fullWidth
+						id="username"
+						label="Username"
+						// defaultValue={props.username}
+						value={usernameValue}
+						onChange={handleUsernameChangeValue}
+						error={errorValidation.username}
+						helperText={
+							// NEED TO CHECK IS IT S USED
+							errorValidation.username
+								? "Username is required"
+								: ""
+						}
+					/>
+				</Grid>
 				<Grid item xs={12} sm={6}>
 					<TextField
 						autoComplete="given-name"
@@ -246,6 +339,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="firstName"
 						label="First Name"
+						value={props.firstName}
 						autoFocus
 						error={errorValidation.firstName}
 						helperText={
@@ -253,6 +347,8 @@ const	FirstStepFormContent = () =>
 								? "First name is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6}>
@@ -261,6 +357,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="lastName"
 						label="Last Name"
+						value={props.lastName}
 						name="lastName"
 						autoComplete="family-name"
 						error={errorValidation.lastName}
@@ -269,6 +366,8 @@ const	FirstStepFormContent = () =>
 								? "Last name is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12}>
@@ -277,6 +376,7 @@ const	FirstStepFormContent = () =>
 						fullWidth
 						id="email"
 						label="Email Address"
+						value={props.email}
 						name="email"
 						autoComplete="email"
 						error={errorValidation.email}
@@ -285,6 +385,8 @@ const	FirstStepFormContent = () =>
 								? "Email is required"
 								: ""
 						}
+						contentEditable={false}
+						variant="filled"
 					/>
 				</Grid>
 				<Grid item xs={12}>
@@ -348,6 +450,13 @@ const	FirstStepFormContent = () =>
 						label={disclamer}
 					/>
 					<UniqueAlert isUnique={uniquePassword} />
+					{
+						(hasError)
+						? (<Alert severity="error" >
+								{errorMessage}
+							</Alert>)
+						: <></>
+					}
 				</Grid>
 			</Grid>
 			<Button
@@ -369,7 +478,7 @@ const	FirstStepFormContent = () =>
 				</Link>
 				</Grid>
 			</Grid>
-			</Box>
+		</Box>
 	);
 };
 

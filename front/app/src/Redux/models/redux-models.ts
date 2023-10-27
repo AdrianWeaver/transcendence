@@ -1,32 +1,28 @@
-export interface MessageModelInterface
-{
-	sender: string,
-	message: string,
-	mode: string
-}
-
 type MessageModel =
 {
 	sender: string,
 	message: string,
-	mode: string
+	mode: string,
+	username: string,
 }
-
-export interface MessageRoomModel
-{
-	"id": string,
-	"roomName": string,
-	// private msg or channel:
-	"privateConv": boolean,
-	"content": MessageModel[],
-}
-
 export	interface ChatUserModel
 {
+	// name == pseudo
 	"name": string,
 	"id": string,
 	"avatar": string,
-	"msgRoom": MessageRoomModel[]
+	"password": string,
+}
+
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
 }
 
 export interface ChatModel
@@ -47,17 +43,45 @@ export interface ChatModel
 	"numberOfChannels": number
 }
 
+export interface	ProfileModel
+{
+	editView: boolean,
+	friendView: boolean,
+	publicView: boolean
+	myView: boolean
+}
 export interface	UserModel
 {
 	"isLoggedIn": boolean,
+	"login": string,
 	"username": string,
 	"bearerToken": string,
 	"rememberMe": boolean,
 	"chat": ChatModel,
 	"id": number,
-	"email": string
+	"email": string,
+	"firstName": string,
+	"lastName": string,
 	"registrationProcess": boolean,
-	"registrationError": string
+	"registrationError": string,
+	"doubleAuth": boolean,
+	"codeValidated": boolean,
+	"otpCode": string,
+	"phoneNumber": string,
+	"registered": boolean,
+	"avatar": string,
+	"ftAvatar": {
+		link: string,
+		version: {
+			large: string,
+			medium: string,
+			small: string,
+			mini: string
+		}
+	},
+	"profile": ProfileModel,
+	"password": string,
+	"location": string,
 }
 
 export interface	AnonymousUserModel
@@ -122,12 +146,14 @@ export interface	CanvasModel
 
 export interface	ControllerModel
 {
+	"allUsers": BackUserModel[],
+	"allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,
 	"user": UserModel,
 	"registration": RegistrationProcessModel,
-	"canvas": CanvasModel
+	"canvas": CanvasModel,
 }
 
 export interface	Dimension

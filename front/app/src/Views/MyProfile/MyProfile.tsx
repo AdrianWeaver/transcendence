@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -7,17 +8,23 @@ import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import Title from "./components/Title";
 import data from "./realFakeData.json";
 import { ConstructionSharp } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, TextField, Typography } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { io } from "socket.io-client";
+import EditProfile from "./components/EditProfile";
+import { addUserAsFriend, setProfileEditView, setProfileFriendView, setProfileMyView, setProfilePublicView } from "../../Redux/store/controllerAction";
+import { addUserToFriends } from "../Chat/actionsSocket/addUserToFriends";
+import { useNavigate } from "react-router-dom";
+import UpdateMyProfilePicture from "../../Component/DropZoneImage/UpdateMyProfilePicture";
 
 type	FriendsModel =
 {
 	id: number,
-	name: string
+	name: string,
+	profileId: string,
 }
 
 type FriendsMapModel = {
@@ -29,34 +36,47 @@ type FriendsMapModel = {
 const	MyProfile = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
+	const	prevPage= useAppSelector((state) =>
+	{
+		return (state.controller.previousPage);
+	});
+
+	const	oldPrevPage = prevPage;
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
 	});
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	// console.log(data);
-	let	ft, online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
+	let	online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
 	let	id, lastName, firstName, login, email, active, avatar;
 
-	ft = true;
-	const	displayStyle: React.CSSProperties = {
-		textAlign: "center",
-		fontSize: "8px"
-	};
+	// const	displayStyle: React.CSSProperties = {
+	// 	textAlign: "center",
+	// 	fontSize: "8px"
+	// };
 
-	if (data !== undefined)
+	if (user !== undefined)
 	{
-		id = data.id;
-		lastName = data.last_name;
-		firstName = data.first_name;
-		login = data.login;
-		email = data.email;
-		active = data["active?"];
-		avatar = data.image;
-		rank = 5;
-		gamesPlayed = 20;
-		victories = 9;
-		defeats = 11;
+		id = user.id;
+		lastName = user.lastName;
+		firstName = user.firstName;
+		login = user.username;
+		email = user.email;
+		console.log("avatar ", user.avatar);
+		if (user.avatar)
+			avatar = user.avatar;
+		else if (user.avatar === undefined)
+			avatar = "https://thispersondoesnotexist.com";
+		rank = 25;
+		gamesPlayed = 250;
+		victories = 19;
+		defeats = 122151;
 		perfectGame = 3;
 	}
 	else
@@ -67,7 +87,7 @@ const	MyProfile = () =>
 		login = "undefined";
 		email = "undefined";
 		active = undefined;
-		avatar = "https://thispersondoesnotexist.com/";
+		avatar = "https://thispersondoesnotexist.com";
 		rank = 5;
 		gamesPlayed = 20;
 		victories = 9;
@@ -172,17 +192,6 @@ const	MyProfile = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
-	const	addUserToFriends = () =>
-	{
-		const	action = {
-			type: "add-friend",
-			payload: {
-				friendName: activeId,
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
 	const	addFriendsToBlocked = (userName: string) =>
 	{
 		const	action = {
@@ -216,7 +225,6 @@ const	MyProfile = () =>
 		// TEST NEED TO VERIFY IT'S NOT USED PSEUDO
 		setPseudo(newPseudo);
 	};
-
 	changePseudo(login);
 // TEST
 	playing = true;
@@ -229,26 +237,42 @@ const	MyProfile = () =>
 	else
 		status = "🔴";
 		// console.log(status);
+
+	const	editOrFriendRequest = () =>
+	{
+		if (user.profile.publicView)
+		{
+			// How can I get the friend Id ?
+			dispatch(addUserAsFriend(activeId));
+			console.log(activeId, " active id ", user.id, " id");
+		}
+		else if (user.profile.myView)
+			dispatch(setProfileEditView());
+		console.log("edit view: ", user.profile.editView);
+		console.log("friend view", user.profile.friendView);
+		console.log("public view", user.profile.publicView);
+		console.log("my view: ", user.profile.myView);
+	};
+
 	return (
 		<>
-
 			<MenuBar />
-			<Title
-				name={pseudo}
-			/>
-			<Button onClick={addUserToFriends} variant="outlined">ADD AS FRIEND
-			</Button>
-			<div className="wrapper">
-				<Grid container>
-						<Grid item xs={6}>
+			{
+				(user.profile.editView)
+				? 	<EditProfile
+						setting={false} />
+				: <div className="wrapper">
+					<Grid container>
+						<Grid item xs={12} sm={6}>
 								<LeftSide
 									status={status}
 									pseudo={pseudo}
-									imageUrl={avatar.link}
+									imageUrl={avatar}
 									defaultUrl="https://thispersondoesnotexist.com/"
+									prevPage={prevPage}
 								/>
 						</Grid>
-						<Grid item xs={6}>
+						<Grid item xs={12} sm={6}>
 								<RightSide
 									rank={rank}
 									gamesPlayed={gamesPlayed}
@@ -259,102 +283,23 @@ const	MyProfile = () =>
 									firstName={firstName}
 								/>
 						</Grid>
-				</Grid>
-			</div>
-			{/* <Button onClick={() =>
-			{
-				return handleFriendsClickOpen(buttonSelection.name);
-			}}>
-				Friends
-			</Button> */}
-			{/* <Dialog open={friendsOpen} onClose={handleFriendsClose} maxWidth="sm" fullWidth>
-				<DialogTitle>
-					Friends of {pseudo}
-				</DialogTitle>
-					 <DialogContent>
-					<ul>
+					</Grid>
 					{
-						friends.map((friend) =>
-						{
-							return (<li key={friend.id}>
-									{friend.name}
-									{friend.name !== uniqueId && (
-									<>
-										<Button onClick={() =>
-										{
-											removeFriend(friend.name);
-											handleFriendsClose();
-										}}>
-											Remove from friends
-										</Button>
-									</>)}
-									{friend.name !== uniqueId && (
-									<>
-										<Button onClick={() =>
-										{
-											addUserToFriends(friend.name);
-										}}>
-											Add friend
-										</Button>
-										<Button onClick={() =>
-										{
-											addFriendsToBlocked(friend.name);
-										}}>
-											Block
-										</Button>
-										<Button onClick={() =>
-										{
-											setInviteDialogOpen(true);
-											// inviteUserToChannel(friend.name);
-										}}>
-											Invite to a chan
-										</Button>
-										<Dialog open={inviteDialogOpen} onClose={() =>
-											{
-												setInviteDialogOpen(false);
-											}}
-											maxWidth="sm" fullWidth>
-											<DialogTitle>Invite friend to Channel</DialogTitle>
-											<DialogContent>
-												<TextField
-												label="Channel Name"
-												variant="outlined"
-												fullWidth
-												value={channelToInvite}
-												onChange={(e) =>
-												{
-													console.log("target value " + e.target.value);
-													setChannelToInvite(e.target.value);
-												}}/>
-											</DialogContent>
-											<DialogActions>
-												<Button onClick={() =>
-													{
-														inviteFriendToChannel(friend.name);
-														setInviteDialogOpen(false);
-													}} color="primary">
-													Invite
-												</Button>
-												<Button onClick={() =>
-												{
-													setInviteDialogOpen(false);
-												}} color="primary">
-												Cancel
-												</Button>
-											</DialogActions>
-										</Dialog>
-									</>)}
-								</li>);
-						})
+						(user.profile.friendView)
+						? <></>
+						: <Button onClick={editOrFriendRequest} variant="outlined">
+							{
+								(user.profile.publicView)
+								? "ADD AS FRIEND"
+								: (user.profile.friendView)
+									? <></>
+									: "EDIT PROFILE"
+							}
+						</Button>
 					}
-					</ul>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleFriendsClose} color="primary">
-						Close
-					</Button>
-				</DialogActions>
-			</Dialog> */}
+				</div>
+			}
+			<UpdateMyProfilePicture />
 		</>
 	);
 };

@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+import { Public } from "@mui/icons-material";
 import UserRegistration from "./UserRegistration";
 /* eslint-disable max-statements */
 
@@ -9,6 +11,7 @@ class	UserRegistrationChecker
 	public	email: boolean;
 	public	password: boolean;
 	public	uniqueness: boolean;
+	public	username: boolean;
 
 	constructor()
 	{
@@ -17,6 +20,7 @@ class	UserRegistrationChecker
 		this.email = false;
 		this.password = false;
 		this.uniqueness = false;
+		this.username = false;
 	}
 
 	public checkData(data: UserRegistration)
@@ -39,6 +43,11 @@ class	UserRegistrationChecker
 			this.password = true;
 		if (data.uniquenessPassword !== "AgreeWithUniquenessOfPassword")
 			this.uniqueness = true;
+		// check username unique
+		if (data.username === undefined || data.username.length === 0 )
+			this.username = true;
+		const	validChar = /^[A-Za-z][A-Za-z0-9_]{3,8}$/;
+		this.username = !(validChar.test(data.username));
 		const	emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 		this.email = !(emailRegex.test(data.emailAddress));
 	}
@@ -50,6 +59,7 @@ class	UserRegistrationChecker
 		this.email = false;
 		this.password = false;
 		this.uniqueness = false;
+		this.username = false;
 	};
 
 	public	getPlainObject = () =>
@@ -60,6 +70,7 @@ class	UserRegistrationChecker
 			email: this.email,
 			password: this.password,
 			uniqueness: this.uniqueness,
+			username: this.username
 		});
 	};
 }

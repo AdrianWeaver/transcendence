@@ -1,42 +1,54 @@
+/* eslint-disable max-statements */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable eqeqeq */
-import { Avatar } from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 import { useState } from "react";
+import { render } from "react-dom";
 
 
 type	MyAvatarProps =
 {
-	imageUrl: string | ((url: string) => string);
+	imageUrl: string;
 	defaultUrl: string;
 	pseudo: string;
 }
 
 const	MyAvatar = (props: MyAvatarProps) =>
 {
-	const [
-defaultImage,
-setDefaultImage
-] = useState(true);
+	const
+	[
+		defaultImage,
+		setDefaultImage
+	] = useState(true);
 // call this method inner componentDidMount
 	const	renderImage = () =>
 	{
-		const	img = props.imageUrl.toString();
+		let	img;
+
+		if (props.imageUrl === undefined)
+			setDefaultImage(true);
+		else
+			if (props.imageUrl !== undefined)
+				img = props.imageUrl;
 		fetch(img)
 		.then((res) =>
-{
-		if(res.status == 404)
+		{
+			if(res.status == 404)
 
-			setDefaultImage(true);
+				setDefaultImage(true);
 
-		else
+			else
 
-			setDefaultImage(false);
-    })
+				setDefaultImage(false);
+		})
     .catch((err) =>
 	{
       setDefaultImage(true);
     });
   };
+  renderImage();
    // use where u want
    const myImage = defaultImage ? <Avatar
 										alt={props.pseudo}
@@ -58,7 +70,7 @@ setDefaultImage
 										/>;
 	return (
 		<>
-			{myImage};
+			{myImage}
 		</>
 	);
 };

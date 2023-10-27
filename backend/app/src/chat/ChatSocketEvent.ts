@@ -7,7 +7,6 @@ import { Server, Socket } from "socket.io";
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
-import { Prisma } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import
 {
@@ -22,6 +21,10 @@ import
 }	from "@nestjs/websockets";
 import { ChatService } from "./Chat.service";
 import { Logger } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { UserService } from "src/user/user.service";
+import	* as jwt from "jsonwebtoken";
+import { error, profile } from "console";
 
 type	ActionSocket = {
 	type: string,
@@ -32,23 +35,34 @@ type MessageModel =
 {
 	sender: string,
 	message: string,
-	id: number
+	id: number,
+	username: string,
 }
 
 type	MembersModel =
 {
 	id: number,
-	name: string
+	name: string,
+	profileId: string,
+	userName: string,
 }
 
-type	FriendsModel =
+export type	FriendsModel =
 {
 	id: number,
-	name: string
+	name: string,
+	profileId: string,
+}
+
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
 }
 
 @WebSocketGateway(
 {
+	path: "/socket-chat",
 	cors:
 	{
 		origin: "*"
@@ -61,63 +75,124 @@ export class ChatSocketEvents
 		server: Server;
 		private readonly logger = new Logger("Chat-socket-events");
 
-		public	constructor(private readonly chatService: ChatService)
+		public	constructor(
+			private readonly chatService: ChatService,
+			private readonly userService: UserService)
 		{
 			this.logger.debug("An instance is started with chat service id: "
 				+ this.chatService.getChatInstanceId());
+			this.logger.debug("User instance service is :"
+				+ this.userService.getUuidInstance());
 		}
 
 		afterInit(server: any)
 		{
+			// this.chatService.setServer(this.server);
 		}
 
 		handleConnection(client: Socket)
 		{
-			const searchUser = this.chatService.searchUser(client.id);
-			if (searchUser === undefined)
+			this.chatService.setServer(this.server);
+			// console.log(client.handshake.auth);
+			// if (client.handshake.auth)
+			let profileId: string;
+			if (client.handshake.auth)
 			{
-				const newUser = new User("test", client);
-				this.chatService.pushUser(newUser, client.id);
+				const	secret = this.userService.getSecret();
+				const	bearerToken: string = client.handshake.auth.token;
+				// console.log(bearerToken);
+				const	token = bearerToken.split("Bearer ");
+				if (token.length !== 2)
+				{
+					client.disconnect();
+					return ;
+				}
+				try
+				{
+					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
+					profileId = decodedToken.id;
+
+					this.logger.warn("ProfileId: ", profileId);
+
+					const index = this.chatService.getIndexUserWithProfileId(profileId);
+					if (index === -1)
+					{
+						this.logger.log("User not found");
+						const userName = this.userService.getUsernameByProfileId(profileId) as string;
+						const newUser = new User(userName, profileId);
+						newUser.setClient(client);
+						this.chatService.pushUser(newUser, client.id);
+					}
+					else
+					{
+						this.logger.log("User found");
+						this.chatService.setSocketToUser(index, client);
+						this.chatService.updateUserSocketInChannels(client);
+
+						this.chatService.updateMemberSocketId(client.id, profileId);
+
+						this.chatService.updateChannelsAdminSocketId(client.id, profileId);
+						this.chatService.updateChannelOwner(client.id, profileId);
+						this.chatService.updateUserInChannels(client.id, profileId);
+						this.chatService.updateUserInChat(client.id, profileId);
+
+						this.chatService.updateBannedInChannel(client.id, profileId);
+					}
+					this.chatService.updateDatabase();
+				}
+				catch (error)
+				{
+					if (error instanceof jwt.JsonWebTokenError)
+					{
+						this.logger.warn("A client try to connect without authenticate");
+						client.disconnect();
+						return ;
+					}
+					this.logger.error(error);
+					return ;
+				}
+			}
+			else
+			{
+				this.logger.warn("A client try to connect without authenticate");
+				client.disconnect();
+				return ;
+			}
+
+			// INIT CHANNELS, USERS, FRIENDS DISPLAY
+
+			const	userMe = this.chatService.getUserBySocketId(client.id);
+			if (userMe !== undefined)
+			{
+				const	friendsArr: string[] = [];
+
+				userMe.friends.forEach((friend) =>
+				{
+					friendsArr.push(friend.name);
+				});
 				const	action = {
 					type: "init-channels",
 					payload: {
 						channels: this.chatService.getChanMap(),
+						friends: friendsArr,
 						uniqueId: client.id,
-						privateMessage: this.chatService.getPrivateMessageMap()
+						privateMessage: this.chatService.getPrivateMessageMap(),
 					}
 				};
-				client.emit("display-channels", action);
+				client.emit("repopulate-on-reconnection", action);
 			}
 		}
 
 		handleDisconnect(client: Socket)
 		{
-			const	userIndex = this.chatService.searchUserIndex(client.id);
-			const	socketIndex = this.chatService.searchSocketIndex(client.id);
-			if (userIndex !== undefined)
-				this.chatService.deleteUser(userIndex, socketIndex);
+			// const	userIndex = this.chatService.searchUserIndex(client.id);
+			// const	socketIndex = this.chatService.searchSocketIndex(client.id);
+			// if (userIndex !== undefined)
+			// {
+				// this.chatService.deleteUser(userIndex, socketIndex);
+				// this.chatService.updateDatabase();
+			// }
 		}
-
-		@SubscribeMessage("display-conversation")
-		handleDisplayConversationWindow(
-			@MessageBody() data: ActionSocket,
-			@ConnectedSocket() client: Socket
-		)
-		{
-				if (data.type === "display-conversation")
-				{
-					const action = {
-						type: "conversation",
-						payload:
-						{
-							sender: client.id,
-							// conversationId: chanName
-							privMsgMap: this.chatService.getPrivateMessageMap()
-						}
-					};
-					this.server.to(data.payload.chanName).emit("display-conversation", action);
-				}
-			}
 
 		@SubscribeMessage("sending-message")
 		handleSendingMessageToUser(
@@ -160,12 +235,12 @@ export class ChatSocketEvents
 				{
 					return (client.id === elem.id);
 				});
-				copyUsers.splice(searchUser, 1);
+				if (searchUser !== -1)
+					copyUsers.splice(searchUser, 1);
 				const action = {
 					type: "sending-list-user",
 					payload:
 					{
-						// arrayListUsers: this.chatService.getAllUsers(),
 						arrayListUsers: copyUsers,
 						kind: "privateMessage"
 					}
@@ -194,9 +269,11 @@ export class ChatSocketEvents
 				const newMessage: MessageModel = {
 					sender: client.id,
 					message: data.payload.message,
-					id: id
+					id: id,
+					username: this.chatService.getUsernameWithSocketId(client.id) as string,
 				};
 				channel.addNewMessage(newMessage);
+				this.chatService.updateDatabase();
 				const	action = {
 					type: "update-messages",
 					payload: {
@@ -246,14 +323,23 @@ export class ChatSocketEvents
 					}
 					if (kind === "channel")
 					{
-						const newChannel = new Channel(chanName,
-						client,
-						data.payload.chanMode,
-						data.payload.chanPassword,
-						kind);
+						const profileId = this.chatService.getProfileIdFromSocketId(client.id);
+						if (profileId === "undefined")
+							throw new Error("'create-channel' ChatSocketEvent");
+						const	searchUser = this.chatService.getUserWithProfileId(profileId);
+						if (searchUser === undefined)
+							throw new Error("'create-channel' ChatSocketEvent");
+						const	newChannel = new Channel(chanName);
+						newChannel.setClient(client, profileId);
+						newChannel.setId();
+						newChannel.setKind(kind);
+						newChannel.setPassword(data.payload.chanPassword);
+						newChannel.setMode(data.payload.chanMode);
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
+						searchUser?.channels.push(newChannel.id);
 						this.chatService.addNewChannel(newChannel, data.payload.chanId, kind);
+						this.chatService.updateDatabase();
 						const	action = {
 							type: "add-new-channel",
 							payload:
@@ -269,18 +355,22 @@ export class ChatSocketEvents
 					{
 						if (searchConv === undefined && alreadyCreated === false)
 						{
-							const newPrivateMsg = new Channel(chanName,
-							client,
-							"",
-							"",
-							kind);
+							const newPrivateMsg = new Channel(chanName);
+							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
+							newPrivateMsg.setId();
+							newPrivateMsg.setPassword("");
+							newPrivateMsg.setKind(kind);
+							newPrivateMsg.setMode("private");
 							newPrivateMsg.chat = this.chatService.getChat();
-							newPrivateMsg?.users.push(data.payload.activeId);
-							// newPrivateMsg?.users.push(client.id);
+							const obj: MemberSocketIdModel = {
+								memberSocketId: data.payload.activeId,
+								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
+							};
+							newPrivateMsg?.users.push(obj);
 							newPrivateMsg?.addAdmin(data.payload.activeId);
-							newPrivateMsg?.addAdmin(client.id);
 							client.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
+							this.chatService.updateDatabase();
 						}
 						const	action = {
 							type: "add-new-channel",
@@ -324,6 +414,7 @@ export class ChatSocketEvents
 				if (isAdmin === true)
 				{
 					this.chatService.deleteChannel(data.payload.name);
+					this.chatService.updateDatabase();
 					this.server.emit("display-channels", action);
 				}
 				else
@@ -333,7 +424,7 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join" && data.payload.kind === "channel")
+			if (data.type === "asked-join" && data.payload.kind !== "privateMessage")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
@@ -346,9 +437,12 @@ export class ChatSocketEvents
 				};
 				if (searchChannel === undefined)
 					return ;
-
+				const	searchUser = this.chatService.getUserWithProfileId(data.payload.id);
+				if (searchUser === undefined)
+					throw new Error("'asked-join ChatSocketEvent");
+				searchUser?.channels.push(searchChannel.id);
 				if (searchChannel.isMember(client.id) === true)
-					action.payload.message = "You are already in this channel.";
+					action.payload.message = "You are already in this channel";
 				if (searchChannel.mode === "private")
 					action.payload.message = "This channel is private";
 				if (searchChannel.isBanned(client.id) === true)
@@ -362,7 +456,8 @@ export class ChatSocketEvents
 					const newMessage: MessageModel = {
 						sender: "server",
 						message: messageText,
-						id: id
+						id: id,
+						username: "server",
 					};
 					searchChannel.addNewMessage(newMessage);
 					const	messageAction = {
@@ -373,14 +468,16 @@ export class ChatSocketEvents
 							socketId: client.id,
 						}
 					};
-					// const room = this.server.sockets.adapter.rooms.get(searchChannel.name);
-					// if (room)
-					// 	console.log("room members: " + room.size);
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
 
 					searchChannel.members++;
-					searchChannel?.users.push(client.id);
+					const obj: MemberSocketIdModel = {
+						memberSocketId: client.id,
+						profileId: this.chatService.getProfileIdWithUserName(client.id) as string,
+					};
+					searchChannel?.users.push(obj);
 					searchChannel.sockets.push(client);
+					this.chatService.updateDatabase();
 				}
 			}
 
@@ -394,26 +491,30 @@ export class ChatSocketEvents
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel?.password === data.payload.password)
+				{
 					action.payload.correct = "true";
+				}
 				client.emit("display-channels", action);
 			}
 
 			if (data.type === "did-I-join")
 			{
-				let	channel;
-				channel = this.chatService.searchChannelByName(data.payload.chanName);
+				let	channel: Channel;
+				channel = this.chatService.searchChannelByName(data.payload.chanName) as Channel;
 				if (channel === undefined)
-					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
+				{
+					channel = this.chatService.searchPrivateConvByName(data.payload.chanName) as Channel;
+				}
 				const	action = {
 					type: "confirm-is-inside-channel",
 					payload: {
 						chanName: data.payload.chanName,
 						isInside: "",
 						chanMessages: channel?.messages,
-						kind: data.payload.kind
+						kind: data.payload.kind,
 					}
 				};
-				if (channel?.isMember(client.id) === false)
+				if (channel.isMember(client.id) === false)
 					action.payload.isInside = "You must first join the channel";
 				client.emit("channel-info", action);
 			}
@@ -430,7 +531,8 @@ export class ChatSocketEvents
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: message,
-					id: id
+					id: id,
+					username: "server",
 				};
 				channel.addNewMessage(newMessage);
 				const	action = {
@@ -444,6 +546,7 @@ export class ChatSocketEvents
 				this.server.to(data.payload.chanName).emit("update-messages", action);
 				action.payload.message = "You have been removed from " + data.payload.chanName;
 				client.emit("left-message", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "kick-member" || data.type === "ban-member")
@@ -457,18 +560,41 @@ export class ChatSocketEvents
 				channel.leaveChannel(targetClient);
 				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
+				const profId = this.chatService.getProfileIdFromSocketId(client.id);
+				if (profId === undefined || profId === "undefined")
+					return ;
+				const	searchUser = this.chatService.getUserWithProfileId(profId);
+				if (searchUser === undefined)
+					throw new Error("User not found - kick/ban-member ChtSocketEvent");
 				let message: string;
 				if (data.type === "kick-member")
+				{
+					// const	chanIndex = searchUser.channels.findIndex((elem) =>
+					// {
+					// 	return (elem === channel.id);
+					// });
+					// if (chanIndex === -1)
+					// 	return ;
+					// searchUser.channels.splice(chanIndex, 1);
 					message = data.payload.userName + " has been kicked.";
+				}
 				else
 				{
+					// const	chanIndex = searchUser.channels.findIndex((elem) =>
+					// {
+					// 	return (elem === channel.id);
+					// });
+					// if (chanIndex === -1)
+					// 	return ;
+					// searchUser.channels.splice(chanIndex, 1);
 					message = data.payload.userName + " has been banned.";
-					channel.addToBanned(data.payload.userName);
+					channel.addToBanned(data.payload.userName, profId);
 				}
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: message,
-					id: id
+					id: id,
+					username: "server",
 				};
 				channel.addNewMessage(newMessage);
 				const	action = {
@@ -485,6 +611,7 @@ export class ChatSocketEvents
 				else
 					action.payload.message = "You have been banned from " + channel.name;
 				targetClient.emit("left-message", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "member-list")
@@ -496,9 +623,15 @@ export class ChatSocketEvents
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
+					const profId = this.chatService.getProfileIdWithUserName(user.memberSocketId);
+					if (profId === undefined)
+						return ;
+					const	userName = this.chatService.getUsernameWithSocketId(user.memberSocketId) as string;
 					const newMember: MembersModel = {
 						id: memberList.length + 1,
-						name: user,
+						name: user.memberSocketId,
+						profileId: profId,
+						userName: userName,
 					};
 					memberList.push(newMember);
 				}
@@ -507,6 +640,7 @@ export class ChatSocketEvents
 					payload: {
 						memberList: memberList,
 						isAdmin: isAdmin,
+						uniqueId: client.id,
 					}
 				};
 				client.emit("channel-info", action);
@@ -521,41 +655,94 @@ export class ChatSocketEvents
 		{
 			if (data.type === "add-friend")
 			{
-				const	userMe = this.chatService.getUserByName(client.id);
-				if (userMe === undefined)
+				this.logger.debug("add friend requested");
+				const	friendUser = this.chatService.getUserBySocketId(data.payload.friendName);
+				const	userMe = this.chatService.getUserBySocketId(client.id);
+				console.log("Me ", userMe);
+				console.log("Friend", friendUser);
+
+				if (userMe === undefined || friendUser === undefined)
 					return ;
-				const	id = userMe?.friends.length + 1;
-				const newMember: FriendsModel = {
-					id: id,
-					name: data.payload.friendName,
-				};
-				userMe?.friends.push(newMember);
+				let message: string;
+				message = "";
+				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
+				// const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
+				let state;
+				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
+				if (state === "ERROR")
+					return ;
+				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
+				if (state === "ERROR")
+					return ;
+				if (state === "ALREADY_FRIENDS")
+					message = friendUser.name + " is already your friend";
+				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
+				const	friendArrayProfileId = this.userService.getFriendsProfileId(friendUser.profileId);
+				const	myFriendArray: Array<FriendsModel> = [];
+				const	myFriendNameArray: Array<string> = [];
+				const	friendArray: Array<FriendsModel> = [];
+				const	friendNameArray: Array<string> = [];
+
+				myArrayProfileId.forEach((elem, index) =>
+				{
+					const toPush = this.userService.getFriendModel(elem, index);
+					if (toPush === undefined)
+						throw new Error("The dev was lazy");
+					myFriendArray.push(toPush);
+					myFriendNameArray.push(this.userService.getFriendName(elem));
+				});
+				friendArrayProfileId.forEach((elem, index) =>
+				{
+					const toPush = this.userService.getFriendModel(elem, index);
+					if (toPush === undefined)
+						throw new Error("The dev was lazy");
+					friendArray.push(toPush);
+					friendNameArray.push(this.userService.getFriendName(elem));
+				});
+				// NOTICE HERE FRIENDS WAS PUSHED
+				userMe.friends = [...myFriendArray];
+				friendUser.friends = [...friendArray];
 				const	action = {
 					type: "add-friend",
 					payload: {
-						friendList: userMe?.friends,
-						newFriend: data.payload.friendName,
+						friendList: myFriendNameArray,
+						newFriend: friendUser.name,
+						alreadyFriend: message,
 					}
 				};
 				client.emit("user-info", action);
+				this.chatService.updateDatabase();
+					// update user service database
+				// }
 			}
 
 			if (data.type === "block-user")
 			{
-				const	userMe = this.chatService.getUserByName(client.id);
+				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				console.log("blocked: " + data.payload.blockedName);
-				userMe.blocked.push(data.payload.blockedName);
-				console.log("blocked members: " + userMe.blocked);
+				const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
+				if (profId === "undefined")
+					return ;
+				const blockedToAdd: MemberSocketIdModel = {
+					memberSocketId: data.payload.blockedName,
+					profileId: profId,
+				};
+				const arrayBlocked: string[] = [];
+				userMe.blocked.forEach((blocked) =>
+				{
+					arrayBlocked.push(blocked.memberSocketId);
+				});
+				userMe.blocked.push(blockedToAdd);
 				const	action = {
 					type: "block-user",
 					payload: {
-						blockedList: userMe.blocked,
-						newBlocked: data.payload.blockedName,
+						blockedList: arrayBlocked,
+						newBlocked: this.chatService.getUsernameWithSocketId(data.payload.blockedName),
 					}
 				};
 				client.emit("user-info", action);
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "mute-user")
@@ -581,7 +768,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-				if (targetClient === undefined)
+				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
 					type: "invite-member",
@@ -617,13 +804,18 @@ export class ChatSocketEvents
 					targetClient.join(channel.name);
 					channel.members++;
 					channel.sockets.push(targetClient);
-					channel.users.push(targetClient.id);
+					const obj: MemberSocketIdModel = {
+						memberSocketId: targetClient.id,
+						profileId: this.chatService.getProfileIdWithUserName(targetClient.id) as string,
+					};
+					channel.users.push(obj);
 
 					const id = channel.messages.length + 1;
 					const newMessage: MessageModel = {
 						sender: "server",
 						message: targetClient.id + " has been added by " + client.id,
 						id: id,
+						username: "server",
 					};
 					channel.addNewMessage(newMessage);
 					const	messageAction = {
@@ -636,6 +828,7 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 				}
+				this.chatService.updateDatabase();
 			}
 
 			if (data.type === "make-admin")
@@ -644,7 +837,7 @@ export class ChatSocketEvents
 				if (channel === undefined)
 					return ;
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-				if (targetClient === undefined)
+				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
 					type: "make-admin",
@@ -670,6 +863,7 @@ export class ChatSocketEvents
 						sender: "server",
 						message: targetClient.id + " is now an admin.",
 						id: id,
+						username: "server",
 					};
 					channel.addNewMessage(newMessage);
 					const	messageAction = {
@@ -681,6 +875,7 @@ export class ChatSocketEvents
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
+					this.chatService.updateDatabase();
 			}
 		}
 	}

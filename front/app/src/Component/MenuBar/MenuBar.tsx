@@ -14,16 +14,11 @@ import LoginSignupButton from "./LoginSignupButton";
 
 const	MenuBar = () =>
 {
-	let		jsxElementLogin;
 	const	controllerState = useAppSelector((state) =>
 	{
 		return (state.controller);
 	});
 
-	if (controllerState.user.isLoggedIn)
-		jsxElementLogin = <AvatarMenu />;
-	else
-		jsxElementLogin = <LoginSignupButton />;
 	return (
 		<AppBar position="static">
 			<Container maxWidth="xl">
@@ -32,7 +27,11 @@ const	MenuBar = () =>
 					<HamburgerMenu />
 					<IconTitle display="hidde-medium" />
 					<LargeMenu />
-					{jsxElementLogin}
+					{
+						(controllerState.user.isLoggedIn)
+						? <AvatarMenu />
+						: <LoginSignupButton />
+					}
 				</Toolbar>
 			</Container>
 		</AppBar>

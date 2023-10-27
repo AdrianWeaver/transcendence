@@ -8,6 +8,36 @@ export interface ApplicationUserModel
 	createdAt: string;
 	secretValidUntil: string;
 }
+
+export interface UserPublicResponseModel
+{
+	id: any;
+	// phoneNumber: string;
+	email: string;
+	login: string;
+	firstName: string;
+	lastName: string;
+	username: string;
+}
+export	interface ChatUserModel
+{
+	// name == pseudo
+	"name": string,
+	"id": string,
+	"avatar": string,
+	"password": string,
+}
+
+export interface BackUserModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
+}
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;
@@ -15,11 +45,14 @@ export interface UserModel
 	date: string;
 	id: any;
 	email: string;
+	username: string;
 	login: string;
 	firstName: string;
 	lastName: string;
 	url: string;
-	avatar: string | {
+	avatar: string;
+	ftAvatar:
+	{
 		link: string,
 		version:
 			{
@@ -31,17 +64,13 @@ export interface UserModel
 	}
 	location: string;
 	revokedConnectionRequest: boolean;
-	// uuid: string;
-	// password: string;
-	// token: string;
-	// lastConnection: number | "never connected";
-	// createdAt: string;
 	authService:
 	{
 		token: string;
 		expAt: number;
 		doubleAuth:
 		{
+			enable: boolean;
 			valid: boolean;
 			validationCode: string;
 			// model phone number +33621523456
@@ -51,6 +80,9 @@ export interface UserModel
 		}
 	};
 	registrationProcessEnded: boolean;
+	password: string,
+	friendsProfileId: Array<string>
+	// tokenSecret: string
 	// revokeConnectionRequest: boolean;
 }
 
@@ -108,5 +140,19 @@ export interface UserRegisterResponseModel
 	// creationDate: string;
 	token: string;
 	statusCode: number;
+	username: string;
 	login: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	ftAvatar:
+	{
+		link: string,
+		version: {
+			large: string,
+			medium: string,
+			small: string,
+			mini: string
+		}
+	};
 }

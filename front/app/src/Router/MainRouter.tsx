@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 
 import LoggedRouter from "./LoggedRouter";
 import RegistrationRouter from "./RegistrationRouter";
@@ -12,6 +13,7 @@ const	MainRouter: React.FC = () =>
 		return (state.controller);
 	});
 
+	console.log("main router", controller);
 	if (controller.user.isLoggedIn)
 		return (<LoggedRouter />);
 	else

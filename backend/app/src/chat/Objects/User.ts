@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
@@ -9,7 +10,8 @@ import { type } from "os";
 
 type	FriendsModel = {
 	id: number,
-	name: string
+	name: string,
+	profileId: string
 };
 
 type	ProfileModel = {
@@ -25,36 +27,66 @@ type	StatsModel = {
 	victories: number,
 	perfect: number
 };
+
+type MemberSocketIdModel ={
+	memberSocketId: string,
+	profileId: string
+};
 class User
 {
+	public profileId: string;
     public name: string;
 	public profile: ProfileModel;
 	public stats: StatsModel;
-	public client: Socket;
-    public id: string;
-    public chat: Chat | undefined;
-    public channels: Channel[] = [];
-	public blocked: string[] = [];
+    // socket id
+	public id: string;
+    // public channels: Channel[] = [];
+	public channels: string[] = [];
+	public blocked: MemberSocketIdModel[] = [];
 	public friends: FriendsModel[] = [];
+	public chat: Chat | undefined;
+	// this one must be initialisez when reconstructed or when reconnected with id 
+	public client: Socket | null;
 	public unlockChannel: (password: string, chanName: string) => void;
 	public joinChannel: (chanName: string) => void;
 	public leaveChannel: (chanName: string) => void;
 	public createProfile: (pseudo: string, data: any) => void;
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
+	public changeSocket: (client: Socket) => void;
+	public isFriend: (socketId: string) => boolean;
+	public setClient: (clientSocket: Socket | null) => void;
+	public setId: (id: string) => void;
 
-    public constructor(name: string, client: Socket)
+    public constructor(name: string, profileId: string)
     {
         this.name = name;
-		this.client = client;
-        this.id = client.id;
-        this.chat = undefined;
-
+		this.profileId = profileId;
+		this.chat = undefined;
+		this.setClient = (clientSocket: Socket | null) =>
+		{
+			if (clientSocket === null)
+			{
+				// NEED TO SEE WHAT WE DO HERE
+				this.id = "to_implement";
+				this.client = null;
+			}
+			else
+				this.id = clientSocket.id;
+		};
+		// TEST NOT SURE IF NECESSARY
+		this.setId = (id: string) =>
+		{
+			this.id = id;
+		};
 		this.joinChannel = (chanName: string) =>
 		{
+			if (this.client === null)
+				return ;
 			if (this.chat && this.chat.server)
 			{
-				for (const channel of this.channels)
+				// TEST it was this.channels, was it a mistake ?
+				for (const channel of this.chat.channels)
 				{
 					if (channel.name === chanName)
 					{
@@ -64,6 +96,14 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
+							console.log("Hola");
+							const	index = this.channels.findIndex((elem) =>
+							{
+								return (elem === channel.id);
+							});
+							if (index === -1)
+								this.channels.push(channel.id);
+							console.log("Les channels du user", this.channels);
 						}
 					}
 				}
@@ -71,16 +111,24 @@ class User
 		};
 		this.leaveChannel = (chanName: string) =>
 		{
+			if (this.client === null)
+				return ;
 			if (this.chat)
 			{
-				for (const channel of this.channels)
+				for (const channel of this.chat.channels)
 				{
 					if (channel.name === chanName)
 					{
 						channel.members--;
-						client.leave(chanName);
+						this.client.leave(chanName);
 						if (channel.members === 0)
 							this.chat.deleteChannel(chanName);
+						const	index = this.channels.findIndex((elem) =>
+						{
+							return (elem === channel.id);
+						});
+						if (index !== -1)
+							this.channels.splice(index, 1);
 						break ;
 					}
 				}
@@ -88,6 +136,8 @@ class User
 		};
         this.unlockChannel = (password: string, chanName: string) =>
         {
+			if (this.client === null)
+				return ;
             if (this.chat)
             {
                 for (const channel of this.chat.channels)
@@ -98,6 +148,12 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
+							const	indexChan = this.channels.findIndex((elem) =>
+							{
+								return (elem === channel.id);
+							});
+							if (indexChan === -1)
+								this.channels.push(channel.id);
 						}
 					}
                 }
@@ -130,7 +186,40 @@ class User
 		{
 			this.profile.avatar = avatar;
 		};
+
+		this.changeSocket = (client: Socket) =>
+		{
+			this.client = client;
+			this.id = client.id;
+		};
+
+		this.isFriend = (profileId: string) =>
+		{
+			let toReturn: boolean;
+			toReturn = false;
+			this.friends.forEach((friend) =>
+			{
+				if (friend.profileId === profileId)
+					toReturn = true;
+			});
+			return (toReturn);
+		};
     }
+
+	public parseForDatabase()
+	{
+		const	dbObject = {
+			channels: [...this.channels],
+			name: this.name,
+			profile: {...this.profile},
+			stats: {...this.stats},
+			id: this.id,
+			blocked: [...this.blocked],
+			friends: [...this.friends],
+			profileId: this.profileId,
+		};
+		return (dbObject);
+	}
 }
 
 export default User;

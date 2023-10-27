@@ -1,4 +1,3 @@
-
 import	axios from "axios";
 
 export default (serverLocation: string) =>
@@ -7,7 +6,7 @@ export default (serverLocation: string) =>
 		axios.create(
 		{
 			baseURL: "http://" + serverLocation +":3000",
-			timeout: 1000
+			timeout: 5000
 		})
 	);
 };

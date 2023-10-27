@@ -8,6 +8,11 @@ import
 	verifyTokenAnonymousUser
 }	from "../../Redux/store/anonymousUserAction";
 
+// import DropZoneImage from "../../Component/DropZoneImage/DropZoneImage";
+import UpdateMyProfilePicture
+	from "../../Component/DropZoneImage/UpdateMyProfilePicture";
+
+
 const	Home = () =>
 {
 	const	savePrevPage = useSavePrevPage();
@@ -18,6 +23,7 @@ const	Home = () =>
 	{
 		savePrevPage("/");
 	}, []);
+
 
 	const header = <MenuBar />;
 
