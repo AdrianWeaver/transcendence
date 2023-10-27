@@ -17,6 +17,7 @@ import {
 	setAllUsers,
 	setDoubleAuth,
 	setPhoneNumber,
+	setProfileMyView,
 	setRegistered,
 	setUserLoggedIn } from "../../../Redux/store/controllerAction";
 import UserSecurity from "../../../Object/UserSecurity";
@@ -125,6 +126,7 @@ const	SecondStepFormContent = () =>
 			dispatch(setPhoneNumber("undefined"));
 			dispatch(setRegistered(true));
 			dispatch(setUserLoggedIn());
+			dispatch(setProfileMyView());
 			dispatch(setAllUsers());
 			dispatch(addUser(user));
 		}

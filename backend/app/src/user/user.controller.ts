@@ -166,7 +166,7 @@ export class UserController
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
-		this.logger.error("NOT AN ERROR :: A User want to register");
+		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -256,14 +256,15 @@ export class UserController
 								valid: false,
 							}
 						},
-						password: "undefined"
+						password: "undefined",
+						friendsProfileId: []
 					};
-					this.logger.error("NOT AN ERROR: Starting processing image");
+					this.logger.log("Starting processing image");
 					const newUserObj = await this.userService.downloadAvatar(userObject);
 					retValue = this.userService.register(newUserObj);
 					res.status(200).send(retValue.res);
 					// mise a jour vers la database
-					this.logger.error("NOT AN ERROR: Ending processing image");
+					this.logger.log("Ending processing image");
 				})
 				.catch((error) =>
 				{
@@ -464,7 +465,7 @@ export class UserController
 		@Body() body: any)
 	{
 		// console.log(req);
-		this.logger.error("NOT AN ERROR: start update photo");
+		this.logger.log("start update photo");
 		try
 		{
 			const	busboyConfig = {
@@ -540,11 +541,10 @@ export class UserController
 				console.log(error);
 				return ;
 			});
-			this.logger.log("Test");
 			await this.userService.uploadPhoto(fileCfg, req.user);
 			res.status(200).json({message: "Success"});
 			// console.log("buffer", fileCfg.getBuffer());
-			this.logger.error("NOT AN ERROR: end update photo");
+			this.logger.log("end update photo");
 		}
 		catch (error)
 		{
@@ -561,7 +561,6 @@ export class UserController
 	{
 		this.logger
 			.log("'change-infos' route request");
-		// console.log("data ", data);
 		return (this.userService.changeInfos(data, req.user.id));
 	}
 
@@ -607,6 +606,7 @@ export class UserController
 		@Body() body: any,
 		@Req() req: any)
 	{
+		// console
 		this.logger
 			.log("'add-friend' route requested");
 		return (this.userService.addUserAsFriend(body.friendId, req.user.id));

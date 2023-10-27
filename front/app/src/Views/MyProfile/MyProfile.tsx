@@ -246,7 +246,7 @@ const	MyProfile = () =>
 			dispatch(addUserAsFriend(activeId));
 			console.log(activeId, " active id ", user.id, " id");
 		}
-		else
+		else if (user.profile.myView)
 			dispatch(setProfileEditView());
 		console.log("edit view: ", user.profile.editView);
 		console.log("friend view", user.profile.friendView);
@@ -291,7 +291,9 @@ const	MyProfile = () =>
 							{
 								(user.profile.publicView)
 								? "ADD AS FRIEND"
-								: "EDIT PROFILE"
+								: (user.profile.friendView)
+									? <></>
+									: "EDIT PROFILE"
 							}
 						</Button>
 					}
