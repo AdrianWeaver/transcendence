@@ -235,8 +235,7 @@ class Chat
 				newChannel.setMode(raw.mode);
 				newChannel.id = raw.id;
 				newChannel.users = [...raw.users];
-				console.log("profile  ", raw.owner.profileId);
-				console.log(raw);
+				console.log("--> raw channel", raw);
 				console.log("new channel : ", newChannel);
 				this.channels.push(newChannel);
 			});
@@ -249,21 +248,26 @@ class Chat
 				newPrivateMessage.setPassword(raw.password);
 				newPrivateMessage.id = raw.id;
 				newPrivateMessage.setMode(raw.mode);
-				console.log("profile private msg ", raw.owner.profileId);
-				console.log(raw);
+				console.log("--> raw private msg", raw);
+				console.log("new private msg", newPrivateMessage);
 				this.privateMessage.push(newPrivateMessage);
 			});
 			rawUsers.forEach((raw: any) =>
 			{
-				console.log("RAW !", raw);
 				const	newUser = new User(raw.name, raw.profileId);
+				const	chanArray = [...raw.channels];
+				const	newChanArray: string[] = [];
+				chanArray.forEach((elem) =>
+				{
+					if (elem !== null)
+						newChanArray.push(elem);
+				});
 				newUser.id = raw.id;
-				newUser.blocked = raw.blocked;
-				newUser.friends = raw.friends;
-				// TEST do we need to reconstruct all the channels here ?
-				newUser.channels = raw.channels;
+				newUser.blocked = [...raw.blocked];
+				newUser.friends = [...raw.friends];
+				newUser.channels = [...newChanArray];
+				console.log("raw user", raw);
 				console.log("new user", newUser);
-				// console.log(raw);
 				this.users.push(newUser);
 			});
 			this.chanMap = [...rawObj.chanMap];
