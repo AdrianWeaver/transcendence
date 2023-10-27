@@ -676,11 +676,22 @@ export class ChatSocketEvents
 					return ;
 				if (state === "ALREADY_FRIENDS")
 					message = friendUser.name + " is already your friend";
-				const	arrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
+				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
+				const	friendArrayProfileId = this.userService.getFriendsProfileId(friendUser.profileId);
+				const	myFriendArray: Array<FriendsModel> = [];
+				const	myFriendNameArray: Array<string> = [];
 				const	friendArray: Array<FriendsModel> = [];
 				const	friendNameArray: Array<string> = [];
 
-				arrayProfileId.forEach((elem, index) =>
+				myArrayProfileId.forEach((elem, index) =>
+				{
+					const toPush = this.userService.getFriendModel(elem, index);
+					if (toPush === undefined)
+						throw new Error("The dev was lazy");
+					myFriendArray.push(toPush);
+					myFriendNameArray.push(this.userService.getFriendName(elem));
+				});
+				friendArrayProfileId.forEach((elem, index) =>
 				{
 					const toPush = this.userService.getFriendModel(elem, index);
 					if (toPush === undefined)
@@ -689,11 +700,12 @@ export class ChatSocketEvents
 					friendNameArray.push(this.userService.getFriendName(elem));
 				});
 				// NOTICE HERE FRIENDS WAS PUSHED
-				userMe.friends = [...friendArray];
+				userMe.friends = [...myFriendArray];
+				friendUser.friends = [...friendArray];
 				const	action = {
 					type: "add-friend",
 					payload: {
-						friendList: friendNameArray,
+						friendList: myFriendNameArray,
 						newFriend: friendUser.name,
 						alreadyFriend: message,
 					}

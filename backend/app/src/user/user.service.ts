@@ -892,11 +892,11 @@ export class UserService
 	{
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
-			return (user.id === myProfileId);
+			return (user.id.toString() === myProfileId.toString());
 		});
 		const	targetUserIndex = this.user.findIndex((user) =>
 		{
-			return (user.id === targetProfileId);
+			return (user.id.toString() === targetProfileId.toString());
 		});
 		if (myUserIndex === -1 || targetUserIndex === -1)
 			return ("ERROR");
@@ -911,6 +911,7 @@ export class UserService
 			if (findProfileIndex === -1)
 			{
 				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
+				console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
 			}
 			else
 			{
@@ -925,7 +926,7 @@ export class UserService
 	{
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
-			return (user.id === myProfileId);
+			return (user.id.toString() === myProfileId.toString());
 		});
 		if (myUserIndex === -1)
 			return ([]);
