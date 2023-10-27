@@ -217,6 +217,7 @@ const	Signin = () =>
 				if (searchUser !== undefined)
 				{
 					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
+					dispatch(setProfileMyView());
 					// dispatch(setUserLoggedIn());
 					// if (user.isLoggedIn)
 					// 	navigate("/");

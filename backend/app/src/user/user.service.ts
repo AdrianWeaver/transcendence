@@ -771,6 +771,8 @@ export class UserService
 		{
 			return (id === elem.id);
 		});
+		if (index === -1)
+			throw new Error("User not found - hashPassword user.service");
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
