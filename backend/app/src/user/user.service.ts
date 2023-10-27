@@ -13,6 +13,7 @@ import
 	InternalServerErrorException,
 	Logger,
 	NotFoundException,
+	OnModuleDestroy,
 	OnModuleInit
 } from "@nestjs/common";
 import
@@ -52,14 +53,17 @@ import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { PrismaClient } from "@prisma/client";
+import { Subject } from "rxjs";
 
 @Injectable()
-export class UserService implements OnModuleInit
+export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
 	private	secret = randomBytes(64).toString("hex");
 	private readonly	logger = new Logger("user-service itself");
 	private readonly	uuidInstance = uuidv4();
+	private	readonly	cdnConfig = new ServerConfig();
+	private			shutdown$ = new Subject<string>();
 
 	// image cdn Large is eq to publicPath 700 X 700
 	private	readonly	publicPath = "/app/public/profilePictures";
@@ -88,7 +92,6 @@ export class UserService implements OnModuleInit
 	{
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
-		
 	}
 
 	async onModuleInit()
@@ -100,6 +103,23 @@ export class UserService implements OnModuleInit
 		this.checkIOAccessPath(this.publicPathSmall);
 		this.checkIOAccessPath(this.publicPathMicro);
 		this.checkIOAccessPath(this.publicPathTemp);
+	}
+
+	public	triggerShutDown(stringReason: string)
+	{
+		this.logger.error("Server will shuting down reason: " + stringReason);
+		this.shutdown$.next(stringReason);
+	}
+
+	public	getShutdown$()
+	{
+		return (this.shutdown$);
+	}
+
+	public onModuleDestroy()
+	{
+		//  cleaning here
+		this.logger.debug("The application is closing connection");
 	}
 
 	public	getConfig()
@@ -196,10 +216,13 @@ export class UserService implements OnModuleInit
 		this.logger.verbose("Protocol: " + test.protocol);
 		this.logger.verbose("Port: " + test.port);
 		if (!test.port || !test.location || !test.protocol)
+		{
 			this.logger.error("Production file must have server config environnement");
+			// this.triggerShutDown("ENVIRONNEMENT UNSETTED");
+		}
 		else
 		{
-			await this.isHavingPreviousPermalinks(test);
+			// await this.isHavingPreviousPermalinks(test);
 			// prisma.
 			// prisma
 			// prisma.secretTable
