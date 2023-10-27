@@ -233,6 +233,7 @@ class Chat
 				newChannel.setKind(raw.kind);
 				newChannel.setPassword(raw.password);
 				newChannel.setMode(raw.mode);
+				newChannel.id = raw.id;
 				newChannel.users = [...raw.users];
 				console.log("profile  ", raw.owner.profileId);
 				console.log(raw);
@@ -246,6 +247,7 @@ class Chat
 				newPrivateMessage.setFromDatabaseAdmins(raw.admins);
 				newPrivateMessage.setKind(raw.kind);
 				newPrivateMessage.setPassword(raw.password);
+				newPrivateMessage.id = raw.id;
 				newPrivateMessage.setMode(raw.mode);
 				console.log("profile private msg ", raw.owner.profileId);
 				console.log(raw);

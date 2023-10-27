@@ -331,6 +331,7 @@ export class ChatSocketEvents
 							throw new Error("'create-channel' ChatSocketEvent");
 						const	newChannel = new Channel(chanName);
 						newChannel.setClient(client, profileId);
+						newChannel.setId();
 						newChannel.setKind(kind);
 						newChannel.setPassword(data.payload.chanPassword);
 						newChannel.setMode(data.payload.chanMode);
@@ -356,6 +357,7 @@ export class ChatSocketEvents
 						{
 							const newPrivateMsg = new Channel(chanName);
 							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
+							newPrivateMsg.setId();
 							newPrivateMsg.setPassword("");
 							newPrivateMsg.setKind(kind);
 							newPrivateMsg.setMode("private");
@@ -433,7 +435,6 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 					}
 				};
-				console.log("ASKED-JOIN ", data.payload);
 				if (searchChannel === undefined)
 					return ;
 				const	searchUser = this.chatService.getUserWithProfileId(data.payload.id);
@@ -560,11 +561,32 @@ export class ChatSocketEvents
 				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
 				const profId = this.chatService.getProfileIdFromSocketId(client.id);
+				if (profId === undefined || profId === "undefined")
+					return ;
+				const	searchUser = this.chatService.getUserWithProfileId(profId);
+				if (searchUser === undefined)
+					throw new Error("User not found - kick/ban-member ChtSocketEvent");
 				let message: string;
 				if (data.type === "kick-member")
+				{
+					// const	chanIndex = searchUser.channels.findIndex((elem) =>
+					// {
+					// 	return (elem === channel.id);
+					// });
+					// if (chanIndex === -1)
+					// 	return ;
+					// searchUser.channels.splice(chanIndex, 1);
 					message = data.payload.userName + " has been kicked.";
+				}
 				else
 				{
+					// const	chanIndex = searchUser.channels.findIndex((elem) =>
+					// {
+					// 	return (elem === channel.id);
+					// });
+					// if (chanIndex === -1)
+					// 	return ;
+					// searchUser.channels.splice(chanIndex, 1);
 					message = data.payload.userName + " has been banned.";
 					channel.addToBanned(data.payload.userName, profId);
 				}
