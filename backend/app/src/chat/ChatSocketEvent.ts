@@ -24,7 +24,7 @@ import { Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
-import { profile } from "console";
+import { error, profile } from "console";
 
 type	ActionSocket = {
 	type: string,
@@ -47,7 +47,7 @@ type	MembersModel =
 	userName: string,
 }
 
-type	FriendsModel =
+export type	FriendsModel =
 {
 	id: number,
 	name: string,
@@ -655,44 +655,53 @@ export class ChatSocketEvents
 		{
 			if (data.type === "add-friend")
 			{
+				this.logger.debug("add friend requested");
+				const	friendUser = this.chatService.getUserBySocketId(data.payload.friendName);
 				const	userMe = this.chatService.getUserBySocketId(client.id);
-				if (userMe === undefined)
+				console.log("Me ", userMe);
+				console.log("Friend", friendUser);
+
+				if (userMe === undefined || friendUser === undefined)
 					return ;
 				let message: string;
 				message = "";
-				const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
-				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-				if (newFriend === "undefined" || profileId === "undefined")
+				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
+				// const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
+				let state;
+				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
+				if (state === "ERROR")
 					return ;
-					// throw new Error("'add-friend' ChatSocketEvent");
-				const friendArray: string[] = [];
+				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
+				if (state === "ERROR")
+					return ;
+				if (state === "ALREADY_FRIENDS")
+					message = friendUser.name + " is already your friend";
+				const	arrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
+				const	friendArray: Array<FriendsModel> = [];
+				const	friendNameArray: Array<string> = [];
 
-				if (userMe.isFriend(profileId) === true)
-					message = newFriend + " is already your friend";
-				else
+				arrayProfileId.forEach((elem, index) =>
 				{
-					const	id = userMe?.friends.length + 1;
-					const newMember: FriendsModel = {
-						id: id,
-						name: newFriend,
-						profileId: profileId,
-					};
-					userMe?.friends.push(newMember);
-					userMe.friends.forEach((friend) =>
-					{
-						friendArray.push(friend.name);
-					});
-				}
+					const toPush = this.userService.getFriendModel(elem, index);
+					if (toPush === undefined)
+						throw new Error("The dev was lazy");
+					friendArray.push(toPush);
+					friendNameArray.push(this.userService.getFriendName(elem));
+				});
+				// NOTICE HERE FRIENDS WAS PUSHED
+				userMe.friends = [...friendArray];
 				const	action = {
 					type: "add-friend",
 					payload: {
-						friendList: friendArray,
-						newFriend: newFriend,
+						friendList: friendNameArray,
+						newFriend: friendUser.name,
 						alreadyFriend: message,
 					}
 				};
 				client.emit("user-info", action);
 				this.chatService.updateDatabase();
+					// update user service database
+				// }
 			}
 
 			if (data.type === "block-user")

@@ -7,7 +7,7 @@ export default () =>
 		axios.create(
 		{
 			baseURL: "https://api.intra.42.fr/",
-			timeout: 1000
+			timeout: 10000
 		})
 	);
 };

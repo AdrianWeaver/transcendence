@@ -81,6 +81,7 @@ export interface UserModel
 	};
 	registrationProcessEnded: boolean;
 	password: string,
+	friendsProfileId: Array<string>
 	// tokenSecret: string
 	// revokeConnectionRequest: boolean;
 }

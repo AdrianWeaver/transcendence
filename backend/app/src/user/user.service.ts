@@ -49,6 +49,7 @@ export type PictureConfigModel = {
 import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
+import { FriendsModel } from "src/chat/ChatSocketEvent";
 
 @Injectable()
 export class UserService
@@ -557,7 +558,8 @@ export class UserService
 					valid: data.authService.doubleAuth.valid,
 				}
 			},
-			password: data.password
+			password: data.password,
+			friendsProfileId: []
 			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
@@ -884,4 +886,80 @@ export class UserService
 			return ("ERROR");
 		return ("okay");
 	}
+
+	public	addFriends(myProfileId: any, targetProfileId: any)
+		: string
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id === myProfileId);
+		});
+		const	targetUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id === targetProfileId);
+		});
+		if (myUserIndex === -1 || targetUserIndex === -1)
+			return ("ERROR");
+		else
+		{
+			const findProfileIndex = this.user[myUserIndex]
+				.friendsProfileId
+				.findIndex((elem) =>
+				{
+					return (elem === targetProfileId.toString());
+				});
+			if (findProfileIndex === -1)
+			{
+				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
+			}
+			else
+			{
+				return ("ALREADY_FRIENDS");
+			}
+		}
+		return ("SUCCESS");
+	}
+
+	public	getFriendsProfileId(myProfileId: any)
+	: Array<string>
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id === myProfileId);
+		});
+		if (myUserIndex === -1)
+			return ([]);
+		const	array = [...this.user[myUserIndex].friendsProfileId];
+		return (array);
+	}
+
+	public	getFriendModel(profileIdRequested: any, index: number)
+		: FriendsModel | undefined
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileIdRequested.toString());
+		});
+		if (myUserIndex === -1)
+			return (undefined);
+		const friend: FriendsModel = {
+			id: index,
+			name: this.user[myUserIndex].username,
+			profileId: this.user[myUserIndex].id,
+		};
+		return (friend);
+	}
+
+	public	getFriendName(profileIdRequested: any)
+		: string
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileIdRequested.toString());
+		});
+		if (myUserIndex === -1)
+			return ("undefined");
+		return (this.user[myUserIndex].username);
+	}
+	// public	doIHaveFriendRequest
 }

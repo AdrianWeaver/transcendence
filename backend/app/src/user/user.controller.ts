@@ -256,7 +256,8 @@ export class UserController
 								valid: false,
 							}
 						},
-						password: "undefined"
+						password: "undefined",
+						friendsProfileId: []
 					};
 					this.logger.log("Starting processing image");
 					const newUserObj = await this.userService.downloadAvatar(userObject);
