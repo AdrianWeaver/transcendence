@@ -6,7 +6,8 @@ import
 	ForbiddenException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	OnModuleInit
 }	from "@nestjs/common";
 import
 {
@@ -19,23 +20,98 @@ import { v4 as uuidv4 } from "uuid";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
 @Injectable()
-export class AnonymousUserService
+export class AnonymousUserService implements OnModuleInit
 {
 	private	anonymousUser: Array<AnonymousUserModel> = [];
-	private	secret;
-	// private	secret = randomBytes(64).toString("hex");
+	private	secret: string;
 	private	uuidInstance: string;
 	private	logger = new Logger("anymous-user-service itself");
+	private	readonly secretId = "anonymous-user-service-secret";
 
 	public constructor ()
 	{
 		this.anonymousUser = [];
-		this.secret = randomBytes(64).toString("hex");
 		this.uuidInstance = uuidv4();
-		this.logger.debug("An instance of service is started with id: "
+		this.logger.log("An instance of service is started with id: "
 			+ this.uuidInstance);
+	}
+
+	onModuleInit()
+	{
+		this.loadSecretFromDB();
+	}
+
+	private	generateSecretForDB()
+	{
+		const	toDB = {
+			"secret_id": this.secretId,
+			"value": randomBytes(64).toString("hex")
+		};
+		const	prisma = new PrismaClient();
+		prisma.secretTable
+			.create(
+				{
+					data: toDB
+				}
+			).then(() =>
+			{
+				this.loadSecretFromDB();
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+			});
+	}
+
+	private loadSecretFromDB()
+	{
+		const	prisma = new PrismaClient();
+		prisma.secretTable
+			.findUnique({
+				where:
+				{
+					// eslint-disable-next-line camelcase
+					secret_id: this.secretId,
+				}
+			}).then((data: any) =>
+			{
+				if (data === null)
+					this.generateSecretForDB();
+				else
+					this.secret = data?.value;
+				this.logger.verbose("secret form db is:" + this.secret);
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+			})
+			.finally(() =>
+			{
+				this.logger.debug("end of load into database ");
+			});
+	}
+
+	public	populateFromDBObject(data: any[])
+	{
+		this.logger.log("Into database");
+		const	cast = data as AnonymousUserModel[];
+		cast.forEach(el =>
+		{
+			const	obj: AnonymousUserModel = {
+				isRegistredAsRegularUser: el.isRegistredAsRegularUser,
+				lastConnection: el.lastConnection,
+				password: el.password,
+				revokeConnectionRequest: el.revokeConnectionRequest,
+				token: el.token,
+				userCreatedAt: el.userCreatedAt,
+				uuid: el.uuid,
+			};
+			this.anonymousUser.push(obj);
+		});
+		this.logger.verbose(this.anonymousUser);
 	}
 
 	public	getUuidInstance (): string
@@ -82,7 +158,6 @@ export class AnonymousUserService
 				isRegistredAsRegularUser: false,
 				revokeConnectionRequest: false
 			};
-			// console.log(newAnonymous);
 			this.anonymousUser.push(newAnonymous);
 			const	response: AnonymousUserRegisterResponseModel = {
 				message: "Your session has been created, you must loggin",
@@ -102,7 +177,7 @@ export class AnonymousUserService
 	}
 
 	public login(uuid: string, password: string)
-		: AnonymousUserLoginResponseModel
+		: {db : AnonymousUserModel, res: AnonymousUserLoginResponseModel}
 	{
 		const	searchUser = this.anonymousUser.find((user) =>
 		{
@@ -112,7 +187,7 @@ export class AnonymousUserService
 			throw new ForbiddenException("Invalid credential");
 		else
 		{
-			// console.log(this.secret);
+			console.log(this.secret);
 			searchUser.lastConnection = Date.now();
 			searchUser.revokeConnectionRequest = false;
 			searchUser.token = "Bearer " + jwt.sign(
@@ -125,15 +200,18 @@ export class AnonymousUserService
 					expiresIn: "1d"
 				}
 			);
-			// console.log(searchUser);
+			console.log(searchUser);
 			const	response: AnonymousUserLoginResponseModel = {
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,
 				expireAt:
 					searchUser.lastConnection + (1000 * 60 * 60 * 24)
-				// Date.now()
 			};
-			return (response);
+			const	retValue = {
+				db: searchUser,
+				res: response
+			};
+			return (retValue);
 		}
 	}
 
@@ -160,7 +238,7 @@ export class AnonymousUserService
 		user.lastConnection = Date.now();
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
-		// console.log("Anonymous user revoke session uuid : " + user.uuid);
+		console.log("Anonymous user revoke session uuid : " + user.uuid);
 		return (false);
 	}
 

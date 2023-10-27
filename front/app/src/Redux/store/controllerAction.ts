@@ -623,7 +623,6 @@ export const verifyToken = ()
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
-		console.log("Before await");
 		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
@@ -632,7 +631,6 @@ export const verifyToken = ()
 			dispatch(reinitialiseUser(false));
 			return ;
 		}
-
 		// console.log("Data inside verify token ");
 		// console.log(data);
 		dispatch(setRegistrationProcessSuccess());

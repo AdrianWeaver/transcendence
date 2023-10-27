@@ -146,7 +146,6 @@ const	DisplayAnonymousConnect = () =>
 		{
 			clearTimeout(timerRegister);
 		});
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() =>
@@ -156,7 +155,7 @@ const	DisplayAnonymousConnect = () =>
 		{
 			const	timerUnmount = setTimeout(() =>
 			{
-				dispatch(setIsFetching(false));
+				dispatch(setIsFetching(true));
 			}, 1500);
 			return (() =>
 			{
@@ -174,6 +173,7 @@ const	DisplayAnonymousConnect = () =>
 		registrationStep,
 		dispatch
 	]);
+
 	const	loading = <LinearProgress color="inherit" />;
 
 	return (
