@@ -15,6 +15,7 @@ class	UserProfileEdit
 	public	phoneNumber: string;
 	public	doubleAuth: boolean;
 	public	user: UserModel;
+	public	pwModified: boolean;
 
 	public	constructor(data: FormData, doubleAuth: boolean, user: UserModel)
 	{
@@ -30,7 +31,9 @@ class	UserProfileEdit
 				this.emailAddress = "undefined";
 		this.password = this.form("password");
 		if (this.password.length === 0)
-			this.password = user.password;
+			this.pwModified = false;
+		else
+			this.pwModified = true;
 		this.passwordConfirm = this.form("passwordConfirm");
 		if (this.passwordConfirm.length === 0)
 		{

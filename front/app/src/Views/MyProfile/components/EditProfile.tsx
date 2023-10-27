@@ -228,6 +228,7 @@ const	EditProfile = (props: EditProfileProps) =>
 	) =>
 	{
 		event.preventDefault();
+		console.log("value pw", event.target.value, " length", event.target.value.length);
 		if (event.target.value.length)
 			setPasswordModified(true);
 		else
@@ -256,11 +257,8 @@ const	EditProfile = (props: EditProfileProps) =>
 		const	data = new FormData(event.currentTarget);
 
 		const	userChanges = new UserProfileEdit(data, required, user);
-		// console.log(userSignup.getPlainObject());
 		userChanges.check();
-
 		setErrorValidation(userChanges.errorTable);
-		// console.log(errorValidation);
 		const	asArray
 			= Object.entries(userChanges.errorTable.getPlainObject());
 		const	filtered = asArray.filter(

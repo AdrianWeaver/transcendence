@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 
 export const	joinChannel = (
 	chanName: string,

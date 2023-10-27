@@ -29,14 +29,17 @@ class	UserProfileEditChecker
 		if (data.emailAddress === undefined || data.emailAddress === "undefined"
 			|| data.emailAddress.length === 0)
 			this.email = true;
-		if (data.password === undefined || data.password === "undefined"
-			|| data.passwordConfirm === undefined
-			|| data.password.length === 0
-			|| data.passwordConfirm.length === 0
-			|| data.password !== data.passwordConfirm)
-			this.password = true;
-		if (data.uniquenessPassword !== "AgreeWithUniquenessOfPassword")
-			this.uniqueness = true;
+		if (data.pwModified)
+		{
+			if (data.password === undefined || data.password === "undefined"
+				|| data.passwordConfirm === undefined
+				|| data.password.length === 0
+				|| data.passwordConfirm.length === 0
+				|| data.password !== data.passwordConfirm)
+				this.password = true;
+			if (data.uniquenessPassword !== "AgreeWithUniquenessOfPassword")
+				this.uniqueness = true;
+		}
 		// check username unique
 		if (data.username === undefined || data.username === "undefined"
 			|| data.username.length === 0 )

@@ -295,7 +295,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 				console.log(response);
 				// // TEST
 				// dispatch(registerInfosInBack(userSignup.username, "username"));
-				// dispatch(setPassword(userSignup.password));
+				dispatch(setPassword(userSignup.password));
 				// dispatch(hashPassword(userSignup.password));
 				dispatch(userRegistrationStepThree());
 			})

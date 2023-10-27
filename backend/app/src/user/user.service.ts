@@ -54,6 +54,7 @@ import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { PrismaClient } from "@prisma/client";
 import { Subject } from "rxjs";
+import { FriendsModel } from "src/chat/ChatSocketEvent";
 
 @Injectable()
 export class UserService implements OnModuleInit, OnModuleDestroy
@@ -677,7 +678,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					valid: data.authService.doubleAuth.valid,
 				}
 			},
-			password: data.password
+			password: data.password,
+			friendsProfileId: []
 			// tokenSecret: secretToken
 		};
 		this.user.push(newUser);
@@ -891,19 +893,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			return (id === elem.id);
 		});
+		if (index === -1)
+			throw new Error("User not found - hashPassword user.service");
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
-		// .then((hash) =>
-		// {
-		// 	this.user[index].password = hash;
-		// 	return (hash);
-		// })
-		// .catch((err) =>
-		// {
-		// 	console.log(err);
-		// 	return ("ERROR");
-		// });
 		console.log("le test ", hashed);
 		return (hashed);
 	}
@@ -990,17 +984,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		: number
 	{
 		this.logger.debug("username: " + username);
-		// this.logger.error("NOT an error");
-		// console.log("here is data ", this.user);
-		// this.logger.error("NOT an error");
 		const count = this.user.filter((obj) =>
 		{
 			return (obj.username === username);
 		}).length;
-		// console.log("count array : ", count);
-		return (
-			count
-		);
+		return (count);
 	}
 
 	public	async updateUser(userId: number, body: RegisterStepOneDto)
@@ -1018,4 +1006,81 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			return ("ERROR");
 		return ("okay");
 	}
+
+	public	addFriends(myProfileId: any, targetProfileId: any)
+		: string
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === myProfileId.toString());
+		});
+		const	targetUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === targetProfileId.toString());
+		});
+		if (myUserIndex === -1 || targetUserIndex === -1)
+			return ("ERROR");
+		else
+		{
+			const findProfileIndex = this.user[myUserIndex]
+				.friendsProfileId
+				.findIndex((elem) =>
+				{
+					return (elem === targetProfileId.toString());
+				});
+			if (findProfileIndex === -1)
+			{
+				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
+				console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
+			}
+			else
+			{
+				return ("ALREADY_FRIENDS");
+			}
+		}
+		return ("SUCCESS");
+	}
+
+	public	getFriendsProfileId(myProfileId: any)
+	: Array<string>
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === myProfileId.toString());
+		});
+		if (myUserIndex === -1)
+			return ([]);
+		const	array = [...this.user[myUserIndex].friendsProfileId];
+		return (array);
+	}
+
+	public	getFriendModel(profileIdRequested: any, index: number)
+		: FriendsModel | undefined
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileIdRequested.toString());
+		});
+		if (myUserIndex === -1)
+			return (undefined);
+		const friend: FriendsModel = {
+			id: index,
+			name: this.user[myUserIndex].username,
+			profileId: this.user[myUserIndex].id,
+		};
+		return (friend);
+	}
+
+	public	getFriendName(profileIdRequested: any)
+		: string
+	{
+		const	myUserIndex = this.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileIdRequested.toString());
+		});
+		if (myUserIndex === -1)
+			return ("undefined");
+		return (this.user[myUserIndex].username);
+	}
+	// public	doIHaveFriendRequest
 }

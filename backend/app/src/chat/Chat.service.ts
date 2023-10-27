@@ -70,7 +70,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-8";
+	private readonly chatID = "id-chat-service-v-9";
 
 	constructor()
 	{

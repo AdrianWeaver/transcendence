@@ -81,7 +81,7 @@ export interface	UserModel
 	},
 	"profile": ProfileModel,
 	"password": string,
-	"location": string;
+	"location": string,
 }
 
 export interface	AnonymousUserModel
