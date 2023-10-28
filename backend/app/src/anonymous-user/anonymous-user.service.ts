@@ -46,71 +46,73 @@ export class AnonymousUserService implements OnModuleInit
 
 	private	generateSecretForDB()
 	{
-		const	toDB = {
-			"secret_id": this.secretId,
-			"value": randomBytes(64).toString("hex")
-		};
-		const	prisma = new PrismaClient();
-		prisma.secretTable
-			.create(
-				{
-					data: toDB
-				}
-			).then(() =>
-			{
-				this.loadSecretFromDB();
-			})
-			.catch((error: any) =>
-			{
-				this.logger.error(error);
-			});
+		// const	toDB = {
+		// 	"secret_id": this.secretId,
+		// 	"value": randomBytes(64).toString("hex")
+		// };
+		// const	prisma = new PrismaClient();
+		// prisma.secretTable
+		// 	.create(
+		// 		{
+		// 			data: toDB
+		// 		}
+		// 	).then(() =>
+		// 	{
+		// 		this.loadSecretFromDB();
+		// 	})
+		// 	.catch((error: any) =>
+		// 	{
+		// 		this.logger.error(error);
+		// 	});
 	}
 
 	private loadSecretFromDB()
 	{
 		const	prisma = new PrismaClient();
-		prisma.secretTable
-			.findUnique({
-				where:
-				{
-					// eslint-disable-next-line camelcase
-					secret_id: this.secretId,
-				}
-			}).then((data: any) =>
-			{
-				if (data === null)
-					this.generateSecretForDB();
-				else
-					this.secret = data?.value;
-				this.logger.verbose("secret form db is:" + this.secret);
-			})
-			.catch((error: any) =>
-			{
-				this.logger.error(error);
-			})
-			.finally(() =>
-			{
-				this.logger.debug("end of load into database ");
-			});
+		// prisma.secretTable
+		// 	.findUnique({
+		// 		where:
+		// 		{
+		// 			// eslint-disable-next-line camelcase
+		// 			secret_id: this.secretId,
+		// 		}
+		// 	}).then((data: any) =>
+		// 	{
+		// 		if (data === null)
+		// 			this.generateSecretForDB();
+		// 		else
+		// 			this.secret = data?.value;
+					// patch 
+					this.secret = randomBytes(64).toString("hex");
+		// 		this.logger.verbose("secret form db is:" + this.secret);
+		// 	})
+		// 	.catch((error: any) =>
+		// 	{
+		// 		this.logger.error(error);
+		// 	})
+		// 	.finally(() =>
+		// 	{
+		// 		this.logger.debug("end of load into database ");
+		// 	});
 	}
 
 	public	populateFromDBObject(data: any[])
 	{
 		this.logger.log("Into database");
-		const	cast = data as AnonymousUserModel[];
-		cast.forEach(el =>
-		{
-			const	obj: AnonymousUserModel = {
-				isRegistredAsRegularUser: el.isRegistredAsRegularUser,
-				lastConnection: el.lastConnection,
-				password: el.password,
-				revokeConnectionRequest: el.revokeConnectionRequest,
-				token: el.token,
-				userCreatedAt: el.userCreatedAt,
-				uuid: el.uuid,
-			};
-			this.anonymousUser.push(obj);
-		});
+		// const	cast = data as AnonymousUserModel[];
+		// cast.forEach(el =>
+		// {
+		// 	const	obj: AnonymousUserModel = {
+		// 		isRegistredAsRegularUser: el.isRegistredAsRegularUser,
+		// 		lastConnection: el.lastConnection,
+		// 		password: el.password,
+		// 		revokeConnectionRequest: el.revokeConnectionRequest,
+		// 		token: el.token,
+		// 		userCreatedAt: el.userCreatedAt,
+		// 		uuid: el.uuid,
+		// 	};
+		// 	this.anonymousUser.push(obj);
+		// });
 		this.logger.verbose(this.anonymousUser);
 	}
 
