@@ -66,7 +66,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	user: Array<UserModel> = [];
 	private	secret: string;
 	private	userDB: Array<UserDBModel> = [];
-	private userDBString: Array<String> = [];
+	private userDBString: Array<string> = [];
 	// TEST
 	private	prisma: PrismaClient;
 	private readonly logger = new Logger("user-service itself");
@@ -100,11 +100,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	public constructor()
 	{
+			// TEST
+		this.prisma = new PrismaClient();
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
-		this.loadSecretFromDB();
-		// TEST
-		this.prisma = new PrismaClient();
+		this.loadSecretFromDB();		
 	}
 
 	private	generateSecretForDB()
@@ -173,7 +173,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-		const	dbString = this.createUserForDB(user);
+		console.log("ici  ", this.user);
+		const	toDB = this.createUserForDB(user);
 		this.prisma
 			.userJson
 			.create(
@@ -181,35 +182,34 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				data:
 				{
 					userJsonID: user.id.toString(),
-					contents: JSON.stringify(dbString)
+					contents: JSON.stringify(toDB)
 				}
 			})
 			.catch((error: any) =>
 			{
-				this.logger.error("On table Create error");
+				this.logger.error("On table Create User error");
 				this.logger.error(error);
 			});
 	}
 
-	private	loadTableToMemory(userId: number)
+	private	loadTableToMemory()
 	{
+		let	id;
 		const	user = this.user.find((elem) =>
 		{
-			return (userId.toString() === elem.id);
+			return ("97756" === elem.id.toString());
 		});
-		const	index = this.user.findIndex((elem) =>
-		{
-			return (userId.toString() === elem.id);
-		});
-		if (user === undefined || index === -1)
-			throw new Error("USER UNDEFINED TO LOAD MEMORY");
+		if (user === undefined)
+			id = "97756";
+		else
+			id = user.id
 		this.prisma
 			.userJson
 			.findUnique(
 			{
 				where:
 				{
-					userJsonID: userId.toString()
+					userJsonID: id
 				}
 			}
 			)
@@ -217,15 +217,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			{
 				if (data === null)
 				{
-					this.onTableCreate(user);
-					this.loadTableToMemory(userId);
+					if (user !== undefined)
+						this.onTableCreate(user);
+					console.log("test data null");
+					this.loadTableToMemory();
 				}
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					console.log("raw object from db", rawobj);
-					const	toObj = this.databaseToObject(rawobj);
-					this.user[index] = toObj;
+					console.log("user raw object from db", rawobj);
+					this.databaseToObject(rawobj);
 				}
 			})
 			.catch((error: any) =>
@@ -236,6 +237,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	async onModuleInit()
 	{
+		console.log("GET USER BACK FROM DB");
+		console.log("user", this.user);
+		console.log("userDB", this.userDB);
+		console.log("userDBString", this.userDBString);
+		this.loadTableToMemory();
+
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
 		this.checkIOAccessPath(this.publicPathLarge);
@@ -835,6 +842,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: newUser.avatar,
 			ftAvatar: newUser.ftAvatar
 		};
+		if (this.user.length === 1)
+			this.onTableCreate(newUser);
 		this.createUserForDB(newUser);
 		return (
 		{
@@ -1226,7 +1235,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// public	doIHaveFriendRequest	
 
 	public	createUserForDB(user: UserModel)
-	 : Array<String>
+	 : string
 	{
 		// UserModel stringified
 		const	objToDB: UserDBModel = {
@@ -1254,7 +1263,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		console.log("create User ready for db ", user);
 		console.log("create User to db ", objToDB);
 		console.log("create USER STRINGIFIED", toDB);
-		return (this.userDBString);
+		return (toDB);
 	}
 
 	public	updateUserForDB(userId: number)
@@ -1303,56 +1312,63 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		return (this.userDBString);
 	}
 
-	public	databaseToObject(stringifiedUser: string)
-		: UserModel
+	public	databaseToObject(data: any)
 	{
-		const	data = JSON.parse(stringifiedUser);
-		console.log("user db to obj", stringifiedUser);
-		const	toObj: UserModel = {
-			registrationProcessEnded: false,
-			ftApi: data.ftApi,
-			retStatus: data.retStatus,
-			date: data.date,
-			id: data.id,
-			email: data.email,
-			username: data.username,
-			login: data.login,
-			firstName: data.firstName,
-			lastName: data.lastName,
-			url: data.url,
-			avatar: data.avatar,
-			ftAvatar: data.ftAvatar,
-			location: data.location,
-			// TEST I dont know if its important to keep it
-			revokedConnectionRequest: false,
-			authService:
-			{
-				// Do we get a new token here or in the route with login ?
-				token: "Bearer " + jwt.sign(
-					{
-						id: data.id,
-						email: data.email
-					},
-					this.secret,
-					{
-						expiresIn: "1d"
-					}
-				),
-				expAt: Date.now() + (1000 * 60 * 60 * 24),
-				doubleAuth:
+		// const	array = [...this.userDBString];
+		const	newUsers: UserModel[] = [];
+
+		// array.forEach((elem) =>
+		// {
+			// const	data = JSON.parse(elem);
+			const	toObj: UserModel = {
+				registrationProcessEnded: false,
+				ftApi: data.ftApi,
+				retStatus: data.retStatus,
+				date: data.date,
+				id: data.id,
+				email: data.email,
+				username: data.username,
+				login: data.login,
+				firstName: data.firstName,
+				lastName: data.lastName,
+				url: data.url,
+				avatar: data.avatar,
+				ftAvatar: data.ftAvatar,
+				location: data.location,
+				// TEST I dont know if its important to keep it
+				revokedConnectionRequest: false,
+				authService:
 				{
-					enable: data.authService.doubleAuth.enable,
-					lastIpClient: data.authService.doubleAuth.lastIpClient,
-					phoneNumber: data.authService.doubleAuth.phoneNumber,
-					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
-					validationCode: data.authService.doubleAuth.validationCode,
-					valid: data.authService.doubleAuth.valid,
-				}
-			},
-			password: data.password,
-			friendsProfileId: [...data.friendsProfileId]
-		};
-		console.log("BACK TO OBJ", toObj);
-		return (toObj);
+					// Do we get a new token here or in the route with login ?
+					token: "Bearer " + jwt.sign(
+						{
+							id: data.id,
+							email: data.email
+						},
+						this.secret,
+						{
+							expiresIn: "1d"
+						}
+					),
+					expAt: Date.now() + (1000 * 60 * 60 * 24),
+					doubleAuth:
+					{
+						enable: data.enable,
+						lastIpClient: data.lastIpClient,
+						phoneNumber: data.phoneNumber,
+						phoneRegistered: data.phoneRegistered,
+						validationCode: data.validationCode,
+						valid: data.valid,
+					}
+				},
+				password: data.password,
+				friendsProfileId: [...data.friendsProfileId]
+			};
+			console.log("BACK TO OBJ", toObj);
+			newUsers.push(toObj);
+		// });
+		console.log("new users", newUsers);
+		this.user = [...newUsers];
+		console.log("THIS USERS", this.user);
 	}
 }

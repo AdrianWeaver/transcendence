@@ -24,7 +24,7 @@ model ChatJson {
 
 model UserJson {
   userJsonID String @id
-  contents String
+  contents   String
 }
 
 model Permalinks {
