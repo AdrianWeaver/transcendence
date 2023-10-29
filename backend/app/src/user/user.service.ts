@@ -1173,8 +1173,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId]
 		};
-		console.log("User ready for db ", user);
-		console.log("User to db ", objToDB);
+		const	toDB = JSON.stringify(objToDB);
+		console.log("create User ready for db ", user);
+		console.log("create User to db ", objToDB);
+		console.log("create USER STRINGIFIED", toDB);
 	}
 
 	public	updateUserForDB(userId: number)
@@ -1199,12 +1201,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: user.avatar,
 			// ftAvatar: user.ftAvatar,
 			// location: user.location,
-			doubleAuth: user.authService.doubleAuth,
+			doubleAuth: {...user.authService.doubleAuth},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId]
 		};
-		console.log("User updated for db ", user);
-		console.log("User updated to db ", objToDB);
+		const	toDB = JSON.stringify(objToDB);
+		console.log("update User updated for db ", user);
+		console.log("update User updated to db ", objToDB);
+		console.log("update USER STRINGIFIED", toDB);
 	}
 
 	public	userBackFromDB()
