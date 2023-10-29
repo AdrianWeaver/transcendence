@@ -1073,6 +1073,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
+		this.updateUserForDB(userId);
 		return ("okay");
 	}
 
@@ -1176,9 +1177,34 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		console.log("User to db ", objToDB);
 	}
 
-	public	updateUserForDB()
+	public	updateUserForDB(userId: number)
 	{
-		// 
+		const	user = this.user.find((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		// TEST 
+		if (user === undefined)
+			return ;
+		// or throw error ?
+		const	objToDB = {
+			// date of creation - 1h
+			date: user.date,
+			id: user.id,
+			email: user.email,
+			username: user.username,
+			login: user.login,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			avatar: user.avatar,
+			// ftAvatar: user.ftAvatar,
+			// location: user.location,
+			doubleAuth: user.authService.doubleAuth,
+			password: user.password,
+			friendsProfileId: [...user.friendsProfileId]
+		};
+		console.log("User updated for db ", user);
+		console.log("User updated to db ", objToDB);
 	}
 
 	public	userBackFromDB()
