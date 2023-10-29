@@ -58,6 +58,7 @@ import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
+import { throws } from "assert";
 
 
 @Injectable()
@@ -173,8 +174,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-		console.log("ici onTableCreate  ", this.user);
 		const	toDB = this.createUserForDB(user);
+		
 		this.prisma
 			.userJson
 			.create(
@@ -195,40 +196,31 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	loadTableToMemory()
 	{
 		let	id;
-		const	user = this.user.find((elem) =>
-		{
-			return ("97756" === elem.id.toString());
-		});
-		if (user === undefined)
-			id = "97756";
-		else
-			id = user.id
+		
+		id = "undefined";
 		this.prisma
 			.userJson
-			.findUnique(
-			{
-				where:
-				{
-					userJsonID: id
-				}
-			}
-			)
+			.findMany({})
 			.then((data: any) =>
 			{
 				if (data === null)
 				{
-					if (user !== undefined)
-						this.onTableCreate(user);
-					console.log("test data null");
+					// this.onTableCreate(user);
+					// console.log("test data null");
 					this.loadTableToMemory();
 				}
 				else
 				{
-					// const	rawObj = JSON.parse(data.contents);
-					// TEST at home, I need to do this:
-					const stringObj = JSON.parse(data.contents);
-					const	rawObj = JSON.parse(stringObj);
-					this.databaseToObject(rawObj);
+					const	array = data;
+					array.forEach((elem: any) =>
+					{
+						// const	rawObj = JSON.parse(elem);
+						// TEST at home, I need to do this:
+						const stringObj = JSON.parse(elem.contents);
+						const	rawObj = JSON.parse(stringObj);
+						console.log(rawObj);
+						this.databaseToObject(rawObj);
+					})
 				}
 			})
 			.catch((error: any) =>
@@ -840,7 +832,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: newUser.avatar,
 			ftAvatar: newUser.ftAvatar
 		};
-		this.createUserForDB(newUser);
+		this.onTableCreate(newUser);
 		return (
 		{
 			res: response,
