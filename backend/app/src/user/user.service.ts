@@ -173,7 +173,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-		console.log("ici  ", this.user);
+		console.log("ici onTableCreate  ", this.user);
 		const	toDB = this.createUserForDB(user);
 		this.prisma
 			.userJson
@@ -224,9 +224,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				}
 				else
 				{
-					const rawobj = JSON.parse(data.contents);
-					console.log("user raw object from db", rawobj);
-					this.databaseToObject(rawobj);
+					// const	rawObj = JSON.parse(data.contents);
+					// TEST at home, I need to do this:
+					const stringObj = JSON.parse(data.contents);
+					const	rawObj = JSON.parse(stringObj);
+					this.databaseToObject(rawObj);
 				}
 			})
 			.catch((error: any) =>
@@ -238,11 +240,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	async onModuleInit()
 	{
 		console.log("GET USER BACK FROM DB");
-		console.log("user", this.user);
-		console.log("userDB", this.userDB);
-		console.log("userDBString", this.userDBString);
 		this.loadTableToMemory();
-
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
 		this.checkIOAccessPath(this.publicPathLarge);
@@ -842,8 +840,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: newUser.avatar,
 			ftAvatar: newUser.ftAvatar
 		};
-		if (this.user.length === 1)
-			this.onTableCreate(newUser);
 		this.createUserForDB(newUser);
 		return (
 		{
@@ -1235,7 +1231,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// public	doIHaveFriendRequest	
 
 	public	createUserForDB(user: UserModel)
-	 : string
 	{
 		// UserModel stringified
 		const	objToDB: UserDBModel = {
@@ -1263,7 +1258,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		console.log("create User ready for db ", user);
 		console.log("create User to db ", objToDB);
 		console.log("create USER STRINGIFIED", toDB);
-		return (toDB);
+		return (objToDB);
 	}
 
 	public	updateUserForDB(userId: number)
@@ -1317,56 +1312,52 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		// const	array = [...this.userDBString];
 		const	newUsers: UserModel[] = [];
 
-		// array.forEach((elem) =>
-		// {
-			// const	data = JSON.parse(elem);
-			const	toObj: UserModel = {
-				registrationProcessEnded: false,
-				ftApi: data.ftApi,
-				retStatus: data.retStatus,
-				date: data.date,
-				id: data.id,
-				email: data.email,
-				username: data.username,
-				login: data.login,
-				firstName: data.firstName,
-				lastName: data.lastName,
-				url: data.url,
-				avatar: data.avatar,
-				ftAvatar: data.ftAvatar,
-				location: data.location,
-				// TEST I dont know if its important to keep it
-				revokedConnectionRequest: false,
-				authService:
-				{
-					// Do we get a new token here or in the route with login ?
-					token: "Bearer " + jwt.sign(
-						{
-							id: data.id,
-							email: data.email
-						},
-						this.secret,
-						{
-							expiresIn: "1d"
-						}
-					),
-					expAt: Date.now() + (1000 * 60 * 60 * 24),
-					doubleAuth:
+		const	toObj: UserModel = {
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			username: data.username,
+			login: data.login,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
+			location: data.location,
+			// TEST I dont know if its important to keep it
+			revokedConnectionRequest: false,
+			authService:
+			{
+				// Do we get a new token here or in the route with login ?
+				token: "Bearer " + jwt.sign(
 					{
-						enable: data.enable,
-						lastIpClient: data.lastIpClient,
-						phoneNumber: data.phoneNumber,
-						phoneRegistered: data.phoneRegistered,
-						validationCode: data.validationCode,
-						valid: data.valid,
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
 					}
-				},
-				password: data.password,
-				friendsProfileId: [...data.friendsProfileId]
-			};
-			console.log("BACK TO OBJ", toObj);
-			newUsers.push(toObj);
-		// });
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					enable: data.enable,
+					lastIpClient: data.lastIpClient,
+					phoneNumber: data.phoneNumber,
+					phoneRegistered: data.phoneRegistered,
+					validationCode: data.validationCode,
+					valid: data.valid,
+				}
+			},
+			password: data.password,
+			friendsProfileId: [...data.friendsProfileId]
+		};
+		console.log("BACK TO OBJ", toObj);
+		newUsers.push(toObj);
 		console.log("new users", newUsers);
 		this.user = [...newUsers];
 		console.log("THIS USERS", this.user);

@@ -152,7 +152,7 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					console.log("raw object from db", rawobj);
+					console.log("raw object chat from db", rawobj);
 					const	newChatInstance = new Chat();
 					newChatInstance.databaseToObject(rawobj);
 					this.chat = {...newChatInstance};
