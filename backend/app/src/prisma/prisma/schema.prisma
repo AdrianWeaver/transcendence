@@ -22,6 +22,11 @@ model ChatJson {
   contents   String
 }
 
+model UserJson {
+  userJsonID String @id
+  contents String
+}
+
 model Permalinks {
   version  String @id
   contents String

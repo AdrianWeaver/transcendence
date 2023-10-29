@@ -20,6 +20,7 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
+	UserDBModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -64,12 +65,15 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
 	private	secret: string;
+	private	userDB: Array<UserDBModel> = [];
+	private userDBString: Array<String> = [];
+	// TEST
+	private	prisma: PrismaClient;
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
 	private readonly secretId = "user-service-secret";
 	private	readonly	cdnConfig = new ServerConfig();
 	private			shutdown$ = new Subject<string>();
-
 	// image cdn Large is eq to publicPath 700 X 700
 	private	readonly	publicPath = "/app/public/profilePictures";
 	private readonly	publicPathLarge = "/app/public/profilePictures/large";
@@ -93,11 +97,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		25
 	];
 
+
 	public constructor()
 	{
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
 		this.loadSecretFromDB();
+		// TEST
+		this.prisma = new PrismaClient();
 	}
 
 	private	generateSecretForDB()
@@ -161,6 +168,70 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		// 	});
 
 		// TEST I DONT KNOW WHERE TO CALL IT YET
+	}
+
+	private onTableCreate(user: UserModel)
+	{
+		this.logger.verbose("Creating a new version User inside database");
+		const	dbString = this.createUserForDB(user);
+		this.prisma
+			.userJson
+			.create(
+			{
+				data:
+				{
+					userJsonID: user.id.toString(),
+					contents: JSON.stringify(dbString)
+				}
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error("On table Create error");
+				this.logger.error(error);
+			});
+	}
+
+	private	loadTableToMemory(userId: number)
+	{
+		const	user = this.user.find((elem) =>
+		{
+			return (userId.toString() === elem.id);
+		});
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (userId.toString() === elem.id);
+		});
+		if (user === undefined || index === -1)
+			throw new Error("USER UNDEFINED TO LOAD MEMORY");
+		this.prisma
+			.userJson
+			.findUnique(
+			{
+				where:
+				{
+					userJsonID: userId.toString()
+				}
+			}
+			)
+			.then((data: any) =>
+			{
+				if (data === null)
+				{
+					this.onTableCreate(user);
+					this.loadTableToMemory(userId);
+				}
+				else
+				{
+					const rawobj = JSON.parse(data.contents);
+					console.log("raw object from db", rawobj);
+					const	toObj = this.databaseToObject(rawobj);
+					this.user[index] = toObj;
+				}
+			})
+			.catch((error: any) =>
+			{
+				console.log(error);
+			});
 	}
 
 	async onModuleInit()
@@ -1155,10 +1226,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// public	doIHaveFriendRequest	
 
 	public	createUserForDB(user: UserModel)
+	 : Array<String>
 	{
 		// UserModel stringified
-		const	objToDB = {
+		const	objToDB: UserDBModel = {
 			// date of creation - 1h
+			ftApi: {...user.ftApi},
+			retStatus: user.retStatus,
 			date: user.date,
 			id: user.id,
 			email: user.email,
@@ -1167,19 +1241,24 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			firstName: user.firstName,
 			lastName: user.lastName,
 			avatar: user.avatar,
-			// ftAvatar: user.ftAvatar,
-			// location: user.location,
+			ftAvatar: user.ftAvatar,
+			location: user.location,
+			url: user.url,
 			doubleAuth: user.authService.doubleAuth,
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId]
 		};
+		this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
+		this.userDBString.push(toDB);
 		console.log("create User ready for db ", user);
 		console.log("create User to db ", objToDB);
 		console.log("create USER STRINGIFIED", toDB);
+		return (this.userDBString);
 	}
 
 	public	updateUserForDB(userId: number)
+	 : Array<String> | string
 	{
 		const	user = this.user.find((elem) =>
 		{
@@ -1187,32 +1266,93 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		});
 		// TEST 
 		if (user === undefined)
-			return ;
+			return ("error");
+		const	userDB = this.userDB.find((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		// TEST 
+		if (userDB === undefined)
+			return ("error");
 		// or throw error ?
-		const	objToDB = {
-			// date of creation - 1h
-			date: user.date,
-			id: user.id,
-			email: user.email,
-			username: user.username,
-			login: user.login,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			avatar: user.avatar,
-			// ftAvatar: user.ftAvatar,
-			// location: user.location,
-			doubleAuth: {...user.authService.doubleAuth},
-			password: user.password,
-			friendsProfileId: [...user.friendsProfileId]
-		};
-		const	toDB = JSON.stringify(objToDB);
+		const	index = this.userDB.findIndex((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		// TEST 
+		if (index === -1)
+			return ("error");
+		userDB.date = user.date,
+		userDB.id = user.id,
+		userDB.email = user.email,
+		userDB.username = user.username,
+		userDB.login = user.login,
+		userDB.firstName = user.firstName,
+		userDB.lastName = user.lastName,
+		userDB.avatar = user.avatar,
+		userDB.ftAvatar = user.ftAvatar,
+		userDB.location = user.location,
+		userDB.doubleAuth = {...user.authService.doubleAuth};
+		userDB.password = user.password;
+		userDB.friendsProfileId = [...user.friendsProfileId];
+		const	toDB = JSON.stringify(userDB);
+		this.userDBString[index] = toDB;
 		console.log("update User updated for db ", user);
-		console.log("update User updated to db ", objToDB);
-		console.log("update USER STRINGIFIED", toDB);
+		console.log("update User updated to db ", userDB);
+		console.log("update USER STRINGIFIED", this.userDBString);
+		return (this.userDBString);
 	}
 
-	public	userBackFromDB()
+	public	databaseToObject(stringifiedUser: string)
+		: UserModel
 	{
-		// get it back to
+		const	data = JSON.parse(stringifiedUser);
+		console.log("user db to obj", stringifiedUser);
+		const	toObj: UserModel = {
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			username: data.username,
+			login: data.login,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
+			location: data.location,
+			// TEST I dont know if its important to keep it
+			revokedConnectionRequest: false,
+			authService:
+			{
+				// Do we get a new token here or in the route with login ?
+				token: "Bearer " + jwt.sign(
+					{
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					enable: data.authService.doubleAuth.enable,
+					lastIpClient: data.authService.doubleAuth.lastIpClient,
+					phoneNumber: data.authService.doubleAuth.phoneNumber,
+					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+					validationCode: data.authService.doubleAuth.validationCode,
+					valid: data.authService.doubleAuth.valid,
+				}
+			},
+			password: data.password,
+			friendsProfileId: [...data.friendsProfileId]
+		};
+		console.log("BACK TO OBJ", toObj);
+		return (toObj);
 	}
 }
