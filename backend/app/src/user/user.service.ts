@@ -159,6 +159,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		// 	{
 		// 		this.logger.debug("end of load into database ");
 		// 	});
+
+		// TEST I DONT KNOW WHERE TO CALL IT YET
 	}
 
 	async onModuleInit()
@@ -762,6 +764,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: newUser.avatar,
 			ftAvatar: newUser.ftAvatar
 		};
+		this.createUserForDB(newUser);
 		return (
 		{
 			res: response,
@@ -1148,5 +1151,38 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			return ("undefined");
 		return (this.user[myUserIndex].username);
 	}
-	// public	doIHaveFriendRequest
+	// public	doIHaveFriendRequest	
+
+	public	createUserForDB(user: UserModel)
+	{
+		// UserModel stringified
+		const	objToDB = {
+			// date of creation - 1h
+			date: user.date,
+			id: user.id,
+			email: user.email,
+			username: user.username,
+			login: user.login,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			avatar: user.avatar,
+			// ftAvatar: user.ftAvatar,
+			// location: user.location,
+			doubleAuth: user.authService.doubleAuth,
+			password: user.password,
+			friendsProfileId: [...user.friendsProfileId]
+		};
+		console.log("User ready for db ", user);
+		console.log("User to db ", objToDB);
+	}
+
+	public	updateUserForDB()
+	{
+		// 
+	}
+
+	public	userBackFromDB()
+	{
+		// get it back to
+	}
 }
