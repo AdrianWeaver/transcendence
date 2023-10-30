@@ -12,7 +12,6 @@ import
 	Injectable,
 	InternalServerErrorException,
 	Logger,
-	NotFoundException,
 	OnModuleDestroy,
 	OnModuleInit
 } from "@nestjs/common";
@@ -20,21 +19,20 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
+	UserDBModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
 	UserRegisterResponseModel,
 } from "./user.interface";
 import { v4 as uuidv4 } from "uuid";
-import User from "src/chat/Objects/User";
 
-import { privateDecrypt, randomBytes } from "crypto";
+import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
 import { PrismaClient } from "@prisma/client";
 
 import axios from "axios";
-import path, { join } from "path";
 import * as fs from "fs";
 import * as sharp from "sharp";
 import FileConfig from "./Object/FileConfig";
@@ -51,7 +49,6 @@ export type PictureConfigModel = {
 	tmpFolder: string;
 	size: number[];
 }
-import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
@@ -64,12 +61,15 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
 	private	secret: string;
+	private	userDB: Array<UserDBModel> = [];
+	private userDBString: Array<string> = [];
+	// TEST
+	private	prisma: PrismaClient;
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
 	private readonly secretId = "user-service-secret";
 	private	readonly	cdnConfig = new ServerConfig();
 	private			shutdown$ = new Subject<string>();
-
 	// image cdn Large is eq to publicPath 700 X 700
 	private	readonly	publicPath = "/app/public/profilePictures";
 	private readonly	publicPathLarge = "/app/public/profilePictures/large";
@@ -93,8 +93,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		25
 	];
 
+
 	public constructor()
 	{
+			// TEST
+		this.prisma = new PrismaClient();
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
 		this.loadSecretFromDB();
@@ -159,10 +162,101 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		// 	{
 		// 		this.logger.debug("end of load into database ");
 		// 	});
+
+		// TEST I DONT KNOW WHERE TO CALL IT YET
+	}
+
+	private onTableCreate(user: UserModel)
+	{
+		this.logger.verbose("Creating a new version User inside database");
+			this.prisma
+				.userJson
+				.findUnique(
+					{
+						where:
+							{
+								userJsonID: user.id.toString()
+							}
+					}
+				)
+				.then((data: any) =>
+				{
+					if (data)
+					{
+						const	content = JSON.parse(data.contents);
+						console.log("content ", content);
+						const	update = this.prepareUserForDB(user.id);
+						this.prisma
+							.userJson
+							.update(
+								{
+									where:
+									{
+										userJsonID: user.id.toString()
+									},
+									data: {
+										contents: JSON.stringify(update)
+									}
+								}
+							);
+					}
+					else
+					{
+						const	toDB = this.prepareUserForDB(user.id.toString());
+						this.prisma
+							.userJson
+							.create(
+							{
+								data:
+								{
+									userJsonID: user.id.toString(),
+									contents: JSON.stringify(toDB)
+								}
+							})
+							.catch((error: any) =>
+							{
+								this.logger.error("On table Create User error");
+								this.logger.error(error);
+							});
+					}
+				})
+				.catch((error) =>
+				{
+					console.log("error create entry", error);
+				});
+	}
+
+	private	loadTableToMemory()
+	{
+		this.prisma
+			.userJson
+			.findMany({})
+			.then((data: any) =>
+			{
+				if (data !== null)
+				{
+					const	array = data;
+					array.forEach((elem: any) =>
+					{
+						const	rawObj = JSON.parse(elem.contents);
+						// // TEST at home, I need to do this:
+						// const stringObj = JSON.parse(elem.contents);
+						// const	rawObj = JSON.parse(stringObj);
+						console.log("rawObj user", rawObj);
+						this.databaseToObject(rawObj);
+					});
+				}
+			})
+			.catch((error: any) =>
+			{
+				console.log(error);
+			});
 	}
 
 	async onModuleInit()
 	{
+		console.log("GET USER BACK FROM DB");
+		this.loadTableToMemory();
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
 		this.checkIOAccessPath(this.publicPathLarge);
@@ -1057,7 +1151,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		return (count);
 	}
 
-	public	async updateUser(userId: number, body: RegisterStepOneDto)
+	public	async updateUser(userId: number, body: RegisterStepOneDto, registerStepOne: boolean)
 		: Promise<string>
 	{
 		const index = this.user.findIndex((user) =>
@@ -1070,6 +1164,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
+		this.prepareUserForDB(userId);
 		return ("okay");
 	}
 
@@ -1148,5 +1243,150 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			return ("undefined");
 		return (this.user[myUserIndex].username);
 	}
-	// public	doIHaveFriendRequest
+	// public	doIHaveFriendRequest	
+
+	public	prepareUserForDB(userId: any)
+	{
+		const	user = this.user.find((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		if (user === undefined)
+			throw new Error("user prepareUserForDB not found");
+		// UserModel stringified
+		const	objToDB: UserDBModel = {
+			// date of creation - 1h
+			ftApi: {...user.ftApi},
+			retStatus: user.retStatus,
+			date: user.date,
+			id: user.id,
+			email: user.email,
+			username: user.username,
+			login: user.login,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			avatar: user.avatar,
+			ftAvatar: user.ftAvatar,
+			location: user.location,
+			url: user.url,
+			doubleAuth: user.authService.doubleAuth,
+			password: user.password,
+			friendsProfileId: [...user.friendsProfileId]
+		};
+		// this.userDB.push(objToDB);
+		const	toDB = JSON.stringify(objToDB);
+		this.userDBString.push(toDB);
+		console.log("create User ready for db ", user);
+		console.log("create User to db ", objToDB);
+		console.log("create USER STRINGIFIED", toDB);
+		return (objToDB);
+	}
+
+	// public	updateUserForDB(userId: number)
+	// 	: UserDBModel | string
+	// {
+	// 	const	user = this.user.find((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (user === undefined)
+	// 		return ("error");
+	// 	console.log("user ok");
+	// 	const	userDB = this.userDB.find((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (userDB === undefined)
+	// 	{
+	// 		this.onTableCreate(user);
+	// 		return ("ok");
+	// 	}
+	// 	console.log("userDB ok");
+	// 	// or throw error ?
+	// 	const	index = this.userDB.findIndex((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (index === -1)
+	// 		return ("error");
+	// 	console.log("userDB index ok");
+	// 	userDB.date = user.date,
+	// 	userDB.id = user.id,
+	// 	userDB.email = user.email,
+	// 	userDB.username = user.username,
+	// 	userDB.login = user.login,
+	// 	userDB.firstName = user.firstName,
+	// 	userDB.lastName = user.lastName,
+	// 	userDB.avatar = user.avatar,
+	// 	userDB.ftAvatar = user.ftAvatar,
+	// 	userDB.location = user.location,
+	// 	userDB.doubleAuth = {...user.authService.doubleAuth};
+	// 	userDB.password = user.password;
+	// 	userDB.friendsProfileId = [...user.friendsProfileId];
+	// 	const	toDB = JSON.stringify(userDB);
+	// 	this.userDBString[index] = toDB;
+	// 	console.log("update User updated for db ", user);
+	// 	console.log("update User updated to db ", userDB);
+	// 	console.log("update USER STRINGIFIED", this.userDBString);
+	// 	return (userDB);
+	// }
+
+	public	databaseToObject(data: any)
+	{
+		// const	array = [...this.userDBString];
+		const	newUsers: UserModel[] = [];
+
+		const	toObj: UserModel = {
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			username: data.username,
+			login: data.login,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
+			location: data.location,
+			// TEST I dont know if its important to keep it
+			revokedConnectionRequest: false,
+			authService:
+			{
+				// Do we get a new token here or in the route with login ?
+				token: "Bearer " + jwt.sign(
+					{
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					enable: data.enable,
+					lastIpClient: data.lastIpClient,
+					phoneNumber: data.phoneNumber,
+					phoneRegistered: data.phoneRegistered,
+					validationCode: data.validationCode,
+					valid: data.valid,
+				}
+			},
+			password: data.password,
+			friendsProfileId: [...data.friendsProfileId]
+		};
+		console.log("BACK TO OBJ", toObj);
+		newUsers.push(toObj);
+		console.log("new users", newUsers);
+		this.user = [...newUsers];
+		console.log("THIS USERS", this.user);
+	}
 }
