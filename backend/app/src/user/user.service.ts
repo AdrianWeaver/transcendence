@@ -61,13 +61,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
 	private	secret: string;
-	private	userDB: Array<UserDBModel> = [];
-	private userDBString: Array<string> = [];
-	// TEST
+	// private	userDB: Array<UserDBModel> = [];
+	// private userDBString: Array<string> = [];
+
 	private	prisma: PrismaClient;
+	private readonly secretId = "user-service-secret";
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
-	private readonly secretId = "user-service-secret";
 	private	readonly	cdnConfig = new ServerConfig();
 	private			shutdown$ = new Subject<string>();
 	// image cdn Large is eq to publicPath 700 X 700
@@ -105,65 +105,92 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private	generateSecretForDB()
 	{
-		// const	toDB = {
-		// 	"secret_id": this.secretId,
-		// 	"value": randomBytes(64).toString("hex")
-		// };
-		// const	prisma = new PrismaClient();
-		// prisma.secretTable
-		// 	.create(
-		// 		{
-		// 			data: toDB
-		// 		}
-		// 	).then(() =>
-		// 	{
-		// 		this.loadSecretFromDB();
-		// 	})
-		// 	.catch((error: any) =>
-		// 	{
-		// 		this.logger.error(error);
-		// 	});
+		const	toDB = {
+			"secret_id": this.secretId,
+			"value": randomBytes(64).toString("hex")
+		};
+		this.prisma.secretTable
+			.create(
+				{
+					data: toDB
+				}
+			).then(() =>
+			{
+				this.loadSecretFromDB();
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+			});
 	}
 
 	private	loadSecretFromDB()
 	{
-		// const	prisma = new PrismaClient();
-		// prisma.se
-		// prisma.secretTable
-		// 	.findUnique({
-		// 		where:
-		// 		{
-		// 			// eslint-disable-next-line camelcase
-		// 			secret_id: this.secretId,
-		// 		}
-		// 	}).then((data: any) =>
-		// 	{
-		// 		this.logger.debug("Next line is for database");
-		// 		this.logger.debug(typeof data);
-		// 		this.logger.debug(data);
-		// 		if (data === null)
-		// 		{
-		// 			this.logger.log("data is eq to null");
-		// 			this.generateSecretForDB();
-		// 		}
-		// 		else
-		// 		{
-		// 			this.logger.log("data is provided");
-		// 			this.secret = data?.value;
-					// patch 
-					this.secret = randomBytes(64).toString("hex");
-		// 		}
-		// 	})
-		// 	.catch((error: any) =>
-		// 	{
-		// 		this.logger.error(error);
-		// 	})
-		// 	.finally(() =>
-		// 	{
-		// 		this.logger.debug("end of load into database ");
-		// 	});
+		this.prisma
+			.secretTable
+			.findUnique({
+				where:
+				{
+					// eslint-disable-next-line camelcase
+					secret_id: this.secretId,
+				}
+			}).then((data: any) =>
+			{
+				this.logger.debug("Next line is for database");
+				this.logger.debug(typeof data);
+				this.logger.debug(data);
+				if (data === null)
+				{
+					this.logger.log("data is eq to null");
+					this.generateSecretForDB();
+				}
+				else
+				{
+					this.logger.log("data is provided");
+					this.secret = data?.value;
+					this.logger.error("Secret : " + this.secret);
+				}
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+				this.triggerShutDown("Secret error form database ");
+			})
+			.finally(() =>
+			{
+				this.logger.debug("end of load into database ");
+			});
+	}
 
-		// TEST I DONT KNOW WHERE TO CALL IT YET
+	public	async createUserToDatabase(user: UserModel)
+		: Promise<string>
+	{
+		this.logger.debug("Create the user into the table User");
+		const	toDB = this.prepareUserForDB(user.id.toString());
+
+		const status = await this.prisma
+			.userJson
+			.create(
+			{
+				data:
+				{
+					userJsonID: user.id.toString(),
+					contents: JSON.stringify(toDB)
+				}
+			})
+			.then(() =>
+			{
+				this.logger.verbose("user succesfully created ");
+				return ("SUCCESS");
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error("On table Create User error");
+				this.logger.error(error);
+				return ("ERROR");
+			});
+		this.logger.debug("value of status " + status);
+		return (status);
 	}
 
 	private onTableCreate(user: UserModel)
@@ -228,6 +255,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private	loadTableToMemory()
 	{
+		// return ;
 		this.prisma
 			.userJson
 			.findMany({})
@@ -242,7 +270,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						// // TEST at home, I need to do this:
 						// const stringObj = JSON.parse(elem.contents);
 						// const	rawObj = JSON.parse(stringObj);
-						console.log("rawObj user", rawObj);
+						// console.log("rawObj user", rawObj);
 						this.databaseToObject(rawObj);
 					});
 				}
@@ -1164,7 +1192,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
-		this.prepareUserForDB(userId);
+
+		// this.onTableCreate(userId);
 		return ("okay");
 	}
 
@@ -1254,9 +1283,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		if (user === undefined)
 			throw new Error("user prepareUserForDB not found");
 		// UserModel stringified
-		const	objToDB: UserDBModel = {
+		const	objToDB: UserModel = {
 			// date of creation - 1h
 			ftApi: {...user.ftApi},
+			registrationProcessEnded: user.registrationProcessEnded,
 			retStatus: user.retStatus,
 			date: user.date,
 			id: user.id,
@@ -1269,13 +1299,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			ftAvatar: user.ftAvatar,
 			location: user.location,
 			url: user.url,
-			doubleAuth: user.authService.doubleAuth,
+			authService: {...user.authService},
 			password: user.password,
-			friendsProfileId: [...user.friendsProfileId]
+			friendsProfileId: [...user.friendsProfileId],
+			revokedConnectionRequest: user.revokedConnectionRequest
 		};
 		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
-		this.userDBString.push(toDB);
+		// this.userDBString.push(toDB);
 		console.log("create User ready for db ", user);
 		console.log("create User to db ", objToDB);
 		console.log("create USER STRINGIFIED", toDB);
@@ -1340,7 +1371,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		const	newUsers: UserModel[] = [];
 
 		const	toObj: UserModel = {
-			registrationProcessEnded: false,
+			registrationProcessEnded: data.registrationProcessEnded,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
 			date: data.date,
@@ -1359,17 +1390,18 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			authService:
 			{
 				// Do we get a new token here or in the route with login ?
-				token: "Bearer " + jwt.sign(
-					{
-						id: data.id,
-						email: data.email
-					},
-					this.secret,
-					{
-						expiresIn: "1d"
-					}
-				),
-				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				// token: "Bearer " + jwt.sign(
+				// 	{
+				// 		id: data.id,
+				// 		email: data.email
+				// 	},
+				// 	this.secret,
+				// 	{
+				// 		expiresIn: "1d"
+				// 	}
+				// ),
+				token: data.token,
+				expAt: data.expAt,
 				doubleAuth:
 				{
 					enable: data.enable,

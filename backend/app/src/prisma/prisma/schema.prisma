@@ -23,7 +23,7 @@ model ChatJson {
 }
 
 model UserJson {
-  userJsonID String @id
+  userJsonID String @id @unique
   contents   String
 }
 

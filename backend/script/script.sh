@@ -15,4 +15,4 @@ rm -rf /app/src/prisma/prisma/migrations;
 cd /app/src/prisma && npx prisma  migrate dev --schema=./prisma/schema.prisma --name=dev;
 cd /app/src/prisma &&  npx prisma db push
 
-npm run start:dev
+npm run start:dev & (cd /app/src/prisma && npx prisma studio)
