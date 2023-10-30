@@ -11,6 +11,7 @@ services:
     # command: npm run start:dev
     volumes:
       - ./backend/app/:/app
+      - ./backend/script:/srv
     ports:
       - 3000:3000
       - 5555:5555

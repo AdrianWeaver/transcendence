@@ -556,11 +556,16 @@ export const setRegistrationProcessSuccess = ()
 	})
 }
 
-export const setRegistrationProcessError = ()
+export const setRegistrationProcessError = (message?: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
 	{
+		let errorMsg: string;
+		if (message)
+			errorMsg = message;
+		else
+			errorMsg = "error";
 		const prev = getState();
 
 		const response: ControllerModel = {
@@ -613,6 +618,26 @@ export const	setUserData = (data: any)
 	});
 }
 
+export const	verifyTokenAtRefresh = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const prevState = getState();
+
+		const user = prevState.controller.user;
+		const	data = await UserServices
+			.verifyToken(
+				user.bearerToken,
+				prevState.server.serverLocation
+			);
+		if (data === "ERROR")
+		{
+			dispatch(controllerActions.reinitialiseUser());
+		}
+	});
+}
+
 export const verifyToken = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -660,7 +685,8 @@ export const registerClientWithCode = (code : string)
 			code, prev.server.serverLocation);
 		if (data === "ERROR")
 		{
-			dispatch(setRegistrationProcessError());
+			// console.error("erreur");
+			dispatch(setRegistrationProcessError("Already used account, please login"));
 			return ;
 		}
 		else
