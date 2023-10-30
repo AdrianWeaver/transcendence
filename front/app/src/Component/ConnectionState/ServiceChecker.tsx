@@ -31,28 +31,37 @@ const	ServiceChecker = () =>
 
 	let	message;
 	let	severity: AlertColor | undefined;
+	let msDuration: number;
 
-	switch (server.connexionAttempt)
+	msDuration = 400;
+	if (server.connexionEnabled === false)
+		switch (server.connexionAttempt)
+		{
+			case 0:
+				severity = "info";
+				message = "Etablissement de la connection en cours";
+				break ;
+			case 1:
+			case 2:
+			case 3:
+				severity = "info";
+				message = "Connexion au serveur en cours attempt #";
+				message += server.connexionAttempt;
+				break ;
+			case 4:
+				message = "Erreur de connexion au serveur ";
+				severity = "error";
+				break ;
+			default:
+				severity= "info";
+				message = "Chargement en cours";
+				break ;
+		}
+	else
 	{
-		case 0:
-			severity = "info";
-			message = "Etablissement de la connection en cours";
-			break ;
-		case 1:
-		case 2:
-		case 3:
-			severity = "info";
-			message = "Connexion au serveur en cours attempt #";
-			message += server.connexionAttempt;
-			break ;
-		case 4:
-			message = "Erreur de connexion au serveur ";
-			severity = "error";
-			break ;
-		default:
-			severity= "info";
-			message = "Chargement en cours";
-			break ;
+		message = "Connextion etablie";
+		severity = "success";
+		msDuration = 500;
 	}
 
 	useEffect(() =>
@@ -61,7 +70,7 @@ const	ServiceChecker = () =>
 		{
 			dispatch(increaseConnectionAttempt());
 			dispatch(getServerConnection());
-		}, 1000);
+		}, msDuration);
 	}, []);
 
 	const	loading = <LinearProgress color="inherit" />;
