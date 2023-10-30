@@ -12,7 +12,6 @@ import
 	Injectable,
 	InternalServerErrorException,
 	Logger,
-	NotFoundException,
 	OnModuleDestroy,
 	OnModuleInit
 } from "@nestjs/common";
@@ -27,15 +26,13 @@ import
 	UserRegisterResponseModel,
 } from "./user.interface";
 import { v4 as uuidv4 } from "uuid";
-import User from "src/chat/Objects/User";
 
-import { privateDecrypt, randomBytes } from "crypto";
+import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
 import { PrismaClient } from "@prisma/client";
 
 import axios from "axios";
-import path, { join } from "path";
 import * as fs from "fs";
 import * as sharp from "sharp";
 import FileConfig from "./Object/FileConfig";
@@ -52,13 +49,11 @@ export type PictureConfigModel = {
 	tmpFolder: string;
 	size: number[];
 }
-import { ThisMonthInstance } from "twilio/lib/rest/api/v2010/account/usage/record/thisMonth";
 import * as bcrypt from "bcrypt";
 import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
-import { throws } from "assert";
 
 
 @Injectable()
@@ -105,7 +100,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		this.prisma = new PrismaClient();
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
-		this.loadSecretFromDB();		
+		this.loadSecretFromDB();
 	}
 
 	private	generateSecretForDB()
@@ -174,53 +169,82 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-		const	toDB = this.createUserForDB(user);
-		
-		this.prisma
-			.userJson
-			.create(
-			{
-				data:
+			this.prisma
+				.userJson
+				.findUnique(
+					{
+						where:
+							{
+								userJsonID: user.id.toString()
+							}
+					}
+				)
+				.then((data: any) =>
 				{
-					userJsonID: user.id.toString(),
-					contents: JSON.stringify(toDB)
-				}
-			})
-			.catch((error: any) =>
-			{
-				this.logger.error("On table Create User error");
-				this.logger.error(error);
-			});
+					if (data)
+					{
+						const	content = JSON.parse(data.contents);
+						console.log("content ", content);
+						const	update = this.prepareUserForDB(user.id);
+						this.prisma
+							.userJson
+							.update(
+								{
+									where:
+									{
+										userJsonID: user.id.toString()
+									},
+									data: {
+										contents: JSON.stringify(update)
+									}
+								}
+							);
+					}
+					else
+					{
+						const	toDB = this.prepareUserForDB(user.id.toString());
+						this.prisma
+							.userJson
+							.create(
+							{
+								data:
+								{
+									userJsonID: user.id.toString(),
+									contents: JSON.stringify(toDB)
+								}
+							})
+							.catch((error: any) =>
+							{
+								this.logger.error("On table Create User error");
+								this.logger.error(error);
+							});
+					}
+				})
+				.catch((error) =>
+				{
+					console.log("error create entry", error);
+				});
 	}
 
 	private	loadTableToMemory()
 	{
-		let	id;
-		
-		id = "undefined";
 		this.prisma
 			.userJson
 			.findMany({})
 			.then((data: any) =>
 			{
-				if (data === null)
-				{
-					// this.onTableCreate(user);
-					// console.log("test data null");
-					this.loadTableToMemory();
-				}
-				else
+				if (data !== null)
 				{
 					const	array = data;
 					array.forEach((elem: any) =>
 					{
-						// const	rawObj = JSON.parse(elem);
-						// TEST at home, I need to do this:
-						const stringObj = JSON.parse(elem.contents);
-						const	rawObj = JSON.parse(stringObj);
-						console.log(rawObj);
+						const	rawObj = JSON.parse(elem.contents);
+						// // TEST at home, I need to do this:
+						// const stringObj = JSON.parse(elem.contents);
+						// const	rawObj = JSON.parse(stringObj);
+						console.log("rawObj user", rawObj);
 						this.databaseToObject(rawObj);
-					})
+					});
 				}
 			})
 			.catch((error: any) =>
@@ -832,7 +856,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: newUser.avatar,
 			ftAvatar: newUser.ftAvatar
 		};
-		this.onTableCreate(newUser);
 		return (
 		{
 			res: response,
@@ -1128,7 +1151,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		return (count);
 	}
 
-	public	async updateUser(userId: number, body: RegisterStepOneDto)
+	public	async updateUser(userId: number, body: RegisterStepOneDto, registerStepOne: boolean)
 		: Promise<string>
 	{
 		const index = this.user.findIndex((user) =>
@@ -1141,7 +1164,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
-		this.updateUserForDB(userId);
+		this.prepareUserForDB(userId);
 		return ("okay");
 	}
 
@@ -1222,8 +1245,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	}
 	// public	doIHaveFriendRequest	
 
-	public	createUserForDB(user: UserModel)
+	public	prepareUserForDB(userId: any)
 	{
+		const	user = this.user.find((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		if (user === undefined)
+			throw new Error("user prepareUserForDB not found");
 		// UserModel stringified
 		const	objToDB: UserDBModel = {
 			// date of creation - 1h
@@ -1244,7 +1273,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId]
 		};
-		this.userDB.push(objToDB);
+		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
 		this.userDBString.push(toDB);
 		console.log("create User ready for db ", user);
@@ -1253,51 +1282,57 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		return (objToDB);
 	}
 
-	public	updateUserForDB(userId: number)
-	 : Array<String> | string
-	{
-		const	user = this.user.find((elem) =>
-		{
-			return (userId.toString() === elem.id.toString());
-		});
-		// TEST 
-		if (user === undefined)
-			return ("error");
-		const	userDB = this.userDB.find((elem) =>
-		{
-			return (userId.toString() === elem.id.toString());
-		});
-		// TEST 
-		if (userDB === undefined)
-			return ("error");
-		// or throw error ?
-		const	index = this.userDB.findIndex((elem) =>
-		{
-			return (userId.toString() === elem.id.toString());
-		});
-		// TEST 
-		if (index === -1)
-			return ("error");
-		userDB.date = user.date,
-		userDB.id = user.id,
-		userDB.email = user.email,
-		userDB.username = user.username,
-		userDB.login = user.login,
-		userDB.firstName = user.firstName,
-		userDB.lastName = user.lastName,
-		userDB.avatar = user.avatar,
-		userDB.ftAvatar = user.ftAvatar,
-		userDB.location = user.location,
-		userDB.doubleAuth = {...user.authService.doubleAuth};
-		userDB.password = user.password;
-		userDB.friendsProfileId = [...user.friendsProfileId];
-		const	toDB = JSON.stringify(userDB);
-		this.userDBString[index] = toDB;
-		console.log("update User updated for db ", user);
-		console.log("update User updated to db ", userDB);
-		console.log("update USER STRINGIFIED", this.userDBString);
-		return (this.userDBString);
-	}
+	// public	updateUserForDB(userId: number)
+	// 	: UserDBModel | string
+	// {
+	// 	const	user = this.user.find((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (user === undefined)
+	// 		return ("error");
+	// 	console.log("user ok");
+	// 	const	userDB = this.userDB.find((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (userDB === undefined)
+	// 	{
+	// 		this.onTableCreate(user);
+	// 		return ("ok");
+	// 	}
+	// 	console.log("userDB ok");
+	// 	// or throw error ?
+	// 	const	index = this.userDB.findIndex((elem) =>
+	// 	{
+	// 		return (userId.toString() === elem.id.toString());
+	// 	});
+	// 	// TEST 
+	// 	if (index === -1)
+	// 		return ("error");
+	// 	console.log("userDB index ok");
+	// 	userDB.date = user.date,
+	// 	userDB.id = user.id,
+	// 	userDB.email = user.email,
+	// 	userDB.username = user.username,
+	// 	userDB.login = user.login,
+	// 	userDB.firstName = user.firstName,
+	// 	userDB.lastName = user.lastName,
+	// 	userDB.avatar = user.avatar,
+	// 	userDB.ftAvatar = user.ftAvatar,
+	// 	userDB.location = user.location,
+	// 	userDB.doubleAuth = {...user.authService.doubleAuth};
+	// 	userDB.password = user.password;
+	// 	userDB.friendsProfileId = [...user.friendsProfileId];
+	// 	const	toDB = JSON.stringify(userDB);
+	// 	this.userDBString[index] = toDB;
+	// 	console.log("update User updated for db ", user);
+	// 	console.log("update User updated to db ", userDB);
+	// 	console.log("update USER STRINGIFIED", this.userDBString);
+	// 	return (userDB);
+	// }
 
 	public	databaseToObject(data: any)
 	{

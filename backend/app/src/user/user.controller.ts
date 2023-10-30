@@ -155,7 +155,7 @@ export class UserController
 			return (unauthorized(401, "You are an hacker go off"), void(0));
 		this.logger.verbose("verification okay");
 		this.logger.debug("Number of user with this username: " + count);
-		const	update = await this.userService.updateUser(user.id, body);
+		const	update = await this.userService.updateUser(user.id, body, true);
 		if (update === "ERROR")
 			return (unauthorized(500, "try again later"), void(0));
 		return (res.status(200).json({message: "okay"}), void(0));
