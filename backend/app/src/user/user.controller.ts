@@ -270,6 +270,22 @@ export class UserController
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
 						retValue = this.userService.register(newUserObj);
+						this.userService.createUserToDatabase(newUserObj)
+						.then((data) =>
+						{
+							if (data === "ERROR")
+							{
+								this.logger.error("Client create a error");
+							}
+							else if (data === "SUCCESS")
+							{
+								this.logger.debug("Client create is a success");
+							}
+							else
+							{
+								this.logger.error("Logic error await/async ");
+							}
+						});
 						res.status(200).send(retValue.res);
 						// mise a jour vers la database
 						this.logger.log("Ending processing image");
