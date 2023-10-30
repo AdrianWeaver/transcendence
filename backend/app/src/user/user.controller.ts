@@ -259,12 +259,21 @@ export class UserController
 						password: "undefined",
 						friendsProfileId: []
 					};
-					this.logger.log("Starting processing image");
-					const newUserObj = await this.userService.downloadAvatar(userObject);
-					retValue = this.userService.register(newUserObj);
-					res.status(200).send(retValue.res);
-					// mise a jour vers la database
-					this.logger.log("Ending processing image");
+					if (this.userService.getUserById(userObject.id) !== undefined)
+					{
+						this.logger.error("User Already register ");
+						// console.log()
+						res.status(400).json({error: "you are already register"});
+					}
+					else
+					{
+						this.logger.log("Starting processing image");
+						const newUserObj = await this.userService.downloadAvatar(userObject);
+						retValue = this.userService.register(newUserObj);
+						res.status(200).send(retValue.res);
+						// mise a jour vers la database
+						this.logger.log("Ending processing image");
+					}
 				})
 				.catch((error) =>
 				{
