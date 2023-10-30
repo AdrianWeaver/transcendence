@@ -107,8 +107,13 @@ const	StepZero = () =>
 		return (state.controller.registration.step);
 	});
 
+	const	hostname = useAppSelector((state) =>
+	{
+		return (state.server.serverLocation);
+	});
 	const	url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code";
 
+	console.log("hostname: ", hostname);
 	const	openSameTab = () =>
 	{
 		// dispatch(userRegistrationStepTwo());
