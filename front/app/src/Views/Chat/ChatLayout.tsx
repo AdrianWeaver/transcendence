@@ -87,14 +87,13 @@ interface TabPanelProps {
 	children?: React.ReactNode;
 	dir?: string;
 	index: number;
-	ind: number;
 	value: number;
 	style?: CSSProperties;
 }
 
 const TabPanel = (props: TabPanelProps) =>
 {
-	const { children, value, index, ind, ...other } = props;
+	const { children, value, index, ...other } = props;
 	let animationSettings;
 
 	if (props.area === false)
@@ -543,12 +542,7 @@ const	ChatLayout = () =>
 			if(data.type === "add-new-channel")
 			{
 				if (data.payload.kind === "channel")
-				{
-					console.log("AAAAAAAH");
 					setChannels(data.payload.chanMap);
-					chanMessageTest = channels;
-					console.log("chanMessageTest", chanMessageTest);
-				}
 				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
@@ -568,7 +562,6 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
-
 				else
 				{
 					setChanMessages([]);
@@ -840,7 +833,7 @@ const	ChatLayout = () =>
 				message: text,
 			}
 		};
-		socketRef.current.emit("info", action);
+		socketRef.current.emit("info", action);;
 		setText("");
 	};
 
