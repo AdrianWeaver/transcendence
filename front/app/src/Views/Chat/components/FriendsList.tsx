@@ -17,7 +17,7 @@ import {
 	TextField
 } from "@mui/material";
 
-import CurrentlyTalkingFriend from "./CurrentlyTalkingFriend";
+import Myself from "./Myself";
 import FriendItem from "./FriendItem";
 
 import
@@ -74,7 +74,7 @@ const FriendsList = (props: FriendsListProps) =>
 
 	return (
 		<>
-			<CurrentlyTalkingFriend />
+			<Myself />
 			<Divider />
 			<Grid
 				item
@@ -106,8 +106,9 @@ const FriendsList = (props: FriendsListProps) =>
 									<FriendItem
 										name={elem.name + ": " + elem.id}
 										avatar={elem.avatar}
-										key={index}
 										online={true}
+										key={index}
+										ind={index}
 									/>
 								</div>
 							</>

@@ -1,12 +1,12 @@
-import	axios from "axios";
+import    axios from "axios";
 
 export default (serverLocation: string) =>
 {
-	return (
-		axios.create(
-		{
-			baseURL: "http://" + serverLocation +":3000",
-			timeout: 5000
-		})
-	);
+    return (
+        axios.create(
+        {
+            baseURL: "http://" + serverLocation +":3000",
+            timeout: 0
+        })
+    );
 };

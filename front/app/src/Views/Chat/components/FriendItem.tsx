@@ -11,6 +11,7 @@ type FriendItemProps = {
 	avatar?: string;
 	online?: boolean;
 	key?: number;
+	ind?: number;
 };
 
 const FriendItem = (props: FriendItemProps) =>
@@ -20,7 +21,7 @@ const FriendItem = (props: FriendItemProps) =>
 	return (
 		<ListItem
 			button
-			key={props.key}
+			key={props.ind}
 		>
 			<ListItemIcon>
 				<Avatar

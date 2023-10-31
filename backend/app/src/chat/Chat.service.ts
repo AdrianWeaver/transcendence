@@ -62,6 +62,7 @@ type MemberSocketIdModel ={
 
 import { v4 as uuidv4 } from "uuid";
 import { profile } from "console";
+import { UserModel } from "src/user/user.interface";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -232,7 +233,6 @@ export	class ChatService implements OnModuleInit
 					newChatInstance.users = arrayUser;
 
 					const	arrayChanMap: Array<ChanMapModel> = [];
-					// console.log(rawobj.chanMap);
 					rawobj.chanMap.forEach((elem: ChanMapModel) =>
 					{
 						const	objToMemory: ChanMapModel = {
@@ -557,7 +557,9 @@ export	class ChatService implements OnModuleInit
 	public	getAllUsers()
 	{
 		const	users: ChatUserModel[] = [];
+		const	globalUser: UserModel[] = [];
 
+		
 		this.chat.users.map((element) =>
 		{
 			const user = {
@@ -580,11 +582,6 @@ export	class ChatService implements OnModuleInit
 	{
 		this.searchUserIndex(user.id);
 	}
-
-	// public	sentMessageToChannel(channel: Channel)
-	// {
-
-	// }
 
 	public deleteChannel(chanName: string)
 	{

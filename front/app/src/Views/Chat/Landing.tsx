@@ -23,7 +23,6 @@ export const	Landing = () =>
 	}, 400);
 	return (
 		<>
-			met moi quelque chose de jolie interface,
-			style la page est en train de charger
+			loading..
 		</>);
 };
