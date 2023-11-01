@@ -18,7 +18,7 @@ import	anonymousUserSlice from "./anonymousUser-slice";
 import	gameEngineSlice from "./gameEngine-slice";
 
 // import
-
+// localStorage.clear();
 const	persistConfigController = {
 	key: "root",
 	// version: 2,
@@ -44,8 +44,10 @@ export const	store = configureStore(
 	reducer:
 	{
 		controller: persistedControllerReducer,
+		// controller: controllerSlice.reducer,
 		server: serverSlice.reducer,
 		anonymousUser: persistedAnonymousUserReducer,
+		// anonymousUser: anonymousUserSlice.reducer,
 		gameEngine: gameEngineSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>

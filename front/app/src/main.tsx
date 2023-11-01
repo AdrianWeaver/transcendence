@@ -7,6 +7,9 @@ import { store, persistor } from "./Redux/store/index.ts";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
+// TEST
+localStorage.clear();
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<Provider store={store}>
 			<PersistGate

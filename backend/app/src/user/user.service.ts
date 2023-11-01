@@ -1166,7 +1166,15 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			return ("User doesnt exist");
 		if (searchFriend === undefined)
 			return ("This new friend doesnt exist");
+		const	searchFriendIndex = this.user.findIndex((elem) =>
+		{
+			return (elem.id === friendId);
+		});
+		if (searchFriendIndex !== -1)
+			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
+		this.user[searchUserIndex].friendsProfileId.push(friendId);
+		this.user[searchFriendIndex].friendsProfileId.push(id);
 		return (searchFriend.username + " added as friend");
 	}
 
