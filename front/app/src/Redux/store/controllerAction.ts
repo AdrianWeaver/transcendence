@@ -200,7 +200,6 @@ export const	reinitialiseUser = (logout: boolean)
 		if (logout)
 		{
 			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
-			console.log("coucou");
 			dispatch(logOffUser());
 			dispatch(resetRegistration);
 		}
@@ -1301,5 +1300,71 @@ export const	addUser = (user: UserModel)
 			allFrontUsers: array
 		}
 		dispatch(controllerActions.addUser(response));
+	});
+}
+
+export const	setOnline = (online: boolean, user: UserModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	array = [...prev.controller.user.chat.users];
+		const	index = array.findIndex((elem) =>
+		{
+			return (elem.name === user.username);
+		});
+		if (index === -1)
+			return ;
+			// throw new Error("controllerAction setOnline, user doesnt exist");
+		else
+			array[index].online = online;
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: array
+				}
+			}
+		}
+		dispatch(controllerActions.setOnline(response));
+	});
+}
+
+export const	setStatus = (status: string, user: UserModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	array = [...prev.controller.user.chat.users];
+		const	index = array.findIndex((elem) =>
+		{
+			return (elem.name === user.username);
+		});
+		if (index === -1)
+			return ;
+			// throw new Error("controllerAction setOnline, user doesnt exist");
+		else
+			array[index].status = status;
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: array
+				}
+			}
+		}
+		dispatch(controllerActions.setOnline(response));
 	});
 }

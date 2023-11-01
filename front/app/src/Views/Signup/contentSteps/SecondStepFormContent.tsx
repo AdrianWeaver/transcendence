@@ -15,10 +15,13 @@ import {
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setAllUsers,
+	setAvatar,
 	setDoubleAuth,
+	setOnline,
 	setPhoneNumber,
 	setProfileMyView,
 	setRegistered,
+	setStatus,
 	setUserLoggedIn } from "../../../Redux/store/controllerAction";
 import UserSecurity from "../../../Object/UserSecurity";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
@@ -129,6 +132,9 @@ const	SecondStepFormContent = () =>
 			dispatch(setProfileMyView());
 			dispatch(setAllUsers());
 			dispatch(addUser(user));
+			dispatch(setOnline(true, user));
+			dispatch(setStatus("online", user));
+			dispatch(setAvatar(user.avatar));
 		}
 	};
 

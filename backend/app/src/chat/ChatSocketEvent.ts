@@ -117,10 +117,15 @@ export class ChatSocketEvents
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
-						this.logger.log("User not found");
+						this.logger.log("Chat User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
+						// TEST
+						const user = this.userService.getUserById(profileId);
+						if (user === undefined)
+							throw new Error("HandleConnexion user dosnt exist");
 						const newUser = new User(userName, profileId);
 						newUser.setClient(client);
+						newUser.setAvatar(user.avatar);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else

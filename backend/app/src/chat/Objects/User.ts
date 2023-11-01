@@ -38,8 +38,11 @@ class User
     public name: string;
 	public profile: ProfileModel;
 	public stats: StatsModel;
+	public avatar: string;
     // socket id
 	public id: string;
+	public online: boolean;
+	public status: string;
     // public channels: Channel[] = [];
 	public channels: string[] = [];
 	public blocked: MemberSocketIdModel[] = [];
@@ -57,6 +60,9 @@ class User
 	public isFriend: (socketId: string) => boolean;
 	public setClient: (clientSocket: Socket | null) => void;
 	public setId: (id: string) => void;
+	public setAvatar: (avatar: string) => void;
+	public setStatus: (status: string) => void;
+	public setOnline: (online: boolean) => void;
 
     public constructor(name: string, profileId: string)
     {
@@ -78,6 +84,21 @@ class User
 		this.setId = (id: string) =>
 		{
 			this.id = id;
+		};
+		this.setAvatar = (avatar: string) =>
+		{
+			if (avatar === undefined)
+				this.avatar = "https://thispersondoesnotexist.com/";
+			this.avatar = avatar;
+		};
+		this.setStatus = (status: string) =>
+		{
+			// online, offline, playing
+			this.status = status;
+		};
+		this.setOnline = (online: boolean) =>
+		{
+			this.online = online;
 		};
 		this.joinChannel = (chanName: string) =>
 		{
@@ -214,6 +235,9 @@ class User
 			profile: {...this.profile},
 			stats: {...this.stats},
 			id: this.id,
+			status: this.status,
+			avatar: this.avatar,
+			online: this.online,
 			blocked: [...this.blocked],
 			friends: [...this.friends],
 			profileId: this.profileId,

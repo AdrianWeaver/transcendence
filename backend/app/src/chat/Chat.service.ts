@@ -201,6 +201,10 @@ export	class ChatService implements OnModuleInit
 						// NEED TO KNOW WHAT TO DO WITH null SOCKET
 						newUserInstance.setClient(null);
 						newUserInstance.chat = this.chat;
+						newUserInstance.setStatus(rawUser.status);
+						newUserInstance.setOnline(rawUser.online);
+						console.log("chat service 207 back AVATAR ", rawUser.avatar);
+						newUserInstance.setAvatar(rawUser.avatar);
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
 						const blockedArray: Array<MemberSocketIdModel> = [];
@@ -559,13 +563,13 @@ export	class ChatService implements OnModuleInit
 		const	users: ChatUserModel[] = [];
 		const	globalUser: UserModel[] = [];
 
-		
 		this.chat.users.map((element) =>
 		{
 			const user = {
 				name: element.name,
 				id: element.id,
-				avatar: "https://thispersondoesnotexist.com/",
+				// AVATAR CHANGE
+				avatar: element.avatar,
 				msgRoom: []
 			};
 			users.push(user);
