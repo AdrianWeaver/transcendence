@@ -251,9 +251,9 @@ const	ChatLayout = () =>
 	// let	chanMessageTest: MessageModel[] = [];
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
-	const	chatConnected = useAppSelector((state) =>
+	const	chatUsers = useAppSelector((state) =>
 	{
-		return (state.controller.user.chat.connected);
+		return (state.controller.user.chat.users);
 	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
@@ -419,7 +419,7 @@ const	ChatLayout = () =>
 	[
 		arrayListUser,
 		setArrayListUser
-	] = useState([]);
+	] = useState<ChatUserModel[]>([]);
 
 	const [
 		joiningChannelName,
@@ -763,6 +763,11 @@ const	ChatLayout = () =>
 		blockedList
 	]);
 
+	useEffect(() =>
+	{
+		setArrayListUser(chatUsers);
+	}), [chatUsers];
+
 	const handlePasswordSubmit = (password: string) =>
 	{
 		const	action = {
@@ -834,7 +839,7 @@ const	ChatLayout = () =>
 				message: text,
 			}
 		};
-		socketRef.current.emit("info", action);;
+		socketRef.current.emit("info", action);
 		setText("");
 	};
 
