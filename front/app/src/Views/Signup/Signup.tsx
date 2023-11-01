@@ -13,7 +13,7 @@ import
 	useRedirectRegistration
 }	from "../../Router/Hooks/useRedirectRegistration";
 import EscButton from "./Header/EscButton";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import HeaderForm from "./Header/HeaderForm";
 import Copyright from "./Footer/Copyright";
 import StepOne from "./contentSteps/StepOne";
@@ -21,11 +21,6 @@ import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
 import { useEffect } from "react";
-import {
-	registerClientWithCode,
-	setRegistrationProcessStart, setUserData, verifyToken } from "../../Redux/store/controllerAction";
-import { checkQueryParams } from "./extras/checkQueryParams";
-import { useLocation } from "react-router-dom";
 
 const	styleMainBox = {
 	marginTop: 8,
