@@ -18,9 +18,7 @@ import { UserController } from "./user/user.controller";
 import { AnonymousUserModule } from "./anonymous-user/anonyous-user.module";
 import { UserModule } from "./user/user.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { dirname, join } from "path";
 import { GracefulShutdownModule } from "nestjs-graceful-shutdown";
-import { UserService } from "./user/user.service";
 
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
@@ -64,7 +62,6 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 	],
 	providers: [
 		AppService,
-		// UserService,
 		AdminsService,
 		ChatApiModule,
 		ChatApiService

@@ -100,7 +100,8 @@ const	StepZero = () =>
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
 
-	const	[
+	const
+	[
 		visible,
 		setVisible
 	] = useState(locationIsARedirectedPage(query.pathname));

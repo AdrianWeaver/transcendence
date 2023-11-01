@@ -1,7 +1,5 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-
-import { buffer } from "stream/consumers";
 import { PictureConfigModel } from "../user.service";
 import ServerConfig from "../../serverConfig";
 
@@ -47,7 +45,6 @@ class FileConfig
 	public	getPathNormal: () => string;
 	public	getPathTmpConverted: () => string;
 	public	getCDNConfig: () => CDNConfig;
-	// eslint-disable-next-line max-statements
 	constructor()
 	{
 		this.serverConfig = new ServerConfig();
