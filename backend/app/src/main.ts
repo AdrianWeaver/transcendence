@@ -18,8 +18,6 @@ async function bootstrap()
 		console.log("The configuration for the project is not okay");
 		return ;
 	}
-	console.log("url :", configTest.getFtAuthURL());
-	return ;
 	console.log("The configuration of the project is okay program will start");
 	const	app = await NestFactory.create(AppModule);
 	app.enableCors({

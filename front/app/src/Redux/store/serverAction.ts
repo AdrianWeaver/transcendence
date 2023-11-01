@@ -21,6 +21,7 @@ export const	setIsFetching = (value : boolean)
 	return ((dispatch, getState) =>
 	{
 		const	previousState = getState();
+		console.log("Set is fetching value : ", previousState);
 		const	response: ServerModel = {
 			...previousState.server,
 			isFetching: value,
@@ -73,7 +74,10 @@ export const	resetState = ()
 			error: false,
 			message: "",
 			serverActiveSince: "unknow",
-			serverLocation: "localhost"
+			serverLocation: "localhost",
+			links: {
+				authApiUrl: "undefined",
+			}
 		};
 		dispatch(serverActions.resetState(response));
 	});
@@ -100,7 +104,8 @@ export const	setServerConnectionErr = (basicErrMsg: string, fullMsg: string)
 	});
 };
 
-export const	setServerConnectionSuccess = (activeSince: string)
+export const	setServerConnectionSuccess = (
+	activeSince: string, links: {authApiUrl: string})
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -109,7 +114,10 @@ export const	setServerConnectionSuccess = (activeSince: string)
 		const	response: ServerModel = {
 			...prevState.server,
 			serverActiveSince: activeSince,
-			connexionEnabled: true
+			connexionEnabled: true,
+			links: {
+				authApiUrl: links.authApiUrl
+			}
 		};
 		// console.log(response);
 		dispatch(serverActions.setServerConnectionSuccess(response));
@@ -144,7 +152,12 @@ export	const	getServerConnection = ()
 						data.fullError.message));
 		}
 		else
-			dispatch(setServerConnectionSuccess(data.availableSince));
+		{
+			console.log("Flag response server-status: ", data);
+			dispatch(
+				setServerConnectionSuccess(data.availableSince, data.links)
+			);
+		}
 	});
 };
 
@@ -168,5 +181,34 @@ export const	setServerLocation = (locationServer: string)
 			serverLocation: locationServer
 		};
 		dispatch(serverActions.setServerLocation(response));
+	});
+};
+
+export const	setAuthApiLinks = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const	data = await ServerService
+		.getAuthApiLinks(prev.server.serverLocation);
+		if (data.success === true)
+		{
+			console.log("Action reducer data set auth links: ", data);
+			const	response: ServerModel = {
+				...prev.server,
+				links: {
+					...prev.server.links,
+					authApiUrl: data
+				}
+			};
+			dispatch(serverActions.setAuthApiLinks(response));
+		}
+		else
+		{
+			console.log("Set auth links fails");
+			dispatch(serverActions.setAuthApiLinks({...prev.server}));
+		}
 	});
 };

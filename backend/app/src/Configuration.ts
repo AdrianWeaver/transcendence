@@ -120,6 +120,7 @@ class Configuration
 	private generateFull()
 		: string
 	{
+		console.log("generate url for  auth");
 		const	paramsArray: Array<TokenModel> = [];
 		let		strUrl: string;
 		const	params: TokenModel = {
@@ -151,6 +152,8 @@ class Configuration
 
 	public	getFtAuthURL()
 	{
+		if (this.ftAuthUrl !== "")
+			return (this.ftAuthUrl);
 		this.isValidConfiguration();
 		if (!this.validConfiguration)
 			return ("");

@@ -135,7 +135,10 @@ export interface	ServerModel
 	"connexionAttempt": number,
 	"error": boolean,
 	"message": string,
-	"serverLocation": string
+	"serverLocation": string,
+	"links": {
+		"authApiUrl" : string
+	},
 }
 
 export interface	CanvasModel

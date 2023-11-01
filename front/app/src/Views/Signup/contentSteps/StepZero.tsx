@@ -22,6 +22,7 @@ import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { registerClientWithCode, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 import { UserModel } from "../../../Redux/models/redux-models";
+import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 
 const	getText = () =>
 {
@@ -133,6 +134,19 @@ const	StepZero = () =>
 		window.open(getUrlFT(), "_self");
 	};
 
+	const	authUrl = useAppSelector((state) =>
+	{
+		return (state.server.links.authApiUrl);
+	});
+
+	// console.log("Inside step zero link api 42", authUrl);
+
+	useEffect(() =>
+	{
+		if (authUrl === undefined)
+			dispatch(setAuthApiLinks());
+		console.log(authUrl);
+	});
 	useEffect(() =>
 	{
 		const timer = setTimeout(() =>
@@ -211,9 +225,7 @@ const	StepZero = () =>
 		else
 			setRenderComponent(<></>);
 	},
-	[
-		step,
-	]);
+	[step]);
 	return (
 		renderComponent
 	);
