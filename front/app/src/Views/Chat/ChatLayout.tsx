@@ -249,6 +249,8 @@ const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	// let	chanMessageTest: MessageModel[] = [];
+	let	listLength: number;
+	let	tmpChatUsers: ChatUserModel[];
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	chatUsers = useAppSelector((state) =>
@@ -259,6 +261,8 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
+	listLength = chatUsers.length;
+	tmpChatUsers = chatUsers;
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
@@ -419,7 +423,7 @@ const	ChatLayout = () =>
 	[
 		arrayListUser,
 		setArrayListUser
-	] = useState<ChatUserModel[]>([]);
+	] = useState([]);
 
 	const [
 		joiningChannelName,
@@ -763,11 +767,6 @@ const	ChatLayout = () =>
 		blockedList
 	]);
 
-	useEffect(() =>
-	{
-		setArrayListUser(chatUsers);
-	}), [chatUsers];
-
 	const handlePasswordSubmit = (password: string) =>
 	{
 		const	action = {
@@ -798,6 +797,18 @@ const	ChatLayout = () =>
 		socketRef.current?.emit("info", action);
 		console.log("refresh the list of user");
 	};
+
+	useEffect(() =>
+	{
+		// if (chatUsers.length !== listLength)
+		if (chatUsers !== tmpChatUsers)
+		{
+			console.log(chatUsers === tmpChatUsers, " tmp ChatUsers");
+			refreshListUser();
+			listLength = chatUsers.length;
+			tmpChatUsers = chatUsers;
+		}
+	});
 
 	const customButtonStyle = {
 		// padding: "4px 8px",
