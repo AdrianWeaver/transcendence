@@ -3,10 +3,15 @@
 /* eslint-disable max-statements */
 import	* as dotenv from "dotenv";
 
+export type TokenModel = {
+	key: string;
+	value: string;
+}
+
 class Configuration
 {
 	private				validConfiguration: boolean;
-	private readonly	env: dotenv.DotenvConfigOutput;
+	private 			env: dotenv.DotenvConfigOutput | null;
 
 	private	readonly	twillioSID: string | undefined;
 	private readonly	twillioAuthToken: string | undefined;
@@ -35,6 +40,8 @@ class Configuration
 	private readonly	pgPassword: string | undefined;
 	private readonly	pgDb: string | undefined;
 	private readonly	pgURL: string | undefined;
+
+	private				ftAuthUrl: string;
 
 	constructor()
 	{
@@ -73,12 +80,83 @@ class Configuration
 		this.pgUser = e.POSTGRES_USER;
 		this.pgPassword = e.POSTGRES_PASSWORD;
 		this.pgURL = e.DATABASE_URL;
-		console.log(this);
+
+		// set as default
+		this.ftAuthUrl = "";
 	}
 
 	public isValidConfiguration()
 	{
+		if (this.twillioSID === undefined
+			|| this.twillioAuthToken === undefined
+			|| this.twillioVerifySID === undefined
+			|| this.myNumber === undefined
+			|| this.ftSecret === undefined
+			|| this.ftUid === undefined
+			|| this.ftDomain === undefined
+			|| this.ftProtocol === undefined
+			|| this.ftRoute === undefined
+			|| this.redirectProtocol === undefined
+			|| this.redirectDomain === undefined
+			|| this.redirectPort === undefined
+			|| this.backProtocol === undefined
+			|| this.backDomain === undefined
+			|| this.backPort === undefined
+			|| this.pgDb === undefined
+			|| this.pgUser === undefined
+			|| this.pgPassword === undefined
+			|| this.pgURL === undefined)
+		{
+			this.validConfiguration = false;
+			const printObj = {...this};
+			printObj.env = null;
+			console.error(printObj);
+		}
+		else
+			this.validConfiguration = true;
 		return (this.validConfiguration);
+	}
+
+	private generateFull()
+		: string
+	{
+		const	paramsArray: Array<TokenModel> = [];
+		let		strUrl: string;
+		const	params: TokenModel = {
+			key: "client_id",
+			value: encodeURIComponent(this.ftUid as string)
+		};
+		paramsArray.push({...params});
+		params.key = "redirect_uri";
+		params.value = encodeURIComponent(
+			this.redirectProtocol + "://"
+			+ this.redirectDomain + ":" + this.redirectPort
+		);
+		paramsArray.push({...params});
+		params.key = "response_type";
+		params.value = "code";
+		paramsArray.push({...params});
+		strUrl = this.ftProtocol + "://" + this.ftDomain + this.ftRoute;
+		paramsArray.forEach((elem, index) =>
+		{
+			if (index === 0)
+				strUrl += "?";
+			else
+				strUrl += "&";
+			strUrl += elem.key + "=" + elem.value;
+		});
+		this.ftAuthUrl = strUrl;
+		return (strUrl);
+	}
+
+	public	getFtAuthURL()
+	{
+		this.isValidConfiguration();
+		if (!this.validConfiguration)
+			return ("");
+		// console.log(this);
+		this.generateFull();
+		return (this.ftAuthUrl);
 	}
 }
 
