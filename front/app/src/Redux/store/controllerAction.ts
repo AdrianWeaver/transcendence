@@ -1313,6 +1313,8 @@ export const	setOnline = (online: boolean, user: UserModel)
 		const	array = [...prev.controller.user.chat.users];
 		const	index = array.findIndex((elem) =>
 		{
+			console.log("SET ONLINE", user.username);
+			console.log("SET ONLINE", elem.name);
 			return (elem.name === user.username);
 		});
 		if (index === -1)

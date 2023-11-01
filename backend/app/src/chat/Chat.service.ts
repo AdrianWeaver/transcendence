@@ -29,6 +29,8 @@ export interface MessageRoomModel
 export	interface ChatUserModel
 {
 	"name": string,
+	"online": boolean,
+	"status": string,
 	"id": string,
 	"avatar": string,
 	"msgRoom": MessageRoomModel[]
@@ -203,7 +205,7 @@ export	class ChatService implements OnModuleInit
 						newUserInstance.chat = this.chat;
 						newUserInstance.setStatus(rawUser.status);
 						newUserInstance.setOnline(rawUser.online);
-						console.log("chat service 207 back AVATAR ", rawUser.avatar);
+						console.log("chat service 206 back AVATAR ", rawUser.avatar);
 						newUserInstance.setAvatar(rawUser.avatar);
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
@@ -568,6 +570,9 @@ export	class ChatService implements OnModuleInit
 			const user = {
 				name: element.name,
 				id: element.id,
+				online: element.online,
+				status: element.status,
+				// stats: element.stats,
 				// AVATAR CHANGE
 				avatar: element.avatar,
 				msgRoom: []

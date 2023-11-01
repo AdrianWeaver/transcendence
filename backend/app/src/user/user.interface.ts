@@ -84,6 +84,8 @@ export interface UserModel
 	retStatus: number;
 	date: string;
 	id: any;
+	online: boolean;
+	status: string;
 	email: string;
 	username: string;
 	login: string;
