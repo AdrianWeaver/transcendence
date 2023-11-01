@@ -670,7 +670,7 @@ export	class ChatService implements OnModuleInit
 		return (searchIndex);
 	}
 
-	public	setSocketToUser(index: number, client: Socket)
+	public	setSocketToUser(index: number, client: Socket | null)
 	{
 		this.chat.users[index].changeSocket(client);
 	}
@@ -709,7 +709,7 @@ export	class ChatService implements OnModuleInit
 		this.chat.updateUserInChat(newSocketId, profileId);
 	}
 
-	public updateUserSocketInChannels(client: Socket)
+	public updateUserSocketInChannels(client: Socket | null)
 	{
 		this.chat.updateUserSocketInChannels(client);
 	}
@@ -734,5 +734,26 @@ export	class ChatService implements OnModuleInit
 				toReturn = user.name;
 		});
 		return (toReturn);
+	}
+
+	public	disconnectUserWithClientId(clientId: string)
+	{
+		return ;
+		// dead code
+		const index = this.searchUserIndex(clientId);
+		if (index === -1)
+		{
+			this.log.error("The user that is started to remove dont exist ???");
+			return ;
+		}
+		// this.chat.users[index]
+		this.chat.users[index].id = "disconnected";
+		const	sockIndex = this.searchSocketIndex(clientId);
+		if (sockIndex === -1)
+		{
+			this.log.error("The user that is started to remove dont exist ???");
+			return ;
+		}
+		this.chat.memberSocketIds[sockIndex].memberSocketId = "disconnected";
 	}
 }

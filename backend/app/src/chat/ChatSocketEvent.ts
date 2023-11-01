@@ -26,6 +26,7 @@ import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
 import { error, profile } from "console";
 import { elementAt } from "rxjs";
+import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
 	type: string,
@@ -89,6 +90,11 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			// this.chatService.setServer(this.server);
+			instrument(this.server,
+				{
+					auth: false,
+					mode: "development"
+				});
 		}
 
 		handleConnection(client: Socket)
@@ -120,7 +126,6 @@ export class ChatSocketEvents
 					{
 						this.logger.log("Chat User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
-						// TEST
 						const user = this.userService.getUserById(profileId);
 						if (user === undefined)
 							throw new Error("HandleConnexion user dosnt exist");
@@ -192,13 +197,34 @@ export class ChatSocketEvents
 
 		handleDisconnect(client: Socket)
 		{
-			// const	userIndex = this.chatService.searchUserIndex(client.id);
-			// const	socketIndex = this.chatService.searchSocketIndex(client.id);
-			// if (userIndex !== undefined)
-			// {
-				// this.chatService.deleteUser(userIndex, socketIndex);
-				// this.chatService.updateDatabase();
-			// }
+			// console.error(client.);
+			const sockId = client.id;
+			client.disconnect();
+			// this.chatService.disconnectUserWithClientId(sockId);
+			const index = this.chatService.searchUserIndex(sockId);
+			if (index === -1)
+			{
+				this.logger.error("The user that is started to remove dont exist ???");
+				return ;
+			}
+			const	profileId = this.chatService.getProfileIdFromSocketId(sockId);
+			if (profileId === "undefined")
+			{
+				this.logger.error("The user that is started to remove dont exist ???");
+				return ;
+			}
+			// this.chatService.setSocketToUser(index, null);
+			// this.chatService.updateUserSocketInChannels(null);
+			this.chatService.updateMemberSocketId("disconnected", profileId);
+
+			this.chatService.updateChannelsAdminSocketId("disconnected", profileId);
+			this.chatService.updateChannelOwner("disconnected", profileId);
+			this.chatService.updateUserInChannels("disconnected", profileId);
+			this.chatService.updateUserInChat("disconnected", profileId);
+
+			this.chatService.updateBannedInChannel("disconnected", profileId);
+
+			this.chatService.updateDatabase();
 		}
 
 		@SubscribeMessage("sending-message")

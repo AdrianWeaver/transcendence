@@ -56,7 +56,7 @@ class User
 	public createProfile: (pseudo: string, data: any) => void;
 	public changePseudo: (pseudo: string) => void;
 	public changeAvatar: (avatar: string) => void;
-	public changeSocket: (client: Socket) => void;
+	public changeSocket: (client: Socket | null) => void;
 	public isFriend: (socketId: string) => boolean;
 	public setClient: (clientSocket: Socket | null) => void;
 	public setId: (id: string) => void;

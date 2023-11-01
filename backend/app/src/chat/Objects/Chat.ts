@@ -66,7 +66,7 @@ class Chat
 	public updateChannelOwner: (newSocketId: string, profileId: string) => void;
 	public updateUserInChannels: (newSocketId: string, profileId: string) => void;
 	public updateUserInChat: (newSocketId: string, profileId: string) => void;
-	public updateUserSocketInChannels: (client: Socket) => void;
+	public updateUserSocketInChannels: (client: Socket | null) => void;
 	public updateFriendList: (newSocketId: string, profileId: string) => void;
 	public updateBannedInChannel: (newSocketId: string, profileId: string) => void;
 	public parseForDatabase: () => void;
