@@ -231,9 +231,9 @@ export class UserController
 						date: resData.headers.date,
 						id: data.id,
 						email: data.email,
-
 						username: data.login,
-
+						online: false,
+						status: "offline",
 						login: data.login,
 						firstName: data.first_name,
 						lastName: data.last_name,

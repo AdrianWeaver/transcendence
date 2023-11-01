@@ -56,6 +56,8 @@ import {
 	// setKindOfConversation,
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
+import { PropaneSharp } from "@mui/icons-material";
+import { ChatUserModel } from "../../Redux/models/redux-models";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -82,12 +84,12 @@ type ChanMapModel = {
 
 // chat part 
 interface TabPanelProps {
+	area?: boolean | string;
 	children?: React.ReactNode;
 	dir?: string;
 	index: number;
 	value: number;
 	style?: CSSProperties;
-	area?: boolean;
 }
 
 const TabPanel = (props: TabPanelProps) =>
@@ -192,9 +194,7 @@ const FriendsList = (props: FriendsListProps) =>
 			<Myself />
 			<Divider />
 			<Grid
-				item
-				xs={12}
-				// style={{padding: '10px'}}
+				item xs={12}
 				sx={{ padding: "10px" }}
 			>
 				<TextField
@@ -211,18 +211,22 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div onClick={() =>
+								<div key={index} onClick={() =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
 									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
+									// console.log("index", elem.avatar);
 								}}>
 									<FriendItem
-										name={elem.name + ": " + elem.id}
+										// name={elem.name + ": " + elem.id}
+										name={elem.name}
 										avatar={elem.avatar}
+										online={elem.online}
+										status={elem.status}
 										key={index}
-										online={true}
+										ind={index}
 									/>
 								</div>
 							</>
@@ -247,12 +251,11 @@ const a11yProps = (index: any) =>
 const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
-	const	chatConnected = useAppSelector((state) =>
+	const	chatUsers = useAppSelector((state) =>
 	{
-		return (state.controller.user.chat.connected);
+		return (state.controller.user.chat.users);
 	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
@@ -522,10 +525,6 @@ const	ChatLayout = () =>
 		const connect = () =>
 		{
 			setConnected(true);
-			// setTimeout(() =>
-			// {
-			// 	socket.emit("info", action);
-			// }, 1000);
 		};
 
 		const disconnect = () =>
@@ -550,7 +549,6 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
-				// dispatch(setKindOfConversation(data.payload.kind));
 			}
 
 			if (data.type === "destroy-channel")
@@ -567,7 +565,6 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 					alert(data.payload.message);
-
 				else
 				{
 					setChanMessages([]);
@@ -600,21 +597,6 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
-		// const sendMessageToUser = (data: any) =>
-		// {
-		// 	const msgRoom: MessageRoomModel[] = [
-		// 		{
-		// 			id: data.payload.msgRoom.id,
-		// 			roomName: data.payload.msgRoom.roomName,
-		// 			privateConv: data.payload.msgRoom.privateConv,
-		// 			content: data.payload.msgRoom.messageContent
-		// 		}
-		// 	];
-		// 	dispatch(setMessageRoom(msgRoom, data.payload.sender));
-		// 	// dispatch(setMessageContent(data.payload.messageContent));
-		// 	console.log("test send Message: ", data);
-		// };
-
 		const	updateMessages = (data: any) =>
 		{
 			const	kind = data.payload.kind;
@@ -629,7 +611,10 @@ const	ChatLayout = () =>
 					return (!blockedListRef.current.includes(message.sender));
 				});
 				if (data.payload.kind === "channel")
+				{
 					setChanMessages(filteredMessages);
+					// chanMessageTest = filteredMessages;
+				}
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
 			}
@@ -643,7 +628,10 @@ const	ChatLayout = () =>
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
 					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
+					{
 						setChanMessages(data.payload.chanMessages);
+						// chanMessageTest = data.payload.chanMessage;
+					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages(data.payload.chanMessages);
 				}
@@ -755,12 +743,7 @@ const	ChatLayout = () =>
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
         });
-    },
-	[
-		// dispatch,
-		// joinChannel,
-		// kindOfConversation
-	]);
+    }, []);
 
 	useEffect(() =>
 	{
@@ -806,17 +789,26 @@ const	ChatLayout = () =>
 
 	const refreshListUser = () =>
 	{
-		// if (chatConnected === false)
-		// {
 		const action = {
 			type: "get-user-list",
 		};
 		socketRef.current?.emit("info", action);
-		// 	console.log("request data from server", connected);
-		// 	dispatch(setChatConnected(true));
-		// }
 		console.log("refresh the list of user");
 	};
+
+	useEffect(() =>
+	{
+		{
+			const	timeout = setTimeout(() =>
+			{
+				refreshListUser();
+			}, 10000);
+			return (() =>
+			{
+				clearTimeout(timeout);
+			});
+		}
+	});
 
 	const customButtonStyle = {
 		// padding: "4px 8px",
@@ -860,7 +852,6 @@ const	ChatLayout = () =>
 		};
 		socketRef.current.emit("info", action);
 		setText("");
-		// MessagesArea(text);
 	};
 
 	const	goToChannel = (chanName: string, kind: string) =>
@@ -893,11 +884,6 @@ const	ChatLayout = () =>
 		isDialogOpen,
 		setIsDialogOpen
 	] = useState(false);
-
-	const [
-		channelAction,
-		setChannelAction
-	] = useState("");
 
 	const handleDialogOpen = () =>
 	{
@@ -1112,7 +1098,7 @@ const	ChatLayout = () =>
 					</Toolbar>
 					{/* right side of the screen  */}
 					<TabPanel
-						area={false}
+						area={"false"}
 						value={value}
 						index={0}
 						dir={style.direction}
@@ -1426,13 +1412,12 @@ const	ChatLayout = () =>
 						</div>
 					</TabPanel>
 					<TabPanel
-						area={false}
+						area={"false"}
 						value={value}
 						index={1}
 						dir={style.direction}
 						style={style}
 					>
-						{/* ///////////// */}
 							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser}/>
 							<List>
 								{privateMessage.map((channel: any) =>
@@ -1458,16 +1443,14 @@ const	ChatLayout = () =>
 									})
 								}
 							</List>
-						{/* ////////////////// */}
 					</TabPanel>
 					<TabPanel
-						area={false}
+						area={"false"}
 						value={value}
 						index={2}
 						dir={style.direction}
 						style={style}
 					>
-						{/* <FriendsList arrayListUsers={arrayListUser} /> */}
 						<List>
 							{
 								friendList.map((friend: any, index) =>
@@ -1477,10 +1460,6 @@ const	ChatLayout = () =>
 											<ListItemText
 												style={listItemTextStyle}
 												primary={friend}
-												// onClick={() =>
-												// {
-												// 	return (goToChannel(channel.name));
-												// }}
 											/>
 										</ListItem>
 									);
@@ -1491,7 +1470,7 @@ const	ChatLayout = () =>
 				</Grid>
 				<Grid item xs={9}>
 					<TabPanel
-						area={true}
+						area={"true"}
 						value={value}
 						index={0}
 						dir={style.direction}
@@ -1503,10 +1482,10 @@ const	ChatLayout = () =>
 								overflowY: "auto"
 							}}
 							> */}
-							{chanMessages.map((message: MessageModel, index) =>
+							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-
+								
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1514,22 +1493,19 @@ const	ChatLayout = () =>
 								else
 									sender = "other";
 								return (
-									// <ListItem key={message.id}>
-									// 	<ListItemText primary={message.message} />
-									// </ListItem>
 									<MessageItem
 										key={index}
+										ind={index}
 										sender={sender}
 										date={message.username}
 										message={message.message}
 									/>
 								);
 							})}
-						{/* </List> */}
 					</TabPanel>
 					{/* when value == 1 */}
 					<TabPanel
-						area={true}
+						area={"true"}
 						value={value}
 						index={1}
 						dir={style.direction}
@@ -1541,11 +1517,10 @@ const	ChatLayout = () =>
 								overflowY: "auto"
 							}}
 							> */}
-						{/* <MessagesArea/> */}
-						{privMessages.map((message: MessageModel, index) =>
+						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-
+								
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1553,9 +1528,6 @@ const	ChatLayout = () =>
 								else
 									sender = "other";
 								return (
-									// <ListItem key={message.id}>
-									// 	<ListItemText primary={message.message} />
-									// </ListItem>
 									<MessageItem
 										key={index}
 										sender={sender}
@@ -1574,7 +1546,6 @@ const	ChatLayout = () =>
 						// style={{padding: '20px'}}
 						sx={{ padding: "20px" }}
 					>
-						{/* <SendingArea /> */}
 						<Grid item xs={11}>
 							<TextField
 							id="outlined-basic-email"
@@ -1584,7 +1555,7 @@ const	ChatLayout = () =>
 							onChange={handleTextChange}
 							/>
 						</Grid>
-						<Grid xs={1} sx={{ alignItems: "right" }}>
+						<Grid item xs={1} sx={{ alignItems: "right" }}>
 							<Fab color="primary" aria-label="add" onClick={handleSendClick}>
 							<SendIcon />
 							</Fab>

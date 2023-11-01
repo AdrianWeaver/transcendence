@@ -29,6 +29,8 @@ export interface MessageRoomModel
 export	interface ChatUserModel
 {
 	"name": string,
+	"online": boolean,
+	"status": string,
 	"id": string,
 	"avatar": string,
 	"msgRoom": MessageRoomModel[]
@@ -62,6 +64,7 @@ type MemberSocketIdModel ={
 
 import { v4 as uuidv4 } from "uuid";
 import { profile } from "console";
+import { UserModel } from "src/user/user.interface";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -200,6 +203,10 @@ export	class ChatService implements OnModuleInit
 						// NEED TO KNOW WHAT TO DO WITH null SOCKET
 						newUserInstance.setClient(null);
 						newUserInstance.chat = this.chat;
+						newUserInstance.setStatus(rawUser.status);
+						newUserInstance.setOnline(rawUser.online);
+						console.log("chat service 206 back AVATAR ", rawUser.avatar);
+						newUserInstance.setAvatar(rawUser.avatar);
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
 						const blockedArray: Array<MemberSocketIdModel> = [];
@@ -232,7 +239,6 @@ export	class ChatService implements OnModuleInit
 					newChatInstance.users = arrayUser;
 
 					const	arrayChanMap: Array<ChanMapModel> = [];
-					// console.log(rawobj.chanMap);
 					rawobj.chanMap.forEach((elem: ChanMapModel) =>
 					{
 						const	objToMemory: ChanMapModel = {
@@ -563,7 +569,9 @@ export	class ChatService implements OnModuleInit
 			const user = {
 				name: element.name,
 				id: element.id,
-				avatar: "https://thispersondoesnotexist.com/",
+				online: element.online,
+				status: element.status,
+				avatar: element.avatar,
 				msgRoom: []
 			};
 			users.push(user);
@@ -580,11 +588,6 @@ export	class ChatService implements OnModuleInit
 	{
 		this.searchUserIndex(user.id);
 	}
-
-	// public	sentMessageToChannel(channel: Channel)
-	// {
-
-	// }
 
 	public deleteChannel(chanName: string)
 	{

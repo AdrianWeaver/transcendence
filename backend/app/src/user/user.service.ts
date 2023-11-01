@@ -836,6 +836,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			email: data.email,
 			username: data.username,
 			login: data.login,
+			online: data.online,
+			status: data.status,
 			firstName: data.firstName,
 			lastName: data.lastName,
 			url: data.url,
@@ -1189,6 +1191,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		if (index === -1)
 			return ("ERROR");
 		this.user[index].username = body.username;
+		this.user[index].online = true;
+		this.user[index].status = "online";
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
@@ -1293,6 +1297,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			email: user.email,
 			username: user.username,
 			login: user.login,
+			online: user.online,
+			status: user.status,
 			firstName: user.firstName,
 			lastName: user.lastName,
 			avatar: user.avatar,
@@ -1379,6 +1385,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			email: data.email,
 			username: data.username,
 			login: data.login,
+			online: data.online,
+			status: data.status,
 			firstName: data.firstName,
 			lastName: data.lastName,
 			url: data.url,

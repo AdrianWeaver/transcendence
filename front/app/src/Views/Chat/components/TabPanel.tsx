@@ -10,12 +10,12 @@ import {
 	Typography} from "@mui/material";
 
 interface TabPanelProps {
+	area?: boolean | string;
 	children?: React.ReactNode;
 	dir?: string;
 	index: number;
 	value: number;
 	style?: CSSProperties;
-	area?: boolean;
 }
 
 const TabPanel = (props: TabPanelProps) =>
@@ -23,7 +23,7 @@ const TabPanel = (props: TabPanelProps) =>
 	const { children, value, index, ...other } = props;
 	let animationSettings;
 
-	if (props.area === false)
+	if (props.area === "false")
 		animationSettings = {
 			type: "spring",
 			duration: 0.3,
