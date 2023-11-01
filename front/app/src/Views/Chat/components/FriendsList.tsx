@@ -96,7 +96,7 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div onClick={() =>
+								<div key={index} onClick={() =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));

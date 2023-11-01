@@ -563,7 +563,6 @@ export	class ChatService implements OnModuleInit
 	public	getAllUsers()
 	{
 		const	users: ChatUserModel[] = [];
-		const	globalUser: UserModel[] = [];
 
 		this.chat.users.map((element) =>
 		{
@@ -572,8 +571,6 @@ export	class ChatService implements OnModuleInit
 				id: element.id,
 				online: element.online,
 				status: element.status,
-				// stats: element.stats,
-				// AVATAR CHANGE
 				avatar: element.avatar,
 				msgRoom: []
 			};

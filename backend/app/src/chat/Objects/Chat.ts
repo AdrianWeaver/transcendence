@@ -225,7 +225,6 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
-				console.log("here !!");
 				const	newChannel = new Channel(raw.name);
 				// newChannel.setClient(null, raw.owner.profileId);
 				newChannel.setOwner({...raw.owner});
