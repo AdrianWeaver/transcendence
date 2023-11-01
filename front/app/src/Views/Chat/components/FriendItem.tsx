@@ -19,13 +19,12 @@ const FriendItem = (props: FriendItemProps) =>
 {
 	let status;
 
-	status = props.online ? "online 💚" : "🔴";
+	status = props.online ? "💚" : "🔴";
 	if (props.status === "playing" && props.online)
 		status = "playing.. 🏓";
 	return (
 		<ListItem
-			button
-			key={props.ind}
+			// key={props.ind}
 		>
 			<ListItemIcon>
 				<Avatar

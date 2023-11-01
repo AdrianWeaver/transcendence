@@ -209,7 +209,6 @@ const FriendsList = (props: FriendsListProps) =>
 				{
 					users.map((elem, index) =>
 					{
-						// console.log("index", elem.avatar);
 						return (
 							<>
 								<div key={index} onClick={() =>
@@ -222,7 +221,7 @@ const FriendsList = (props: FriendsListProps) =>
 								}}>
 									<FriendItem
 										// name={elem.name + ": " + elem.id}
-										name={elem.name	}
+										name={elem.name}
 										avatar={elem.avatar}
 										online={elem.online}
 										status={elem.status}

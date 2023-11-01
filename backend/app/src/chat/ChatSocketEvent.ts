@@ -247,17 +247,16 @@ export class ChatSocketEvents
 				});
 				if (searchUser !== -1)
 					copyUsers.splice(searchUser, 1);
-				let	i: number;
-
-				i = 0;
 				copyUsers.forEach((elem) =>
 				{
-					if (elem.name === regularUsers[i].username)
+					regularUsers.map((element) =>
 					{
-						elem.online = regularUsers[i].online;
-						elem.status = regularUsers[i].status;
-					}
-					i++;
+						if (elem.name === element.username)
+						{
+							elem.online = element.online;
+							elem.status = element.status;
+						}
+					});
 				});
 				const action = {
 					type: "sending-list-user",
