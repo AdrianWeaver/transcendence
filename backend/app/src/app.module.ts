@@ -20,6 +20,7 @@ import { UserModule } from "./user/user.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { GracefulShutdownModule } from "nestjs-graceful-shutdown";
 
+import { join } from "path";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 
@@ -43,7 +44,7 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 			}),
 		GracefulShutdownModule
 			.forRoot({
-				cleanup: async (app) =>
+				cleanup: async (app : any) =>
 				{
 					// releasing ressources
 					console.log("Releasing ressources");
