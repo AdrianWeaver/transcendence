@@ -57,6 +57,7 @@ import {
 	setNumberOfChannels
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
+import { ChatUserModel } from "../../Redux/models/redux-models";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -210,7 +211,7 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div onClick={() =>
+								<div key={index} onClick={() =>
 								{
 									displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
@@ -247,7 +248,7 @@ const a11yProps = (index: any) =>
 const	ChatLayout = () =>
 {
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-	let	chanMessageTest: MessageModel[] = [];
+	// let	chanMessageTest: MessageModel[] = [];
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	chatConnected = useAppSelector((state) =>
@@ -610,7 +611,7 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "channel")
 				{
 					setChanMessages(filteredMessages);
-					chanMessageTest = filteredMessages;
+					// chanMessageTest = filteredMessages;
 				}
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
@@ -627,7 +628,7 @@ const	ChatLayout = () =>
 					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
 					{
 						setChanMessages(data.payload.chanMessages);
-						chanMessageTest = data.payload.chanMessage;
+						// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages(data.payload.chanMessages);
