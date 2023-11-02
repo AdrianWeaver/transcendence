@@ -19,14 +19,14 @@ import
 	WebSocketGateway,
 	WebSocketServer
 }	from "@nestjs/websockets";
-import { ChatService } from "./Chat.service";
+import { ChatService, ChatUserModel } from "./Chat.service";
 import { Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
 import { error, profile } from "console";
 import { elementAt } from "rxjs";
-import { instrument } from "@socket.io/admin-ui";
+// import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
 	type: string,
@@ -89,12 +89,12 @@ export class ChatSocketEvents
 
 		afterInit(server: any)
 		{
-			// this.chatService.setServer(this.server);
-			instrument(this.server,
-				{
-					auth: false,
-					mode: "development"
-				});
+			this.chatService.setServer(this.server);
+			// instrument(this.server,
+			// 	{
+			// 		auth: false,
+			// 		mode: "development"
+			// 	});
 		}
 
 		handleConnection(client: Socket)
@@ -120,7 +120,6 @@ export class ChatSocketEvents
 					profileId = decodedToken.id;
 
 					this.logger.warn("ProfileId: ", profileId);
-
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
@@ -131,8 +130,11 @@ export class ChatSocketEvents
 							throw new Error("HandleConnexion user dosnt exist");
 						const newUser = new User(userName, profileId);
 						newUser.setClient(client);
-						console.log("SOKCET EVENT AVATAR 128", user.avatar);
 						newUser.setAvatar(user.avatar);
+						newUser.setId(client.id);
+						newUser.status = user.status;
+						newUser.online = user.online;
+						console.log(" handle connection add New user back: ", user);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else
@@ -330,6 +332,52 @@ export class ChatSocketEvents
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
+			}
+
+			if (data.type === "create-chat-user")
+			{
+				console.log("CREATE CHAT USER");
+				const	searchChatUser = this.chatService.getUserBySocketId(client.id);
+
+				let newChatUser: ChatUserModel;
+				if (searchChatUser === undefined)
+				{
+					console.log("back does not exist");
+					newChatUser = {
+						name: data.payload.user.username,
+						avatar: data.payload.user.avatar,
+						id: client.id,
+						online: data.payload.online,
+						status: data.payload.status,
+						profileId: data.payload.user.id
+					}
+					console.log("newChatUser back", newChatUser);
+					console.log("data", data);
+					this.chatService.addNewChatUser(newChatUser, client);
+				}
+				else
+				{
+					console.log("back does exist");
+					newChatUser = {
+						name: searchChatUser.name,
+						avatar: searchChatUser.avatar,
+						id: searchChatUser.id,
+						online: searchChatUser.online,
+						status: searchChatUser.status,
+						profileId: searchChatUser.profileId
+					}
+					console.log("newChatUser back", newChatUser);
+					console.log("data", data);
+				}
+				const	action = {
+					type: "create-chat-user",
+					payload: 
+					{
+						newChatUser: newChatUser,
+						online: data.payload.online
+					}
+				}
+				this.server.emit("add-chat-user", action);
 			}
 		}
 

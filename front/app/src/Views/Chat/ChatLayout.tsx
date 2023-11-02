@@ -54,7 +54,9 @@ import {
 	setChatUsers,
 	// setMessageRoom,
 	// setKindOfConversation,
-	setNumberOfChannels
+	setNumberOfChannels,
+	connectChatUser,
+	addChatUser
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -521,15 +523,71 @@ const	ChatLayout = () =>
 			});
 
 		socketRef.current = socket;
-
+		const	createChatUser = (data: any) =>
+		{
+			if (data.type === "create-chat-user")
+			{
+				console.log("create chat user front ", data.payload);
+				if (data.payload.newChatUser === undefined)
+					return ;
+				console.log("ADD CHAT USER FRONT");
+				dispatch(addChatUser(data.payload.newChatUser));
+				dispatch(connectChatUser(data.payload.newChatUser, data.payload.online));
+				console.log("connecteed", user.chat.connectedUsers);
+				console.log("disconnected", user.chat.disconnectedUsers);
+			}
+		};
 		const connect = () =>
 		{
+			console.log("CONNECT ?");
 			setConnected(true);
+			const	searchChatUser = user.chat.users.find((elem) =>
+			{
+				return (elem.name === user.username);
+			});
+			if (searchChatUser === undefined)
+			{
+				console.log("does not exist");
+				const	action = {
+					type: "create-chat-user",
+					payload: {
+						user: user,
+						online: true,
+						status: "connected"
+					}
+				}
+				socketRef.current.emit("info", action);
+			}
+			else
+			{
+				console.log("already exists");
+				dispatch(connectChatUser(searchChatUser, true));
+			}
 		};
 
 		const disconnect = () =>
 		{
 			setConnected(false);
+			const	searchChatUser = user.chat.users.find((elem) =>
+			{
+				return (elem.name === user.username);
+			});
+			if (searchChatUser === undefined)
+			{
+				const	action = {
+					type: "create-chat-user",
+					payload: {
+						user: user,
+						online: false,
+						status: "offline"
+					}
+				}
+				socketRef.current.emit("info", action);
+			}
+			else
+			{
+				dispatch(connectChatUser(searchChatUser, false));
+			}
 		};
 
 		const	updateChannels = (data: any) =>
@@ -725,6 +783,7 @@ const	ChatLayout = () =>
 		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
 		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
+		socket.on("add-chat-user", createChatUser);
 
         socket.connect();
 
@@ -742,6 +801,7 @@ const	ChatLayout = () =>
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
+			socket.off("add-chat-user", createChatUser);
         });
     }, []);
 

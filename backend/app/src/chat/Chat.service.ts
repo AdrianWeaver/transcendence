@@ -33,7 +33,7 @@ export	interface ChatUserModel
 	"status": string,
 	"id": string,
 	"avatar": string,
-	"msgRoom": MessageRoomModel[]
+	"profileId": string
 }
 
 type MessageModel =
@@ -65,6 +65,7 @@ type MemberSocketIdModel ={
 import { v4 as uuidv4 } from "uuid";
 import { profile } from "console";
 import { UserModel } from "src/user/user.interface";
+import { allowedNodeEnvironmentFlags } from "process";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -572,7 +573,7 @@ export	class ChatService implements OnModuleInit
 				online: element.online,
 				status: element.status,
 				avatar: element.avatar,
-				msgRoom: []
+				profileId: element.profileId
 			};
 			users.push(user);
 		});
@@ -755,5 +756,18 @@ export	class ChatService implements OnModuleInit
 			return ;
 		}
 		this.chat.memberSocketIds[sockIndex].memberSocketId = "disconnected";
+	}
+
+	public	addNewChatUser(chatUser: ChatUserModel, client: Socket | null)
+	{
+		console.log("addd NEW USER BACK");
+		const	user: User = new User(chatUser.name, chatUser.profileId);
+		user.setClient(client);
+		user.setId(chatUser.id);
+		user.status = chatUser.status;
+		user.online = chatUser.online;
+		user.avatar = chatUser.avatar; 
+		console.log("add New user back: ", user);
+		this.pushUser(user, chatUser.id);
 	}
 }

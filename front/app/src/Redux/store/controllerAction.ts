@@ -1153,6 +1153,38 @@ export const	setAllUsers = ()
 	});
 }
 
+export const	setProfileId = (name: string, profileId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	array = [...prev.controller.user.chat.users];
+		array.map((elem) =>
+		{
+			if (elem.name === name)
+			{
+				elem.profileId = profileId;
+				return ;
+			}
+		});
+
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: [...array]
+				}
+			}
+		}
+		dispatch(controllerActions.setProfileId(response));
+	});
+}
 export const	registerInfosInBack = (info: string, field: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -1367,6 +1399,102 @@ export const	setStatus = (status: string, user: UserModel)
 				}
 			}
 		}
-		dispatch(controllerActions.setOnline(response));
+		dispatch(controllerActions.setStatus(response));
+	});
+}
+
+export const	addChatUser = (user: ChatUserModel)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	searchChatUser = prev.controller.user.chat.users.find((elem) =>
+		{
+			return (elem.name === user.name);
+		});
+		// useless protection but just in case
+		if (searchChatUser === undefined)
+			return ;
+		const	newUser: ChatUserModel[] = [...prev.controller.user.chat.users];
+		newUser.push(user);
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: newUser
+				}
+			}
+		}
+		dispatch(controllerActions.addChatUser(response));
+	});
+}
+
+export const	connectChatUser = (user: ChatUserModel, online: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		
+		const	connected = [...prev.controller.user.chat.connectedUsers];
+		const	disconnected = [...prev.controller.user.chat.disconnectedUsers];
+		const	indexConnect = connected.findIndex((elem) =>
+		{
+			return (elem.name === user.name);
+		});
+		const	indexDisconnect = disconnected.findIndex((elem) =>
+		{
+			return (elem.name === user.name);
+		});
+		const	newUser: ChatUserModel = {
+			name: user.name,
+			avatar: user.avatar,
+			id: user.id,
+			profileId: user.profileId,
+			password: user.password,
+			online: online,
+			status: online ? "online" : "offline"
+		}
+		if (online)
+		{
+			if (indexConnect === -1)
+			{
+				connected.push(newUser);
+			}
+			if (indexDisconnect !== -1)
+			{
+				disconnected.splice(indexDisconnect, 1);
+			}
+		}
+		else
+		{
+			if (indexDisconnect === -1)
+			{
+				disconnected.push(newUser);
+			}
+			if (indexConnect !== -1)
+			{
+				connected.splice(indexConnect, 1);
+			}
+		}
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					disconnectedUsers: disconnected,
+					connectedUsers: connected
+				}
+			}
+		}
+		dispatch(controllerActions.connectChatUser(response));
 	});
 }
