@@ -21,15 +21,16 @@ declare module "@mui/material/ListItemText"
 
 type MessageItemProps = {
 	key?: number,
-	align?: ListItemTextProps,
+	ind?: number,
+	// align?: ListItemTextProps,
 	sender: "me" | "other" | "server",
 	message: string,
 	date: string
 };
 
 const MessageItem = (props: MessageItemProps) => {
-	let align: "right" | "center" | "left" | undefined;
-
+	let align: "right" | "center" | "left"; // | undefined
+	
 	switch (props.sender)
 	{
 		case "me":
@@ -47,7 +48,7 @@ const MessageItem = (props: MessageItemProps) => {
 	}
 	if (props.message === "!play pong" && props.sender === "server")
 		return (
-			<ListItem key={props.key}>
+			<ListItem key={props.ind}>
 				<Grid container>
 					<Grid item xs={12}>
 						<ListItemText
@@ -69,7 +70,7 @@ const MessageItem = (props: MessageItemProps) => {
 		);
 	else
 		return (
-			<ListItem key={props.key}>
+			<ListItem key={props.ind}>
 				<Grid container>
 					<Grid item xs={12}>
 						<ListItemText

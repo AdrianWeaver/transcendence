@@ -61,6 +61,8 @@ const	initialControllerState: ControllerModel = {
 			{
 				name: "undefined",
 				id: "undefined",
+				online: false,
+				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
 			}
@@ -376,6 +378,14 @@ const	controllerSlice = createSlice(
 		addUser(state, action: PayloadAction<ControllerModel>)
 		{
 			state.allFrontUsers = action.payload.allFrontUsers;
+		},
+		setOnline(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.users = action.payload.user.chat.users;
+		},
+		setStatus(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.users = action.payload.user.chat.users;
 		},
 	}
 });

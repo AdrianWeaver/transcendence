@@ -225,7 +225,6 @@ class Chat
 
 			rawChannels.forEach((raw: any) =>
 			{
-				console.log("here !!");
 				const	newChannel = new Channel(raw.name);
 				// newChannel.setClient(null, raw.owner.profileId);
 				newChannel.setOwner({...raw.owner});
@@ -266,6 +265,12 @@ class Chat
 				newUser.blocked = [...raw.blocked];
 				newUser.friends = [...raw.friends];
 				newUser.channels = [...newChanArray];
+				// TEST
+				console.log(raw.avatar);
+				newUser.avatar = raw.avatar;
+				newUser.status = raw.status;
+				newUser.online = raw.online;
+				newUser.stats = {...raw.stats};
 				console.log("raw user", raw);
 				console.log("new user", newUser);
 				this.users.push(newUser);

@@ -25,6 +25,7 @@ import { PrismaClient } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
 import { error, profile } from "console";
+import { elementAt } from "rxjs";
 
 type	ActionSocket = {
 	type: string,
@@ -117,10 +118,16 @@ export class ChatSocketEvents
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
-						this.logger.log("User not found");
+						this.logger.log("Chat User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
+						// TEST
+						const user = this.userService.getUserById(profileId);
+						if (user === undefined)
+							throw new Error("HandleConnexion user dosnt exist");
 						const newUser = new User(userName, profileId);
 						newUser.setClient(client);
+						console.log("SOKCET EVENT AVATAR 128", user.avatar);
+						newUser.setAvatar(user.avatar);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else
@@ -231,12 +238,26 @@ export class ChatSocketEvents
 			if (data.type === "get-user-list")
 			{
 				const copyUsers = this.chatService.getAllUsers();
+				const regularUsers = this.userService.getAllUserRaw();
+				if (regularUsers === undefined)
+					return ;
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);
 				});
 				if (searchUser !== -1)
 					copyUsers.splice(searchUser, 1);
+				copyUsers.forEach((elem) =>
+				{
+					regularUsers.map((element) =>
+					{
+						if (elem.name === element.username)
+						{
+							elem.online = element.online;
+							elem.status = element.status;
+						}
+					});
+				});
 				const action = {
 					type: "sending-list-user",
 					payload:
