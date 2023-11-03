@@ -19,8 +19,6 @@ import
 
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
-import { LargeNumberLike } from "crypto";
-import { async } from "rxjs/internal/scheduler/async";
 import { GameService } from "./Game.service";
 import { Logger } from "@nestjs/common";
 
@@ -86,14 +84,14 @@ export class GameSocketEvents
 {
 	@WebSocketServer()
 	server: Server;
-	users: number;
-	totalUsers: number;
-	classicUsers: number;
-	specialUsers: number;
-	socketIdUsers: string[] = [];
-	userReady: number;
-	socketIdReady: string[] = [];
-	gameInstances: GameServe[] = [];
+	// users: number;
+	// totalUsers: number;
+	// classicUsers: number;
+	// specialUsers: number;
+	// socketIdUsers: string[] = [];
+	// userReady: number;
+	// socketIdReady: string[] = [];
+	// gameInstances: GameServe[] = [];
 	printPerformance: (timestamp: number, frame: number, instance: GameServe) => void;
 	update: (instance: GameServe) => void;
 	private readonly	logger = new Logger("game-socket-event");
@@ -103,7 +101,7 @@ export class GameSocketEvents
 	)
 	{
 		this.logger.error("I am using service game with id: " + this.gameService.getInstanceId());
-		this.userReady = 0;
+		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
 			instance.playerOne.updatePlayerPosition();
@@ -163,26 +161,25 @@ export class GameSocketEvents
 	afterInit(server: Server)
 	{
 		this.server = server;
-		this.users = 0;
-		this.totalUsers = 0;
+		this.gameService.setUsers(0);
+		this.gameService.setTotalUsers(0);
 	}
 
 	async handleConnection(client: Socket)
 	{
 		let roomName: string;
-		const searchUser = this.socketIdUsers.find((element) =>
-		{
-			return (element === client.id);
-		});
+		const searchUser = this.gameService
+			.findSocketIdUserByClientId(client.id);
 		if (searchUser === undefined)
 		{
-			this.socketIdUsers.push(client.id);
-			this.users += 1;
-			this.totalUsers += 1;
+			this.gameService.pushClientIdIntoSocketIdUsers(client.id);
+			this.gameService.increaseUsers();
+			this.gameService.increaseTotalUsers();
 			// We will create each time a new room
-			roomName = "room" + (Math.round(this.totalUsers / 2)).toString();
+			roomName = "room"
+				+ (Math.round(this.gameService.getTotalUsers() / 2)).toString();
 			await client.join(roomName);
-			if (this.totalUsers % 2 !== 0)
+			if (this.gameService.getTotalUsers() % 2 !== 0)
 			{
 				const newRoom = new GameServe(roomName);
 				newRoom.ball.game = newRoom;
@@ -194,11 +191,11 @@ export class GameSocketEvents
 				newRoom.loop.game = newRoom;
 				newRoom.loop.callbackFunction = this.printPerformance;
 				newRoom.loop.update(performance.now());
-				this.gameInstances.push(newRoom);
+				this.gameService.pushGameServeToGameInstance(newRoom);
 			}
 			else
 			{
-				for (const instance of this.gameInstances)
+				for (const instance of this.gameService.getGameInstances())
 				{
 					if (instance.roomName === roomName)
 						instance.playerTwo.socketId = client.id;
@@ -232,7 +229,7 @@ export class GameSocketEvents
 			}
 		};
 
-		for (const instance of this.gameInstances)
+		for (const instance of this.gameService.getGameInstances())
 		{
 			if (instance.roomName === roomName)
 			{
@@ -247,8 +244,8 @@ export class GameSocketEvents
 				const	action = {
 					type: "connect",
 					payload: {
-						numberUsers: this.users,
-						userReadyCount: this.userReady,
+						numberUsers: this.gameService.getUsers(),
+						userReadyCount: this.gameService.getUserReadyNumber(),
 						socketId: client.id,
 					}
 				};
@@ -259,41 +256,36 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
-		for (const instance of this.gameInstances)
+		for (const instance of this.gameService.getGameInstances())
 		{
 			if (instance.loop && (instance.playerOne.socketId === client.id
 				|| instance.playerTwo.socketId === client.id))
 				instance.loop.gameActive = false;
 		}
 
-		const userIndex = this.socketIdUsers.findIndex((element) =>
-		{
-			return (element === client.id);
-		});
+		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		if (userIndex !== -1)
 		{
-			this.socketIdUsers.splice(userIndex, 1);
-			this.users -= 1;
+			this.gameService.removeOneSocketIdUserWithIndex(userIndex);
+			this.gameService.decreaseUsers();
 		}
 
-		const	wasReadyIndex = this.socketIdReady.findIndex((element) =>
-		{
-			return (element === client.id);
-		});
+		const	wasReadyIndex = this.gameService
+			.findIndexSocketIdReadyWithSocketId(client.id);
 		if (wasReadyIndex !== -1)
 		{
-			this.socketIdReady.splice(wasReadyIndex, 1);
-			this.userReady--;
+			this.gameService.removeOneSocketIdReadyWithIndex(wasReadyIndex);
+			this.gameService.decreaseUserReadyNumber();
 		}
 
 		const	action = {
 			type: "disconnect",
 			payload: {
-				numberUsers: this.users,
-				userReadyCount: this.userReady
+				numberUsers: this.gameService.getUsers(),
+				userReadyCount: this.gameService.getUserReadyNumber()
 			}
 		};
-		for (const instance of this.gameInstances)
+		for (const instance of this.gameService.getGameInstances())
 		{
 			if (instance.playerOne.socketId === client.id
 				|| instance.playerTwo.socketId === client.id)
@@ -307,7 +299,7 @@ export class GameSocketEvents
 		@ConnectedSocket() client: Socket
 	)
 	{
-		for (const instance of this.gameInstances)
+		for (const instance of this.gameService.getGameInstances())
 		{
 			if (instance.playerOne.socketId === client.id
 				|| instance.playerTwo.socketId === client.id)
@@ -377,14 +369,11 @@ export class GameSocketEvents
 
 		if (data.type === "ready")
 		{
-			const	search = this.socketIdReady.find((element) =>
-			{
-				return (element === client.id);
-			});
+			const	search = this.gameService.findSocketIdReadyWithSocketId(client.id);
 			if (search === undefined)
 			{
-				this.socketIdReady.push(client.id);
-				this.userReady++;
+				this.gameService.pushClientIdIntoSocketIdReady(client.id);
+				this.gameService.increaseUserReadyNumber();
 
 				// check and add the user to the ready list
 
@@ -392,10 +381,8 @@ export class GameSocketEvents
 				countReadyInRoom = 0;
 				for (const socketId of socketIdsInRoom)
 				{
-					const	searchReady = this.socketIdReady.find((element) =>
-					{
-						return (element === socketId);
-					});
+					const	searchReady = this.gameService
+						.findSocketIdReadyWithSocketId(socketId);
 					if (searchReady !== undefined)
 						countReadyInRoom++;
 				}
@@ -403,7 +390,7 @@ export class GameSocketEvents
 				const	action = {
 					type: "ready-player",
 					payload: {
-						userReadyCount: this.userReady,
+						userReadyCount: this.gameService.getUserReadyNumber(),
 						gameActive: true
 					}
 				};
@@ -413,7 +400,7 @@ export class GameSocketEvents
 				if (countReadyInRoom === 2)
 				{
 					this.server.to(userRoom).emit("game-active", action);
-					for (const instance of this.gameInstances)
+					for (const instance of this.gameService.getGameInstances())
 					{
 						if (instance.loop && (instance.playerOne.socketId === client.id
 							|| instance.playerTwo.socketId === client.id))
@@ -435,7 +422,7 @@ export class GameSocketEvents
 			break ;
 		}
 
-		for (const instance of this.gameInstances)
+		for (const instance of this.gameService.getGameInstances())
 		{
 			if (instance.roomName === userRoom)
 			{
