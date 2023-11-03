@@ -382,7 +382,7 @@ const	controllerSlice = createSlice(
 			state.user.ftAvatar = action.payload.user.ftAvatar;
 			state.user.password = action.payload.user.password;
 		},
-		addUser(state, action: PayloadAction<ControllerModel>)
+		addFrontUser(state, action: PayloadAction<ControllerModel>)
 		{
 			state.allFrontUsers = action.payload.allFrontUsers;
 		},

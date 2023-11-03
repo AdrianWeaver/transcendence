@@ -124,9 +124,12 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
+			const	profId = this.chat?.getProfileIdFromSocketId(id);
 			for (const user of this.admins)
 			{
 				if (id === user.memberSocketId)
+					return (true);
+				if (profId === user.profileId)
 					return (true);
 			}
 			return (false);

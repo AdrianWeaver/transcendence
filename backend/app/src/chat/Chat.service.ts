@@ -764,7 +764,7 @@ export	class ChatService implements OnModuleInit
 		user.setId(chatUser.id);
 		user.status = chatUser.status;
 		user.online = chatUser.online;
-		user.avatar = chatUser.avatar; 
+		user.avatar = chatUser.avatar;
 		console.log("add New user back: ", user);
 		this.pushUser(user, chatUser.id);
 	}

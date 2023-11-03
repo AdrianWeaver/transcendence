@@ -8,7 +8,6 @@ import
 	Grid,
 	ListItem,
 	ListItemText,
-	ListItemTextProps
 } from "@mui/material";
 import InvitationCard from "./InvitationCard";
 
@@ -28,9 +27,9 @@ type MessageItemProps = {
 	date: string
 };
 
-const MessageItem = (props: MessageItemProps) => {
-	let align: "right" | "center" | "left"; // | undefined
-	
+const MessageItem = (props: MessageItemProps) =>
+{
+	let align: "right" | "center" | "left";
 	switch (props.sender)
 	{
 		case "me":

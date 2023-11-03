@@ -1311,7 +1311,7 @@ export const	addUserAsFriend = (friendId: string)
 	});
 }
 
-export const	addUser = (user: UserModel)
+export const	addFrontUser = (user: UserModel)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
@@ -1331,7 +1331,7 @@ export const	addUser = (user: UserModel)
 			...prev.controller,
 			allFrontUsers: array
 		}
-		dispatch(controllerActions.addUser(response));
+		dispatch(controllerActions.addFrontUser(response));
 	});
 }
 

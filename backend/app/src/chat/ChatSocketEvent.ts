@@ -26,6 +26,7 @@ import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
 import { error, profile } from "console";
 import { elementAt } from "rxjs";
+import { constants } from "buffer";
 // import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
@@ -118,9 +119,10 @@ export class ChatSocketEvents
 				{
 					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 					profileId = decodedToken.id;
+					const	realProfId = this.chatService.getProfileIdFromSocketId(client.id);
 
-					this.logger.warn("ProfileId: ", profileId);
-					const index = this.chatService.getIndexUserWithProfileId(profileId);
+					this.logger.warn("ProfileId: ", profileId, "real profId", realProfId);
+					const index = this.chatService.getIndexUserWithProfileId(realProfId);
 					if (index === -1)
 					{
 						this.logger.log("Chat User not found");
@@ -178,6 +180,7 @@ export class ChatSocketEvents
 			const	userMe = this.chatService.getUserBySocketId(client.id);
 			if (userMe !== undefined)
 			{
+				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				const	friendsArr: string[] = [];
 
 				userMe.friends.forEach((friend) =>
@@ -189,7 +192,7 @@ export class ChatSocketEvents
 					payload: {
 						channels: this.chatService.getChanMap(),
 						friends: friendsArr,
-						uniqueId: client.id,
+						uniqueId: profId,
 						privateMessage: this.chatService.getPrivateMessageMap(),
 					}
 				};
@@ -300,6 +303,7 @@ export class ChatSocketEvents
 			if (data.type === "sent-message")
 			{
 				let	channel, kind;
+				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 				{
@@ -316,7 +320,8 @@ export class ChatSocketEvents
 				const	id = channel.messages.length;
 
 				const newMessage: MessageModel = {
-					sender: client.id,
+					// profileId instead of socketId ?
+					sender: profileId,
 					message: data.payload.message,
 					id: id,
 					username: this.chatService.getUsernameWithSocketId(client.id) as string,
@@ -350,7 +355,7 @@ export class ChatSocketEvents
 						online: data.payload.online,
 						status: data.payload.status,
 						profileId: data.payload.user.id
-					}
+					};
 					console.log("newChatUser back", newChatUser);
 					console.log("data", data);
 					this.chatService.addNewChatUser(newChatUser, client);
@@ -376,7 +381,7 @@ export class ChatSocketEvents
 						newChatUser: newChatUser,
 						online: data.payload.online
 					}
-				}
+				};
 				this.server.emit("add-chat-user", action);
 			}
 		}
@@ -714,6 +719,7 @@ export class ChatSocketEvents
 			if (data.type === "member-list")
 			{
 				const channel = this.chatService.searchChannelByName(data.payload.chanName);
+				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				if (channel === undefined)
 					return ;
 				const	isAdmin = channel.isAdmin(client.id);
@@ -726,7 +732,8 @@ export class ChatSocketEvents
 					const	userName = this.chatService.getUsernameWithSocketId(user.memberSocketId) as string;
 					const newMember: MembersModel = {
 						id: memberList.length + 1,
-						name: user.memberSocketId,
+						// replace socketId by profileId
+						name: user.profileId,
 						profileId: profId,
 						userName: userName,
 					};
@@ -737,7 +744,8 @@ export class ChatSocketEvents
 					payload: {
 						memberList: memberList,
 						isAdmin: isAdmin,
-						uniqueId: client.id,
+						// uniqueId profId instead of socketId
+						uniqueId: profId,
 					}
 				};
 				client.emit("channel-info", action);

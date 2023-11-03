@@ -170,7 +170,7 @@ const FriendsList = (props: FriendsListProps) =>
 			type: "create-channel",
 			payload: {
 				chanName: "undefined",
-				chanMode: "undefined",
+				chanMode: "private",
 				chanPassword: "undefined",
 				chanId: numberOfChannels + 1,
 				activeId: activeId
@@ -555,7 +555,7 @@ const	ChatLayout = () =>
 						online: true,
 						status: "connected"
 					}
-				}
+				};
 				socketRef.current.emit("info", action);
 			}
 			else
@@ -581,7 +581,7 @@ const	ChatLayout = () =>
 						online: false,
 						status: "offline"
 					}
-				}
+				};
 				socketRef.current.emit("info", action);
 			}
 			else
@@ -680,6 +680,7 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
+			// NEED c'est ici qu'on va pouvoir regler le soucis d'affichage decaler je pense
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
@@ -767,6 +768,8 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
+				if (data.payload.privateMessage !== undefined)
+					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
 			}
 		};
@@ -1482,7 +1485,6 @@ const	ChatLayout = () =>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
-										// setKindOfConversation("privateMessage");
 										return (
 											<ListItem style={listItemStyle} key={channel.id}>
 												<ListItemText
@@ -1545,7 +1547,7 @@ const	ChatLayout = () =>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-								
+
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1580,7 +1582,6 @@ const	ChatLayout = () =>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-								
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1590,13 +1591,13 @@ const	ChatLayout = () =>
 								return (
 									<MessageItem
 										key={index}
+										ind={index}
 										sender={sender}
-										date={message.sender}
+										date={message.username}
 										message={message.message}
 									/>
 								);
 							})}
-							{/* </List> */}
 					</TabPanel>
 
 					<Divider />
@@ -1608,11 +1609,11 @@ const	ChatLayout = () =>
 					>
 						<Grid item xs={11}>
 							<TextField
-							id="outlined-basic-email"
-							label="Type Something"
-							fullWidth
-							value={text}
-							onChange={handleTextChange}
+								id="outlined-basic-email"
+								label="Type Something"
+								fullWidth
+								value={text}
+								onChange={handleTextChange}
 							/>
 						</Grid>
 						<Grid item xs={1} sx={{ alignItems: "right" }}>
