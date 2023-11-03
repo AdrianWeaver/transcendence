@@ -715,15 +715,16 @@ const	ChatLayout = () =>
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
-				const	talk = channelMembers.find((elem) =>
+				const	talk = data.payload.memberList.find((elem: any) =>
 				{
-					return (elem.profileId !== uniqueId);
+					return (elem.name === data.payload.talkingUser);
 				});
+				console.log("talk", talk?.name);
 				if (talk !== undefined)
+				{
 					setTalkingUser(talk.name);
+				}
 				setIsFriend(data.payload.isFriend);
-				if (data.payload.talkingUser !== "")
-					setTalkingUser(data.payload.talkingUser);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};

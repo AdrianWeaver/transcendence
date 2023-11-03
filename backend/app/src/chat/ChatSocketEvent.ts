@@ -744,14 +744,12 @@ export class ChatSocketEvents
 				for(const user of channel.users)
 				{
 					console.log("user ", user.profileId);
-					const profId = user.profileId;
-					if (profId === undefined)
-						return ;
 					console.log("profID ok", profId);
 					const	userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 					if (user.profileId !== profId && conv)
 					{
-						talkingUser = userName;
+						console.log("talking yser ???", user.profileId);
+						talkingUser = user.profileId;
 						const	searchFriend = searchUser.friends.find((elem) =>
 						{
 							return (elem.name === userName);
