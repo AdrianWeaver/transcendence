@@ -69,7 +69,6 @@ class Configuration
 
 		this.redirectProtocol = e.REDIRECT_PROTOCOL;
 		this.redirectDomain = e.REDIRECT_DOMAIN;
-
 		this.redirectPort = e.REDIRECT_PORT;
 
 		this.backDomain = e.HOST_LOCATION;
@@ -114,6 +113,7 @@ class Configuration
 		}
 		else
 			this.validConfiguration = true;
+		// console.info(this);
 		return (this.validConfiguration);
 	}
 
