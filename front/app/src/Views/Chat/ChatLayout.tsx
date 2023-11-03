@@ -178,18 +178,19 @@ const FriendsList = (props: FriendsListProps) =>
 		};
 		props.socketRef.current.emit("channel-info", action);
 	};
-	const displayConversationWindow = (id: string) =>
-	{
-		const action = {
-			type: "display-conversation",
-			payload:
-			{
-				id: id,
-				index: numberOfChannels + 1
-			}
-		};
-		props.socketRef.current?.emit("display-conversation", action);
-	};
+	// const displayConversationWindow = (id: string) =>
+	// {
+	// 	console.log("DISPLYA CONVERSATION ?");
+	// 	const action = {
+	// 		type: "display-conversation",
+	// 		payload:
+	// 		{
+	// 			id: id,
+	// 			index: numberOfChannels + 1
+	// 		}
+	// 	};
+	// 	props.socketRef.current?.emit("display-conversation", action);
+	// };
 
 	return (
 		<>
@@ -215,7 +216,7 @@ const FriendsList = (props: FriendsListProps) =>
 							<>
 								<div key={index} onClick={() =>
 								{
-									displayConversationWindow(elem.id);
+									// displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
 									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
@@ -360,6 +361,17 @@ const	ChatLayout = () =>
 		setIsChannelAdmin
 	] = useState(false);
 
+	const
+	[
+		talkingUser,
+		setTalkingUser
+	] = useState("");
+
+	const
+	[
+		isFriend,
+		setIsFriend
+	] = useState(false);
 	const [
 		uniqueId,
 		setUniqueId
@@ -702,6 +714,12 @@ const	ChatLayout = () =>
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
+				if (data.payload.talkingUser !== "")
+				{
+					setTalkingUser(data.payload.talkingUser);
+					setIsFriend(data.payload.isFriend);
+				}
+				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};
 
@@ -1486,25 +1504,133 @@ const	ChatLayout = () =>
 								{privateMessage.map((channel: any) =>
 									{
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
-												<ListItemText
-													style={
-														channel.name === currentChannel
-														? { color: "green" }
-														: listItemTextStyle
-													}
-													primary={channel.name}
-													onClick={() =>
-													{
-														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name, "privateMessage"));
-													}}
-												/>
-											</ListItem>
-										);
-									})
+											<>
+												<ListItem style={listItemStyle} key={channel.id}>
+													<ListItemText
+														style={
+															channel.name === currentChannel
+															? { color: "green" }
+															: listItemTextStyle
+														}
+														primary={channel.name}
+														onClick={() =>
+														{
+															setKindOfConversation("privateMessage");
+															return (goToChannel(channel.name, "privateMessage"));
+														}}
+													/>
+												</ListItem>
+												<Button onClick={() =>
+												{
+													handleDialogOpen();
+													setButtonSelection(channel);
+												}}>
+													Options
+												</Button>
+												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+													<DialogTitle>
+														Choose an Action
+													</DialogTitle>
+													<DialogContent>
+														<Button onClick={() =>
+														{
+															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+														}}>
+															Remove
+														</Button>
+														<Button onClick={() =>
+														{
+															return handleMembersClickOpen(buttonSelection.name);
+														}}>
+															action with user
+														</Button>
+														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
+															<DialogContent>
+																<ul>
+																{
+																	<li>
+																		{talkingUser}
+																			<>
+																				{
+																					(isFriend)
+																					? <Button onClick={() =>
+																					{
+																						addUserToFriends(talkingUser);
+																					}}>
+																						Add friend
+																					</Button>
+																					: <></>
+																				}
+																				<Button onClick={() =>
+																				{
+																					addUserToBlocked(talkingUser);
+																				}}>
+																					Block
+																				</Button>
+																				<Button onClick={() =>
+																				{
+																					setInviteDialogOpen(true);
+																				}}>
+																					Invite
+																				</Button>
+																				<Dialog open={inviteDialogOpen} onClose={() =>
+																							{
+																								setInviteDialogOpen(false);
+																							}}
+																							maxWidth="sm" fullWidth>
+																					<DialogTitle>Invite User to Channel</DialogTitle>
+																					<DialogContent>
+																						<TextField
+																						label="Channel Name"
+																						variant="outlined"
+																						fullWidth
+																						value={channelToInvite}
+																						onChange={(e) =>
+																						{
+																							console.log("target value " + e.target.value);
+																							setChannelToInvite(e.target.value);
+																						}}/>
+																					</DialogContent>
+																					<DialogActions>
+																						<Button onClick={() =>
+																							{
+																								inviteUserToChannel(talkingUser);
+																								setInviteDialogOpen(false);
+																							}} color="primary">
+																							Invite
+																						</Button>
+																						<Button onClick={() =>
+																						{
+																							setInviteDialogOpen(false);
+																						}} color="primary">
+																						Cancel
+																						</Button>
+																					</DialogActions>
+																				</Dialog>
+																			</>
+																		</li>
+																	}
+																	</ul>
+																</DialogContent>
+																<DialogActions>
+																<Button onClick={handleMembersClose} color="primary">
+																	Close
+																</Button>
+																</DialogActions>
+															</Dialog>
+														</DialogContent>
+														<DialogActions>
+															<Button onClick={handleDialogClose} color="primary">
+																Cancel
+															</Button>
+														</DialogActions>
+													</Dialog>
+												</>
+											);
+										})
 								}
-							</List>
+								</List>
+
 					</TabPanel>
 					<TabPanel
 						area={"false"}

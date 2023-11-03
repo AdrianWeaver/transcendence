@@ -790,7 +790,7 @@ export const registerNumberForDoubleAuth = (numero : string, token: string)
 					phoneNumber: numero
 				}
 			}
-			console.log("controller action 791  ", data);
+			// console.log("controller action 791  ", data);
 		}
 		dispatch(controllerActions.registerNumberForDoubleAuth(response));
 		console.log("phone number enregistre");
@@ -827,7 +827,7 @@ export const receiveValidationCode = (numero : string, token: string)
 					phoneNumber: numero
 				}
 			}
-			console.log("controller action 791  ", data);
+			// console.log("controller action 791  ", data);
 		}
 		dispatch(controllerActions.receiveValidationCode(response));
 		console.log("phone number enregistre");
@@ -856,7 +856,7 @@ export const GetValidationCode = (otpCode : string, token: string)
 		}
 		else
 		{
-			console.log("TEST data validated cde", data.data);
+			// console.log("TEST data validated cde", data.data);
 			response = {
 				...prev.controller,
 				user:
@@ -866,7 +866,7 @@ export const GetValidationCode = (otpCode : string, token: string)
 					codeValidated: data.data
 				}
 			}
-			console.log("controller action 791  ", data.data);
+			// console.log("controller action 791  ", data.data);
 		}
 		dispatch(controllerActions.getValidationCode(response));
 		console.log("code enregistre");
@@ -1142,7 +1142,7 @@ export const	setAllUsers = ()
 			console.error("Error to get users");
 			return ;
 		}
-		console.log("here theUsers", theUsers);
+		// console.log("here theUsers", theUsers);
 		const array: BackUserModel[] = theUsers;
 
 		const	response: ControllerModel = {
@@ -1220,7 +1220,7 @@ export const	hashPassword = (password: string)
 			password, prev.server.serverLocation)
 		.then((data) =>
 		{
-			console.log("okay", data);
+			// console.log("okay", data);
 		})
 		.catch((error) =>
 		{
@@ -1260,7 +1260,7 @@ export const	decodePassword = (id: any, password: string, email: string)
 				password, id, email,
 				prev.server.serverLocation
 			);
-			console.log("data: ", data);
+			// console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
 			newUser.bearerToken = data.token;
@@ -1301,7 +1301,7 @@ export const	addUserAsFriend = (friendId: string)
 			friendId, prev.server.serverLocation)
 		.then((data) =>
 		{
-			console.log("okay", data);
+			// console.log("okay", data);
 		})
 		.catch((error) =>
 		{

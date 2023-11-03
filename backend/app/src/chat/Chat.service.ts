@@ -156,7 +156,7 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					console.log("raw object chat from db", rawobj);
+					// console.log("raw object chat from db", rawobj);
 					const	newChatInstance = new Chat();
 					newChatInstance.databaseToObject(rawobj);
 					this.chat = {...newChatInstance};
@@ -206,7 +206,6 @@ export	class ChatService implements OnModuleInit
 						newUserInstance.chat = this.chat;
 						newUserInstance.setStatus(rawUser.status);
 						newUserInstance.setOnline(rawUser.online);
-						console.log("chat service 206 back AVATAR ", rawUser.avatar);
 						newUserInstance.setAvatar(rawUser.avatar);
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
@@ -359,9 +358,9 @@ export	class ChatService implements OnModuleInit
 							searchUser.channels = chanArray;
 					});
 
-					console.log("End of parser check with serialized value ");
-					console.log( JSON.parse(this.parseForDatabase()));
-					console.log(this.chat);
+					// console.log("End of parser check with serialized value ");
+					// console.log( JSON.parse(this.parseForDatabase()));
+					// console.log(this.chat);
 				}
 			})
 			.catch((error: any) =>
@@ -501,12 +500,17 @@ export	class ChatService implements OnModuleInit
 
 	public	pushUser(newUser: User, clientId: string)
 	{
-		this.chat.users.push(newUser);
-		this.chat.memberSocketIds.push(
+		console.log("PUSH USER PROFILE ID", newUser.profileId);
+		const	searchUser = this.getUserWithProfileId(newUser.profileId);
+		if (searchUser === undefined)
 		{
-			memberSocketId: clientId,
-			profileId: newUser.profileId
-		});
+			this.chat.users.push(newUser);
+			this.chat.memberSocketIds.push(
+			{
+				memberSocketId: clientId,
+				profileId: newUser.profileId
+			});
+		}
 	}
 
 	public	deleteUser(userIndex: number, userSocket: number)
@@ -528,7 +532,7 @@ export	class ChatService implements OnModuleInit
 	{
 		const searchUser = this.chat.users.find((element) =>
 		{
-			return (element.id === userName);
+			return (element.name === userName);
 		});
 		if (searchUser === undefined)
 			return (undefined);

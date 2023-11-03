@@ -144,7 +144,7 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
-					console.log(data);
+					// console.log(data);
 					return ("SUCCESS");
 				})
 				.catch((error) =>

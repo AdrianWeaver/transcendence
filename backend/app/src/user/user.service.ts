@@ -211,7 +211,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					if (data)
 					{
 						const	content = JSON.parse(data.contents);
-						console.log("content ", content);
+						// console.log("content ", content);
 						const	update = this.prepareUserForDB(user.id);
 						this.prisma
 							.userJson
@@ -378,9 +378,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			else
 			{
 				const compareFromDB = await JSON.parse(permalinks.contents);
-				console.log(compareFromDB);
+				// console.log(compareFromDB);
 				const requestedCmp = await JSON.parse(actualServerCfg.serialize());
-				console.log(requestedCmp);
+				// console.log(requestedCmp);
 				if (compareFromDB === requestedCmp)
 				{
 					this.logger.error("Permalink already set but environnement changing");
@@ -657,7 +657,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			const	imagePng = sharp(oldTmpFilePath);
 			const	metadata = await imagePng.metadata();
-			console.log(metadata);
+			// console.log(metadata);
 			const	outputBuffer = await imagePng.jpeg().toBuffer();
 			this.logger.verbose("buffer ready to be writted");
 			fs.writeFileSync(destTmpFilePath, outputBuffer);
@@ -1147,7 +1147,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				else if (data.field === "password")
 					this.decodePassword(data.info, id, searchUser.email);
 
-			console.log(searchUser);
+			// console.log(searchUser);
 			return ("okay");
 		}
 		return ("user doesnt exist");
@@ -1233,7 +1233,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			if (findProfileIndex === -1)
 			{
 				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
-				console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
+				// console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
 			}
 			else
 			{
@@ -1321,9 +1321,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
 		// this.userDBString.push(toDB);
-		console.log("create User ready for db ", user);
-		console.log("create User to db ", objToDB);
-		console.log("create USER STRINGIFIED", toDB);
+		// console.log("create User ready for db ", user);
+		// console.log("create User to db ", objToDB);
+		// console.log("create USER STRINGIFIED", toDB);
 		return (objToDB);
 	}
 
@@ -1431,10 +1431,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			password: data.password,
 			friendsProfileId: [...data.friendsProfileId]
 		};
-		console.log("BACK TO OBJ", toObj);
+		// console.log("BACK TO OBJ", toObj);
 		newUsers.push(toObj);
-		console.log("new users", newUsers);
+		// console.log("new users", newUsers);
 		this.user = [...newUsers];
-		console.log("THIS USERS", this.user);
+		// console.log("THIS USERS", this.user);
 	}
 }

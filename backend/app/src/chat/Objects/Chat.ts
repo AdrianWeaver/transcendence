@@ -234,8 +234,8 @@ class Chat
 				newChannel.setMode(raw.mode);
 				newChannel.id = raw.id;
 				newChannel.users = [...raw.users];
-				console.log("--> raw channel", raw);
-				console.log("new channel : ", newChannel);
+				// console.log("--> raw channel", raw);
+				// console.log("new channel : ", newChannel);
 				this.channels.push(newChannel);
 			});
 			rawPrivateMessages.forEach((raw: any) =>
@@ -247,8 +247,8 @@ class Chat
 				newPrivateMessage.setPassword(raw.password);
 				newPrivateMessage.id = raw.id;
 				newPrivateMessage.setMode(raw.mode);
-				console.log("--> raw private msg", raw);
-				console.log("new private msg", newPrivateMessage);
+				// console.log("--> raw private msg", raw);
+				// console.log("new private msg", newPrivateMessage);
 				this.privateMessage.push(newPrivateMessage);
 			});
 			rawUsers.forEach((raw: any) =>
@@ -265,14 +265,12 @@ class Chat
 				newUser.blocked = [...raw.blocked];
 				newUser.friends = [...raw.friends];
 				newUser.channels = [...newChanArray];
-				// TEST
-				console.log(raw.avatar);
 				newUser.avatar = raw.avatar;
 				newUser.status = raw.status;
 				newUser.online = raw.online;
 				newUser.stats = {...raw.stats};
-				console.log("raw user", raw);
-				console.log("new user", newUser);
+				// console.log("raw user", raw);
+				// console.log("new user", newUser);
 				this.users.push(newUser);
 			});
 			this.chanMap = [...rawObj.chanMap];
