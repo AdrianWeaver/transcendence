@@ -151,9 +151,14 @@ class Channel
 
 		this.isMember = (id: string) =>
 		{
+			const	profileId = this.chat?.getProfileIdFromSocketId(id);
+			if (profileId === undefined || profileId === "undefined")
+				return (false);
 			for (const user of this.users)
 			{
 				if (user.memberSocketId === id)
+					return (true);
+				if (profileId === user.profileId)
 					return (true);
 			}
 			return (false);

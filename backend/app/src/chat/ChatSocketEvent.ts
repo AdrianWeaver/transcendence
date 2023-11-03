@@ -365,13 +365,13 @@ export class ChatSocketEvents
 						online: searchChatUser.online,
 						status: searchChatUser.status,
 						profileId: searchChatUser.profileId
-					}
+					},
 					console.log("newChatUser back", newChatUser);
 					console.log("data", data);
 				}
 				const	action = {
 					type: "create-chat-user",
-					payload: 
+					payload:
 					{
 						newChatUser: newChatUser,
 						online: data.payload.online
@@ -392,13 +392,18 @@ export class ChatSocketEvents
 					let kind;
 					let	alreadyCreated;
 					alreadyCreated = false;
+					let	tmp, tmp2;
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
 					if (searchUser > -1 && data.payload.kind !== "channel")
 					{
-						chanName = this.chatService.createPrivateConvName(client.id, data.payload.activeId);
-						const chanName1 = this.chatService.createPrivateConvName(data.payload.activeId, client.id);
+						tmp = this.chatService.getUserBySocketId(client.id);
+						tmp2 = this.chatService.getUserBySocketId(data.payload.activeId);
+						if (tmp === undefined || tmp2 === undefined)
+							return ;
+						chanName = this.chatService.createPrivateConvName(tmp, tmp2);
+						const chanName1 = this.chatService.createPrivateConvName(tmp2, tmp);
 						if (this.chatService.searchPrivateConvByName(chanName) || this.chatService.searchPrivateConvByName(chanName1))
 							alreadyCreated = true;
 						else
@@ -410,6 +415,35 @@ export class ChatSocketEvents
 								searchConv = this.chatService.searchPrivateConvByName(chanName);
 						}
 						kind = "privateMessage";
+						if (searchConv === undefined && alreadyCreated === false)
+						{
+							const newPrivateMsg = new Channel(chanName);
+							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
+							newPrivateMsg.setId();
+							newPrivateMsg.setPassword("");
+							newPrivateMsg.setKind(kind);
+							newPrivateMsg.setMode("private");
+							newPrivateMsg.chat = this.chatService.getChat();
+							const obj: MemberSocketIdModel = {
+								memberSocketId: data.payload.activeId,
+								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
+							};
+							newPrivateMsg?.users.push(obj);
+							newPrivateMsg?.addAdmin(tmp2?.profileId);
+							client.join(newPrivateMsg.name);
+							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
+							this.chatService.updateDatabase();
+						}
+						const	action = {
+							type: "add-new-channel",
+							payload:
+							{
+								chanMap: undefined,
+								kind: "privateMessage",
+								privateMessageMap: this.chatService.getPrivateMessageMap()
+							}
+						};
+						this.server.emit("display-channels", action);
 					}
 					else
 					{
@@ -442,38 +476,6 @@ export class ChatSocketEvents
 								chanMap: this.chatService.getChanMap(),
 								kind: "channel",
 								privateMessageMap: undefined
-							}
-						};
-						this.server.emit("display-channels", action);
-					}
-					else if (kind === "privateMessage")
-					{
-						if (searchConv === undefined && alreadyCreated === false)
-						{
-							const newPrivateMsg = new Channel(chanName);
-							newPrivateMsg.setClient(client, this.chatService.getProfileIdFromSocketId(client.id));
-							newPrivateMsg.setId();
-							newPrivateMsg.setPassword("");
-							newPrivateMsg.setKind(kind);
-							newPrivateMsg.setMode("private");
-							newPrivateMsg.chat = this.chatService.getChat();
-							const obj: MemberSocketIdModel = {
-								memberSocketId: data.payload.activeId,
-								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
-							};
-							newPrivateMsg?.users.push(obj);
-							newPrivateMsg?.addAdmin(data.payload.activeId);
-							client.join(newPrivateMsg.name);
-							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
-							this.chatService.updateDatabase();
-						}
-						const	action = {
-							type: "add-new-channel",
-							payload:
-							{
-								chanMap: undefined,
-								kind: "privateMessage",
-								privateMessageMap: this.chatService.getPrivateMessageMap()
 							}
 						};
 						this.server.emit("display-channels", action);

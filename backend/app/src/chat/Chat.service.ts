@@ -619,11 +619,9 @@ export	class ChatService implements OnModuleInit
 		return (searchChannel);
 	}
 
-	public	createPrivateConvName(senderId: string, receiverId: string)
+	public	createPrivateConvName(sender: User, receiver: User)
 	{
-		const	tmp = senderId.slice(0, senderId.length / 2);
-		const	tmp1 = receiverId.slice(0, receiverId.length / 2);
-		const	newId = tmp + tmp1;
+		const	newId = sender.name + "&" + receiver.name;
 		return (newId);
 	}
 
