@@ -711,14 +711,19 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
+				console.log("DISPLAY MEMBERS", data.payload);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
-				if (data.payload.talkingUser !== "")
+				const	talk = channelMembers.find((elem) =>
 				{
+					return (elem.profileId !== uniqueId);
+				});
+				if (talk !== undefined)
+					setTalkingUser(talk.name);
+				setIsFriend(data.payload.isFriend);
+				if (data.payload.talkingUser !== "")
 					setTalkingUser(data.payload.talkingUser);
-					setIsFriend(data.payload.isFriend);
-				}
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};
@@ -1015,6 +1020,7 @@ const	ChatLayout = () =>
 
 	const handleMembersClickOpen = (chanName: string) =>
 	{
+		console.log("HANDLE MEMBER CLICK OPEN");
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1549,65 +1555,71 @@ const	ChatLayout = () =>
 																<ul>
 																{
 																	<li>
-																		{talkingUser}
-																			<>
-																				{
-																					(isFriend)
-																					? <Button onClick={() =>
+																		{
+																			(talkingUser !== undefined)
+																			? <>
+																				{talkingUser}
+																				<>
 																					{
-																						addUserToFriends(talkingUser);
-																					}}>
-																						Add friend
-																					</Button>
-																					: <></>
-																				}
-																				<Button onClick={() =>
-																				{
-																					addUserToBlocked(talkingUser);
-																				}}>
-																					Block
-																				</Button>
-																				<Button onClick={() =>
-																				{
-																					setInviteDialogOpen(true);
-																				}}>
-																					Invite
-																				</Button>
-																				<Dialog open={inviteDialogOpen} onClose={() =>
-																							{
-																								setInviteDialogOpen(false);
-																							}}
-																							maxWidth="sm" fullWidth>
-																					<DialogTitle>Invite User to Channel</DialogTitle>
-																					<DialogContent>
-																						<TextField
-																						label="Channel Name"
-																						variant="outlined"
-																						fullWidth
-																						value={channelToInvite}
-																						onChange={(e) =>
+																						(!isFriend)
+																						? <Button onClick={() =>
 																						{
-																							console.log("target value " + e.target.value);
-																							setChannelToInvite(e.target.value);
-																						}}/>
-																					</DialogContent>
-																					<DialogActions>
-																						<Button onClick={() =>
+																							addUserToFriends(talkingUser);
+																						}}>
+																							Add friend
+																						</Button>
+																						: <></>
+																					}
+																					<Button onClick={() =>
+																					{
+																						addUserToBlocked(talkingUser);
+																					}}>
+																						Block
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setInviteDialogOpen(true);
+																					}}>
+																						Invite
+																					</Button>
+																					<Dialog open={inviteDialogOpen} onClose={() =>
+																								{
+																									setInviteDialogOpen(false);
+																								}}
+																								maxWidth="sm" fullWidth>
+																						<DialogTitle>Invite User to Channel</DialogTitle>
+																						<DialogContent>
+																							<TextField
+																							label="Channel Name"
+																							variant="outlined"
+																							fullWidth
+																							value={channelToInvite}
+																							onChange={(e) =>
 																							{
-																								inviteUserToChannel(talkingUser);
+																								console.log("target value " + e.target.value);
+																								setChannelToInvite(e.target.value);
+																							}}/>
+																						</DialogContent>
+																						<DialogActions>
+																							<Button onClick={() =>
+																								{
+																									inviteUserToChannel(talkingUser);
+																									setInviteDialogOpen(false);
+																								}} color="primary">
+																								Invite
+																							</Button>
+																							<Button onClick={() =>
+																							{
 																								setInviteDialogOpen(false);
 																							}} color="primary">
-																							Invite
-																						</Button>
-																						<Button onClick={() =>
-																						{
-																							setInviteDialogOpen(false);
-																						}} color="primary">
-																						Cancel
-																						</Button>
-																					</DialogActions>
-																				</Dialog>
+																							Cancel
+																							</Button>
+																						</DialogActions>
+																					</Dialog>
+																				</>
 																			</>
+																			: <></>
+																		}
 																		</li>
 																	}
 																	</ul>

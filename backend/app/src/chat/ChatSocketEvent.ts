@@ -718,6 +718,7 @@ export class ChatSocketEvents
 
 			if (data.type === "member-list")
 			{
+				console.log("MEMBER-LIST");
 				let channel;
 				let	conv: boolean, isFriend;
 				let	talkingUser: string;
@@ -729,23 +730,25 @@ export class ChatSocketEvents
 				const	searchUser = this.chatService.getUserWithProfileId(profId);
 				if (searchUser === undefined)
 					return ;
-				console.log("iciii chanName", data.payload.chanName);
+				console.log("searchUSER OK");
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
 					if (channel === undefined)
 						return ;
+					console.log("SEARCH CONV OK");
 					conv = true;
-					console.log("ici ????");
 				}
 				const	isAdmin = channel.isAdmin(profId);
 				const	memberList: MembersModel[] = [];
 				for(const user of channel.users)
 				{
-					const profId = this.chatService.getProfileIdWithUserName(user.memberSocketId);
+					console.log("user ", user.profileId);
+					const profId = user.profileId;
 					if (profId === undefined)
 						return ;
-					const	userName = this.chatService.getUsernameWithSocketId(user.memberSocketId) as string;
+					console.log("profID ok", profId);
+					const	userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 					if (user.profileId !== profId && conv)
 					{
 						talkingUser = userName;
@@ -756,6 +759,7 @@ export class ChatSocketEvents
 						if (searchFriend !== undefined)
 							isFriend = true;
 					}
+					console.log("HERE", talkingUser);
 					const newMember: MembersModel = {
 						id: memberList.length + 1,
 						// replace socketId by profileId
@@ -854,6 +858,7 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
+				console.log("id ???", data.payload.blockedName);
 				const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
 				if (profId === "undefined")
 					return ;

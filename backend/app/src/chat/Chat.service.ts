@@ -694,6 +694,8 @@ export	class ChatService implements OnModuleInit
 		{
 			return (elem.id === socketId);
 		});
+		if (searchUser === undefined)
+			return (undefined);
 		return (searchUser?.name);
 	}
 
