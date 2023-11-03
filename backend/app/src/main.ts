@@ -7,9 +7,20 @@ import * as bodyParser from "body-parser";
 import { ValidationPipe } from "@nestjs/common";
 import { setupGracefulShutdown } from "nestjs-graceful-shutdown";
 import { UserService } from "./user/user.service";
+import Configuration from "./Configuration";
 
 async function bootstrap()
 {
+	const	configTest = new Configuration();
+
+	if ( await configTest.isValidConfiguration() === false)
+	{
+		console.log("The configuration for the project "
+			+ "is not okay -- goto help folder and $> npm run"
+			+ " (to see command and configure project)");
+		return ;
+	}
+	console.log("The configuration of the project is okay program will start");
 	const	app = await NestFactory.create(AppModule);
 	app.enableCors({
 		origin: "*",

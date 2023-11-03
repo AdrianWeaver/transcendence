@@ -16,10 +16,21 @@ export class AppController implements OnModuleInit
 	}
 
 	@Get("/server-status")
-	getServerStatus(): {success: string, availableSince: string}
+	getServerStatus()
+		: {
+			success: string,
+			availableSince: string,
+			links: {authApiUrl : string}
+		}
 	{
 		this.logger.log("User request /server-status");
 		return (this.appService.getServerStatus());
+	}
+
+	@Get("/authLink")
+	getAuthLink(): string
+	{
+		return (this.appService.getAuthLink());
 	}
 
 	@Get()

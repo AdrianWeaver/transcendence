@@ -270,7 +270,7 @@ export class UserController
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
 						retValue = this.userService.register(newUserObj);
-						this.userService.createUserToDatabase(newUserObj)
+						await this.userService.createUserToDatabase(newUserObj)
 						.then((data) =>
 						{
 							if (data === "ERROR")
