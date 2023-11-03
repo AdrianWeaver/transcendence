@@ -21,6 +21,9 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { GracefulShutdownModule } from "nestjs-graceful-shutdown";
 
 import { join } from "path";
+import { GameApiModule } from "./game-api/game-api.module";
+import { GameApiController } from "./game-api/game-api.controller";
+import { GameApiService } from "./game-api/game-api.service";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 
@@ -59,13 +62,16 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 		AnonymousUserController,
 		AdminsController,
 		ChatApiController,
+		GameApiController,
 		UserController
 	],
 	providers: [
 		AppService,
 		AdminsService,
 		ChatApiModule,
-		ChatApiService
+		ChatApiService,
+		GameApiService,
+		GameApiModule
 	],
 })
 

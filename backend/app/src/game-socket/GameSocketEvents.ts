@@ -21,6 +21,8 @@ import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
 import { LargeNumberLike } from "crypto";
 import { async } from "rxjs/internal/scheduler/async";
+import { GameService } from "./Game.service";
+import { Logger } from "@nestjs/common";
 
 export class	NodeAnimationFrame
 {
@@ -94,9 +96,13 @@ export class GameSocketEvents
 	gameInstances: GameServe[] = [];
 	printPerformance: (timestamp: number, frame: number, instance: GameServe) => void;
 	update: (instance: GameServe) => void;
+	private readonly	logger = new Logger("game-socket-event");
 
-	public	constructor()
+	public	constructor(
+		private readonly gameService: GameService
+	)
 	{
+		this.logger.error("I am using service game with id: " + this.gameService.getInstanceId());
 		this.userReady = 0;
 		this.update = (instance: GameServe) =>
 		{
