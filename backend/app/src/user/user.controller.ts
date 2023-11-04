@@ -327,8 +327,8 @@ export class UserController
 	getAllUsers()
 		: BackUserModel[]
 	{
-		console.log("request back users model data");
-		console.log(this.userService.getBackUserModelArray());
+		// console.log("request back users model data");
+		// console.log(this.userService.getBackUserModelArray());
 		return (this.userService.getBackUserModelArray());
 	}
 
@@ -385,8 +385,8 @@ export class UserController
 		@Req() req: any
 	)
 	{
-		console.log("body ", body);
-		console.log("req ", req.user);
+		// console.log("body ", body);
+		// console.log("req ", req.user);
 		console.log(this.env);
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -429,8 +429,8 @@ export class UserController
 		@Res() res: Response
 	)
 	{
-		console.log("body ", body);
-		console.log("opt-code", body.otpCode);
+		// console.log("body ", body);
+		// console.log("opt-code", body.otpCode);
 		if (body.otpCode === undefined)
 			throw new UnauthorizedException();
 		console.log(this.env);

@@ -65,6 +65,7 @@ const	initialControllerState: ControllerModel = {
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
+				profileId: "undefined"
 			}
 			],
 			activeConversationId: "undefined",
@@ -78,7 +79,9 @@ const	initialControllerState: ControllerModel = {
 				}
 			],
 			kindOfConversation: "undefined",
-			numberOfChannels: -1
+			numberOfChannels: -1,
+			connectedUsers: [],
+			disconnectedUsers: []
 		},
 		profile: {
 			editView: false,
@@ -355,6 +358,10 @@ const	controllerSlice = createSlice(
 		{
 			state.allUsers = action.payload.allUsers;
 		},
+		setProfileId(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.users = action.payload.user.chat.users;
+		},
 		registerInfosInBack(state, action: PayloadAction<ControllerModel>)
 		{
 			state.allUsers = action.payload.allUsers;
@@ -375,7 +382,7 @@ const	controllerSlice = createSlice(
 			state.user.ftAvatar = action.payload.user.ftAvatar;
 			state.user.password = action.payload.user.password;
 		},
-		addUser(state, action: PayloadAction<ControllerModel>)
+		addFrontUser(state, action: PayloadAction<ControllerModel>)
 		{
 			state.allFrontUsers = action.payload.allFrontUsers;
 		},
@@ -386,6 +393,15 @@ const	controllerSlice = createSlice(
 		setStatus(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
+		},
+		addChatUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.users = action.payload.user.chat.users;
+		},
+		connectChatUser(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.disconnectedUsers = action.payload.user.chat.disconnectedUsers;
+			state.user.chat.connectedUsers = action.payload.user.chat.connectedUsers;
 		},
 	}
 });

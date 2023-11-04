@@ -14,6 +14,7 @@ export	interface ChatUserModel
 	"id": string,
 	"avatar": string,
 	"password": string,
+	"profileId": string
 }
 
 export interface BackUserModel
@@ -42,7 +43,9 @@ export interface ChatModel
 	"currentChannel": string,
 	"chanMessages": MessageModel[],
 	"kindOfConversation": string,
-	"numberOfChannels": number
+	"numberOfChannels": number,
+	"connectedUsers": ChatUserModel[],
+	"disconnectedUsers": ChatUserModel[]
 }
 
 export interface	ProfileModel

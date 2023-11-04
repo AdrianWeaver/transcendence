@@ -54,7 +54,9 @@ import {
 	setChatUsers,
 	// setMessageRoom,
 	// setKindOfConversation,
-	setNumberOfChannels
+	setNumberOfChannels,
+	connectChatUser,
+	addChatUser
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -168,7 +170,7 @@ const FriendsList = (props: FriendsListProps) =>
 			type: "create-channel",
 			payload: {
 				chanName: "undefined",
-				chanMode: "undefined",
+				chanMode: "private",
 				chanPassword: "undefined",
 				chanId: numberOfChannels + 1,
 				activeId: activeId
@@ -176,18 +178,19 @@ const FriendsList = (props: FriendsListProps) =>
 		};
 		props.socketRef.current.emit("channel-info", action);
 	};
-	const displayConversationWindow = (id: string) =>
-	{
-		const action = {
-			type: "display-conversation",
-			payload:
-			{
-				id: id,
-				index: numberOfChannels + 1
-			}
-		};
-		props.socketRef.current?.emit("display-conversation", action);
-	};
+	// const displayConversationWindow = (id: string) =>
+	// {
+	// 	console.log("DISPLYA CONVERSATION ?");
+	// 	const action = {
+	// 		type: "display-conversation",
+	// 		payload:
+	// 		{
+	// 			id: id,
+	// 			index: numberOfChannels + 1
+	// 		}
+	// 	};
+	// 	props.socketRef.current?.emit("display-conversation", action);
+	// };
 
 	return (
 		<>
@@ -213,7 +216,7 @@ const FriendsList = (props: FriendsListProps) =>
 							<>
 								<div key={index} onClick={() =>
 								{
-									displayConversationWindow(elem.id);
+									// displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
 									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
@@ -358,6 +361,17 @@ const	ChatLayout = () =>
 		setIsChannelAdmin
 	] = useState(false);
 
+	const
+	[
+		talkingUser,
+		setTalkingUser
+	] = useState("");
+
+	const
+	[
+		isFriend,
+		setIsFriend
+	] = useState(false);
 	const [
 		uniqueId,
 		setUniqueId
@@ -521,15 +535,71 @@ const	ChatLayout = () =>
 			});
 
 		socketRef.current = socket;
-
+		const	createChatUser = (data: any) =>
+		{
+			if (data.type === "create-chat-user")
+			{
+				console.log("create chat user front ", data.payload);
+				if (data.payload.newChatUser === undefined)
+					return ;
+				console.log("ADD CHAT USER FRONT");
+				dispatch(addChatUser(data.payload.newChatUser));
+				dispatch(connectChatUser(data.payload.newChatUser, data.payload.online));
+				console.log("connecteed", user.chat.connectedUsers);
+				console.log("disconnected", user.chat.disconnectedUsers);
+			}
+		};
 		const connect = () =>
 		{
+			console.log("CONNECT ?");
 			setConnected(true);
+			const	searchChatUser = user.chat.users.find((elem) =>
+			{
+				return (elem.name === user.username);
+			});
+			if (searchChatUser === undefined)
+			{
+				console.log("does not exist");
+				const	action = {
+					type: "create-chat-user",
+					payload: {
+						user: user,
+						online: true,
+						status: "connected"
+					}
+				};
+				socketRef.current.emit("info", action);
+			}
+			else
+			{
+				console.log("already exists");
+				dispatch(connectChatUser(searchChatUser, true));
+			}
 		};
 
 		const disconnect = () =>
 		{
 			setConnected(false);
+			const	searchChatUser = user.chat.users.find((elem) =>
+			{
+				return (elem.name === user.username);
+			});
+			if (searchChatUser === undefined)
+			{
+				const	action = {
+					type: "create-chat-user",
+					payload: {
+						user: user,
+						online: false,
+						status: "offline"
+					}
+				};
+				socketRef.current.emit("info", action);
+			}
+			else
+			{
+				dispatch(connectChatUser(searchChatUser, false));
+			}
 		};
 
 		const	updateChannels = (data: any) =>
@@ -622,6 +692,7 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
+			// NEED c'est ici qu'on va pouvoir regler le soucis d'affichage decaler je pense
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
@@ -640,9 +711,21 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
+				console.log("DISPLAY MEMBERS", data.payload);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
+				const	talk = data.payload.memberList.find((elem: any) =>
+				{
+					return (elem.name === data.payload.talkingUser);
+				});
+				console.log("talk", talk?.name);
+				if (talk !== undefined)
+				{
+					setTalkingUser(talk.name);
+				}
+				setIsFriend(data.payload.isFriend);
+				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};
 
@@ -709,6 +792,8 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
+				if (data.payload.privateMessage !== undefined)
+					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
 			}
 		};
@@ -725,6 +810,7 @@ const	ChatLayout = () =>
 		socket.on("get-user-list", updateChannels);
 		socket.on("user-info", userInfo);
 		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
+		socket.on("add-chat-user", createChatUser);
 
         socket.connect();
 
@@ -742,6 +828,7 @@ const	ChatLayout = () =>
 			socket.off("get-user-list", updateChannels);
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
+			socket.off("add-chat-user", createChatUser);
         });
     }, []);
 
@@ -934,6 +1021,7 @@ const	ChatLayout = () =>
 
 	const handleMembersClickOpen = (chanName: string) =>
 	{
+		console.log("HANDLE MEMBER CLICK OPEN");
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1422,27 +1510,140 @@ const	ChatLayout = () =>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
-										// setKindOfConversation("privateMessage");
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
-												<ListItemText
-													style={
-														channel.name === currentChannel
-														? { color: "green" }
-														: listItemTextStyle
-													}
-													primary={channel.name}
-													onClick={() =>
-													{
-														setKindOfConversation("privateMessage");
-														return (goToChannel(channel.name, "privateMessage"));
-													}}
-												/>
-											</ListItem>
-										);
-									})
+											<>
+												<ListItem style={listItemStyle} key={channel.id}>
+													<ListItemText
+														style={
+															channel.name === currentChannel
+															? { color: "green" }
+															: listItemTextStyle
+														}
+														primary={channel.name}
+														onClick={() =>
+														{
+															setKindOfConversation("privateMessage");
+															return (goToChannel(channel.name, "privateMessage"));
+														}}
+													/>
+												</ListItem>
+												<Button onClick={() =>
+												{
+													handleDialogOpen();
+													setButtonSelection(channel);
+												}}>
+													Options
+												</Button>
+												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+													<DialogTitle>
+														Choose an Action
+													</DialogTitle>
+													<DialogContent>
+														<Button onClick={() =>
+														{
+															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+														}}>
+															Remove
+														</Button>
+														<Button onClick={() =>
+														{
+															return handleMembersClickOpen(buttonSelection.name);
+														}}>
+															action with user
+														</Button>
+														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
+															<DialogContent>
+																<ul>
+																{
+																	<li>
+																		{
+																			(talkingUser !== undefined)
+																			? <>
+																				{talkingUser}
+																				<>
+																					{
+																						(!isFriend)
+																						? <Button onClick={() =>
+																						{
+																							addUserToFriends(talkingUser);
+																						}}>
+																							Add friend
+																						</Button>
+																						: <></>
+																					}
+																					<Button onClick={() =>
+																					{
+																						addUserToBlocked(talkingUser);
+																					}}>
+																						Block
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setInviteDialogOpen(true);
+																					}}>
+																						Invite
+																					</Button>
+																					<Dialog open={inviteDialogOpen} onClose={() =>
+																								{
+																									setInviteDialogOpen(false);
+																								}}
+																								maxWidth="sm" fullWidth>
+																						<DialogTitle>Invite User to Channel</DialogTitle>
+																						<DialogContent>
+																							<TextField
+																							label="Channel Name"
+																							variant="outlined"
+																							fullWidth
+																							value={channelToInvite}
+																							onChange={(e) =>
+																							{
+																								console.log("target value " + e.target.value);
+																								setChannelToInvite(e.target.value);
+																							}}/>
+																						</DialogContent>
+																						<DialogActions>
+																							<Button onClick={() =>
+																								{
+																									inviteUserToChannel(talkingUser);
+																									setInviteDialogOpen(false);
+																								}} color="primary">
+																								Invite
+																							</Button>
+																							<Button onClick={() =>
+																							{
+																								setInviteDialogOpen(false);
+																							}} color="primary">
+																							Cancel
+																							</Button>
+																						</DialogActions>
+																					</Dialog>
+																				</>
+																			</>
+																			: <></>
+																		}
+																		</li>
+																	}
+																	</ul>
+																</DialogContent>
+																<DialogActions>
+																<Button onClick={handleMembersClose} color="primary">
+																	Close
+																</Button>
+																</DialogActions>
+															</Dialog>
+														</DialogContent>
+														<DialogActions>
+															<Button onClick={handleDialogClose} color="primary">
+																Cancel
+															</Button>
+														</DialogActions>
+													</Dialog>
+												</>
+											);
+										})
 								}
-							</List>
+								</List>
+
 					</TabPanel>
 					<TabPanel
 						area={"false"}
@@ -1485,7 +1686,7 @@ const	ChatLayout = () =>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-								
+
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1520,7 +1721,6 @@ const	ChatLayout = () =>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
-								
 								if (uniqueId === message.sender)
 									sender = "me";
 								else if (message.sender === "server")
@@ -1530,13 +1730,13 @@ const	ChatLayout = () =>
 								return (
 									<MessageItem
 										key={index}
+										ind={index}
 										sender={sender}
-										date={message.sender}
+										date={message.username}
 										message={message.message}
 									/>
 								);
 							})}
-							{/* </List> */}
 					</TabPanel>
 
 					<Divider />
@@ -1548,11 +1748,11 @@ const	ChatLayout = () =>
 					>
 						<Grid item xs={11}>
 							<TextField
-							id="outlined-basic-email"
-							label="Type Something"
-							fullWidth
-							value={text}
-							onChange={handleTextChange}
+								id="outlined-basic-email"
+								label="Type Something"
+								fullWidth
+								value={text}
+								onChange={handleTextChange}
 							/>
 						</Grid>
 						<Grid item xs={1} sx={{ alignItems: "right" }}>

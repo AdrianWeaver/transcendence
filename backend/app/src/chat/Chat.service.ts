@@ -33,7 +33,7 @@ export	interface ChatUserModel
 	"status": string,
 	"id": string,
 	"avatar": string,
-	"msgRoom": MessageRoomModel[]
+	"profileId": string
 }
 
 type MessageModel =
@@ -65,6 +65,7 @@ type MemberSocketIdModel ={
 import { v4 as uuidv4 } from "uuid";
 import { profile } from "console";
 import { UserModel } from "src/user/user.interface";
+import { allowedNodeEnvironmentFlags } from "process";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -155,7 +156,7 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					console.log("raw object chat from db", rawobj);
+					// console.log("raw object chat from db", rawobj);
 					const	newChatInstance = new Chat();
 					newChatInstance.databaseToObject(rawobj);
 					this.chat = {...newChatInstance};
@@ -205,7 +206,6 @@ export	class ChatService implements OnModuleInit
 						newUserInstance.chat = this.chat;
 						newUserInstance.setStatus(rawUser.status);
 						newUserInstance.setOnline(rawUser.online);
-						console.log("chat service 206 back AVATAR ", rawUser.avatar);
 						newUserInstance.setAvatar(rawUser.avatar);
 						// newUserInstance.id = "not-connect";
 						newUserInstance.id = rawUser.id;
@@ -358,9 +358,9 @@ export	class ChatService implements OnModuleInit
 							searchUser.channels = chanArray;
 					});
 
-					console.log("End of parser check with serialized value ");
-					console.log( JSON.parse(this.parseForDatabase()));
-					console.log(this.chat);
+					// console.log("End of parser check with serialized value ");
+					// console.log( JSON.parse(this.parseForDatabase()));
+					// console.log(this.chat);
 				}
 			})
 			.catch((error: any) =>
@@ -500,12 +500,17 @@ export	class ChatService implements OnModuleInit
 
 	public	pushUser(newUser: User, clientId: string)
 	{
-		this.chat.users.push(newUser);
-		this.chat.memberSocketIds.push(
+		console.log("PUSH USER PROFILE ID", newUser.profileId);
+		const	searchUser = this.getUserWithProfileId(newUser.profileId);
+		if (searchUser === undefined)
 		{
-			memberSocketId: clientId,
-			profileId: newUser.profileId
-		});
+			this.chat.users.push(newUser);
+			this.chat.memberSocketIds.push(
+			{
+				memberSocketId: clientId,
+				profileId: newUser.profileId
+			});
+		}
 	}
 
 	public	deleteUser(userIndex: number, userSocket: number)
@@ -527,7 +532,7 @@ export	class ChatService implements OnModuleInit
 	{
 		const searchUser = this.chat.users.find((element) =>
 		{
-			return (element.id === userName);
+			return (element.name === userName);
 		});
 		if (searchUser === undefined)
 			return (undefined);
@@ -572,7 +577,7 @@ export	class ChatService implements OnModuleInit
 				online: element.online,
 				status: element.status,
 				avatar: element.avatar,
-				msgRoom: []
+				profileId: element.profileId
 			};
 			users.push(user);
 		});
@@ -618,11 +623,9 @@ export	class ChatService implements OnModuleInit
 		return (searchChannel);
 	}
 
-	public	createPrivateConvName(senderId: string, receiverId: string)
+	public	createPrivateConvName(sender: User, receiver: User)
 	{
-		const	tmp = senderId.slice(0, senderId.length / 2);
-		const	tmp1 = receiverId.slice(0, receiverId.length / 2);
-		const	newId = tmp + tmp1;
+		const	newId = sender.name + "&" + receiver.name;
 		return (newId);
 	}
 
@@ -670,7 +673,7 @@ export	class ChatService implements OnModuleInit
 		return (searchIndex);
 	}
 
-	public	setSocketToUser(index: number, client: Socket)
+	public	setSocketToUser(index: number, client: Socket | null)
 	{
 		this.chat.users[index].changeSocket(client);
 	}
@@ -691,6 +694,8 @@ export	class ChatService implements OnModuleInit
 		{
 			return (elem.id === socketId);
 		});
+		if (searchUser === undefined)
+			return (undefined);
 		return (searchUser?.name);
 	}
 
@@ -709,7 +714,7 @@ export	class ChatService implements OnModuleInit
 		this.chat.updateUserInChat(newSocketId, profileId);
 	}
 
-	public updateUserSocketInChannels(client: Socket)
+	public updateUserSocketInChannels(client: Socket | null)
 	{
 		this.chat.updateUserSocketInChannels(client);
 	}
@@ -734,5 +739,39 @@ export	class ChatService implements OnModuleInit
 				toReturn = user.name;
 		});
 		return (toReturn);
+	}
+
+	public	disconnectUserWithClientId(clientId: string)
+	{
+		return ;
+		// dead code
+		const index = this.searchUserIndex(clientId);
+		if (index === -1)
+		{
+			this.log.error("The user that is started to remove dont exist ???");
+			return ;
+		}
+		// this.chat.users[index]
+		this.chat.users[index].id = "disconnected";
+		const	sockIndex = this.searchSocketIndex(clientId);
+		if (sockIndex === -1)
+		{
+			this.log.error("The user that is started to remove dont exist ???");
+			return ;
+		}
+		this.chat.memberSocketIds[sockIndex].memberSocketId = "disconnected";
+	}
+
+	public	addNewChatUser(chatUser: ChatUserModel, client: Socket | null)
+	{
+		console.log("addd NEW USER BACK");
+		const	user: User = new User(chatUser.name, chatUser.profileId);
+		user.setClient(client);
+		user.setId(chatUser.id);
+		user.status = chatUser.status;
+		user.online = chatUser.online;
+		user.avatar = chatUser.avatar;
+		console.log("add New user back: ", user);
+		this.pushUser(user, chatUser.id);
 	}
 }

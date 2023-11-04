@@ -124,9 +124,12 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
+			const	profId = this.chat?.getProfileIdFromSocketId(id);
 			for (const user of this.admins)
 			{
 				if (id === user.memberSocketId)
+					return (true);
+				if (profId === user.profileId)
 					return (true);
 			}
 			return (false);
@@ -151,9 +154,14 @@ class Channel
 
 		this.isMember = (id: string) =>
 		{
+			const	profileId = this.chat?.getProfileIdFromSocketId(id);
+			if (profileId === undefined || profileId === "undefined")
+				return (false);
 			for (const user of this.users)
 			{
 				if (user.memberSocketId === id)
+					return (true);
+				if (profileId === user.profileId)
 					return (true);
 			}
 			return (false);

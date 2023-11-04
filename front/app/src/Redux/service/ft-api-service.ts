@@ -26,7 +26,7 @@ const	UserServices = {
 			.then((data) =>
 			{
 				console.log("register front");
-				console.log(data.data);
+				// console.log(data.data);
 				return (data.data);
 			})
 			.catch((error) =>
@@ -53,7 +53,7 @@ const	UserServices = {
 			.post("/user/verify-token", {}, config)
 			.then((data) =>
 			{
-				console.log(data);
+				// console.log(data);
 				return ("OKay");
 			})
 			.catch(() =>
@@ -79,7 +79,7 @@ const	UserServices = {
 			.post("/user/revoke-token", {}, config)
 			.then((data) =>
 			{
-				console.log(data);
+				// console.log(data);
 				return ("OKay");
 			})
 			.catch((error) =>
@@ -97,7 +97,7 @@ const	UserServices = {
 			.get("/user/get-all-users", {})
 			.then((data) =>
 			{
-				console.log("get all users route ", data.data);
+				// console.log("get all users route ", data.data);
 				return (data.data);
 			})
 			.catch((error) =>
@@ -127,7 +127,7 @@ const	UserServices = {
 			.post("/user/double-auth", data, config)
 			.then((data) =>
 			{
-				console.log("ft-api-service double auth :", data.data);
+				// console.log("ft-api-service double auth :", data.data);
 				return (data.data);
 			})
 			.catch((error) =>
@@ -220,7 +220,7 @@ const	UserServices = {
 			.post("/user/change-infos", data, config)
 			.then((data) =>
 			{
-				console.log("ft-api-service register infos in backend ", data);
+				// console.log("ft-api-service register infos in backend ", data);
 				return ("okay");
 			})
 			.catch((error) =>
@@ -248,7 +248,7 @@ const	UserServices = {
 			.post("user/hash-password", data, config)
 			.then((data) =>
 			{
-				console.log(data);
+				// console.log(data);
 				return (data.data);
 			})
 			.catch((error) =>
@@ -278,7 +278,7 @@ const	UserServices = {
 			.post("user/decode-password", data, config)
 			.then((data) =>
 			{
-				console.log(data);
+				// console.log(data);
 				return (data.data);
 			})
 			.catch(() =>
@@ -305,7 +305,7 @@ const	UserServices = {
 			.post("user/add-friend", data, config)
 			.then((data) =>
 			{
-				console.log(data);
+				// console.log(data);
 				return ("OK");
 			})
 			.catch((error) =>
