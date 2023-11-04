@@ -33,7 +33,7 @@ export class	NodeAnimationFrame
 		((timestamp: number, frame: number, game: GameServe) => void) | null;
 	public update: (timestamp: number) => void;
 
-	// eslint-disable-next-line max-statements
+	public	getSerializable: () => any;
 	constructor()
 	{
 		this.frameRate = 60;
@@ -63,6 +63,15 @@ export class	NodeAnimationFrame
 				this.frameNumber++;
 			this.requestFrame(this.update);
 		};
+		this.getSerializable = () =>
+		{
+			return ({
+				frameRate: this.frameRate,
+				frameNumber: this.frameNumber,
+				gameActive: this.gameActive,
+				// game: this.game
+			});
+		};
 	}
 }
 
@@ -83,18 +92,17 @@ export class GameSocketEvents
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
 	@WebSocketServer()
-	server: Server;
-	// users: number;
-	// totalUsers: number;
-	// classicUsers: number;
-	// specialUsers: number;
-	// socketIdUsers: string[] = [];
-	// userReady: number;
-	// socketIdReady: string[] = [];
-	// gameInstances: GameServe[] = [];
-	printPerformance: (timestamp: number, frame: number, instance: GameServe) => void;
-	update: (instance: GameServe) => void;
+	server				: Server;
 	private readonly	logger = new Logger("game-socket-event");
+	printPerformance	: (timestamp: number, frame: number, instance: GameServe) => void;
+	update				: (instance: GameServe) => void;
+
+	afterInit(server: Server)
+	{
+		this.server = server;
+		this.gameService.setUsers(0);
+		this.gameService.setTotalUsers(0);
+	}
 
 	public	constructor(
 		private readonly gameService: GameService
@@ -158,13 +166,6 @@ export class GameSocketEvents
 		};
 	}
 
-	afterInit(server: Server)
-	{
-		this.server = server;
-		this.gameService.setUsers(0);
-		this.gameService.setTotalUsers(0);
-	}
-
 	async handleConnection(client: Socket)
 	{
 		let roomName: string;
@@ -175,7 +176,6 @@ export class GameSocketEvents
 			this.gameService.pushClientIdIntoSocketIdUsers(client.id);
 			this.gameService.increaseUsers();
 			this.gameService.increaseTotalUsers();
-			// We will create each time a new room
 			roomName = "room"
 				+ (Math.round(this.gameService.getTotalUsers() / 2)).toString();
 			await client.join(roomName);
@@ -208,7 +208,6 @@ export class GameSocketEvents
 			return ;
 		}
 
-		// Count number of users in a room
 		const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
 		let	roomSize: number;
 		if (roomInfo)
@@ -218,9 +217,6 @@ export class GameSocketEvents
 			console.log("An error occured due to rooms");
 			return ;
 		}
-
-		// This will send the right message to each player but it will
-		// also create a room instance on the client side
 		const	userMessage = {
 			type: "",
 			payload: {

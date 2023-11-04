@@ -27,8 +27,7 @@ export class	GameService implements OnModuleInit
 		this.logger.error("Service constructed with ID: " + this.instanceId);
 		this.users = 0;
 		this.totalUsers = 0;
-		// next 2 line is not used --
-		//  keeped for initiatorlogic no method implemnented
+
 		this.classicUsers = 0;
 		this.specialUsers = 0;
 
@@ -50,6 +49,12 @@ export class	GameService implements OnModuleInit
 
 	public getGameServiceCopy()
 	{
+		this.logger.verbose("getting data ");
+		const gameInstanceSerialized = this.gameInstances.map((elem) =>
+		{
+			return (elem.getSeralizable());
+		});
+		console.log("Serialized data : ", gameInstanceSerialized);
 		return ({
 			instanceId: this.instanceId,
 			users: this.users,
@@ -59,7 +64,7 @@ export class	GameService implements OnModuleInit
 			socketIdUsers: this.socketIdUsers,
 			userReady: this.userReady,
 			socketIdReady: this.socketIdReady,
-			// gameInstances: this.gameInstances, // that throw error
+			gameInstances: gameInstanceSerialized,
 		});
 	}
 

@@ -22,6 +22,8 @@ class Board
 	public registerEvents: () => void;
 	public init: () => void;
 
+	public getSeralizable: () => any;
+
 	public constructor()
 	{
 		this.borderStyle = "1px solid";
@@ -84,6 +86,19 @@ class Board
 			}
 			else
 				console.error(this.game);
+		};
+
+		this.getSeralizable = () =>
+		{
+			return ({
+				borderStyle: this.borderStyle,
+				backgroundColor: this.backgroundColor,
+				irlWidth: this.irlWidth,
+				irlHeight: this.irlHeight,
+				irlRatio: this.irlRatio,
+				dim: this.dim,
+				// game: this.game,
+			});
 		};
 	}
 }
