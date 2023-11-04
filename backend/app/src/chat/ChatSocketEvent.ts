@@ -741,15 +741,17 @@ export class ChatSocketEvents
 				}
 				const	isAdmin = channel.isAdmin(profId);
 				const	memberList: MembersModel[] = [];
+				let userName: string;
 				for(const user of channel.users)
 				{
 					console.log("user ", user.profileId);
 					console.log("profID ok", profId);
-					const	userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+					userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 					if (user.profileId !== profId && conv)
 					{
-						console.log("talking yser ???", user.profileId);
-						talkingUser = user.profileId;
+						
+						talkingUser = userName;
+						console.log("talking yser ???", talkingUser);
 						const	searchFriend = searchUser.friends.find((elem) =>
 						{
 							return (elem.name === userName);
