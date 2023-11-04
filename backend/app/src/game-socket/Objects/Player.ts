@@ -21,6 +21,8 @@ class Player
 	public isLeftPlayer: (posX: number, posY: number) => boolean;
 	public isRightPlayer: (posX: number, posY: number) => boolean;
 
+	public getSerializable: () => any;
+
 	public constructor()
 	{
 		this.pos = new Position();
@@ -130,7 +132,20 @@ class Player
 			else
 				return (false);
 		};
-    }
+		this.getSerializable = () =>
+		{
+			return ({
+				pos: this.pos,
+				racket: this.racket.getSerializable(),
+				score: this.score,
+				// game: this.game,
+				side: this.side,
+				uuid: this.uuid,
+				socketId: this.socketId,
+				name: this.name
+			});
+		};
+	}
 }
 
 export default Player;

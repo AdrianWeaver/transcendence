@@ -29,6 +29,14 @@ class Racket
 				this.dim.setDimension(newRacketHeight, newRacketWidth);
 		};
 	}
+
+	public	getSerializable()
+	{
+		return ({
+			dim: this.dim,
+			// game: this.game
+		});
+	}
 }
 
 export default Racket;

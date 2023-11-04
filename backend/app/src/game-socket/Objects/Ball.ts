@@ -29,6 +29,8 @@ class Ball
 	public radiansToDegrees: (radians: number) => number;
 	public getBounceAngle: () => number;
 
+	public getSeralizable: () => any;
+
 	public constructor()
 	{
 		this.pos = new Position();
@@ -195,6 +197,23 @@ class Ball
 					this.speedX = ((this.radius / 2) * 0.5) * 2.5;
 			}
 			return (bounceAngle);
+		};
+		this.getSeralizable = () =>
+		{
+			return ({
+				pos: this.pos,
+				radius: this.radius,
+				startAngle: this.startAngle,
+				endAngle: this.endAngle,
+				// game: this.game,
+				speedX: this.speedX,
+				speedY: this.speedY,
+				angle: this.angle,
+				moveDirection: this.moveDirection,
+				firstSetDirection: this.firstSetDirection,
+				maxAngle: this.maxAngle,
+				maxSpeed: this.maxSpeed,
+			});
 		};
 	}
 }

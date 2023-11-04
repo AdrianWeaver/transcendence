@@ -15,7 +15,7 @@ export class AppService
 		this.startedAt = new Date();
 		this.config = new Configuration();
 		this.authApiUrl = this.config.getFtAuthURL();
-		this.logger.verbose("auth link generated: " + this.authApiUrl);
+		this.logger.log("auth link generated: " + this.authApiUrl);
 	}
 
 	getServerStatus()

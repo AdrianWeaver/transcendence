@@ -77,7 +77,7 @@ export	class ChatService implements OnModuleInit
 
 	constructor()
 	{
-		this.log.verbose("Chat Service is constructed");
+		this.log.verbose("Chat Service is constructed with id: " + this.uuid);
 		this.chat = new Chat();
 		this.prisma = new PrismaClient();
 		// this.initDB();
