@@ -74,11 +74,11 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-9";
+	private readonly chatID = "id-chat-service-v-10";
 
 	constructor()
 	{
-		this.log.verbose("Chat Service is constructed");
+		this.log.verbose("Chat Service is constructed with id: " + this.uuid);
 		this.chat = new Chat();
 		this.prisma = new PrismaClient();
 		// this.initDB();

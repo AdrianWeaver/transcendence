@@ -1,7 +1,5 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
-
-// import { Logger } from "@nestjs/common";
 import * as dotenv from "dotenv";
 
 class	ServerConfig
@@ -10,7 +8,6 @@ class	ServerConfig
 	public readonly		port: string | undefined;
 	public readonly		protocol: string | undefined;
 	private readonly	env: dotenv.DotenvConfigOutput;
-	// private	readonly	logger = new Logger("ERROR ENV LOADDER");
 	public serialize: () => string;
 
 	public constructor()
@@ -30,13 +27,5 @@ class	ServerConfig
 		};
 	}
 }
-
-
-// // backend
-// const serverConfig = {
-// 	location: "localhost",
-// 	port: "3000",
-// 	protocol: "http"
-// };
 
 export default ServerConfig;

@@ -11,6 +11,8 @@ class Net
 	public defineNetRectSize: () => void;
 	public render: () => void;
 
+	public getSerializable: () => any;
+
 	// eslint-disable-next-line max-lines-per-function
 	public constructor()
 	{
@@ -49,6 +51,14 @@ class Net
 					delay += this.dim.height + this.dim.height/2;
 				}
 			}
+		};
+		this.getSerializable = () =>
+		{
+			return ({
+				pos: this.pos,
+				dim: this.dim,
+				// game: this.game
+			});
 		};
 	}
 

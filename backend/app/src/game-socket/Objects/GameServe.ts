@@ -26,6 +26,8 @@ class GameServe
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
 
+	public getSeralizable: () => any;
+
 	public constructor(roomName: string)
 	{
 		this.uuid = undefined;
@@ -62,6 +64,42 @@ class GameServe
 			this.playerTwo.pos.y = this.board.dim.height / 2;
 			this.playerTwo.racket.defineRacketSize();
 			this.playerTwo.pos.y -= this.playerTwo.racket.dim.height / 2;
+		};
+
+		this.getSeralizable = () =>
+		{
+			console.log("getSeralizable inside  GameServe.ts", {
+				uuid: this.uuid,
+				roomName: this.roomName,
+				frameRate: this.frameRate,
+				frameCount: this.frameCount,
+				playerOne: this.playerOne.getSerializable(),
+				plpayerTwo: this.playerTwo.getSerializable(),
+				board: this.board.getSeralizable(),
+				ball: this.ball.getSeralizable(),
+				net: this.net.getSerializable(),
+				scoreLimit: this.scoreLimit,
+				actionKeyPress: this.actionKeyPress,
+				startDisplayed: this.startDisplayed,
+				continueAnimating: this.continueAnimating,
+				loop: this.loop?.getSerializable(),
+			});
+			return ({
+				uuid: this.uuid,
+				roomName: this.roomName,
+				frameRate: this.frameRate,
+				frameCount: this.frameCount,
+				playerOne: this.playerOne.getSerializable(),
+				plpayerTwo: this.playerTwo.getSerializable(),
+				board: this.board.getSeralizable(),
+				ball: this.ball.getSeralizable(),
+				net: this.net.getSerializable(),
+				scoreLimit: this.scoreLimit,
+				actionKeyPress: this.actionKeyPress,
+				startDisplayed: this.startDisplayed,
+				continueAnimating: this.continueAnimating,
+				loop: this.loop?.getSerializable()
+			});
 		};
 	}
 }

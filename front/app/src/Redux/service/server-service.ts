@@ -32,6 +32,26 @@ const	ServerService = {
 				})
 		);
 	},
+	async	getAuthApiLinks(serverLocation: string)
+	{
+		return (
+			Api(serverLocation)
+				.get("/autLink")
+				.then((res) =>
+				{
+					return ({
+						...res.data,
+						success: true,
+					});
+				})
+				.catch((error: any) =>
+				{
+					return ({
+						success: false
+					});
+				})
+		);
+	},
 	async	register(uuid: string, serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
