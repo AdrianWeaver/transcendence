@@ -146,6 +146,7 @@ const	Signin = () =>
 	{
 		return (state.controller.allUsers);
 	});
+
 	useEffect(() =>
 	{
 		savePrevPage("/signin");
@@ -188,7 +189,8 @@ const	Signin = () =>
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	userLogIn = new UserLogin(data);
-
+		
+		console.log("prev User ", user);
 		userLogIn.check();
 		setErrorValidation(userLogIn.checker);
 		const	asArray = Object.entries(userLogIn.checker.getPlainObject());
@@ -218,6 +220,7 @@ const	Signin = () =>
 				{
 					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
 					dispatch(setProfileMyView());
+					console.log("User is update ? ", user);
 					// dispatch(setUserLoggedIn());
 					// if (user.isLoggedIn)
 					// 	navigate("/");

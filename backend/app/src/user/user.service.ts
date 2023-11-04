@@ -1119,6 +1119,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			};
 			if (ret === undefined)
 				return ("ERROR");
+			this.user[index].authService.token = ret.token;
+			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
 		.catch((err) =>
@@ -1126,6 +1128,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			console.log(err);
 			return ("ERROR");
 		});
+		console.log("valid password ?", valid);
 		return (valid);
 	}
 

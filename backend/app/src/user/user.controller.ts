@@ -619,7 +619,7 @@ export class UserController
 			.log("'decode-password' route requested");
 		const	ret = await this.userService.decodePassword(body.password, body.id, body.email);
 		console.log(ret);
-		if (!ret)
+		if (!ret || ret === "ERROR")
 			return ("error");
 		return (ret);
 	}
