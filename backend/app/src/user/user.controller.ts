@@ -259,10 +259,10 @@ export class UserController
 						password: "undefined",
 						friendsProfileId: []
 					};
-					if (this.userService.getUserById(userObject.id) !== undefined)
+					const userTempCheck: UserModel | undefined = this.userService.getUserById(userObject.id);
+					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
-						// console.log()
 						res.status(400).json({error: "you are already register"});
 					}
 					else

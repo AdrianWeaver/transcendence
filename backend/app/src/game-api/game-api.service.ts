@@ -19,7 +19,7 @@ export class GameApiService
 		return (this.gameService.getInstanceId());
 	}
 
-	public	getGameServiceCopy() :any
+	public	getGameServiceCopy() : any
 	{
 		return (this.gameService.getGameServiceCopy());
 	}
