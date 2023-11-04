@@ -180,4 +180,41 @@ export class	GameService implements OnModuleInit
 	{
 		return (this.gameInstances);
 	}
+
+	public	setGameActiveToFalse(indexInstance: number)
+	{
+		if (indexInstance !== -1 || indexInstance !== undefined)
+		{
+			const instance = this.gameInstances[indexInstance];
+			if (instance && instance.loop)
+				instance.loop.gameActive = false;
+			this.gameInstances[indexInstance] = instance;
+		}
+	}
+
+	public	findIndexGameInstanceWithClientId(clientId: string)
+	{
+		const	index = this.gameInstances.findIndex((instance) =>
+		{
+			return (
+				instance.loop
+				&& (instance.playerOne.socketId === clientId
+				|| instance.playerTwo.socketId === clientId)
+			);
+		});
+		return (index);
+	}
+
+	public	findGameInstanceWithClientId(clientId: string)
+	{
+		return (
+			this.gameInstances.find((instance) =>
+			{
+				return (
+					instance.playerOne.socketId === clientId
+					|| instance.playerTwo.socketId === clientId
+				);
+			})
+		);
+	}
 }

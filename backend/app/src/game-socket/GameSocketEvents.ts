@@ -252,13 +252,12 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
-		for (const instance of this.gameService.getGameInstances())
-		{
-			if (instance.loop && (instance.playerOne.socketId === client.id
-				|| instance.playerTwo.socketId === client.id))
-				instance.loop.gameActive = false;
-		}
+		// set pause if client id is in a game
+		const indexInstance = this.gameService
+				.findIndexGameInstanceWithClientId(client.id);
+		this.gameService.setGameActiveToFalse(indexInstance);
 
+		// remove the user from the list of users
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		if (userIndex !== -1)
 		{
@@ -266,6 +265,7 @@ export class GameSocketEvents
 			this.gameService.decreaseUsers();
 		}
 
+		// remove the user from the list of users ready
 		const	wasReadyIndex = this.gameService
 			.findIndexSocketIdReadyWithSocketId(client.id);
 		if (wasReadyIndex !== -1)
@@ -274,6 +274,7 @@ export class GameSocketEvents
 			this.gameService.decreaseUserReadyNumber();
 		}
 
+		// send the new number of users and users ready
 		const	action = {
 			type: "disconnect",
 			payload: {
@@ -281,12 +282,9 @@ export class GameSocketEvents
 				userReadyCount: this.gameService.getUserReadyNumber()
 			}
 		};
-		for (const instance of this.gameService.getGameInstances())
-		{
-			if (instance.playerOne.socketId === client.id
-				|| instance.playerTwo.socketId === client.id)
-				this.server.to(instance.roomName).emit("player-info", action);
-		}
+		const instance = this.gameService.findGameInstanceWithClientId(client.id);
+		if (instance)
+			this.server.to(instance.roomName).emit("player-info", action);
 	}
 
 	@SubscribeMessage("info")
@@ -295,43 +293,36 @@ export class GameSocketEvents
 		@ConnectedSocket() client: Socket
 	)
 	{
-		for (const instance of this.gameService.getGameInstances())
-		{
-			if (instance.playerOne.socketId === client.id
-				|| instance.playerTwo.socketId === client.id)
+		let		actionType: string;
+		const	instance = this.gameService
+			.getGameInstances()
+			.find((instance) =>
 			{
-				if (data.type === "GET_BOARD_SIZE")
-				{
-					const	action = {
-						type: "serverBoard_info",
-						payload:
+				return (instance.playerOne.socketId === client.id
+					|| instance.playerTwo.socketId === client.id);
+			});
+		if (instance)
+		{
+			if (data.type === "GET_BOARD_SIZE")
+				actionType = "serverBoard_info";
+			else if (data.type === "resize")
+				actionType = "reset_your_scale";
+			else
+				actionType = "";
+			if (actionType !== "")
+			{
+				const	action = {
+					type: actionType,
+					payload:
+					{
+						serverBoardDim:
 						{
-							serverBoardDim:
-							{
-								width: instance.board.dim.width,
-								height: instance.board.dim.height
-							}
+							width: instance.board.dim.width,
+							height: instance.board.dim.height
 						}
-					};
-					client.emit("info", action);
-					return ;
-				}
-				if (data.type === "resize")
-				{
-					const action = {
-						type: "reset_your_scale",
-						payload:
-						{
-							serverBoardDim:
-							{
-								width: instance.board.dim.width,
-								height: instance.board.dim.height
-							}
-						}
-					};
-					client.emit("info", action);
-					return;
-				}
+					}
+				};
+				client.emit("info", action);
 			}
 		}
 	}
