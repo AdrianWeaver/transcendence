@@ -213,12 +213,13 @@ const	controllerSlice = createSlice(
 		},
 		setUserData(state, action: PayloadAction<ControllerModel>)
 		{
-			state.user.id = action.payload.user.id;
-			state.user.email = action.payload.user.email;
-			state.user.bearerToken = action.payload.user.bearerToken;
-			state.user.firstName = action.payload.user.firstName;
-			state.user.lastName = action.payload.user.lastName;
-			state.allUsers = action.payload.allUsers;
+			state.user = action.payload.user;
+			// state.user.id = action.payload.user.id;
+			// state.user.email = action.payload.user.email;
+			// state.user.bearerToken = action.payload.user.bearerToken;
+			// state.user.firstName = action.payload.user.firstName;
+			// state.user.lastName = action.payload.user.lastName;
+			// state.allUsers = action.payload.allUsers;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{

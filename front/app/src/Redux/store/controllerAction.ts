@@ -580,42 +580,42 @@ export const setRegistrationProcessError = (message?: string)
 	})
 }
 
-export const	setUserData = (data: any)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return ((dispatch, getState) =>
-	{
-		const	prev = getState();
+// export const	setUserData = (data: any)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return ((dispatch, getState) =>
+// 	{
+// 		const	prev = getState();
 
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
+// 		const	array: BackUserModel[] = [...prev.controller.allUsers];
 
-		array.forEach((elem) =>
-		{
-			if (elem.id === data.id)
-			{
-				elem.id = data.id;
-				elem.email = data.email;
-				elem.firstName = data.firstName;
-				elem.lastName = data.lastName;
-				elem.username = data.login;
-			}
-		});
-		const	response: ControllerModel = {
-			...prev.controller,
-			allUsers: [...array],
-			user:
-			{
-				...prev.controller.user,
-				id: data.id,
-				email: data.email,
-				bearerToken: data.token,
-				firstName: data.firstName,
-				lastName: data.lastName
-			}
-		}
-		dispatch(controllerActions.setUserData(response));
-	});
-}
+// 		array.forEach((elem) =>
+// 		{
+// 			if (elem.id === data.id)
+// 			{
+// 				elem.id = data.id;
+// 				elem.email = data.email;
+// 				elem.firstName = data.firstName;
+// 				elem.lastName = data.lastName;
+// 				elem.username = data.login;
+// 			}
+// 		});
+// 		const	response: ControllerModel = {
+// 			...prev.controller,
+// 			allUsers: [...array],
+// 			user:
+// 			{
+// 				...prev.controller.user,
+// 				id: data.id,
+// 				email: data.email,
+// 				bearerToken: data.token,
+// 				firstName: data.firstName,
+// 				lastName: data.lastName,
+// 			}
+// 		}
+// 		dispatch(controllerActions.setUserData(response));
+// 	});
+// }
 
 export const	verifyTokenAtRefresh = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -1260,7 +1260,7 @@ export const	decodePassword = (id: any, password: string, email: string)
 				password, id, email,
 				prev.server.serverLocation
 			);
-			// console.log("data: ", data);
+			console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
 			newUser.bearerToken = data.token;
@@ -1270,11 +1270,13 @@ export const	decodePassword = (id: any, password: string, email: string)
 				...prev.controller,
 				user: newUser
 			}
-			dispatch(controllerActions.setNewToken(response));
+			console.log("newUser = ", newUser);
+			dispatch(controllerActions.setUserData(response));
+			// dispatch(controllerActions.setNewToken(response));
 		}
 		catch (error)
 		{
-			dispatch(controllerActions.setNewToken({...prev.controller}))
+			dispatch(controllerActions.setUserData({...prev.controller}))
 			console.log(error);
 			return ;
 		}
