@@ -158,6 +158,10 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.users);
 	});
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 
 	const	numberOfChannels = useAppSelector((state) =>
 	{
@@ -194,7 +198,11 @@ const FriendsList = (props: FriendsListProps) =>
 
 	return (
 		<>
-			<Myself />
+			{
+				(user.ft)
+				? <Myself />
+				: <></>
+			}
 			<Divider />
 			<Grid
 				item xs={12}
