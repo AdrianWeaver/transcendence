@@ -868,6 +868,7 @@ export class ChatSocketEvents
 						friendList: myFriendNameArray,
 						newFriend: friendUser.name,
 						alreadyFriend: message,
+						friendProfileId: friendUser.profileId
 					}
 				};
 				client.emit("user-info", action);

@@ -56,7 +56,8 @@ import {
 	// setKindOfConversation,
 	setNumberOfChannels,
 	connectChatUser,
-	addChatUser
+	addChatUser,
+	addUserAsFriend
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -775,6 +776,7 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
+					dispatch(addUserAsFriend(data.payload.friendProfileId));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
 					alert(alertMessage);
 				}
