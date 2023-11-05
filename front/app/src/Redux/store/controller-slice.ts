@@ -90,7 +90,8 @@ const	initialControllerState: ControllerModel = {
 			myView: false
 		},
 		password: "undefined",
-		location: "undefined"
+		location: "undefined",
+		ft: true
 	},
 	registration:
 	{
@@ -404,6 +405,10 @@ const	controllerSlice = createSlice(
 			state.user.chat.disconnectedUsers = action.payload.user.chat.disconnectedUsers;
 			state.user.chat.connectedUsers = action.payload.user.chat.connectedUsers;
 		},
+		setFt(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.ft = action.payload.user.ft
+		}
 	}
 });
 

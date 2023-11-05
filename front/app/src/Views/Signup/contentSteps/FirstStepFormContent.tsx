@@ -274,9 +274,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			key;
 			return (value === true);
 		});
-		// this is error filter 
-		// console.debug("filtered", filtered);
-		// verifier toute les informations
 		if (filtered.length === 0)
 		{
 			const objToSend = userSignup.getPlainObject();
@@ -293,10 +290,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			.then((response) =>
 			{
 				console.log(response);
-				// // TEST
-				// dispatch(registerInfosInBack(userSignup.username, "username"));
 				dispatch(setPassword(userSignup.password));
-				// dispatch(hashPassword(userSignup.password));
 				dispatch(userRegistrationStepThree());
 			})
 			.catch((error: any) =>

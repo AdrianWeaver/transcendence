@@ -1500,3 +1500,21 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 		dispatch(controllerActions.connectChatUser(response));
 	});
 }
+
+export const	setFt = (isFromFortyTwo: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				ft: isFromFortyTwo
+			}
+		}
+		dispatch(controllerActions.setFt(response));
+	});
+}

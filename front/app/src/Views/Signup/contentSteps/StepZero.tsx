@@ -20,7 +20,7 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setFt, setRegistrationProcessStart,  userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 import { UserModel } from "../../../Redux/models/redux-models";
 import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 
@@ -184,11 +184,18 @@ const	StepZero = () =>
 			);
 	}, [visible]);
 
+	const	handleNoFt = () =>
+	{
+		dispatch(setFt(false));
+		dispatch(userRegistrationStepTwo());
+	}
 	useEffect(() =>
 	{
 		if (step === 0)
 		{
 			setRenderComponent(
+				<>
+				<Button onClick={handleNoFt}>Register without 42</Button>
 				<Card sx={{ m: 5}}>
 					<CardActionArea
 						onClick={openSameTab}
@@ -220,6 +227,7 @@ const	StepZero = () =>
 					{displayRedirect}
 					{alertInfo}
 				</Card>
+				</>
 			);
 		}
 		else
