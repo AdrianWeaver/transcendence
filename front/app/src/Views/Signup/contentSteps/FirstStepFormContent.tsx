@@ -169,6 +169,10 @@ type	FirstStepFormContentProps =
 const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 {
 	const	dispatch = useAppDispatch();
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 
 	const	[
 		firstTriggerPassword,
@@ -276,7 +280,17 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		});
 		if (filtered.length === 0)
 		{
-			const objToSend = userSignup.getPlainObject();
+			const	plainObj = userSignup.getPlainObject();
+			const	objToSend = {
+				username: plainObj.username,
+				firstName: plainObj.firstName,
+				lastName: plainObj.lastName,
+				emailAddress: plainObj.emailAddress,
+				password: plainObj.password,
+				passwordConfirm: plainObj.passwordConfirm,
+				uniquenessPassword: plainObj.uniquenessPassword,
+				ft: user.ft
+			}
 			const	config = {
 				headers: {
 					"Authorization": token
