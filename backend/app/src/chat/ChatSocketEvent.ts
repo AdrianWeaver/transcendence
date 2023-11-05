@@ -731,6 +731,7 @@ export class ChatSocketEvents
 				if (searchUser === undefined)
 					return ;
 				console.log("searchUSER OK");
+				console.log("chanNAme", data.payload.chanName);
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);

@@ -222,7 +222,7 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div key={index} onClick={() =>
+								<div onClick={() =>
 								{
 									// displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
@@ -415,8 +415,22 @@ const	ChatLayout = () =>
 	});
 
 	const [
+		buttonSelectionPriv,
+		setButtonSelectionPriv
+	] = useState<ChanMapModel>({
+		id: 0,
+		name: "",
+		mode: "private",
+	});
+
+	const [
 		inviteDialogOpen,
 		setInviteDialogOpen
+	] = useState(false);
+
+	const [
+		invitePrivDialogOpen,
+		setInvitePrivDialogOpen
 	] = useState(false);
 
 	const [
@@ -972,13 +986,27 @@ const	ChatLayout = () =>
 		setIsDialogOpen
 	] = useState(false);
 
-	const handleDialogOpen = () =>
+	const [
+		isPrivDialogOpen,
+		setIsPrivDialogOpen
+	] = useState(false);
+
+	const handleDialogOpen = (priv: boolean) =>
 	{
-		setIsDialogOpen(true);
+		if (priv)
+			setIsPrivDialogOpen(true);
+		else
+			setIsDialogOpen(true);
 	};
 
 	const handleDialogClose = () =>
 	{
+		setIsPrivDialogOpen(false);
+		setButtonSelectionPriv({
+			id: 0,
+			name: "",
+			mode: "",
+		});
 		setIsDialogOpen(false);
 		setButtonSelection({
 			id: 0,
@@ -989,6 +1017,7 @@ const	ChatLayout = () =>
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
 	{
+		console.log("handle join for priv ?");
 		if (chanMode === "protected")
 		{
 			setJoiningChannelName(chanName);
@@ -1022,6 +1051,7 @@ const	ChatLayout = () =>
 	const handleMembersClickOpen = (chanName: string) =>
 	{
 		console.log("HANDLE MEMBER CLICK OPEN");
+		console.log(chanName);
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1300,7 +1330,7 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
-													handleDialogOpen();
+													handleDialogOpen(false);
 													setButtonSelection(channel);
 												}}>
 													Options
@@ -1529,27 +1559,27 @@ const	ChatLayout = () =>
 												</ListItem>
 												<Button onClick={() =>
 												{
-													handleDialogOpen();
-													setButtonSelection(channel);
+													handleDialogOpen(true);
+													setButtonSelectionPriv(channel);
 												}}>
 													Options
 												</Button>
-												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+												<Dialog open={isPrivDialogOpen} onClose={handleDialogClose}>
 													<DialogTitle>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleRemoveButtonClick(buttonSelectionPriv.id, buttonSelectionPriv.name);
 														}}>
 															Remove
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															return handleMembersClickOpen(buttonSelectionPriv.name);
 														}}>
-															action with user
+															Other options
 														</Button>
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogContent>
@@ -1583,9 +1613,9 @@ const	ChatLayout = () =>
 																					}}>
 																						Invite
 																					</Button>
-																					<Dialog open={inviteDialogOpen} onClose={() =>
+																					<Dialog open={invitePrivDialogOpen} onClose={() =>
 																								{
-																									setInviteDialogOpen(false);
+																									setInvitePrivDialogOpen(false);
 																								}}
 																								maxWidth="sm" fullWidth>
 																						<DialogTitle>Invite User to Channel</DialogTitle>
