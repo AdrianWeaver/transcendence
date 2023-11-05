@@ -723,10 +723,7 @@ const	ChatLayout = () =>
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
-				if (data.payload.talkingUser !== undefined && data.payload.talkingUser !== "")
-				{
-					setTalkingUser(data.payload.talkingUser);
-				}
+				setTalkingUser(data.payload.talkingUser);
 				setIsFriend(data.payload.isFriend);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
