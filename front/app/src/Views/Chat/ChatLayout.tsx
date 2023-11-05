@@ -1036,6 +1036,7 @@ const	ChatLayout = () =>
 
 	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
 	{
+		console.log("HANDLE REMOVE BUTTON CLICK ", chanId, " ", chanName);
 		removeChannel(chanId, chanName);
 		handleDialogClose();
 	};

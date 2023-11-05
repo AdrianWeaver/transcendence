@@ -486,14 +486,20 @@ export class ChatSocketEvents
 			}
 			if (data.type === "destroy-channel")
 			{
-				const	searchChannel = this.chatService.searchChannelByName(data.payload.name);
+				let	searchChannel: Channel | undefined;
+				
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 // do the samed for private msg
 				let isAdmin: boolean;
-				if (searchChannel?.kind === "privateMessage")
+				console.log("DESTROY CHANNEL", data.payload.kind);
+				if (data.payload.kind === "privateMessage")
+				{
+					searchChannel = this.chatService.searchPrivateConvByName(data.payload.name);
 					isAdmin = true;
+				}
 				else
 				{
+					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
 						isAdmin = true;
 					else
@@ -504,22 +510,32 @@ export class ChatSocketEvents
 					msg = "";
 				else if (data.payload.kind === "privateMessage")
 					msg = "privateMessage";
-				const	action = {
-					type: "destroy-channel",
-					payload: {
-						chanMap: this.chatService.getChanMap(),
-						message: msg,
-						privateMessageMap: this.chatService.getPrivateMessageMap()
-					}
-				};
+				let	action;
+				const	priv = msg === "" ? false : true;
 				if (isAdmin === true)
 				{
-					this.chatService.deleteChannel(data.payload.name);
+					this.chatService.deleteChannel(data.payload.name, priv);
 					this.chatService.updateDatabase();
+					action = {
+						type: "destroy-channel",
+						payload: {
+							chanMap: this.chatService.getChanMap(),
+							message: msg,
+							privateMessageMap: this.chatService.getPrivateMessageMap()
+						}
+					};
 					this.server.emit("display-channels", action);
 				}
 				else
 				{
+					action = {
+						type: "destroy-channel",
+						payload: {
+							chanMap: this.chatService.getChanMap(),
+							message: msg,
+							privateMessageMap: this.chatService.getPrivateMessageMap()
+						}
+					};
 					action.payload.message = "You are not the channel's admin !";
 					client.emit("display-channels", action);
 				}

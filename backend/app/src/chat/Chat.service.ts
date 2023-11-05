@@ -594,23 +594,45 @@ export	class ChatService implements OnModuleInit
 		this.searchUserIndex(user.id);
 	}
 
-	public deleteChannel(chanName: string)
+	public deleteChannel(chanName: string, priv: boolean)
 	{
-		const	index = this.chat.channels.findIndex((element) =>
+		if (priv)
 		{
-			return (element.name === chanName);
-		});
-		this.chat.channels.splice(index, 1);
-		let i: number;
-		i = 0;
-		for (const chanMap of this.chat.chanMap)
-		{
-			if (chanMap.name === chanName)
+			const	index = this.chat.privateMessage.findIndex((element) =>
 			{
-				this.chat.chanMap.splice(i, 1);
-				break ;
+				return (element.name === chanName);
+			});
+			this.chat.privateMessage.splice(index, 1);
+			let i: number;
+			i = 0;
+			for (const privMsgMap of this.chat.privateMessageMap)
+			{
+				if (privMsgMap.name === chanName)
+				{
+					this.chat.privateMessageMap.splice(i, 1);
+					break ;
+				}
+				i++;
 			}
-			i++;
+		}
+		else
+		{
+			const	index = this.chat.channels.findIndex((element) =>
+			{
+				return (element.name === chanName);
+			});
+			this.chat.channels.splice(index, 1);
+			let i: number;
+			i = 0;
+			for (const chanMap of this.chat.chanMap)
+			{
+				if (chanMap.name === chanName)
+				{
+					this.chat.chanMap.splice(i, 1);
+					break ;
+				}
+				i++;
+			}
 		}
 	}
 
