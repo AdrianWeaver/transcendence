@@ -287,7 +287,10 @@ const UniqueAlert = (props: UniqueAlertProps) =>
 const	FirstStepFormContentNoData = () =>
 {
 	const	dispatch = useAppDispatch();
-
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	const	[
 		firstTriggerPassword,
 		setPasswordFirstTrigger
@@ -375,6 +378,7 @@ const	FirstStepFormContentNoData = () =>
 		event.preventDefault();
 		setHasError(false);
 		setErrorMessage("");
+		
 		const	data = new FormData(event.currentTarget);
 		const	userSignup = new UserRegistration(data);
 		userSignup.check();
@@ -394,16 +398,23 @@ const	FirstStepFormContentNoData = () =>
 		});
 		if (filtered.length === 0)
 		{
-			const objToSend = userSignup.getPlainObject();
-			const	config = {
-				headers: {
-					"Authorization": token
-				}
-			};
+			const	plainObj = userSignup.getPlainObject();
+			const	profileID = user.id;
+			const	objToSend = {
+				username: plainObj.username,
+				firstName: plainObj.firstName,
+				lastName: plainObj.lastName,
+				emailAddress: plainObj.emailAddress,
+				password: plainObj.password,
+				passwordConfirm: plainObj.passwordConfirm,
+				uniquenessPassword: plainObj.uniquenessPassword,
+				profileID: profileID
+			}
+			console.log("PLAIN OBJ", objToSend);
 			axios
-			.post("http://localhost:3000/user/register/step-one",
+			.post("http://localhost:3000/user/register-forty-three/step-one",
 				objToSend,
-				config
+				{}
 			)
 			.then((response) =>
 			{

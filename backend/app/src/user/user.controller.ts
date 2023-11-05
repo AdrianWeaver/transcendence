@@ -48,6 +48,28 @@ export class	RegisterStepOneDto
 	@IsNotEmpty()
 	username: string;
 }
+export class	RegisterFortyThreeStepOneDto
+{
+	@IsEmail()
+	@IsNotEmpty()
+	emailAddress: string;
+
+	// minmax
+	@IsNotEmpty()
+	firstName: string;
+	@IsNotEmpty()
+	lastName: string;
+	@IsNotEmpty()
+	password: string;
+	@IsNotEmpty()
+	passwordConfirm: string;
+	@IsNotEmpty()
+	uniquenessPassword: "AgreeWithUniquenessOfPassword";
+	@IsNotEmpty()
+	username: string;
+	@IsNotEmpty()
+	profileID: number;
+}
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -156,6 +178,41 @@ export class UserController
 		this.logger.verbose("verification okay");
 		this.logger.debug("Number of user with this username: " + count);
 		const	update = await this.userService.updateUser(user.id, body, true);
+		if (update === "ERROR")
+			return (unauthorized(500, "try again later"), void(0));
+		return (res.status(200).json({message: "okay"}), void(0));
+	}
+
+	@Post("register-forty-three/step-one")
+	async getUserRegisterFortyThreeStepOne(
+		@Body() body: RegisterFortyThreeStepOneDto,
+		@Res() res: Response)
+	{
+		this.logger.verbose("Next information is the previous user");
+
+		const	unauthorized = (errCode: number, info: string) =>
+		{
+			res.status(errCode).json(
+				{
+					message: "Unauthorized",
+					info: info,
+					error: true
+				});
+		};
+		this.logger.verbose("Next information is the updated user");
+		// console.log(body);
+		if (body.password !== body.passwordConfirm)
+			return (unauthorized(401, "You are an hacker go off"), void(0));
+		this.logger.verbose("password okay and are the same");
+		const count = this.userService
+			.getNumberOfUserWithUsername(body.username);
+		if (count > 1)
+			return (unauthorized(401, "Username already taken"), void(0));
+		this.logger.verbose("username count okay");
+		this.logger.verbose("verification okay");
+		this.logger.debug("Number of user with this username: " + count);
+		const	profileId = body.profileID;
+		const	update = await this.userService.updateUser(profileId, body, true);
 		if (update === "ERROR")
 			return (unauthorized(500, "try again later"), void(0));
 		return (res.status(200).json({message: "okay"}), void(0));
@@ -309,6 +366,110 @@ export class UserController
 					error: error
 				});
 			});
+	}
+
+	@Post("register-forty-three")
+	getUserRegisterFortyThree(
+		// @Body() body: RegisterDto,
+		@Res() res: Response)
+	{
+		this.logger.log("A no 42 User want to register");
+		// need to throw 5xx exception
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.FT_UID
+			|| !this.env.parsed.FT_SECRET)
+			throw new InternalServerErrorException();
+		let	retValue;
+		// let	userObject: UserModel;
+		let	profileId: number;
+		profileId = Math.floor((Math.random() * 1000000) + 1);
+		while (!this.userService.isProfileIDUnique(profileId))
+			profileId = Math.floor((Math.random() * 1000000) + 1);
+		const	userObject:UserModel = {
+			registrationProcessEnded: false,
+			ftApi: {
+				accessToken: "undefined",
+				tokenType: "undefined",
+				expiresIn: "undefined",
+				refreshToken: "undefined",
+				scope: "undefined",
+				createdAt: "undefined",
+				secretValidUntil: "undefined"
+			},
+			retStatus: 200,
+			date: "undefined",
+			id: profileId,
+			email: "undefined",
+			username:"undefined",
+			online: false,
+			status: "offline",
+			login: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			url:"undefined",
+			avatar: "https://thispersondoesnotexist.com/",
+			ftAvatar: {
+				link: "https://thispersondoesnotexist.com/",
+				version: {
+					large: "https://thispersondoesnotexist.com/",
+					medium: "https://thispersondoesnotexist.com/",
+					small: "https://thispersondoesnotexist.com/",
+					mini: "https://thispersondoesnotexist.com/"
+				}
+			},
+			location: "outer space",
+			revokedConnectionRequest: false,
+			authService:
+			{
+				token: "",
+				expAt: 0,
+				doubleAuth:
+				{
+					enable: false,
+					lastIpClient: "undefined",
+					phoneNumber: "undefined",
+					phoneRegistered: false,
+					validationCode: "undefined",
+					valid: false,
+				}
+			},
+			password: "undefined",
+			friendsProfileId: []
+		};
+		if (this.userService.getUserById(userObject.id) !== undefined)
+		{
+			this.logger.error("User Already register ");
+			// console.log()
+			res.status(400).json({error: "you are already register"});
+		}
+		else
+		{
+			this.logger.log("Starting register forty three user");
+			// const newUserObj = this.userService.downloadAvatar(userObject);
+			retValue = this.userService.register(userObject);
+			// this.userService.createUserToDatabase(userObject)
+			// .then((data) =>
+			// {
+			// 	if (data === "ERROR")
+			// 	{
+			// 		this.logger.error("Client create a error");
+			// 	}
+			// 	else if (data === "SUCCESS")
+			// 	{
+			// 		this.logger.debug("Client create is a success");
+			// 	}
+			// 	else
+			// 	{
+			// 		this.logger.error("Logic error await/async ");
+			// 	}
+			// });
+			res.status(200).send(retValue.res);
+			// mise a jour vers la database
+			this.logger.log("Ending forty three user processing register");
+		}
 	}
 
 	@Get("all-users")

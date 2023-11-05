@@ -580,42 +580,42 @@ export const setRegistrationProcessError = (message?: string)
 	})
 }
 
-// export const	setUserData = (data: any)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const	prev = getState();
+export const	setUserData = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
 
-// 		const	array: BackUserModel[] = [...prev.controller.allUsers];
-
-// 		array.forEach((elem) =>
-// 		{
-// 			if (elem.id === data.id)
-// 			{
-// 				elem.id = data.id;
-// 				elem.email = data.email;
-// 				elem.firstName = data.firstName;
-// 				elem.lastName = data.lastName;
-// 				elem.username = data.login;
-// 			}
-// 		});
-// 		const	response: ControllerModel = {
-// 			...prev.controller,
-// 			allUsers: [...array],
-// 			user:
-// 			{
-// 				...prev.controller.user,
-// 				id: data.id,
-// 				email: data.email,
-// 				bearerToken: data.token,
-// 				firstName: data.firstName,
-// 				lastName: data.lastName,
-// 			}
-// 		}
-// 		dispatch(controllerActions.setUserData(response));
-// 	});
-// }
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
+		console.log("SET USER DATA", data);
+		array.forEach((elem) =>
+		{
+			if (elem.id === data.id)
+			{
+				elem.id = data.id;
+				elem.email = data.email;
+				elem.firstName = data.firstName;
+				elem.lastName = data.lastName;
+				elem.username = data.login;
+			}
+		});
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: [...array],
+			user:
+			{
+				...prev.controller.user,
+				id: data.id,
+				email: data.email,
+				bearerToken: data.token,
+				firstName: data.firstName,
+				lastName: data.lastName,
+			}
+		}
+		dispatch(controllerActions.setUserData(response));
+	});
+}
 
 export const	verifyTokenAtRefresh = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>

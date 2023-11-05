@@ -20,9 +20,10 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setFt, setRegistrationProcessStart,  userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setFt, setRegistrationProcessStart,  setUserData,  userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 import { UserModel } from "../../../Redux/models/redux-models";
 import { setAuthApiLinks } from "../../../Redux/store/serverAction";
+import axios from "axios";
 
 const	getText = () =>
 {
@@ -187,7 +188,18 @@ const	StepZero = () =>
 	const	handleNoFt = () =>
 	{
 		dispatch(setFt(false));
-		dispatch(userRegistrationStepTwo());
+		axios
+		.post("http://localhost:3000/user/register-forty-three")
+		.then((data) =>
+		{
+			console.log("fortythree data:", data);
+			dispatch(setUserData(data.data));
+			dispatch(userRegistrationStepTwo());
+		})
+		.catch((err) =>
+		{
+			console.error(err);
+		})
 	}
 	useEffect(() =>
 	{
