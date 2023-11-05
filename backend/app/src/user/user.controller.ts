@@ -11,7 +11,7 @@
 
 import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
 import	ApiTwilio from "../Api-twilio";
@@ -47,29 +47,10 @@ export class	RegisterStepOneDto
 	uniquenessPassword: "AgreeWithUniquenessOfPassword";
 	@IsNotEmpty()
 	username: string;
+	@IsBoolean()
+	ft: boolean
 }
-export class	RegisterFortyThreeStepOneDto
-{
-	@IsEmail()
-	@IsNotEmpty()
-	emailAddress: string;
 
-	// minmax
-	@IsNotEmpty()
-	firstName: string;
-	@IsNotEmpty()
-	lastName: string;
-	@IsNotEmpty()
-	password: string;
-	@IsNotEmpty()
-	passwordConfirm: string;
-	@IsNotEmpty()
-	uniquenessPassword: "AgreeWithUniquenessOfPassword";
-	@IsNotEmpty()
-	username: string;
-	@IsNotEmpty()
-	profileID: number;
-}
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -171,48 +152,13 @@ export class UserController
 		this.logger.verbose("username count okay");
 		const user = req.user;
 		console.log(user, " ", body);
-		if (body.emailAddress !== user.email
+		if (body.ft && (body.emailAddress !== user.email
 			|| body.firstName !== user.firstName
-			|| body.lastName !== user.lastName)
+			|| body.lastName !== user.lastName))
 			return (unauthorized(401, "You are an hacker go off"), void(0));
 		this.logger.verbose("verification okay");
 		this.logger.debug("Number of user with this username: " + count);
 		const	update = await this.userService.updateUser(user.id, body, true);
-		if (update === "ERROR")
-			return (unauthorized(500, "try again later"), void(0));
-		return (res.status(200).json({message: "okay"}), void(0));
-	}
-
-	@Post("register-forty-three/step-one")
-	async getUserRegisterFortyThreeStepOne(
-		@Body() body: RegisterFortyThreeStepOneDto,
-		@Res() res: Response)
-	{
-		this.logger.verbose("Next information is the previous user");
-
-		const	unauthorized = (errCode: number, info: string) =>
-		{
-			res.status(errCode).json(
-				{
-					message: "Unauthorized",
-					info: info,
-					error: true
-				});
-		};
-		this.logger.verbose("Next information is the updated user");
-		// console.log(body);
-		if (body.password !== body.passwordConfirm)
-			return (unauthorized(401, "You are an hacker go off"), void(0));
-		this.logger.verbose("password okay and are the same");
-		const count = this.userService
-			.getNumberOfUserWithUsername(body.username);
-		if (count > 1)
-			return (unauthorized(401, "Username already taken"), void(0));
-		this.logger.verbose("username count okay");
-		this.logger.verbose("verification okay");
-		this.logger.debug("Number of user with this username: " + count);
-		const	profileId = body.profileID;
-		const	update = await this.userService.updateUser(profileId, body, true);
 		if (update === "ERROR")
 			return (unauthorized(500, "try again later"), void(0));
 		return (res.status(200).json({message: "okay"}), void(0));

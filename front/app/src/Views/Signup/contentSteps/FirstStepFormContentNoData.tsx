@@ -23,6 +23,7 @@ import {
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
 import axios from "axios";
+import { useWillChange } from "framer-motion";
 
 // type PasswordAlertProps ={
 // 	password: string,
@@ -399,7 +400,6 @@ const	FirstStepFormContentNoData = () =>
 		if (filtered.length === 0)
 		{
 			const	plainObj = userSignup.getPlainObject();
-			const	profileID = user.id;
 			const	objToSend = {
 				username: plainObj.username,
 				firstName: plainObj.firstName,
@@ -408,13 +408,19 @@ const	FirstStepFormContentNoData = () =>
 				password: plainObj.password,
 				passwordConfirm: plainObj.passwordConfirm,
 				uniquenessPassword: plainObj.uniquenessPassword,
-				profileID: profileID
+				ft: user.ft
 			}
+			const	config = {
+				headers: {
+					"Authorization": token
+				}
+			};
 			console.log("PLAIN OBJ", objToSend);
 			axios
-			.post("http://localhost:3000/user/register-forty-three/step-one",
+			// .post("http://localhost:3000/user/register-forty-three/step-one",
+			.post("http://localhost:3000/user/register/step-one",
 				objToSend,
-				{}
+				config
 			)
 			.then((response) =>
 			{
