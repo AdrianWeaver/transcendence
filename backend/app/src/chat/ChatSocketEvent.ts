@@ -764,7 +764,7 @@ export class ChatSocketEvents
 						id: memberList.length + 1,
 						// replace socketId by profileId
 						name: user.profileId,
-						profileId: profId,
+						profileId: user.profileId,
 						userName: userName,
 					};
 					memberList.push(newMember);

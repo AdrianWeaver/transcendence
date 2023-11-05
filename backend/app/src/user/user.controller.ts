@@ -331,9 +331,9 @@ export class UserController
 		let	retValue;
 		// let	userObject: UserModel;
 		let	profileId: number;
-		profileId = Math.floor((Math.random() * 1000000) + 1);
+		profileId = Math.floor((Math.random() * 100000) + 1);
 		while (!this.userService.isProfileIDUnique(profileId))
-			profileId = Math.floor((Math.random() * 1000000) + 1);
+			profileId = Math.floor((Math.random() * 100000) + 1);
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
 			ftApi: {
