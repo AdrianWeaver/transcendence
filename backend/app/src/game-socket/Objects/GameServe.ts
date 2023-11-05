@@ -5,10 +5,11 @@ import Board from "./Board";
 import Ball from "./Ball";
 import Net from "./Net";
 import { NodeAnimationFrame } from "../GameSocketEvents";
+import {v4 as uuidv4 } from "uuid";
 
 class GameServe
 {
-	public uuid: number | undefined;
+	public uuid: string | undefined;
 	public roomName: string;
 	public frameRate: number | undefined;
 	public frameCount: number | undefined;
@@ -26,11 +27,13 @@ class GameServe
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
 
+	public isSocketIdExistGameInstance: (clientId: string) => boolean;
+
 	public getSeralizable: () => any;
 
 	public constructor(roomName: string)
 	{
-		this.uuid = undefined;
+		this.uuid = uuidv4();
 		this.roomName = roomName;
 		this.frameRate = 30;
 		this.frameCount = 0;
@@ -100,6 +103,15 @@ class GameServe
 				continueAnimating: this.continueAnimating,
 				loop: this.loop?.getSerializable()
 			});
+		};
+		this.isSocketIdExistGameInstance = (clientId: string) =>
+		{
+			const	playerOneId = this.playerOne.getPlayerSocketId();
+			const	playerTwoId = this.playerTwo.getPlayerSocketId();
+
+			if (clientId === playerOneId || clientId === playerTwoId)
+				return (true);
+			return (false);
 		};
 	}
 }

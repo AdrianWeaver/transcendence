@@ -21,6 +21,7 @@ class Player
 	public isLeftPlayer: (posX: number, posY: number) => boolean;
 	public isRightPlayer: (posX: number, posY: number) => boolean;
 
+	public getPlayerSocketId: () => string;
 	public getSerializable: () => any;
 
 	public constructor()
@@ -144,6 +145,10 @@ class Player
 				socketId: this.socketId,
 				name: this.name
 			});
+		};
+		this.getPlayerSocketId = () =>
+		{
+			return (this.socketId as string);
 		};
 	}
 }

@@ -7,6 +7,11 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import GameServe from "./Objects/GameServe";
 
+type	MapSocketIdProfileId = {
+	socketId: string
+	profileId: string
+};
+
 @Injectable()
 export class	GameService implements OnModuleInit
 {
@@ -17,9 +22,9 @@ export class	GameService implements OnModuleInit
 	public				totalUsers		: number;
 	public				classicUsers	: number;
 	public				specialUsers	: number;
-	public				socketIdUsers	: Array<string>;
+	public				socketIdUsers	: Array<MapSocketIdProfileId>;
 	public				userReady		: number;
-	public				socketIdReady	: Array<string>;
+	public				socketIdReady	: Array<MapSocketIdProfileId>;
 	public				gameInstances	: Array<GameServe>;
 
 	public constructor()
@@ -107,7 +112,7 @@ export class	GameService implements OnModuleInit
 	{
 		const	searchUser = this.socketIdUsers.find((elem) =>
 		{
-			return (elem === clientId);
+			return (elem.socketId === clientId);
 		});
 		return (searchUser);
 	}
@@ -115,14 +120,18 @@ export class	GameService implements OnModuleInit
 	{
 		const	searchIndex = this.socketIdUsers.findIndex((elem) =>
 		{
-			return (elem === clientId);
+			return (elem.socketId === clientId);
 		});
 		return (searchIndex);
 	}
 
-	public	pushClientIdIntoSocketIdUsers(clientId: string)
+	public	pushClientIdIntoSocketIdUsers(clientId: string, profileId: string)
 	{
-		this.socketIdUsers.push(clientId);
+		const tmp: MapSocketIdProfileId = {
+			socketId: clientId,
+			profileId: profileId
+		};
+		this.socketIdUsers.push(tmp);
 	}
 	public	removeOneSocketIdUserWithIndex(indexToRemove: number)
 	{
@@ -150,7 +159,7 @@ export class	GameService implements OnModuleInit
 	{
 		const elem = this.socketIdReady.find((element) =>
 		{
-			return (element === clientId);
+			return (element.socketId === clientId);
 		});
 		return (elem);
 	}
@@ -159,7 +168,7 @@ export class	GameService implements OnModuleInit
 	{
 		const	index = this.socketIdReady.findIndex((element) =>
 		{
-			return (element === clientId);
+			return (element.socketId === clientId);
 		});
 		return (index);
 	}
@@ -167,9 +176,13 @@ export class	GameService implements OnModuleInit
 	{
 		this.socketIdReady.splice(index, 1);
 	}
-	public	pushClientIdIntoSocketIdReady(clientId: string)
+	public	pushClientIdIntoSocketIdReady(clientId: string, profileId: string)
 	{
-		this.socketIdReady.push(clientId);
+		const	tmp: MapSocketIdProfileId = {
+			profileId: profileId,
+			socketId: clientId,
+		};
+		this.socketIdReady.push(tmp);
 	}
 
 	public	pushGameServeToGameInstance(roomInstance: GameServe)
@@ -214,6 +227,16 @@ export class	GameService implements OnModuleInit
 					instance.playerOne.socketId === clientId
 					|| instance.playerTwo.socketId === clientId
 				);
+			})
+		);
+	}
+
+	public	findProfileIdFromSocketId(clientId: string)
+	{
+		return (
+			this.socketIdUsers.find((elem) =>
+			{
+				return (elem.socketId === clientId);
 			})
 		);
 	}

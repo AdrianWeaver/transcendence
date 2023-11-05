@@ -16,11 +16,12 @@ import
 	WebSocketGateway,
 	WebSocketServer
 } from "@nestjs/websockets";
-
+import * as jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import GameServe from "./Objects/GameServe";
 import { GameService } from "./Game.service";
 import { Logger } from "@nestjs/common";
+import { UserService } from "../user/user.service";
 
 export class	NodeAnimationFrame
 {
@@ -105,10 +106,12 @@ export class GameSocketEvents
 	}
 
 	public	constructor(
-		private readonly gameService: GameService
+		private readonly gameService: GameService,
+		private readonly userService: UserService
 	)
 	{
 		this.logger.error("I am using service game with id: " + this.gameService.getInstanceId());
+		this.logger.error("I am using service user with id: " + this.userService.getUuidInstance());
 		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
@@ -168,85 +171,122 @@ export class GameSocketEvents
 
 	async handleConnection(client: Socket)
 	{
-		let roomName: string;
-		const searchUser = this.gameService
-			.findSocketIdUserByClientId(client.id);
-		if (searchUser === undefined)
+		// console.log("handshake du client:", client.handshake);
+		let	profileId: string;
+		if (client.handshake.auth)
 		{
-			this.gameService.pushClientIdIntoSocketIdUsers(client.id);
-			this.gameService.increaseUsers();
-			this.gameService.increaseTotalUsers();
-			roomName = "room"
-				+ (Math.round(this.gameService.getTotalUsers() / 2)).toString();
-			await client.join(roomName);
-			if (this.gameService.getTotalUsers() % 2 !== 0)
+			const	secret = this.userService.getSecret();
+			const	bearerToken: string = client.handshake.auth.token;
+			const	token = bearerToken.split("Bearer ");
+			if (token.length !== 2)
 			{
-				const newRoom = new GameServe(roomName);
-				newRoom.ball.game = newRoom;
-				newRoom.board.game = newRoom;
-				newRoom.net.game = newRoom;
-				newRoom.playerOne.socketId = client.id;
-				newRoom.board.init();
-				newRoom.loop = new NodeAnimationFrame();
-				newRoom.loop.game = newRoom;
-				newRoom.loop.callbackFunction = this.printPerformance;
-				newRoom.loop.update(performance.now());
-				this.gameService.pushGameServeToGameInstance(newRoom);
+				this.logger.warn("Client try a wrong token");
+				client.disconnect();
+				return ;
+			}
+			try
+			{
+				const	decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
+				profileId = decodedToken.id;
+				console.log(profileId);
+				// const index = this.gameService.find
+			}
+			catch (error)
+			{
+				if (error instanceof jwt.JsonWebTokenError)
+					{
+						this.logger.warn("A client try to connect without authenticate");
+						client.disconnect();
+						return ;
+					}
+					this.logger.error(error);
+					return ;
+			}
+			let roomName: string;
+			const searchUser = this.gameService
+				.findSocketIdUserByClientId(client.id);
+			if (searchUser === undefined)
+			{
+				this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+				this.gameService.increaseUsers();
+				this.gameService.increaseTotalUsers();
+				roomName = "room"
+					+ (Math.round(this.gameService.getTotalUsers() / 2)).toString();
+				await client.join(roomName);
+				if (this.gameService.getTotalUsers() % 2 !== 0)
+				{
+					const newRoom = new GameServe(roomName);
+					newRoom.ball.game = newRoom;
+					newRoom.board.game = newRoom;
+					newRoom.net.game = newRoom;
+					newRoom.playerOne.socketId = client.id;
+					newRoom.board.init();
+					newRoom.loop = new NodeAnimationFrame();
+					newRoom.loop.game = newRoom;
+					newRoom.loop.callbackFunction = this.printPerformance;
+					newRoom.loop.update(performance.now());
+					this.gameService.pushGameServeToGameInstance(newRoom);
+				}
+				else
+				{
+					for (const instance of this.gameService.getGameInstances())
+					{
+						if (instance.roomName === roomName)
+							instance.playerTwo.socketId = client.id;
+					}
+				}
 			}
 			else
 			{
-				for (const instance of this.gameService.getGameInstances())
+				console.log("Something odd happened");
+				return ;
+			}
+
+			const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
+			let	roomSize: number;
+			if (roomInfo)
+				roomSize = roomInfo.size;
+			else
+			{
+				console.log("An error occured due to rooms");
+				return ;
+			}
+			const	userMessage = {
+				type: "",
+				payload: {
+					roomName: roomName,
+					roomSize: roomSize
+				}
+			};
+
+			for (const instance of this.gameService.getGameInstances())
+			{
+				if (instance.roomName === roomName)
 				{
-					if (instance.roomName === roomName)
-						instance.playerTwo.socketId = client.id;
+					if (roomSize === 1)
+						userMessage.type = "player-one";
+					else if (roomSize === 2)
+						userMessage.type = "player-two";
+					else
+						userMessage.type = "visitor";
+					client.emit("init-message", userMessage);
+
+					const	action = {
+						type: "connect",
+						payload: {
+							numberUsers: this.gameService.getUsers(),
+							userReadyCount: this.gameService.getUserReadyNumber(),
+							socketId: client.id,
+						}
+					};
+					this.server.to(roomName).emit("player-info", action);
 				}
 			}
 		}
 		else
 		{
-			console.log("Something odd happened");
-			return ;
-		}
-
-		const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
-		let	roomSize: number;
-		if (roomInfo)
-			roomSize = roomInfo.size;
-		else
-		{
-			console.log("An error occured due to rooms");
-			return ;
-		}
-		const	userMessage = {
-			type: "",
-			payload: {
-				roomName: roomName,
-				roomSize: roomSize
-			}
-		};
-
-		for (const instance of this.gameService.getGameInstances())
-		{
-			if (instance.roomName === roomName)
-			{
-				if (roomSize === 1)
-					userMessage.type = "player-one";
-				else if (roomSize === 2)
-					userMessage.type = "player-two";
-				else
-					userMessage.type = "visitor";
-				client.emit("init-message", userMessage);
-
-				const	action = {
-					type: "connect",
-					payload: {
-						numberUsers: this.gameService.getUsers(),
-						userReadyCount: this.gameService.getUserReadyNumber(),
-						socketId: client.id,
-					}
-				};
-				this.server.to(roomName).emit("player-info", action);
-			}
+			this.logger.warn("A client try to connect without authenticate, kicked");
+			client.disconnect();
 		}
 	}
 
@@ -259,11 +299,11 @@ export class GameSocketEvents
 
 		// remove the user from the list of users
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
-		if (userIndex !== -1)
-		{
-			this.gameService.removeOneSocketIdUserWithIndex(userIndex);
-			this.gameService.decreaseUsers();
-		}
+		// if (userIndex !== -1)
+		// {
+		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
+		this.gameService.decreaseUsers();
+		// }
 
 		// remove the user from the list of users ready
 		const	wasReadyIndex = this.gameService
@@ -359,7 +399,8 @@ export class GameSocketEvents
 			const	search = this.gameService.findSocketIdReadyWithSocketId(client.id);
 			if (search === undefined)
 			{
-				this.gameService.pushClientIdIntoSocketIdReady(client.id);
+				const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId as string;
+				this.gameService.pushClientIdIntoSocketIdReady(client.id, profileId);
 				this.gameService.increaseUserReadyNumber();
 
 				// check and add the user to the ready list
