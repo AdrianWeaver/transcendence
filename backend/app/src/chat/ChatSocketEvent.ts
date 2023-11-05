@@ -506,10 +506,11 @@ export class ChatSocketEvents
 						isAdmin = false;
 				}
 				let	msg;
-				if (data.payload.kind === "channel")
-					msg = "";
-				else if (data.payload.kind === "privateMessage")
-					msg = "privateMessage";
+				msg = "";
+				// if (data.payload.kind === "channel")
+				// 	msg = "";
+				// else if (data.payload.kind === "privateMessage")
+				// 	msg = "privateMessage";
 				let	action;
 				const	priv = msg === "" ? false : true;
 				if (isAdmin === true)
@@ -741,6 +742,7 @@ export class ChatSocketEvents
 				talkingUser = "";
 				conv = false;
 				isFriend = false;
+				let	friendProfId;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				const	searchUser = this.chatService.getUserWithProfileId(profId);
@@ -766,7 +768,7 @@ export class ChatSocketEvents
 					userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 					if (user.profileId !== profId && conv)
 					{
-						
+						friendProfId = user.profileId;
 						talkingUser = userName;
 						console.log("talking yser ???", talkingUser);
 						const	searchFriend = searchUser.friends.find((elem) =>
@@ -794,7 +796,8 @@ export class ChatSocketEvents
 						// uniqueId profId instead of socketId
 						uniqueId: profId,
 						talkingUser: talkingUser,
-						isFriend: isFriend
+						isFriend: isFriend,
+						friendId: friendProfId
 					}
 				};
 				client.emit("channel-info", action);
@@ -810,13 +813,14 @@ export class ChatSocketEvents
 			if (data.type === "add-friend")
 			{
 				this.logger.debug("add friend requested");
-				const	friendUser = this.chatService.getUserBySocketId(data.payload.friendName);
+				const	friendUser = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				console.log("Me ", userMe);
 				console.log("Friend", friendUser);
 
 				if (userMe === undefined || friendUser === undefined)
 					return ;
+				console.log("ADD FRIEND USERME AND FRIENDUSER OK");
 				let message: string;
 				message = "";
 				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
@@ -825,9 +829,11 @@ export class ChatSocketEvents
 				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
 				if (state === "ERROR")
 					return ;
+					console.log("ADD FRIEND Add to my friend OK");
 				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
 				if (state === "ERROR")
 					return ;
+				console.log("ADD FRIEND add me to friends OK");
 				if (state === "ALREADY_FRIENDS")
 					message = friendUser.name + " is already your friend";
 				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
@@ -876,12 +882,16 @@ export class ChatSocketEvents
 				if (userMe === undefined)
 					return ;
 				console.log("id ???", data.payload.blockedName);
+
+				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
+				if (userToBlock === undefined)
+					return ;
 				const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
 				if (profId === "undefined")
 					return ;
 				const blockedToAdd: MemberSocketIdModel = {
 					memberSocketId: data.payload.blockedName,
-					profileId: profId,
+					profileId: data.payload.friendProfileId,
 				};
 				const arrayBlocked: string[] = [];
 				userMe.blocked.forEach((blocked) =>

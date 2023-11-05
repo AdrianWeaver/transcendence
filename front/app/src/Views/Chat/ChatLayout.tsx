@@ -377,6 +377,12 @@ const	ChatLayout = () =>
 
 	const
 	[
+		friendProfileId,
+		setFriendProfileId
+	] = useState("");
+
+	const
+	[
 		isFriend,
 		setIsFriend
 	] = useState(false);
@@ -738,6 +744,7 @@ const	ChatLayout = () =>
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
 				setTalkingUser(data.payload.talkingUser);
+				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
@@ -1098,11 +1105,13 @@ const	ChatLayout = () =>
 
 	const	addUserToFriends = (userName: string) =>
 	{
-		console.log("I START ADDING A FRIEND");
+		console.log("I START ADDING A FRIEND", userName);
+		
 		const	action = {
 			type: "add-friend",
 			payload: {
 				friendName: userName,
+				friendProfileId: friendProfileId
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -1110,10 +1119,12 @@ const	ChatLayout = () =>
 
 	const	addUserToBlocked = (userName: string) =>
 	{
+		console.log("userrname", userName);
 		const	action = {
 			type: "block-user",
 			payload: {
 				blockedName: userName,
+				friendProfileId: friendProfileId,
 			}
 		};
 		socketRef.current.emit("user-info", action);
