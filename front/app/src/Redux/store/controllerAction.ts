@@ -1293,14 +1293,14 @@ export const	decodePassword = (id: any, password: string, email: string)
 	});
 }
 
-export const	addUserAsFriend = (friendId: string)
+export const	addUserAsFriend = (myId: string, friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.serverLocation)
+			friendId, prev.server.serverLocation, myId)
 		.then((data) =>
 		{
 			// console.log("okay", data);
@@ -1442,7 +1442,7 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		
+
 		const	connected = [...prev.controller.user.chat.connectedUsers];
 		const	disconnected = [...prev.controller.user.chat.disconnectedUsers];
 		const	indexConnect = connected.findIndex((elem) =>

@@ -313,7 +313,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	addUserAsFriend(token: string, friendId: string, hostname: string)
+	async	addUserAsFriend(token: string, friendId: string, hostname: string, myId: string)
 	{
 		console.log("Add User as friend");
 		const	config: AxiosRequestConfig = {
@@ -324,7 +324,8 @@ const	UserServices = {
 		};
 
 		const	data = {
-			friendId: friendId
+			friendId: friendId,
+			myId: myId
 		};
 		return (
 			Api(hostname)

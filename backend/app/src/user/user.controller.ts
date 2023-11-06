@@ -48,7 +48,7 @@ export class	RegisterStepOneDto
 	@IsNotEmpty()
 	username: string;
 	@IsBoolean()
-	ft: boolean
+	ft: boolean;
 }
 
 class	RegisterDto
@@ -349,13 +349,13 @@ export class UserController
 			date: "undefined",
 			id: profileId,
 			email: "undefined",
-			username:"undefined",
+			username: "undefined",
 			online: false,
 			status: "offline",
 			login: "undefined",
 			firstName: "undefined",
 			lastName: "undefined",
-			url:"undefined",
+			url: "undefined",
 			avatar: "https://thispersondoesnotexist.com/",
 			ftAvatar: {
 				link: "https://thispersondoesnotexist.com/",
@@ -735,12 +735,11 @@ export class UserController
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
 	AddFriend(
-		@Body() body: any,
-		@Req() req: any)
+		@Body() body: any)
 	{
 		// console
 		this.logger
 			.log("'add-friend' route requested");
-		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
+		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
 }

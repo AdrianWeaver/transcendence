@@ -183,19 +183,6 @@ const FriendsList = (props: FriendsListProps) =>
 		};
 		props.socketRef.current.emit("channel-info", action);
 	};
-	// const displayConversationWindow = (id: string) =>
-	// {
-	// 	console.log("DISPLYA CONVERSATION ?");
-	// 	const action = {
-	// 		type: "display-conversation",
-	// 		payload:
-	// 		{
-	// 			id: id,
-	// 			index: numberOfChannels + 1
-	// 		}
-	// 	};
-	// 	props.socketRef.current?.emit("display-conversation", action);
-	// };
 
 	return (
 		<>
@@ -223,13 +210,10 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div onClick={() =>
+								<div key={index} onClick={() =>
 								{
-									// displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
-									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
-									// console.log("index", elem.avatar);
 								}}>
 									<FriendItem
 										// name={elem.name + ": " + elem.id}
@@ -639,6 +623,22 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
+				if (data.payload.friends !== undefined)
+					setFriendList(data.payload.friends);
+				console.log("friendList update channels", friendList);
+			}
+
+			if (data.type === "sending-list-user")
+			{
+				if (data.payload.friendsList !== undefined)
+					setFriendList(data.payload.friendsList);
+				console.log("sending list user", data.payload, " ", friendList);
+
+				// if (data.payload.privateMessage !== undefined)
+				// 	setPrivateMessage(data.payload.privateMessage);
+				// if (data.payload.friends !== undefined)
+				// 	setFriendList(data.payload.friends);
+				// console.log("friendList update channels", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -692,6 +692,7 @@ const	ChatLayout = () =>
 		const serverInfo = (data: any) =>
 		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
+			setFriendList(data.payload.friendsList);
 			console.log("information from server: ", data);
 			setArrayListUser(data.payload.arrayListUser);
 		};
@@ -776,7 +777,9 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					dispatch(addUserAsFriend(data.payload.friendProfileId));
+					console.log("userInfo FRIENDS LIST", friendList);
+					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
+					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
 					alert(alertMessage);
 				}
@@ -815,6 +818,7 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
+				console.log("repopulate FRIENDS LIST", friendList);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
@@ -1698,7 +1702,7 @@ const	ChatLayout = () =>
 					>
 						<List>
 							{
-								friendList.map((friend: any, index) =>
+								friendList.map((friend: any, index: number) =>
 								{
 									return (
 										<ListItem style={listItemStyle} key={index}>

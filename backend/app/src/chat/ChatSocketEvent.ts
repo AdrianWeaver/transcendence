@@ -27,6 +27,7 @@ import	* as jwt from "jsonwebtoken";
 import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
+import { UserModel } from "src/user/user.interface";
 // import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
@@ -185,6 +186,7 @@ export class ChatSocketEvents
 				{
 					friendsArr.push(friend.name);
 				});
+				console.log("FRIEND ARRAY INIT CHANNELS", friendsArr);
 				const	action = {
 					type: "init-channels",
 					payload: {
@@ -266,7 +268,11 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
+				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				const copyUsers = this.chatService.getAllUsers();
+				const	me = this.chatService.getUserBySocketId(client.id);
+				if (me === undefined)
+					return ;
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
@@ -276,9 +282,16 @@ export class ChatSocketEvents
 				});
 				if (searchUser !== -1)
 					copyUsers.splice(searchUser, 1);
+				const	newArray= [...regularUsers];
+				const	friendsList: string[] = [];
+				me.friends.map((elem) =>
+				{
+					friendsList.push(elem.name);
+				});
+				console.log("friendsList here", friendsList);
 				copyUsers.forEach((elem) =>
 				{
-					regularUsers.map((element) =>
+					newArray.map((element) =>
 					{
 						if (elem.name === element.username)
 						{
@@ -292,6 +305,7 @@ export class ChatSocketEvents
 					payload:
 					{
 						arrayListUsers: copyUsers,
+						friendsList: friendsList,
 						kind: "privateMessage"
 					}
 				};

@@ -1526,14 +1526,14 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	}
 
 	public	isProfileIDUnique(profileID: number | string)
-	 : boolean
+	: boolean
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
 			return (profileID === elem.id);
 		});
 		if (searchUser !== undefined)
-			return (false)
+			return (false);
 		return (true);
 	}
 }

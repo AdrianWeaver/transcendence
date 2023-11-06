@@ -74,7 +74,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-10";
+	private readonly chatID = "id-chat-service-v-11";
 
 	constructor()
 	{
@@ -753,14 +753,13 @@ export	class ChatService implements OnModuleInit
 
 	public getUsernameWithProfileId(profileId: string)
 	{
-		let toReturn: string;
-		toReturn = "undefined";
-		this.chat.users.forEach((user) =>
+		const	ret = this.chat.users.find((user) =>
 		{
-			if (user.profileId === profileId)
-				toReturn = user.name;
+			return (profileId === user.profileId);
 		});
-		return (toReturn);
+		if (ret === undefined)
+			return ("undefined");
+		return (ret.name);
 	}
 
 	public	disconnectUserWithClientId(clientId: string)
