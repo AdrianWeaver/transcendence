@@ -1,3 +1,5 @@
+/* eslint-disable max-depth */
+/* eslint-disable semi */
 /* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -102,14 +104,11 @@ export class ChatSocketEvents
 		handleConnection(client: Socket)
 		{
 			this.chatService.setServer(this.server);
-			// console.log(client.handshake.auth);
-			// if (client.handshake.auth)
 			let profileId: string;
 			if (client.handshake.auth)
 			{
 				const	secret = this.userService.getSecret();
-				const	bearerToken: string = client.handshake.auth.token;
-				// console.log(bearerToken);
+				const	bearerToken: string = client.handshake.auth.token;;
 				const	token = bearerToken.split("Bearer ");
 				if (token.length !== 2)
 				{
@@ -202,10 +201,8 @@ export class ChatSocketEvents
 
 		handleDisconnect(client: Socket)
 		{
-			// console.error(client.);
 			const sockId = client.id;
 			client.disconnect();
-			// this.chatService.disconnectUserWithClientId(sockId);
 			const index = this.chatService.searchUserIndex(sockId);
 			if (index === -1)
 			{
@@ -218,8 +215,6 @@ export class ChatSocketEvents
 				this.logger.error("The user that is started to remove dont exist ???");
 				return ;
 			}
-			// this.chatService.setSocketToUser(index, null);
-			// this.chatService.updateUserSocketInChannels(null);
 			this.chatService.updateMemberSocketId("disconnected", profileId);
 
 			this.chatService.updateChannelsAdminSocketId("disconnected", profileId);
@@ -368,8 +363,6 @@ export class ChatSocketEvents
 						status: data.payload.status,
 						profileId: data.payload.user.id
 					};
-					// console.log("newChatUser back", newChatUser);
-					// console.log("data", data);
 					this.chatService.addNewChatUser(newChatUser, client);
 				}
 				else
@@ -383,8 +376,6 @@ export class ChatSocketEvents
 						status: searchChatUser.status,
 						profileId: searchChatUser.profileId
 					};
-					// console.log("newChatUser back", newChatUser);
-					// console.log("data", data);
 				}
 				const	action = {
 					type: "create-chat-user",
@@ -501,7 +492,7 @@ export class ChatSocketEvents
 			if (data.type === "destroy-channel")
 			{
 				let	searchChannel: Channel | undefined;
-				
+
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 // do the samed for private msg
 				let isAdmin: boolean;
@@ -521,10 +512,6 @@ export class ChatSocketEvents
 				}
 				let	msg;
 				msg = "";
-				// if (data.payload.kind === "channel")
-				// 	msg = "";
-				// else if (data.payload.kind === "privateMessage")
-				// 	msg = "privateMessage";
 				let	action;
 				const	priv = msg === "" ? false : true;
 				if (isAdmin === true)
@@ -543,6 +530,7 @@ export class ChatSocketEvents
 				}
 				else
 				{
+					msg = "You are not the channel's admin !";
 					action = {
 						type: "destroy-channel",
 						payload: {
@@ -551,7 +539,6 @@ export class ChatSocketEvents
 							privateMessageMap: this.chatService.getPrivateMessageMap()
 						}
 					};
-					action.payload.message = "You are not the channel's admin !";
 					client.emit("display-channels", action);
 				}
 			}
@@ -605,7 +592,7 @@ export class ChatSocketEvents
 					searchChannel.members++;
 					const obj: MemberSocketIdModel = {
 						memberSocketId: client.id,
-						profileId: this.chatService.getProfileIdWithUserName(client.id) as string,
+						profileId: this.chatService.getProfileIdFromSocketId(client.id) as string,
 					};
 					searchChannel?.users.push(obj);
 					searchChannel.sockets.push(client);
@@ -775,32 +762,36 @@ export class ChatSocketEvents
 				const	isAdmin = channel.isAdmin(profId);
 				const	memberList: MembersModel[] = [];
 				let userName: string;
+				userName = "";
 				for(const user of channel.users)
 				{
 					console.log("user ", user.profileId);
 					console.log("profID ok", profId);
-					userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
-					if (user.profileId !== profId && conv)
+					if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 					{
-						friendProfId = user.profileId;
-						talkingUser = userName;
-						console.log("talking yser ???", talkingUser);
-						const	searchFriend = searchUser.friends.find((elem) =>
+						console.log("user not undefined", user.profileId);
+						userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+						if (user.profileId !== profId && conv)
 						{
-							return (elem.name === userName);
-						});
-						if (searchFriend !== undefined)
-							isFriend = true;
+							friendProfId = user.profileId;
+							talkingUser = userName;
+							console.log("talking yser ???", talkingUser);
+							const	searchFriend = searchUser.friends.find((elem) =>
+							{
+								return (elem.name === userName);
+							});
+							if (searchFriend !== undefined)
+								isFriend = true
+						}
+						const newMember: MembersModel = {
+							id: memberList.length + 1,
+							// replace socketId by profileId
+							name: user.profileId,
+							profileId: user.profileId,
+							userName: userName,
+						};
+						memberList.push(newMember);
 					}
-					console.log("HERE", talkingUser);
-					const newMember: MembersModel = {
-						id: memberList.length + 1,
-						// replace socketId by profileId
-						name: user.profileId,
-						profileId: user.profileId,
-						userName: userName,
-					};
-					memberList.push(newMember);
 				}
 				const	action = {
 					type: "display-members",
@@ -947,9 +938,26 @@ export class ChatSocketEvents
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
+				console.log("invite-member, channel exists", channel.name);
+				// let	targetClient;
+				console.log("data.payload", data.payload);
+				// if (data.payload.friendSocketId === "undefined" || data.payload.friendSocketId === undefined)
+				// {
+					console.log("-->1");
 				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-				if (targetClient === undefined || targetClient === null)
-					return ;
+					if (targetClient === undefined || targetClient === null)
+						return ;
+					console.log("invite-member, targetClient 1 exists", targetClient.id);
+				// }
+				// else
+				// {
+				// 	console.log("-->2");
+				// 	targetClient = this.chatService.searchUser(data.payload.friendSocketId)?.client;
+				// 	if (targetClient === undefined)
+				// 		return ;
+				// 	// targetClient = data.payload.friendSocketId;
+				// 	console.log("invite-member, targetClient 2 exists", targetClient.id);
+				// }
 				const	action = {
 					type: "invite-member",
 					payload: {
@@ -986,7 +994,7 @@ export class ChatSocketEvents
 					channel.sockets.push(targetClient);
 					const obj: MemberSocketIdModel = {
 						memberSocketId: targetClient.id,
-						profileId: this.chatService.getProfileIdWithUserName(targetClient.id) as string,
+						profileId: this.chatService.getProfileIdFromSocketId(targetClient.id) as string,
 					};
 					channel.users.push(obj);
 
@@ -1008,6 +1016,7 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 				}
+				console.log("invite-member OK", targetClient.id);
 				this.chatService.updateDatabase();
 			}
 

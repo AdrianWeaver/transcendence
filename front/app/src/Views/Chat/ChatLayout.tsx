@@ -522,6 +522,7 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
+		console.log(" Join channel", chanName);
 		const	action = {
 			type: "asked-join",
 			payload: {
@@ -742,6 +743,7 @@ const	ChatLayout = () =>
 			if (data.type === "display-members")
 			{
 				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
@@ -1030,7 +1032,6 @@ const	ChatLayout = () =>
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
 	{
-		console.log("handle join for priv ?");
 		if (chanMode === "protected")
 		{
 			setJoiningChannelName(chanName);
@@ -1112,7 +1113,7 @@ const	ChatLayout = () =>
 	const	addUserToFriends = (userName: string) =>
 	{
 		console.log("I START ADDING A FRIEND", userName);
-		
+
 		const	action = {
 			type: "add-friend",
 			payload: {
@@ -1156,11 +1157,20 @@ const	ChatLayout = () =>
 	{
 		console.log("member: " + userName);
 		console.log("chanel : " + channelToInvite);
+		// let	socketId;
+		// socketId = "undefined";
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (elem.name === userName);
+		});
+		if (searchUser !== undefined)
+			userName = searchUser.id;
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
 				userName: userName,
+				// friendSocketId: socketId
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -1631,9 +1641,9 @@ const	ChatLayout = () =>
 																					}}>
 																						Invite
 																					</Button>
-																					<Dialog open={invitePrivDialogOpen} onClose={() =>
+																					<Dialog open={inviteDialogOpen} onClose={() =>
 																								{
-																									setInvitePrivDialogOpen(false);
+																									setInviteDialogOpen(false);
 																								}}
 																								maxWidth="sm" fullWidth>
 																						<DialogTitle>Invite User to Channel</DialogTitle>
