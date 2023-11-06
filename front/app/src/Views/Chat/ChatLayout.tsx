@@ -61,6 +61,8 @@ import {
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
+import MyProfile from "../MyProfile/MyProfile";
+import { render } from "react-dom";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -352,6 +354,12 @@ const	ChatLayout = () =>
 	const [
 		isChannelAdmin,
 		setIsChannelAdmin
+	] = useState(false);
+
+	const
+	[
+		seeProfile,
+		setSeeProfile
 	] = useState(false);
 
 	const
@@ -949,6 +957,12 @@ const	ChatLayout = () =>
 		setText
 	] = useState("");
 
+	const
+	[
+		talkingUserProfileId,
+		setTalkingUserProfileId
+	] = useState("");
+
 	const handleTextChange = (e: any) =>
 	{
 		if (isMuted === true)
@@ -981,6 +995,19 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
+	};
+
+	const	goToProfilePage = (username: string) =>
+	{
+		console.log("Go to ", username, "'s profile");
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (elem.name === username);
+		});
+		if (searchUser === undefined)
+			return ;
+		setSeeProfile(true);
+		setTalkingUserProfileId(searchUser.profileId);
 	};
 
 	const	leaveChannel = (chanName: string) =>
@@ -1563,6 +1590,10 @@ const	ChatLayout = () =>
 									{
 										return (
 											<>
+												{/* {(seeProfile)}
+												? <MyProfile
+													profileId={talkingUserProfileId} />
+												: <> */}
 												<ListItem style={listItemStyle} key={channel.id}>
 													<ListItemText
 														style={
@@ -1624,12 +1655,20 @@ const	ChatLayout = () =>
 																					}
 																					<Button onClick={() =>
 																					{
+																						goToProfilePage(talkingUser);
+																					}}>
+																						see profile page
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setSeeProfile(false);
 																						addUserToBlocked(talkingUser);
 																					}}>
 																						Block
 																					</Button>
 																					<Button onClick={() =>
 																					{
+																						setSeeProfile(false);
 																						setInviteDialogOpen(true);
 																					}}>
 																						Invite
@@ -1648,6 +1687,7 @@ const	ChatLayout = () =>
 																							value={channelToInvite}
 																							onChange={(e) =>
 																							{
+																								setSeeProfile(false);
 																								console.log("target value " + e.target.value);
 																								setChannelToInvite(e.target.value);
 																							}}/>
@@ -1655,6 +1695,7 @@ const	ChatLayout = () =>
 																						<DialogActions>
 																							<Button onClick={() =>
 																								{
+																									setSeeProfile(false);
 																									inviteUserToChannel(talkingUser);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
@@ -1662,6 +1703,7 @@ const	ChatLayout = () =>
 																							</Button>
 																							<Button onClick={() =>
 																							{
+																								setSeeProfile(false);
 																								setInviteDialogOpen(false);
 																							}} color="primary">
 																							Cancel
@@ -1689,6 +1731,7 @@ const	ChatLayout = () =>
 															</Button>
 														</DialogActions>
 													</Dialog>
+													{/* </> */}
 												</>
 											);
 										})

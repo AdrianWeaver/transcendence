@@ -33,7 +33,14 @@ type FriendsMapModel = {
 	blocked: boolean
 };
 
-const	MyProfile = () =>
+type	MyProfileProps =
+{
+	profileId: string,
+	// myView: boolean,
+	// friendView: boolean
+}
+
+const	MyProfile = (props: MyProfileProps) =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
