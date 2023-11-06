@@ -199,15 +199,16 @@ const	StepZero = () =>
 		.catch((err) =>
 		{
 			console.error(err);
-		})
-	}
+		});
+	};
 	useEffect(() =>
 	{
 		if (step === 0)
 		{
 			setRenderComponent(
 				<>
-				<Button onClick={handleNoFt}>Register without 42</Button>
+				{/* ONLY TO HELP TEST FROM HOME */}
+				{/* <Button onClick={handleNoFt}>Register without 42</Button> */}
 				<Card sx={{ m: 5}}>
 					<CardActionArea
 						onClick={openSameTab}
