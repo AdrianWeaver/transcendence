@@ -1524,7 +1524,6 @@ const	ChatLayout = () =>
 																					<Button onClick={() =>
 																					{
 																						setInviteDialogOpen(true);
-																						// inviteUserToChannel(member.name);
 																					}}>
 																						Invite
 																					</Button>
