@@ -23,6 +23,7 @@ class GameServe
 	public startDisplayed: boolean;
 	public continueAnimating: boolean;
 	public loop: NodeAnimationFrame | undefined;
+	public	countUser: number;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
@@ -47,6 +48,7 @@ class GameServe
 		this.startDisplayed = true;
 		this.continueAnimating = true;
 		this.loop = undefined;
+		this.countUser = 0;
 
 		this.initPlayers = () =>
 		{
@@ -93,7 +95,7 @@ class GameServe
 				frameRate: this.frameRate,
 				frameCount: this.frameCount,
 				playerOne: this.playerOne.getSerializable(),
-				plpayerTwo: this.playerTwo.getSerializable(),
+				playerTwo: this.playerTwo.getSerializable(),
 				board: this.board.getSeralizable(),
 				ball: this.ball.getSeralizable(),
 				net: this.net.getSerializable(),
@@ -101,7 +103,8 @@ class GameServe
 				actionKeyPress: this.actionKeyPress,
 				startDisplayed: this.startDisplayed,
 				continueAnimating: this.continueAnimating,
-				loop: this.loop?.getSerializable()
+				loop: this.loop?.getSerializable(),
+				countUser: this.countUser
 			});
 		};
 		this.isSocketIdExistGameInstance = (clientId: string) =>

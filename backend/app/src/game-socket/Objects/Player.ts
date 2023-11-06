@@ -7,22 +7,23 @@ import Racket from "./Racket";
 
 class Player
 {
-	public pos: Position;
-	public racket: Racket;
-	public score: number;
-	public game: Game | undefined;
-	public side: string | undefined;
-	public uuid: number | undefined;
-	public socketId: string | undefined;
-	public name: string | undefined;
-	public render: () => void;
-	public renderScore: () => void;
-	public updatePlayerPosition: () => void;
-	public isLeftPlayer: (posX: number, posY: number) => boolean;
-	public isRightPlayer: (posX: number, posY: number) => boolean;
+	public	pos: Position;
+	public	racket: Racket;
+	public	score: number;
+	public	game: Game | undefined;
+	public	side: string | undefined;
+	public	uuid: number | undefined;
+	public	socketId: string | undefined;
+	public	name: string | undefined;
+	public	profileId: string | undefined;
+	public	render: () => void;
+	public	renderScore: () => void;
+	public	updatePlayerPosition: () => void;
+	public	isLeftPlayer: (posX: number, posY: number) => boolean;
+	public	isRightPlayer: (posX: number, posY: number) => boolean;
 
-	public getPlayerSocketId: () => string;
-	public getSerializable: () => any;
+	public	getPlayerSocketId: () => string;
+	public	getSerializable: () => any;
 
 	public constructor()
 	{
@@ -34,6 +35,7 @@ class Player
 		this.uuid = undefined;
 		this.socketId = undefined;
 		this.name = undefined;
+		this.profileId = "undefined";
 		this.render = () =>
 		{
 			if (this.game && this.game.board.ctx)
@@ -143,6 +145,7 @@ class Player
 				side: this.side,
 				uuid: this.uuid,
 				socketId: this.socketId,
+				profileId: this.profileId,
 				name: this.name
 			});
 		};

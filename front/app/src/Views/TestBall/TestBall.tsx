@@ -25,7 +25,15 @@ import {
 	setScaleServer,
 	setServerDimension
 } from "../../Redux/store/gameEngineAction";
-import { Backdrop, Alert, Typography, Card, Box, CardContent, IconButton } from "@mui/material";
+import {
+	Backdrop,
+	Alert,
+	Typography,
+	Card,
+	Box,
+	CardContent,
+	IconButton
+} from "@mui/material";
 import { useTheme } from "@emotion/react";
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import CardMedia from "@mui/material/CardMedia";
@@ -39,7 +47,7 @@ type	ActionSocket = {
 const	WaitingActive = () =>
 {
 	// use proper condition to set as false for start game
-	const	devTestValue = true;
+	const	devTestValue = false;
 
 	const theme = useTheme();
 

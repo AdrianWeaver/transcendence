@@ -18,6 +18,7 @@ export class	GameService implements OnModuleInit
 	private readonly	logger = new Logger("instance game service itself");
 	private	readonly	instanceId = uuidv4();
 
+	public				roomCount		: number;
 	public				users			: number;
 	public				totalUsers		: number;
 	public				classicUsers	: number;
@@ -30,6 +31,7 @@ export class	GameService implements OnModuleInit
 	public constructor()
 	{
 		this.logger.error("Service constructed with ID: " + this.instanceId);
+		this.roomCount = 0;
 		this.users = 0;
 		this.totalUsers = 0;
 
@@ -61,6 +63,7 @@ export class	GameService implements OnModuleInit
 		});
 		console.log("Serialized data : ", gameInstanceSerialized);
 		return ({
+			roomCount: this.roomCount,
 			instanceId: this.instanceId,
 			users: this.users,
 			totalUsers: this.totalUsers,
@@ -71,6 +74,15 @@ export class	GameService implements OnModuleInit
 			socketIdReady: this.socketIdReady,
 			gameInstances: gameInstanceSerialized,
 		});
+	}
+
+	public	increaseRoomCount()
+	{
+		this.roomCount += 1;
+	}
+	public	getRoomCount()
+	{
+		return (this.roomCount);
 	}
 
 	// getter and setter
@@ -123,6 +135,15 @@ export class	GameService implements OnModuleInit
 			return (elem.socketId === clientId);
 		});
 		return (searchIndex);
+	}
+	public findIndexSocketIdUserByProfileId(profileId: string)
+	{
+		return (
+			this.socketIdUsers.findIndex((elem) =>
+			{
+				return (elem.profileId === profileId);
+			})
+		);
 	}
 
 	public	pushClientIdIntoSocketIdUsers(clientId: string, profileId: string)
@@ -193,6 +214,15 @@ export class	GameService implements OnModuleInit
 	{
 		return (this.gameInstances);
 	}
+	public	findIndexGameInstanceByRoomName(roomName: string)
+	{
+		return (
+			this.gameInstances.findIndex((elem) =>
+			{
+				return (elem.roomName === roomName);
+			})
+		);
+	}
 
 	public	setGameActiveToFalse(indexInstance: number)
 	{
@@ -237,6 +267,37 @@ export class	GameService implements OnModuleInit
 			this.socketIdUsers.find((elem) =>
 			{
 				return (elem.socketId === clientId);
+			})
+		);
+	}
+
+	public	isProfileIdUserOne(idGameInstance: number, profileId: string)
+	{
+		if (idGameInstance === -1)
+			return (false);
+		return (
+			this.gameInstances[idGameInstance]
+				.playerOne.profileId === profileId
+		);
+	}
+
+	public	isProfileIdUserTwo(idGameInstance: number, profileId: string)
+	{
+		if (idGameInstance === -1)
+			return (false);
+		return (
+			this.gameInstances[idGameInstance]
+				.playerTwo.profileId === profileId
+		);
+	}
+
+	// ONLY WITH PLAYER TWO
+	public	findIndexGameInstanceAlonePlayer()
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (instance.playerTwo.profileId === "undefined");
 			})
 		);
 	}

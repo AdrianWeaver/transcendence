@@ -22,6 +22,7 @@ import GameServe from "./Objects/GameServe";
 import { GameService } from "./Game.service";
 import { Logger } from "@nestjs/common";
 import { UserService } from "../user/user.service";
+import { disconnect } from "process";
 
 export class	NodeAnimationFrame
 {
@@ -178,6 +179,7 @@ export class GameSocketEvents
 			const	secret = this.userService.getSecret();
 			const	bearerToken: string = client.handshake.auth.token;
 			const	token = bearerToken.split("Bearer ");
+			let	roomName: string;
 			if (token.length !== 2)
 			{
 				this.logger.warn("Client try a wrong token");
@@ -189,7 +191,136 @@ export class GameSocketEvents
 				const	decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 				profileId = decodedToken.id;
 				console.log(profileId);
-				// const index = this.gameService.find
+				this.logger.verbose("Searching user inside a game instance, profileId :" + profileId);
+				this.logger.verbose("Number of game instance: " + this.gameService.gameInstances.length);
+				const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
+				{
+					return (
+						instance.playerOne.profileId === profileId
+						|| instance.playerTwo.profileId === profileId
+					);
+				});
+				const	indexSocketId = this.gameService.findIndexSocketIdUserByProfileId(profileId);
+				if (indexSocketId === -1)
+					this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+				else
+					this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+				if (indexGameInstance === -1)
+				{
+					this.logger.verbose("The User has no game started");
+					this.logger.verbose("Selecting a game that have user alone");
+					// this method check player two if undefined in one game.
+					const	indexGamePlayerAlone = this.gameService.findIndexGameInstanceAlonePlayer();
+					if (indexGamePlayerAlone === -1)
+					{
+						this.logger.verbose("There are  no player alone");
+						this.gameService.increaseRoomCount();
+						roomName = "room"
+							+ this.gameService.getRoomCount().toString();
+						await client.join(roomName);
+						const newRoom = new GameServe(roomName);
+						newRoom.ball.game = newRoom;
+						newRoom.board.game = newRoom;
+						newRoom.net.game = newRoom;
+						newRoom.playerOne.socketId = client.id;
+						newRoom.playerOne.profileId = profileId;
+						newRoom.board.init();
+						newRoom.loop = new NodeAnimationFrame();
+						newRoom.loop.game = newRoom;
+						newRoom.loop.callbackFunction = this.printPerformance;
+						newRoom.loop.update(performance.now());
+						this.gameService.pushGameServeToGameInstance(newRoom);
+						this.logger.verbose("User is created as player One");
+					}
+					else
+					{
+						this.logger.verbose("We have a player one alone");
+						this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.socketId = client.id;
+						this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.profileId = profileId;
+						this.logger.verbose("User is created as player Two");
+						roomName = this.gameService.gameInstances[indexGamePlayerAlone].roomName;
+						await client.join(roomName);
+					}
+				}
+				else
+				{
+					this.logger.verbose("A game is already played by this user but socket different");
+					this.logger.verbose("Determine if user One Or user Two");
+
+					const	isplayerOne = this.gameService
+						.isProfileIdUserOne(indexGameInstance, profileId);
+					const	isplayerTwo = this.gameService
+						.isProfileIdUserTwo(indexGameInstance, profileId);
+					this.logger.verbose("The profile is player one : " + isplayerOne);
+					this.logger.verbose("The profile is player Two : " + isplayerTwo);
+					if (isplayerOne)
+					{
+						// check if user has many socket at same time
+						if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+						{
+							this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
+							this.gameService.gameInstances[indexGameInstance].playerOne.profileId = profileId;
+						}
+						else
+						{
+							this.logger.warn("User try a  random game with same profileId, disconnected");
+							client.disconnect();
+							return ;
+						}
+					}
+					else if (isplayerTwo)
+					{
+						if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+						{
+							this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
+							this.gameService.gameInstances[indexGameInstance].playerTwo.profileId = profileId;
+						}
+						else
+						{
+							this.logger.warn("User try a  random game with same profileId, disconnected");
+							client.disconnect();
+							return ;
+						}
+					}
+					else
+						this.logger.error("See this error: user already played");
+					roomName = this.gameService.gameInstances[indexGameInstance].roomName;
+					await client.join(roomName);
+				}
+				this.gameService.increaseUsers();
+				this.gameService.increaseTotalUsers();
+				const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
+				console.log("Room infos", roomInfo);
+				let	roomSize: number;
+				if (roomInfo)
+					roomSize = roomInfo.size;
+				else
+				{
+					console.log("An error occured due to rooms");
+					return ;
+				}
+				const	userMessage = {
+					type: "",
+					payload: {
+						roomName: roomName,
+						roomSize: roomSize
+					}
+				};
+				const	indexInstance = this.gameService.findIndexGameInstanceByRoomName(roomName);
+				if (this.gameService.isProfileIdUserOne(indexInstance, profileId))
+					userMessage.type = "player-one";
+				else
+					userMessage.type = "player-two";
+				client.emit("init-message", userMessage);
+				const	action = {
+					type: "connect",
+					payload: {
+						numberUsers: this.gameService.getUsers(),
+						userReadyCount: this.gameService.getUserReadyNumber(),
+						socketId: client.id,
+					}
+				};
+				this.server.to(roomName).emit("player-info", action);
 			}
 			catch (error)
 			{
@@ -202,86 +333,6 @@ export class GameSocketEvents
 					this.logger.error(error);
 					return ;
 			}
-			let roomName: string;
-			const searchUser = this.gameService
-				.findSocketIdUserByClientId(client.id);
-			if (searchUser === undefined)
-			{
-				this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
-				this.gameService.increaseUsers();
-				this.gameService.increaseTotalUsers();
-				roomName = "room"
-					+ (Math.round(this.gameService.getTotalUsers() / 2)).toString();
-				await client.join(roomName);
-				if (this.gameService.getTotalUsers() % 2 !== 0)
-				{
-					const newRoom = new GameServe(roomName);
-					newRoom.ball.game = newRoom;
-					newRoom.board.game = newRoom;
-					newRoom.net.game = newRoom;
-					newRoom.playerOne.socketId = client.id;
-					newRoom.board.init();
-					newRoom.loop = new NodeAnimationFrame();
-					newRoom.loop.game = newRoom;
-					newRoom.loop.callbackFunction = this.printPerformance;
-					newRoom.loop.update(performance.now());
-					this.gameService.pushGameServeToGameInstance(newRoom);
-				}
-				else
-				{
-					for (const instance of this.gameService.getGameInstances())
-					{
-						if (instance.roomName === roomName)
-							instance.playerTwo.socketId = client.id;
-					}
-				}
-			}
-			else
-			{
-				console.log("Something odd happened");
-				return ;
-			}
-
-			const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
-			let	roomSize: number;
-			if (roomInfo)
-				roomSize = roomInfo.size;
-			else
-			{
-				console.log("An error occured due to rooms");
-				return ;
-			}
-			const	userMessage = {
-				type: "",
-				payload: {
-					roomName: roomName,
-					roomSize: roomSize
-				}
-			};
-
-			for (const instance of this.gameService.getGameInstances())
-			{
-				if (instance.roomName === roomName)
-				{
-					if (roomSize === 1)
-						userMessage.type = "player-one";
-					else if (roomSize === 2)
-						userMessage.type = "player-two";
-					else
-						userMessage.type = "visitor";
-					client.emit("init-message", userMessage);
-
-					const	action = {
-						type: "connect",
-						payload: {
-							numberUsers: this.gameService.getUsers(),
-							userReadyCount: this.gameService.getUserReadyNumber(),
-							socketId: client.id,
-						}
-					};
-					this.server.to(roomName).emit("player-info", action);
-				}
-			}
 		}
 		else
 		{
@@ -293,17 +344,22 @@ export class GameSocketEvents
 	handleDisconnect(client: Socket)
 	{
 		// set pause if client id is in a game
-		const indexInstance = this.gameService
-				.findIndexGameInstanceWithClientId(client.id);
+		const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId;
+		if (profileId === undefined)
+			this.logger.error("Profile id not found");
+		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
+		if (indexInstance === -1)
+			this.logger.error("game instance not fouded for disconnect user");
+		if (this.gameService.isProfileIdUserOne(indexInstance, profileId as string))
+			this.gameService.gameInstances[indexInstance].playerOne.socketId = "disconnected";
+		if (this.gameService.isProfileIdUserTwo(indexInstance, profileId as string))
+			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
 		this.gameService.setGameActiveToFalse(indexInstance);
 
 		// remove the user from the list of users
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
-		// if (userIndex !== -1)
-		// {
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		this.gameService.decreaseUsers();
-		// }
 
 		// remove the user from the list of users ready
 		const	wasReadyIndex = this.gameService
