@@ -78,6 +78,21 @@ export interface UserDBModel
 	friendsProfileId: Array<string>;
 }
 
+export interface HistoryModel
+{
+	timestamp: string;
+	playerOne:
+	{
+		id: string;
+		score: number;
+	};
+	playerTwo:
+	{
+		id: string;
+		score: number;
+	};
+}
+
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;

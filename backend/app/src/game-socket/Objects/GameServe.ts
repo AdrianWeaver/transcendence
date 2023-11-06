@@ -44,7 +44,7 @@ class GameServe
 		this.ball = new Ball();
 		this.net = new Net();
 		this.actionKeyPress = -1;
-		this.scoreLimit = 7;
+		this.scoreLimit = 2;
 		this.startDisplayed = true;
 		this.continueAnimating = true;
 		this.loop = undefined;

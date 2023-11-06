@@ -62,7 +62,9 @@ export class	NodeAnimationFrame
 			if (this.game)
 				this.callbackFunction(timestamp, this.frameNumber, this.game);
 			if (this.gameActive === true)
+			{
 				this.frameNumber++;
+			}
 			this.requestFrame(this.update);
 		};
 		this.getSerializable = () =>
@@ -71,6 +73,8 @@ export class	NodeAnimationFrame
 				frameRate: this.frameRate,
 				frameNumber: this.frameNumber,
 				gameActive: this.gameActive,
+				// playerOne: this.game?.playerOne.getSerializable(),
+				// playerTwo: this.game?.playerTwo.getSerializable()
 				// game: this.game
 			});
 		};
@@ -127,6 +131,17 @@ export class GameSocketEvents
 			if (instance.loop && instance.loop.gameActive === false)
 				return ;
 			this.update(instance);
+
+			const	scorePlayerOne = instance.playerOne.score;
+			const	scorePlayerTwo = instance.playerTwo.score;
+			if (scorePlayerOne === instance.scoreLimit)
+			{
+				console.log("User one has won ");
+			}
+			if (scorePlayerTwo === instance.scoreLimit)
+			{
+				console.log("User two has won");
+			}
 			const action = {
 				type: "game-data",
 				payload:
