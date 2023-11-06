@@ -1157,17 +1157,21 @@ const	ChatLayout = () =>
 	{
 		console.log("member: " + profileId);
 		console.log("channel : " + channelToInvite);
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (profileId === elem.id);
+		});
+		if (searchUser)
+			profileId = searchUser.profileId;
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
 				userName: profileId,
-				// friendSocketId: socketId
 			}
 		};
 		console.log("Action : invite", action);
 		socketRef.current.emit("user-info", action);
-		// setChannelToInvite("");
 	};
 
 	// END OF INVITE
