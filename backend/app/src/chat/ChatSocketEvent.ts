@@ -937,27 +937,20 @@ export class ChatSocketEvents
 			{
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
+				{
+					this.logger.error("Channel is undefined ");
 					return ;
+				}
 				console.log("invite-member, channel exists", channel.name);
-				// let	targetClient;
 				console.log("data.payload", data.payload);
-				// if (data.payload.friendSocketId === "undefined" || data.payload.friendSocketId === undefined)
-				// {
-					console.log("-->1");
-				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
-					if (targetClient === undefined || targetClient === null)
+				const	searchUser = this.chatService.getUserWithProfileId(data.payload.userName);
+				console.log("invite-member, searchUser 0 exists", searchUser);
+				if (searchUser === undefined)
 						return ;
-					console.log("invite-member, targetClient 1 exists", targetClient.id);
-				// }
-				// else
-				// {
-				// 	console.log("-->2");
-				// 	targetClient = this.chatService.searchUser(data.payload.friendSocketId)?.client;
-				// 	if (targetClient === undefined)
-				// 		return ;
-				// 	// targetClient = data.payload.friendSocketId;
-				// 	console.log("invite-member, targetClient 2 exists", targetClient.id);
-				// }
+				const	targetClient = searchUser?.client;
+				if (targetClient === undefined || targetClient === null)
+					return ;
+				console.log("invite-member, targetClient 2 exists", targetClient.id);
 				const	action = {
 					type: "invite-member",
 					payload: {

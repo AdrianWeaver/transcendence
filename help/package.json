@@ -6,7 +6,8 @@
 	{
 		"dev": "cd ../ && docker compose down --timeout 0 && docker compose up --build",
 		"dev:splitted": "cd ../ && docker compose down --timeout 0 && docker compose up --build -d && (gnome-terminal --title='Front Logs' -x bash -c \"docker logs -f front && exit\" & gnome-terminal --title='Backend Logs' -x bash -c \"docker logs -f backend && exit\" & gnome-terminal --title='Postgers Logs' -x bash -c \"docker logs -f postgres && exit\" & gnome-terminal --title='[MONITOR] Board Control' -x bash -c \"cd ./help && cat ./logo.localghost ;read -p '\n' && npm stop\")",
-		"stop": "cd ../ && docker compose down --timeout 0 && docker c",
+		"stop": "cd ../ && docker compose down --timeout 0",
+		"stop:no-persist": "cd ../ && docker compose down --timeout 0 && docker volume rm postgres",
 		"help": "bash ./color.sh | less ",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
