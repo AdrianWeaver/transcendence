@@ -580,42 +580,42 @@ export const setRegistrationProcessError = (message?: string)
 	})
 }
 
-// export const	setUserData = (data: any)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return ((dispatch, getState) =>
-// 	{
-// 		const	prev = getState();
+export const	setUserData = (data: any)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
 
-// 		const	array: BackUserModel[] = [...prev.controller.allUsers];
-
-// 		array.forEach((elem) =>
-// 		{
-// 			if (elem.id === data.id)
-// 			{
-// 				elem.id = data.id;
-// 				elem.email = data.email;
-// 				elem.firstName = data.firstName;
-// 				elem.lastName = data.lastName;
-// 				elem.username = data.login;
-// 			}
-// 		});
-// 		const	response: ControllerModel = {
-// 			...prev.controller,
-// 			allUsers: [...array],
-// 			user:
-// 			{
-// 				...prev.controller.user,
-// 				id: data.id,
-// 				email: data.email,
-// 				bearerToken: data.token,
-// 				firstName: data.firstName,
-// 				lastName: data.lastName,
-// 			}
-// 		}
-// 		dispatch(controllerActions.setUserData(response));
-// 	});
-// }
+		const	array: BackUserModel[] = [...prev.controller.allUsers];
+		console.log("SET USER DATA", data);
+		array.forEach((elem) =>
+		{
+			if (elem.id === data.id)
+			{
+				elem.id = data.id;
+				elem.email = data.email;
+				elem.firstName = data.firstName;
+				elem.lastName = data.lastName;
+				elem.username = data.login;
+			}
+		});
+		const	response: ControllerModel = {
+			...prev.controller,
+			allUsers: [...array],
+			user:
+			{
+				...prev.controller.user,
+				id: data.id,
+				email: data.email,
+				bearerToken: data.token,
+				firstName: data.firstName,
+				lastName: data.lastName,
+			}
+		}
+		dispatch(controllerActions.setUserData(response));
+	});
+}
 
 export const	verifyTokenAtRefresh = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -1293,14 +1293,14 @@ export const	decodePassword = (id: any, password: string, email: string)
 	});
 }
 
-export const	addUserAsFriend = (friendId: string)
+export const	addUserAsFriend = (myId: string, friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.serverLocation)
+			friendId, prev.server.serverLocation, myId)
 		.then((data) =>
 		{
 			// console.log("okay", data);
@@ -1442,7 +1442,7 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		
+
 		const	connected = [...prev.controller.user.chat.connectedUsers];
 		const	disconnected = [...prev.controller.user.chat.disconnectedUsers];
 		const	indexConnect = connected.findIndex((elem) =>
@@ -1498,5 +1498,23 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 			}
 		}
 		dispatch(controllerActions.connectChatUser(response));
+	});
+}
+
+export const	setFt = (isFromFortyTwo: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				ft: isFromFortyTwo
+			}
+		}
+		dispatch(controllerActions.setFt(response));
 	});
 }

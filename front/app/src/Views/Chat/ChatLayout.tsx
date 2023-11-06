@@ -56,7 +56,8 @@ import {
 	// setKindOfConversation,
 	setNumberOfChannels,
 	connectChatUser,
-	addChatUser
+	addChatUser,
+	addUserAsFriend
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -158,6 +159,10 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.users);
 	});
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 
 	const	numberOfChannels = useAppSelector((state) =>
 	{
@@ -178,23 +183,14 @@ const FriendsList = (props: FriendsListProps) =>
 		};
 		props.socketRef.current.emit("channel-info", action);
 	};
-	// const displayConversationWindow = (id: string) =>
-	// {
-	// 	console.log("DISPLYA CONVERSATION ?");
-	// 	const action = {
-	// 		type: "display-conversation",
-	// 		payload:
-	// 		{
-	// 			id: id,
-	// 			index: numberOfChannels + 1
-	// 		}
-	// 	};
-	// 	props.socketRef.current?.emit("display-conversation", action);
-	// };
 
 	return (
 		<>
-			<Myself />
+			{
+				(user.ft)
+				? <Myself />
+				: <></>
+			}
 			<Divider />
 			<Grid
 				item xs={12}
@@ -216,11 +212,8 @@ const FriendsList = (props: FriendsListProps) =>
 							<>
 								<div key={index} onClick={() =>
 								{
-									// displayConversationWindow(elem.id);
 									dispatch(setActiveConversationId(elem.id));
-									// dispatch(setKindOfConversation("privateMessage"));
 									createNewConv(elem.id);
-									// console.log("index", elem.avatar);
 								}}>
 									<FriendItem
 										// name={elem.name + ": " + elem.id}
@@ -369,6 +362,12 @@ const	ChatLayout = () =>
 
 	const
 	[
+		friendProfileId,
+		setFriendProfileId
+	] = useState("");
+
+	const
+	[
 		isFriend,
 		setIsFriend
 	] = useState(false);
@@ -407,8 +406,22 @@ const	ChatLayout = () =>
 	});
 
 	const [
+		buttonSelectionPriv,
+		setButtonSelectionPriv
+	] = useState<ChanMapModel>({
+		id: 0,
+		name: "",
+		mode: "private",
+	});
+
+	const [
 		inviteDialogOpen,
 		setInviteDialogOpen
+	] = useState(false);
+
+	const [
+		invitePrivDialogOpen,
+		setInvitePrivDialogOpen
 	] = useState(false);
 
 	const [
@@ -509,6 +522,7 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
+		console.log(" Join channel", chanName);
 		const	action = {
 			type: "asked-join",
 			payload: {
@@ -610,6 +624,22 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
+				if (data.payload.friends !== undefined)
+					setFriendList(data.payload.friends);
+				console.log("friendList update channels", friendList);
+			}
+
+			if (data.type === "sending-list-user")
+			{
+				if (data.payload.friendsList !== undefined)
+					setFriendList(data.payload.friendsList);
+				console.log("sending list user", data.payload, " ", friendList);
+
+				// if (data.payload.privateMessage !== undefined)
+				// 	setPrivateMessage(data.payload.privateMessage);
+				// if (data.payload.friends !== undefined)
+				// 	setFriendList(data.payload.friends);
+				// console.log("friendList update channels", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -663,6 +693,7 @@ const	ChatLayout = () =>
 		const serverInfo = (data: any) =>
 		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
+			setFriendList(data.payload.friendsList);
 			console.log("information from server: ", data);
 			setArrayListUser(data.payload.arrayListUser);
 		};
@@ -712,18 +743,12 @@ const	ChatLayout = () =>
 			if (data.type === "display-members")
 			{
 				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
-				const	talk = data.payload.memberList.find((elem: any) =>
-				{
-					return (elem.name === data.payload.talkingUser);
-				});
-				console.log("talk", talk?.name);
-				if (talk !== undefined)
-				{
-					setTalkingUser(talk.name);
-				}
+				setTalkingUser(data.payload.talkingUser);
+				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
@@ -754,6 +779,9 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
+					console.log("userInfo FRIENDS LIST", friendList);
+					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
+					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
 					alert(alertMessage);
 				}
@@ -792,6 +820,7 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
+				console.log("repopulate FRIENDS LIST", friendList);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
@@ -972,13 +1001,27 @@ const	ChatLayout = () =>
 		setIsDialogOpen
 	] = useState(false);
 
-	const handleDialogOpen = () =>
+	const [
+		isPrivDialogOpen,
+		setIsPrivDialogOpen
+	] = useState(false);
+
+	const handleDialogOpen = (priv: boolean) =>
 	{
-		setIsDialogOpen(true);
+		if (priv)
+			setIsPrivDialogOpen(true);
+		else
+			setIsDialogOpen(true);
 	};
 
 	const handleDialogClose = () =>
 	{
+		setIsPrivDialogOpen(false);
+		setButtonSelectionPriv({
+			id: 0,
+			name: "",
+			mode: "",
+		});
 		setIsDialogOpen(false);
 		setButtonSelection({
 			id: 0,
@@ -1007,6 +1050,7 @@ const	ChatLayout = () =>
 
 	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
 	{
+		console.log("HANDLE REMOVE BUTTON CLICK ", chanId, " ", chanName);
 		removeChannel(chanId, chanName);
 		handleDialogClose();
 	};
@@ -1022,6 +1066,7 @@ const	ChatLayout = () =>
 	const handleMembersClickOpen = (chanName: string) =>
 	{
 		console.log("HANDLE MEMBER CLICK OPEN");
+		console.log(chanName);
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1067,11 +1112,13 @@ const	ChatLayout = () =>
 
 	const	addUserToFriends = (userName: string) =>
 	{
-		console.log("I START ADDING A FRIEND");
+		console.log("I START ADDING A FRIEND", userName);
+
 		const	action = {
 			type: "add-friend",
 			payload: {
 				friendName: userName,
+				friendProfileId: friendProfileId
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -1079,10 +1126,12 @@ const	ChatLayout = () =>
 
 	const	addUserToBlocked = (userName: string) =>
 	{
+		console.log("userrname", userName);
 		const	action = {
 			type: "block-user",
 			payload: {
 				blockedName: userName,
+				friendProfileId: friendProfileId,
 			}
 		};
 		socketRef.current.emit("user-info", action);
@@ -1104,17 +1153,19 @@ const	ChatLayout = () =>
 
 	// INVITE
 
-	const	inviteUserToChannel = (userName: string) =>
+	const	inviteUserToChannel = (profileId: string) =>
 	{
-		console.log("member: " + userName);
-		console.log("chanel : " + channelToInvite);
+		console.log("member: " + profileId);
+		console.log("channel : " + channelToInvite);
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
-				userName: userName,
+				userName: profileId,
+				// friendSocketId: socketId
 			}
 		};
+		console.log("Action : invite", action);
 		socketRef.current.emit("user-info", action);
 		// setChannelToInvite("");
 	};
@@ -1300,7 +1351,7 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
-													handleDialogOpen();
+													handleDialogOpen(false);
 													setButtonSelection(channel);
 												}}>
 													Options
@@ -1529,27 +1580,27 @@ const	ChatLayout = () =>
 												</ListItem>
 												<Button onClick={() =>
 												{
-													handleDialogOpen();
-													setButtonSelection(channel);
+													handleDialogOpen(true);
+													setButtonSelectionPriv(channel);
 												}}>
 													Options
 												</Button>
-												<Dialog open={isDialogOpen} onClose={handleDialogClose}>
+												<Dialog open={isPrivDialogOpen} onClose={handleDialogClose}>
 													<DialogTitle>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleRemoveButtonClick(buttonSelectionPriv.id, buttonSelectionPriv.name);
 														}}>
 															Remove
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															return handleMembersClickOpen(buttonSelectionPriv.name);
 														}}>
-															action with user
+															Other options
 														</Button>
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogContent>
@@ -1654,7 +1705,7 @@ const	ChatLayout = () =>
 					>
 						<List>
 							{
-								friendList.map((friend: any, index) =>
+								friendList.map((friend: any, index: number) =>
 								{
 									return (
 										<ListItem style={listItemStyle} key={index}>

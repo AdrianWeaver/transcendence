@@ -88,7 +88,7 @@ class User
 		this.setAvatar = (avatar: string) =>
 		{
 			if (avatar === undefined)
-				this.avatar = "https://thispersondoesnotexist.com/";
+				this.avatar = "https://doesnotexist.com/";
 			this.avatar = avatar;
 		};
 		this.setStatus = (status: string) =>

@@ -74,7 +74,7 @@ export	class ChatService implements OnModuleInit
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private prisma: PrismaClient;
-	private readonly chatID = "id-chat-service-v-10";
+	private readonly chatID = "id-chat-service-v-11";
 
 	constructor()
 	{
@@ -594,23 +594,45 @@ export	class ChatService implements OnModuleInit
 		this.searchUserIndex(user.id);
 	}
 
-	public deleteChannel(chanName: string)
+	public deleteChannel(chanName: string, priv: boolean)
 	{
-		const	index = this.chat.channels.findIndex((element) =>
+		if (priv)
 		{
-			return (element.name === chanName);
-		});
-		this.chat.channels.splice(index, 1);
-		let i: number;
-		i = 0;
-		for (const chanMap of this.chat.chanMap)
-		{
-			if (chanMap.name === chanName)
+			const	index = this.chat.privateMessage.findIndex((element) =>
 			{
-				this.chat.chanMap.splice(i, 1);
-				break ;
+				return (element.name === chanName);
+			});
+			this.chat.privateMessage.splice(index, 1);
+			let i: number;
+			i = 0;
+			for (const privMsgMap of this.chat.privateMessageMap)
+			{
+				if (privMsgMap.name === chanName)
+				{
+					this.chat.privateMessageMap.splice(i, 1);
+					break ;
+				}
+				i++;
 			}
-			i++;
+		}
+		else
+		{
+			const	index = this.chat.channels.findIndex((element) =>
+			{
+				return (element.name === chanName);
+			});
+			this.chat.channels.splice(index, 1);
+			let i: number;
+			i = 0;
+			for (const chanMap of this.chat.chanMap)
+			{
+				if (chanMap.name === chanName)
+				{
+					this.chat.chanMap.splice(i, 1);
+					break ;
+				}
+				i++;
+			}
 		}
 	}
 
@@ -731,14 +753,13 @@ export	class ChatService implements OnModuleInit
 
 	public getUsernameWithProfileId(profileId: string)
 	{
-		let toReturn: string;
-		toReturn = "undefined";
-		this.chat.users.forEach((user) =>
+		const	ret = this.chat.users.find((user) =>
 		{
-			if (user.profileId === profileId)
-				toReturn = user.name;
+			return (profileId === user.profileId);
 		});
-		return (toReturn);
+		if (ret === undefined)
+			return ("undefined");
+		return (ret.name);
 	}
 
 	public	disconnectUserWithClientId(clientId: string)

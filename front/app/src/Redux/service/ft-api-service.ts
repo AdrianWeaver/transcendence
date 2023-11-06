@@ -37,6 +37,32 @@ const	UserServices = {
 			})
 		);
 	},
+	async	registerFortyThree(hostname: string)
+	{
+		// console.log("test");
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded"
+			}
+		};
+		return (
+			Api(hostname)
+			.post("/user/register-forty-three", {}, config)
+			.then((data) =>
+			{
+				console.log("register forty three user front");
+				// console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error("error 43 user from api redux ");
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 	async	verifyToken(token: string, hostname: string)
 	{
 		console.log("verify token");
@@ -287,7 +313,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	addUserAsFriend(token: string, friendId: string, hostname: string)
+	async	addUserAsFriend(token: string, friendId: string, hostname: string, myId: string)
 	{
 		console.log("Add User as friend");
 		const	config: AxiosRequestConfig = {
@@ -298,7 +324,8 @@ const	UserServices = {
 		};
 
 		const	data = {
-			friendId: friendId
+			friendId: friendId,
+			myId: myId
 		};
 		return (
 			Api(hostname)

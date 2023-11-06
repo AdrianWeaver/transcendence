@@ -18,7 +18,7 @@ const	StepOne = () =>
 	return (
 		<>
 			{
-				(user.email && user.firstName && user.lastName && user.username)
+				(user.email !== "undefined" && user.firstName !== "undefined" && user.lastName !== "undefined" && user.username !== "undefined")
 				? <FirstStepFormContent
 					username={user.username}
 					email={user.email}

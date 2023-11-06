@@ -29,6 +29,7 @@ import axios from "axios";
 import { PhoneInput } from "react-international-phone";
 
 import MuiPhone from "../component/MuiPhone";
+import { useNavigate } from "react-router-dom";
 
 
 // import "react-international-phone/style.css";
@@ -41,7 +42,7 @@ const	SecondStepFormContent = () =>
 	{
 		return (state.controller.user);
 	});
-
+	const	navigate = useNavigate();
 	const	[
 		errorValidation,
 		setErrorValidation
@@ -135,6 +136,8 @@ const	SecondStepFormContent = () =>
 			dispatch(setOnline(true, user));
 			dispatch(setStatus("online", user));
 			dispatch(setAvatar(user.avatar));
+			navigate("/");
+			
 		}
 	};
 

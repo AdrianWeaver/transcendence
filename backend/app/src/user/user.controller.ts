@@ -11,7 +11,7 @@
 
 import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
 import	ApiTwilio from "../Api-twilio";
@@ -47,7 +47,10 @@ export class	RegisterStepOneDto
 	uniquenessPassword: "AgreeWithUniquenessOfPassword";
 	@IsNotEmpty()
 	username: string;
+	@IsBoolean()
+	ft: boolean;
 }
+
 class	RegisterDto
 {
 	@IsNotEmpty()
@@ -149,9 +152,9 @@ export class UserController
 		this.logger.verbose("username count okay");
 		const user = req.user;
 		console.log(user, " ", body);
-		if (body.emailAddress !== user.email
+		if (body.ft && (body.emailAddress !== user.email
 			|| body.firstName !== user.firstName
-			|| body.lastName !== user.lastName)
+			|| body.lastName !== user.lastName))
 			return (unauthorized(401, "You are an hacker go off"), void(0));
 		this.logger.verbose("verification okay");
 		this.logger.debug("Number of user with this username: " + count);
@@ -309,6 +312,110 @@ export class UserController
 					error: error
 				});
 			});
+	}
+
+	@Post("register-forty-three")
+	getUserRegisterFortyThree(
+		// @Body() body: RegisterDto,
+		@Res() res: Response)
+	{
+		this.logger.log("A no 42 User want to register");
+		// need to throw 5xx exception
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.FT_UID
+			|| !this.env.parsed.FT_SECRET)
+			throw new InternalServerErrorException();
+		let	retValue;
+		// let	userObject: UserModel;
+		let	profileId: number;
+		profileId = Math.floor((Math.random() * 100000) + 1);
+		while (!this.userService.isProfileIDUnique(profileId))
+			profileId = Math.floor((Math.random() * 100000) + 1);
+		const	userObject:UserModel = {
+			registrationProcessEnded: false,
+			ftApi: {
+				accessToken: "undefined",
+				tokenType: "undefined",
+				expiresIn: "undefined",
+				refreshToken: "undefined",
+				scope: "undefined",
+				createdAt: "undefined",
+				secretValidUntil: "undefined"
+			},
+			retStatus: 200,
+			date: "undefined",
+			id: profileId,
+			email: "undefined",
+			username: "undefined",
+			online: false,
+			status: "offline",
+			login: "undefined",
+			firstName: "undefined",
+			lastName: "undefined",
+			url: "undefined",
+			avatar: "https://thispersondoesnotexist.com/",
+			ftAvatar: {
+				link: "https://thispersondoesnotexist.com/",
+				version: {
+					large: "https://thispersondoesnotexist.com/",
+					medium: "https://thispersondoesnotexist.com/",
+					small: "https://thispersondoesnotexist.com/",
+					mini: "https://thispersondoesnotexist.com/"
+				}
+			},
+			location: "outer space",
+			revokedConnectionRequest: false,
+			authService:
+			{
+				token: "",
+				expAt: 0,
+				doubleAuth:
+				{
+					enable: false,
+					lastIpClient: "undefined",
+					phoneNumber: "undefined",
+					phoneRegistered: false,
+					validationCode: "undefined",
+					valid: false,
+				}
+			},
+			password: "undefined",
+			friendsProfileId: []
+		};
+		if (this.userService.getUserById(userObject.id) !== undefined)
+		{
+			this.logger.error("User Already register ");
+			// console.log()
+			res.status(400).json({error: "you are already register"});
+		}
+		else
+		{
+			this.logger.log("Starting register forty three user");
+			// const newUserObj = this.userService.downloadAvatar(userObject);
+			retValue = this.userService.register(userObject);
+			// this.userService.createUserToDatabase(userObject)
+			// .then((data) =>
+			// {
+			// 	if (data === "ERROR")
+			// 	{
+			// 		this.logger.error("Client create a error");
+			// 	}
+			// 	else if (data === "SUCCESS")
+			// 	{
+			// 		this.logger.debug("Client create is a success");
+			// 	}
+			// 	else
+			// 	{
+			// 		this.logger.error("Logic error await/async ");
+			// 	}
+			// });
+			res.status(200).send(retValue.res);
+			// mise a jour vers la database
+			this.logger.log("Ending forty three user processing register");
+		}
 	}
 
 	@Get("all-users")
@@ -628,12 +735,11 @@ export class UserController
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
 	AddFriend(
-		@Body() body: any,
-		@Req() req: any)
+		@Body() body: any)
 	{
 		// console
 		this.logger
 			.log("'add-friend' route requested");
-		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
+		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
 }
