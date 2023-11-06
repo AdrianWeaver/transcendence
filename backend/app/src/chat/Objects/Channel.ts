@@ -45,7 +45,7 @@ class Channel
 	public isAdmin: (id: string) => boolean;
 	public isBanned: (id: string) => boolean;
 	public addAdmin: (id: string) => void;
-	public addToBanned: (id: string, proarrayfileId: string) => void;
+	public addToBanned: (id: string, profileId: string) => void;
 	public addNewMessage: (message: MessageModel) => void;
 	public leaveChannel: (client: Socket) => void;
 	public findClientById: (socketId: string) => Socket | undefined;
