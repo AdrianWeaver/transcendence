@@ -890,16 +890,16 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				console.log("id ???", data.payload.blockedName);
-
+				console.log("payload block user", data.payload);
+				const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
 				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
 				if (userToBlock === undefined)
 					return ;
-				const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
-				if (profId === "undefined")
-					return ;
+				// const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
+				// if (profId === "undefined")
+				// 	return ;
 				const blockedToAdd: MemberSocketIdModel = {
-					memberSocketId: data.payload.blockedName,
+					memberSocketId: searchSocket === undefined ? userToBlock.id : data.payload.blockedName,
 					profileId: data.payload.friendProfileId,
 				};
 				const arrayBlocked: string[] = [];
@@ -912,7 +912,7 @@ export class ChatSocketEvents
 					type: "block-user",
 					payload: {
 						blockedList: arrayBlocked,
-						newBlocked: this.chatService.getUsernameWithSocketId(data.payload.blockedName),
+						newBlocked: data.payload.blockedName,
 					}
 				};
 				client.emit("user-info", action);
