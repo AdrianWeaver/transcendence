@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { useEffect, useRef, useState } from "react";
@@ -24,14 +25,123 @@ import {
 	setScaleServer,
 	setServerDimension
 } from "../../Redux/store/gameEngineAction";
+import {
+	Backdrop,
+	Alert,
+	Typography,
+	Card,
+	Box,
+	CardContent,
+	IconButton
+} from "@mui/material";
+import { useTheme } from "@emotion/react";
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import CardMedia from "@mui/material/CardMedia";
+import pong from "./assets/pong.jpeg";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
 };
 
+const	WaitingActive = () =>
+{
+	// use proper condition to set as false for start game
+	const	devTestValue = false;
+
+	const theme = useTheme();
+
+	const
+	[
+		render,
+		setRender
+	] = useState(<></>);
+
+	useEffect(() =>
+	{
+		if (devTestValue === true)
+		{
+			setRender(
+				<>
+					<Backdrop
+						sx={
+						{
+							color: "#fff",
+							zIndex: (theme) =>
+							{
+								return (theme.zIndex.drawer + 1);
+							}
+						}}
+						open={true}
+					>
+						{/* <>en attente d'un adversaire</> */}
+						<Card sx={{
+							display: "flex",
+							justifyContent: "flex-start",
+							backgroundColor: theme.palette.background.default,
+							// width: "80%",
+						}}>
+							<Box
+								sx={
+								{
+									display: "flex",
+									flexDirection: "column",
+									// border: "1px solid red"
+								}}>
+								<CardContent sx={{ flex: "1 0 auto" }}>
+									<Typography component="div" variant="h5">
+										Partie random
+									</Typography>
+									<Typography
+										variant="subtitle1"
+										color="text.secondary"
+										component="div">
+										En attente d'un adversaire
+									</Typography>
+								</CardContent>
+								<Box sx={
+									{
+										display: "flex",
+										pl: 1,
+										pb: 1
+									}}
+								>
+									<IconButton aria-label="play/pause">
+										<HourglassBottomIcon sx={{
+											height: 38,
+											width: 38
+										}} />
+									</IconButton>
+								</Box>
+							</Box>
+							<CardMedia
+								component="img"
+								sx={{ width: 200 }}
+								image={pong}
+								alt="Image de pong"
+							/>
+						</Card>
+					</Backdrop>
+				</>
+			);
+		}
+		else
+		{
+			setRender(
+				<>game is started</>
+			);
+		}
+	}, [devTestValue]);
+	return (render);
+};
+
 const	TestBall = () =>
 {
+	const	profileToken = useAppSelector((state) =>
+	{
+		return (state.controller.user.bearerToken);
+	});
+
 	/* local state */
 	const
 	[
@@ -76,7 +186,8 @@ const	TestBall = () =>
 	try
 	{
 		throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
-	}catch (error)
+	}
+	catch (error)
 	{
 		console.log(error);
 	}
@@ -95,6 +206,10 @@ const	TestBall = () =>
 			path: "/socket-game/random",
 			autoConnect: false,
 			reconnectionAttempts: 5,
+			auth:
+			{
+				token: profileToken
+			}
 		});
 
 		socketRef.current = socket;
@@ -402,6 +517,7 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
+			<WaitingActive />
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>

@@ -28,7 +28,7 @@ type	StatsModel = {
 	perfect: number
 };
 
-type MemberSocketIdModel ={
+type MemberSocketIdModel = {
 	memberSocketId: string,
 	profileId: string
 };

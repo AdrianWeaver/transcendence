@@ -102,7 +102,6 @@ export class ChatSocketEvents
 		{
 			this.chatService.setServer(this.server);
 			// console.log(client.handshake.auth);
-			// if (client.handshake.auth)
 			let profileId: string;
 			if (client.handshake.auth)
 			{
