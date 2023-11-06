@@ -7,24 +7,31 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import GameServe from "./Objects/GameServe";
 
+type	MapSocketIdProfileId = {
+	socketId: string
+	profileId: string
+};
+
 @Injectable()
 export class	GameService implements OnModuleInit
 {
 	private readonly	logger = new Logger("instance game service itself");
 	private	readonly	instanceId = uuidv4();
 
+	public				roomCount		: number;
 	public				users			: number;
 	public				totalUsers		: number;
 	public				classicUsers	: number;
 	public				specialUsers	: number;
-	public				socketIdUsers	: Array<string>;
+	public				socketIdUsers	: Array<MapSocketIdProfileId>;
 	public				userReady		: number;
-	public				socketIdReady	: Array<string>;
+	public				socketIdReady	: Array<MapSocketIdProfileId>;
 	public				gameInstances	: Array<GameServe>;
 
 	public constructor()
 	{
 		this.logger.error("Service constructed with ID: " + this.instanceId);
+		this.roomCount = 0;
 		this.users = 0;
 		this.totalUsers = 0;
 
@@ -56,6 +63,7 @@ export class	GameService implements OnModuleInit
 		});
 		console.log("Serialized data : ", gameInstanceSerialized);
 		return ({
+			roomCount: this.roomCount,
 			instanceId: this.instanceId,
 			users: this.users,
 			totalUsers: this.totalUsers,
@@ -66,6 +74,15 @@ export class	GameService implements OnModuleInit
 			socketIdReady: this.socketIdReady,
 			gameInstances: gameInstanceSerialized,
 		});
+	}
+
+	public	increaseRoomCount()
+	{
+		this.roomCount += 1;
+	}
+	public	getRoomCount()
+	{
+		return (this.roomCount);
 	}
 
 	// getter and setter
@@ -107,7 +124,7 @@ export class	GameService implements OnModuleInit
 	{
 		const	searchUser = this.socketIdUsers.find((elem) =>
 		{
-			return (elem === clientId);
+			return (elem.socketId === clientId);
 		});
 		return (searchUser);
 	}
@@ -115,14 +132,27 @@ export class	GameService implements OnModuleInit
 	{
 		const	searchIndex = this.socketIdUsers.findIndex((elem) =>
 		{
-			return (elem === clientId);
+			return (elem.socketId === clientId);
 		});
 		return (searchIndex);
 	}
-
-	public	pushClientIdIntoSocketIdUsers(clientId: string)
+	public findIndexSocketIdUserByProfileId(profileId: string)
 	{
-		this.socketIdUsers.push(clientId);
+		return (
+			this.socketIdUsers.findIndex((elem) =>
+			{
+				return (elem.profileId === profileId);
+			})
+		);
+	}
+
+	public	pushClientIdIntoSocketIdUsers(clientId: string, profileId: string)
+	{
+		const tmp: MapSocketIdProfileId = {
+			socketId: clientId,
+			profileId: profileId
+		};
+		this.socketIdUsers.push(tmp);
 	}
 	public	removeOneSocketIdUserWithIndex(indexToRemove: number)
 	{
@@ -150,7 +180,7 @@ export class	GameService implements OnModuleInit
 	{
 		const elem = this.socketIdReady.find((element) =>
 		{
-			return (element === clientId);
+			return (element.socketId === clientId);
 		});
 		return (elem);
 	}
@@ -159,7 +189,7 @@ export class	GameService implements OnModuleInit
 	{
 		const	index = this.socketIdReady.findIndex((element) =>
 		{
-			return (element === clientId);
+			return (element.socketId === clientId);
 		});
 		return (index);
 	}
@@ -167,9 +197,13 @@ export class	GameService implements OnModuleInit
 	{
 		this.socketIdReady.splice(index, 1);
 	}
-	public	pushClientIdIntoSocketIdReady(clientId: string)
+	public	pushClientIdIntoSocketIdReady(clientId: string, profileId: string)
 	{
-		this.socketIdReady.push(clientId);
+		const	tmp: MapSocketIdProfileId = {
+			profileId: profileId,
+			socketId: clientId,
+		};
+		this.socketIdReady.push(tmp);
 	}
 
 	public	pushGameServeToGameInstance(roomInstance: GameServe)
@@ -179,6 +213,15 @@ export class	GameService implements OnModuleInit
 	public	getGameInstances()
 	{
 		return (this.gameInstances);
+	}
+	public	findIndexGameInstanceByRoomName(roomName: string)
+	{
+		return (
+			this.gameInstances.findIndex((elem) =>
+			{
+				return (elem.roomName === roomName);
+			})
+		);
 	}
 
 	public	setGameActiveToFalse(indexInstance: number)
@@ -214,6 +257,47 @@ export class	GameService implements OnModuleInit
 					instance.playerOne.socketId === clientId
 					|| instance.playerTwo.socketId === clientId
 				);
+			})
+		);
+	}
+
+	public	findProfileIdFromSocketId(clientId: string)
+	{
+		return (
+			this.socketIdUsers.find((elem) =>
+			{
+				return (elem.socketId === clientId);
+			})
+		);
+	}
+
+	public	isProfileIdUserOne(idGameInstance: number, profileId: string)
+	{
+		if (idGameInstance === -1)
+			return (false);
+		return (
+			this.gameInstances[idGameInstance]
+				.playerOne.profileId === profileId
+		);
+	}
+
+	public	isProfileIdUserTwo(idGameInstance: number, profileId: string)
+	{
+		if (idGameInstance === -1)
+			return (false);
+		return (
+			this.gameInstances[idGameInstance]
+				.playerTwo.profileId === profileId
+		);
+	}
+
+	// ONLY WITH PLAYER TWO
+	public	findIndexGameInstanceAlonePlayer()
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (instance.playerTwo.profileId === "undefined");
 			})
 		);
 	}
