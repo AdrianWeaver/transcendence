@@ -1,0 +1,3 @@
+To map your data model to the database schema, you need to use the prisma migrate CLI commands:
+
+npx prisma migrate dev --name init
