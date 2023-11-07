@@ -59,7 +59,9 @@ import {
 	addChatUser,
 	addUserAsFriend,
 	setCurrentProfile,
-	setCurrentProfileIsFriend
+	setCurrentProfileIsFriend,
+	setProfileFriendView,
+	setProfilePublicView
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -1019,10 +1021,14 @@ const	ChatLayout = () =>
 		});
 		if (searchUser === undefined)
 			return ;
+		if (isFriend)
+			dispatch(setProfileFriendView());
+		else
+			dispatch(setProfilePublicView());
 		// setSeeProfile(true);
 		setTalkingUserProfileId(searchUser.profileId);
 		// navigate(talkingUser + "/profile/");
-		navigate("/me/profile/");
+		navigate("/profile/");
 	};
 
 	const	leaveChannel = (chanName: string) =>

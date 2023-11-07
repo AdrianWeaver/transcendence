@@ -32,7 +32,7 @@ const	LeftSide = (props: LeftSideProps) =>
 
 	const	handleLeaveProfile = () =>
 	{
-		navigate(previous);
+		navigate("/the-chat/");
 	};
 
 	return (
@@ -57,7 +57,12 @@ const	LeftSide = (props: LeftSideProps) =>
 							{
 								(user.profile.publicView)
 								? <>
-									{props.pseudo}
+									<Typography style={{color: "green"}}>
+										{props.pseudo}
+									</Typography>
+									<Typography style={{color: "green"}}>
+										___________________
+									</Typography>
 								</>
 								: <>
 									{props.pseudo} is {props.status}
@@ -67,7 +72,7 @@ const	LeftSide = (props: LeftSideProps) =>
 					}
 				</Grid>
 					<button className="leaveProfile__btn"
-						onClick={handleLeaveProfile}>
+						onClick={handleLeaveProfile} style={{backgroundColor: "grey"}}>
 							Leave profile
 					</button>
 			</Grid>

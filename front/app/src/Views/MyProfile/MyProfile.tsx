@@ -244,19 +244,6 @@ const	MyProfile = () =>
 									/>
 						</Grid>
 					</Grid>
-					{
-						(user.profile.friendView)
-						? <></>
-						: <Button onClick={editOrFriendRequest} variant="outlined">
-							{
-								(user.profile.publicView)
-								? "ADD AS FRIEND"
-								: (user.profile.friendView)
-									? <></>
-									: "EDIT PROFILE"
-							}
-						</Button>
-					}
 				</div>
 			}
 			<UpdateMyProfilePicture />

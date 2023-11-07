@@ -6,16 +6,16 @@ import { Info } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { setProfileEditView } from "../../../Redux/store/controllerAction";
+import { setProfileEditView, setProfileFriendView, setProfilePublicView } from "../../../Redux/store/controllerAction";
 import EditProfile from "./EditProfile";
 // import Stats from "./Stats";
 import { useNavigate } from "react-router-dom";
+import { blue } from "@mui/material/colors";
 
 type	RightSideProps =
 {
 	profileId: string;
 	isMe: boolean;
-	// isFriend: boolean;
 }
 
 const	RightSide = (props: RightSideProps) =>
@@ -23,6 +23,10 @@ const	RightSide = (props: RightSideProps) =>
 	let	editOrFriendReq;
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	userMe = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -84,13 +88,14 @@ const	RightSide = (props: RightSideProps) =>
 
 	const	editOrFriendRequest = () =>
 	{
-		if (publicProfile)
-			editOrFriendReq = "ADD AS FRIEND";
+		if (!props.isMe)
+
+			if (!userMe.chat.currentProfileIsFriend)
+				dispatch(setProfilePublicView());
+			else
+				dispatch(setProfileFriendView());
 		else
-		{
-			editOrFriendReq = "EDIT PROFILE";
 			dispatch(setProfileEditView());
-		}
 	};
 
 	const	displayStats = () =>
@@ -114,8 +119,9 @@ const	RightSide = (props: RightSideProps) =>
 				</Grid> */}
 				<Grid item xs={12}>
 					<Typography>
+						___________________
 						__________________
-						{/* __________________ */}
+						_________________
 					</Typography>
 				</Grid>
 				<Grid item xs={12}>
@@ -126,16 +132,21 @@ const	RightSide = (props: RightSideProps) =>
 						click to see the stats
 					</Button>
 				</Grid>
-				<Button onClick={editOrFriendRequest} variant="outlined">
-					{
-						(props.isMe)
-						? "EDIT PROFILE"
-						// : (props.isFriend)
-							// ? "ADD AS FRIEND"
-							// : ""
-						: ""
-					}
-				</Button>
+				{
+					(props.isMe)
+					? <Button onClick={editOrFriendRequest}>
+						"EDIT PROFILE"
+					</Button>
+					: (!userMe.chat.currentProfileIsFriend)
+						? <Grid item xs={12}>
+							<Typography>
+								________________
+								__________________
+								___________________
+							</Typography>
+						</Grid>
+						: <></>
+				}
 			</Grid>
 		</div>
 		</>
