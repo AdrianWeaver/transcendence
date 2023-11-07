@@ -19,7 +19,7 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
-	UserDBModel,
+	HistoryModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -60,6 +60,7 @@ import { FriendsModel } from "src/chat/ChatSocketEvent";
 export class UserService implements OnModuleInit, OnModuleDestroy
 {
 	private	user: Array<UserModel> = [];
+	private	matchHistory: Array<HistoryModel> = [];
 	private	secret: string;
 	// private	userDB: Array<UserDBModel> = [];
 	// private userDBString: Array<string> = [];
