@@ -19,10 +19,11 @@ import TestBall from "../Views/TestBall/TestBall";
 import GameSetup from "../Views/GameSetup/GameSetup";
 
 // import Chat from "../Views/Chat/Chat";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
-import { setBigWindow } from "../Redux/store/controllerAction";
+import { useAppSelector } from "../Redux/hooks/redux-hooks";
 import { Landing } from "../Views/Chat/Landing";
 import ChatLayout from "../Views/Chat/ChatLayout";
+import { useDispatch } from "react-redux";
+import ProfilePage from "../Views/MyProfile/ProfilePage";
 
 
 /**
@@ -34,6 +35,7 @@ const	LoggedRouter = () =>
 	{
 		return (state.controller.user);
 	});
+
 	return (
 		<BrowserRouter >
 			<Routes>
@@ -60,7 +62,7 @@ const	LoggedRouter = () =>
 
 				<Route
 					path="/profile"
-					element={<MyProfile />}
+					element={<ProfilePage />}
 				/>
 
 				<Route

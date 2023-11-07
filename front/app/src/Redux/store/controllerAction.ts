@@ -12,11 +12,12 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
+import { AnonymousUserModel, BackUserModel, CanvasModel, ChatUserModel, ControllerModel, GameEngineModel, ServerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
+import { PersistPartial } from "redux-persist/es/persistReducer";
 type MessageModel =
 {
 	sender: string,

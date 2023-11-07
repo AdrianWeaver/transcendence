@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 
 import LogoBase from "./components/LogoBase";
 import TitleBase from "./components/TitleBase";
@@ -10,6 +11,7 @@ import "./styles/Base.css";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 const	BaseViewFromViteJs = () =>
 {

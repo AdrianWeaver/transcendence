@@ -2,20 +2,17 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import { Component, useEffect, useRef, useState } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import EditProfile from "./components/EditProfile";
-import UpdateMyProfilePicture from "../../Component/DropZoneImage/UpdateMyProfilePicture";
+import { addUserAsFriend, setProfileEditView } from "../../Redux/store/controllerAction";
 
-const	MyProfile = () =>
+const	ProfilePage = () =>
 {
-	const	savePrevPage = useSavePrevPage();
 	const	prevPage= useAppSelector((state) =>
 	{
 		return (state.controller.previousPage);
@@ -24,13 +21,21 @@ const	MyProfile = () =>
 	{
 		return (state.controller.user);
 	});
-
-	useEffect(() =>
+	const	currentProfile = useAppSelector((state) =>
 	{
-		if (user.profile.editView)
-			savePrevPage("/me/profile");
+		return (state.controller.user.chat.currentProfile);
 	});
-
+	if (currentProfile === undefined)
+		throw new Error("currentProfile undefine");
+	const	userSelected = user.chat.users.find((elem) =>
+	{
+		return (elem.profileId === currentProfile);
+	});
+	if (userSelected === undefined)
+		throw new Error("user profile doesnt exist");
+	console.log(userSelected.name, "'s profile !!!");
+	const	online = userSelected.online ? "🟢" : "🔴";
+	const	status = userSelected.status === "playing" ? "playing... 🏓" : online;
 	return (
 		<>
 			<MenuBar />
@@ -42,27 +47,26 @@ const	MyProfile = () =>
 					<Grid container>
 						<Grid item xs={12} sm={6}>
 								<LeftSide
-									status={""}
-									pseudo={user.username}
-									imageUrl={user.avatar}
+									status={status}
+									pseudo={userSelected.name}
+									imageUrl={userSelected.avatar}
 									defaultUrl="https://thispersondoesnotexist.com/"
 									prevPage={prevPage}
-									isMe={true}
-									isFriend={true}
+									isMe={false}
+									isFriend={user.chat.currentProfileIsFriend}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
 								<RightSide
-									profileId={user.id.toString()}
-									isMe={true}
+									profileId={userSelected.profileId}
+									isMe={false}
 									/>
 						</Grid>
 					</Grid>
 				</div>
 			}
-			<UpdateMyProfilePicture />
 		</>
 	);
 };
 
-export default MyProfile;
+export default ProfilePage;

@@ -61,7 +61,8 @@ import {
 	setCurrentProfile,
 	setCurrentProfileIsFriend,
 	setProfileFriendView,
-	setProfilePublicView
+	setProfilePublicView,
+	setPreviousPage
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
@@ -1015,6 +1016,7 @@ const	ChatLayout = () =>
 	const	goToProfilePage = (username: string) =>
 	{
 		console.log("Go to ", username, "'s profile");
+		dispatch(setPreviousPage("/the-chat"));
 		const	searchUser = chatUsers.find((elem) =>
 		{
 			return (elem.name === username);

@@ -16,6 +16,8 @@ type	LeftSideProps =
 	imageUrl: string,
 	defaultUrl: string,
 	prevPage: string;
+	isMe: boolean;
+	isFriend: boolean;
 };
 
 
@@ -28,11 +30,9 @@ const	LeftSide = (props: LeftSideProps) =>
 
 	const	navigate = useNavigate();
 
-	const	previous = props.prevPage === "/me/profile" ? "/" : props.prevPage;
-
 	const	handleLeaveProfile = () =>
 	{
-		navigate("/the-chat/");
+		navigate(props.prevPage);
 	};
 
 	return (
@@ -49,13 +49,14 @@ const	LeftSide = (props: LeftSideProps) =>
 				</Grid>
 				<Grid item xs={12}>
 					{
-						(user.profile.myView)
+						(props.isMe)
 						? <>
 							♡ {props.pseudo}'s profile ♡
+							♡♡♡
 						</>
 						: <Typography>
 							{
-								(user.profile.publicView)
+								(!props.isFriend)
 								? <>
 									<Typography style={{color: "green"}}>
 										{props.pseudo}
