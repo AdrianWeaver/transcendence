@@ -420,13 +420,13 @@ const	ChatLayout = () =>
 	] = useState(false);
 
 	const [
-		invitePrivDialogOpen,
-		setInvitePrivDialogOpen
-	] = useState(false);
-
-	const [
 		channelToInvite,
 		setChannelToInvite
+	] = useState("");
+
+	const [
+		userToInvite,
+		setUserToInvite
 	] = useState("");
 
 	// END OF USE STATEs
@@ -1152,22 +1152,57 @@ const	ChatLayout = () =>
 	// END OF MEMBERS FUNCTIONS
 
 	// INVITE
-
-	const	inviteUserToChannel = (profileId: string) =>
+	const	getProfileId = (username: string) =>
 	{
-		console.log("member: " + profileId);
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (elem.name === username);
+		});
+		if (searchUser !== undefined)
+			setUserToInvite(searchUser.profileId);
+	};
+
+	const	inviteUserToChannel = (data: string) =>
+	{
+		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
+		let	profileId: string;
+
+		profileId = "";
+		const	searchProfilId = chatUsers.find((elem) =>
+		{
+			return (data === elem.profileId);
+		});
+		if (searchProfilId !== undefined)
+			profileId = data;
+		else
+		{
+			const	searchUser = chatUsers.find((elem) =>
+			{
+				return (data === elem.id);
+			});
+			if (searchUser)
+				profileId = searchUser.profileId;
+			else
+			{
+				const	searchUsername = chatUsers.find((elem) =>
+				{
+					return (data === elem.name);
+				});
+				if (searchUsername)
+					profileId = searchUsername?.profileId;
+			}
+		}
+		console.log("profileID ?  ", profileId);
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
 				userName: profileId,
-				// friendSocketId: socketId
 			}
 		};
 		console.log("Action : invite", action);
 		socketRef.current.emit("user-info", action);
-		// setChannelToInvite("");
 	};
 
 	// END OF INVITE
@@ -1385,6 +1420,53 @@ const	ChatLayout = () =>
 														}}>
 															Members
 														</Button>
+														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
+
+														<Button onClick={() =>
+														{
+															setInviteDialogOpen(true);
+															// inviteUserToChannel(member.name);
+														}}>
+															Invite
+														</Button>
+														<Dialog open={inviteDialogOpen} onClose={() =>
+															{
+																setInviteDialogOpen(false);
+															}}
+															maxWidth="sm" fullWidth>
+															<DialogTitle>Invite User to Channel</DialogTitle>
+															<DialogContent>
+																<TextField
+																label="Channel Name"
+																variant="outlined"
+																fullWidth
+																value={userToInvite}
+																onChange={(e) =>
+																{
+																	console.log("target value " + e.target.value);
+																	setUserToInvite(e.target.value);
+																	setChannelToInvite(channel.name);
+																}}/>
+															</DialogContent>
+															<DialogActions>
+																<Button onClick={() =>
+																	{
+																		getProfileId(userToInvite);
+																		inviteUserToChannel(userToInvite);
+																		setInviteDialogOpen(false);
+																	}} color="primary">
+																	Invite
+																</Button>
+																<Button onClick={() =>
+																{
+																	setInviteDialogOpen(false);
+																}} color="primary">
+																Cancel
+																</Button>
+															</DialogActions>
+														</Dialog>
+
+														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogTitle>
 																Channel Members
@@ -1442,7 +1524,6 @@ const	ChatLayout = () =>
 																					<Button onClick={() =>
 																					{
 																						setInviteDialogOpen(true);
-																						// inviteUserToChannel(member.name);
 																					}}>
 																						Invite
 																					</Button>
