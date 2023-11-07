@@ -57,10 +57,18 @@ import {
 	setNumberOfChannels,
 	connectChatUser,
 	addChatUser,
-	addUserAsFriend
+	addUserAsFriend,
+	setCurrentProfile,
+	setCurrentProfileIsFriend,
+	setProfileFriendView,
+	setProfilePublicView,
+	setPreviousPage
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
+import MyProfile from "../MyProfile/MyProfile";
+import { render } from "react-dom";
+import { useNavigate } from "react-router-dom";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -249,6 +257,7 @@ const	ChatLayout = () =>
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
 	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -279,6 +288,11 @@ const	ChatLayout = () =>
 	});
 
 	// USE STATES
+	const
+	[
+		isMyConv,
+		setIsMyConv
+	] = useState(false);
 
 	const
 	[
@@ -356,6 +370,12 @@ const	ChatLayout = () =>
 
 	const
 	[
+		seeProfile,
+		setSeeProfile
+	] = useState(false);
+
+	const
+	[
 		talkingUser,
 		setTalkingUser
 	] = useState("");
@@ -420,13 +440,13 @@ const	ChatLayout = () =>
 	] = useState(false);
 
 	const [
-		invitePrivDialogOpen,
-		setInvitePrivDialogOpen
-	] = useState(false);
-
-	const [
 		channelToInvite,
 		setChannelToInvite
+	] = useState("");
+
+	const [
+		userToInvite,
+		setUserToInvite
 	] = useState("");
 
 	// END OF USE STATEs
@@ -616,6 +636,15 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	isOneOfMyConvFunc = (name: any) =>
+		{
+			const	action = {
+				type: "is-my-conv",
+				payload: {name: name}
+			};
+			socketRef.current.emit("user-info", action);
+		};
+
 		const	updateChannels = (data: any) =>
 		{
 			if (data.type === "init-channels")
@@ -649,6 +678,10 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
+				if (data.payload.kind === "privateMessage")
+				{
+					isOneOfMyConvFunc(data.payload.chanName);
+				}
 			}
 
 			if (data.type === "destroy-channel")
@@ -748,6 +781,15 @@ const	ChatLayout = () =>
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
 				setTalkingUser(data.payload.talkingUser);
+				const	searchUser = chatUsers.find((elem) =>
+				{
+					return (elem.name === data.payload.talkingUser);
+				});
+				if (searchUser)
+				{
+					dispatch(setCurrentProfile(searchUser.profileId));
+					dispatch(setCurrentProfileIsFriend(data.payload.isFriend));
+				}
 				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
@@ -827,6 +869,12 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	isMyConversation = (data: any) =>
+		{
+			console.log("is my converation data,", data.payload);
+			setIsMyConv(data.payload.isMyConv);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -840,6 +888,7 @@ const	ChatLayout = () =>
 		socket.on("user-info", userInfo);
 		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
 		socket.on("add-chat-user", createChatUser);
+		socket.on("is-my-conv", isMyConversation);
 
         socket.connect();
 
@@ -858,6 +907,7 @@ const	ChatLayout = () =>
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
 			socket.off("add-chat-user", createChatUser);
+			socket.off("is-my-conv", isMyConversation);
         });
     }, []);
 
@@ -949,6 +999,12 @@ const	ChatLayout = () =>
 		setText
 	] = useState("");
 
+	const
+	[
+		talkingUserProfileId,
+		setTalkingUserProfileId
+	] = useState("");
+
 	const handleTextChange = (e: any) =>
 	{
 		if (isMuted === true)
@@ -981,6 +1037,28 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
+	};
+
+	const	goToProfilePage = (username: string) =>
+	{
+		console.log("Go to ", username, "'s profile");
+		dispatch(setPreviousPage("/the-chat"));
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (elem.name === username);
+		});
+		if (searchUser === undefined)
+			return ;
+		dispatch(setCurrentProfile(searchUser.profileId));
+		if (isFriend)
+		{
+			dispatch(setProfileFriendView());
+			dispatch(setCurrentProfileIsFriend(true));
+		}
+		else
+			dispatch(setProfilePublicView());
+		setTalkingUserProfileId(searchUser.profileId);
+		navigate("/profile/");
 	};
 
 	const	leaveChannel = (chanName: string) =>
@@ -1152,22 +1230,57 @@ const	ChatLayout = () =>
 	// END OF MEMBERS FUNCTIONS
 
 	// INVITE
-
-	const	inviteUserToChannel = (profileId: string) =>
+	const	getProfileId = (username: string) =>
 	{
-		console.log("member: " + profileId);
+		const	searchUser = chatUsers.find((elem) =>
+		{
+			return (elem.name === username);
+		});
+		if (searchUser !== undefined)
+			setUserToInvite(searchUser.profileId);
+	};
+
+	const	inviteUserToChannel = (data: string) =>
+	{
+		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
+		let	profileId: string;
+
+		profileId = "";
+		const	searchProfilId = chatUsers.find((elem) =>
+		{
+			return (data === elem.profileId);
+		});
+		if (searchProfilId !== undefined)
+			profileId = data;
+		else
+		{
+			const	searchUser = chatUsers.find((elem) =>
+			{
+				return (data === elem.id);
+			});
+			if (searchUser)
+				profileId = searchUser.profileId;
+			else
+			{
+				const	searchUsername = chatUsers.find((elem) =>
+				{
+					return (data === elem.name);
+				});
+				if (searchUsername)
+					profileId = searchUsername?.profileId;
+			}
+		}
+		console.log("profileID ?  ", profileId);
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
 				userName: profileId,
-				// friendSocketId: socketId
 			}
 		};
 		console.log("Action : invite", action);
 		socketRef.current.emit("user-info", action);
-		// setChannelToInvite("");
 	};
 
 	// END OF INVITE
@@ -1385,6 +1498,53 @@ const	ChatLayout = () =>
 														}}>
 															Members
 														</Button>
+														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
+
+														<Button onClick={() =>
+														{
+															setInviteDialogOpen(true);
+															// inviteUserToChannel(member.name);
+														}}>
+															Invite
+														</Button>
+														<Dialog open={inviteDialogOpen} onClose={() =>
+															{
+																setInviteDialogOpen(false);
+															}}
+															maxWidth="sm" fullWidth>
+															<DialogTitle>Invite User to Channel</DialogTitle>
+															<DialogContent>
+																<TextField
+																label="Channel Name"
+																variant="outlined"
+																fullWidth
+																value={userToInvite}
+																onChange={(e) =>
+																{
+																	console.log("target value " + e.target.value);
+																	setUserToInvite(e.target.value);
+																	setChannelToInvite(channel.name);
+																}}/>
+															</DialogContent>
+															<DialogActions>
+																<Button onClick={() =>
+																	{
+																		getProfileId(userToInvite);
+																		inviteUserToChannel(userToInvite);
+																		setInviteDialogOpen(false);
+																	}} color="primary">
+																	Invite
+																</Button>
+																<Button onClick={() =>
+																{
+																	setInviteDialogOpen(false);
+																}} color="primary">
+																Cancel
+																</Button>
+															</DialogActions>
+														</Dialog>
+
+														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogTitle>
 																Channel Members
@@ -1442,7 +1602,6 @@ const	ChatLayout = () =>
 																					<Button onClick={() =>
 																					{
 																						setInviteDialogOpen(true);
-																						// inviteUserToChannel(member.name);
 																					}}>
 																						Invite
 																					</Button>
@@ -1557,13 +1716,14 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser}/>
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} />
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
 										return (
 											<>
-												<ListItem style={listItemStyle} key={channel.id}>
+											{
+												<><ListItem style={listItemStyle} key={channel.id}>
 													<ListItemText
 														style={
 															channel.name === currentChannel
@@ -1624,12 +1784,20 @@ const	ChatLayout = () =>
 																					}
 																					<Button onClick={() =>
 																					{
+																						goToProfilePage(talkingUser);
+																					}}>
+																						see profile page
+																					</Button>
+																					<Button onClick={() =>
+																					{
+																						setSeeProfile(false);
 																						addUserToBlocked(talkingUser);
 																					}}>
 																						Block
 																					</Button>
 																					<Button onClick={() =>
 																					{
+																						setSeeProfile(false);
 																						setInviteDialogOpen(true);
 																					}}>
 																						Invite
@@ -1648,6 +1816,7 @@ const	ChatLayout = () =>
 																							value={channelToInvite}
 																							onChange={(e) =>
 																							{
+																								setSeeProfile(false);
 																								console.log("target value " + e.target.value);
 																								setChannelToInvite(e.target.value);
 																							}}/>
@@ -1655,6 +1824,7 @@ const	ChatLayout = () =>
 																						<DialogActions>
 																							<Button onClick={() =>
 																								{
+																									setSeeProfile(false);
 																									inviteUserToChannel(talkingUser);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
@@ -1662,6 +1832,7 @@ const	ChatLayout = () =>
 																							</Button>
 																							<Button onClick={() =>
 																							{
+																								setSeeProfile(false);
 																								setInviteDialogOpen(false);
 																							}} color="primary">
 																							Cancel
@@ -1689,6 +1860,7 @@ const	ChatLayout = () =>
 															</Button>
 														</DialogActions>
 													</Dialog>
+												</>}
 												</>
 											);
 										})

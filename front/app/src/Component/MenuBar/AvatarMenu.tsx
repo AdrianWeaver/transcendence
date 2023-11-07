@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import	React from "react";
+import	React, { useEffect } from "react";
 import	Box from "@mui/material/Box";
 import	Tooltip from "@mui/material/Tooltip";
 import	IconButton from "@mui/material/IconButton";
@@ -13,17 +14,19 @@ import	{ settings, settingsLinks } from "./config/SettingsItem";
 
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import MyAvatar from "../../Views/MyProfile/components/MyAvatar";
+import { setCurrentProfile } from "../../Redux/store/controllerAction";
+
 
 const	AvatarMenu = () =>
 {
 	const	navigate = useNavigate();
+	const	dispatch = useAppDispatch();
 	const	user = useAppSelector((state) =>
 	{
 		return (state.controller.user);
 	});
-
 	let myAvatar;
 
 	if (user.avatar !== undefined)
@@ -34,6 +37,11 @@ const	AvatarMenu = () =>
 		anchorElUser,
 		setAnchorElUser
 	] = React.useState<null | HTMLElement>(null);
+
+	useEffect(() =>
+	{
+		console.log(user.chat.currentProfile);
+	}, [user]);
 
 	const	handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
@@ -54,6 +62,7 @@ const	AvatarMenu = () =>
 			return (elem === text);
 		});
 		setAnchorElUser(null);
+		dispatch(setCurrentProfile(user.id.toString()));
 		navigate(settingsLinks[linkId]);
 	};
 

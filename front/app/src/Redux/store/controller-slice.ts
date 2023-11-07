@@ -65,7 +65,22 @@ const	initialControllerState: ControllerModel = {
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
-				profileId: "undefined"
+				profileId: "undefined",
+				// matchHistory: [],
+				// Stats:
+				// {
+				// 	specialModePlayed: 0,
+				// 	victories: 0,
+				// 	defeats: 0,
+				// 	lastGreatVictory:
+				// 	{
+				// 		userScore: 0,
+				// 		opponentScore: 0,
+				// 		opponent: "",
+				// 		timestamp: "undefined",
+				// 		specialMode: false
+				// 	}
+				// }
 			}
 			],
 			activeConversationId: "undefined",
@@ -81,7 +96,9 @@ const	initialControllerState: ControllerModel = {
 			kindOfConversation: "undefined",
 			numberOfChannels: -1,
 			connectedUsers: [],
-			disconnectedUsers: []
+			disconnectedUsers: [],
+			currentProfile: "",
+			currentProfileIsFriend: false
 		},
 		profile: {
 			editView: false,
@@ -407,8 +424,16 @@ const	controllerSlice = createSlice(
 		},
 		setFt(state, action: PayloadAction<ControllerModel>)
 		{
-			state.user.ft = action.payload.user.ft
-		}
+			state.user.ft = action.payload.user.ft;
+		},
+		setCurrentProfile(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.currentProfile = action.payload.user.chat.currentProfile;
+		},
+		setCurrentProfileIsFriend(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.chat.currentProfileIsFriend = action.payload.user.chat.currentProfileIsFriend;
+		},
 	}
 });
 

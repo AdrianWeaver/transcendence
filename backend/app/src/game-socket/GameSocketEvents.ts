@@ -22,64 +22,8 @@ import GameServe from "./Objects/GameServe";
 import { GameService } from "./Game.service";
 import { Logger } from "@nestjs/common";
 import { UserService } from "../user/user.service";
-import { disconnect } from "process";
-
-export class	NodeAnimationFrame
-{
-	public frameRate: number;
-	public frameNumber: number;
-	public gameActive: boolean;
-	public game: GameServe | undefined;
-	public requestFrame: (callbackFunction: any) => void;
-	public callbackFunction:
-		((timestamp: number, frame: number, game: GameServe) => void) | null;
-	public update: (timestamp: number) => void;
-
-	public	getSerializable: () => any;
-	constructor()
-	{
-		this.frameRate = 60;
-		this.frameNumber = 0;
-		this.gameActive = false;
-		this.game = undefined;
-		this.requestFrame = (callbackFunction) =>
-		{
-			if (this.frameNumber === (Number.MAX_VALUE - 1))
-				this.frameNumber = 0;
-			setTimeout(() =>
-			{
-				callbackFunction(performance.now());
-			}, 1000 / (this.frameRate));
-		};
-		this.callbackFunction = null;
-		this.update = (timestamp) =>
-		{
-			if (this.callbackFunction === null)
-			{
-				console.log("Error: no callback function provided");
-				return ;
-			}
-			if (this.game)
-				this.callbackFunction(timestamp, this.frameNumber, this.game);
-			if (this.gameActive === true)
-			{
-				this.frameNumber++;
-			}
-			this.requestFrame(this.update);
-		};
-		this.getSerializable = () =>
-		{
-			return ({
-				frameRate: this.frameRate,
-				frameNumber: this.frameNumber,
-				gameActive: this.gameActive,
-				// playerOne: this.game?.playerOne.getSerializable(),
-				// playerTwo: this.game?.playerTwo.getSerializable()
-				// game: this.game
-			});
-		};
-	}
-}
+import { NodeAnimationFrame } from "./NodeAnimationFrame";
+import e from "express";
 
 type	ActionSocket = {
 	type: string,
@@ -187,7 +131,6 @@ export class GameSocketEvents
 
 	async handleConnection(client: Socket)
 	{
-		// console.log("handshake du client:", client.handshake);
 		let	profileId: string;
 		if (client.handshake.auth)
 		{
@@ -219,7 +162,45 @@ export class GameSocketEvents
 				if (indexSocketId === -1)
 					this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
 				else
-					this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+				{
+					this.logger.debug("User has already logged, will now if a game is active");
+					if (indexGameInstance !== -1)
+					{
+						if (this.gameService.gameInstances[indexGameInstance].playerOne.profileId === profileId)
+						{
+							if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+							{
+								// accept the renew connection
+								this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+								this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
+								this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+							}
+							else
+							{
+								// disconnect
+								this.logger.error("No multiple connection allowed for a user");
+								client.disconnect();
+								return ;
+							}
+						}
+						if (this.gameService.gameInstances[indexGameInstance].playerTwo.profileId === profileId)
+						{
+							if (this.gameService.gameInstances[indexGameInstance].playerTwo.socketId === "disconnected")
+							{
+								// accept the renew connection
+								this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+								this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
+								this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+							}
+							else
+							{
+								this.logger.error("No multiple connection allowed for a user");
+								client.disconnect();
+								return ;
+							}
+						}
+					}
+				}
 				if (indexGameInstance === -1)
 				{
 					this.logger.verbose("The User has no game started");
@@ -239,6 +220,7 @@ export class GameSocketEvents
 						newRoom.net.game = newRoom;
 						newRoom.playerOne.socketId = client.id;
 						newRoom.playerOne.profileId = profileId;
+						newRoom.userConnected += 1;
 						newRoom.board.init();
 						newRoom.loop = new NodeAnimationFrame();
 						newRoom.loop.game = newRoom;
@@ -252,6 +234,7 @@ export class GameSocketEvents
 						this.logger.verbose("We have a player one alone");
 						this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.socketId = client.id;
 						this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.profileId = profileId;
+						this.gameService.gameInstances[indexGamePlayerAlone].userConnected += 1;
 						this.logger.verbose("User is created as player Two");
 						roomName = this.gameService.gameInstances[indexGamePlayerAlone].roomName;
 						await client.join(roomName);
@@ -275,6 +258,7 @@ export class GameSocketEvents
 						{
 							this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
 							this.gameService.gameInstances[indexGameInstance].playerOne.profileId = profileId;
+							this.gameService.gameInstances[indexGameInstance].userConnected += 1;
 						}
 						else
 						{
@@ -289,6 +273,7 @@ export class GameSocketEvents
 						{
 							this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
 							this.gameService.gameInstances[indexGameInstance].playerTwo.profileId = profileId;
+							this.gameService.gameInstances[indexGameInstance].userConnected += 1;
 						}
 						else
 						{
@@ -393,9 +378,25 @@ export class GameSocketEvents
 				userReadyCount: this.gameService.getUserReadyNumber()
 			}
 		};
+		this.logger.error("User with id: " + client.id + " is quitting pprofile id is: " + profileId);
+
+		const indexGameInstance = this.gameService.findIndexGameInstanceWithProfileId(profileId as string);
+		if (indexGameInstance === -1)
+			this.logger.error("Index game instance failure ");
+		else
+		{
+			this.gameService.gameInstances[indexGameInstance].userConnected -= 1;
+			if (this.gameService.gameInstances[indexGameInstance].userConnected === 0)
+			{
+				this.gameService.removeGameInstance(indexGameInstance);
+			}
+		}
 		const instance = this.gameService.findGameInstanceWithClientId(client.id);
 		if (instance)
+		{
 			this.server.to(instance.roomName).emit("player-info", action);
+		}
+		// function to remove instance is 2 player is disconnected or undefined
 	}
 
 	@SubscribeMessage("info")

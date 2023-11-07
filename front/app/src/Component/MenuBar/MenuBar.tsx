@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 
 import	AppBar from "@mui/material/AppBar";
 import	Container from "@mui/material/Container";
@@ -10,6 +11,8 @@ import	LargeMenu from "./LargeMenu";
 
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import LoginSignupButton from "./LoginSignupButton";
+import { useDispatch } from "react-redux";
+import { setCurrentProfile } from "../../Redux/store/controllerAction";
 
 
 const	MenuBar = () =>

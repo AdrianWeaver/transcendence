@@ -137,7 +137,6 @@ const	SecondStepFormContent = () =>
 			dispatch(setStatus("online", user));
 			dispatch(setAvatar(user.avatar));
 			navigate("/");
-			
 		}
 	};
 
