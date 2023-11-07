@@ -240,7 +240,6 @@ const	UserServices = {
 			info: info,
 			field: field
 		};
-
 		return (
 			Api(hostname)
 			.post("/user/change-infos", data, config)
@@ -256,7 +255,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	hashPassword(token: string, password: string, hostname: string)
+	async	hashPassword(token: string, password: string, hostname: string, id: string | number)
 	{
 		console.log("Hash password");
 		const	config: AxiosRequestConfig = {
@@ -267,7 +266,8 @@ const	UserServices = {
 		};
 
 		const	data = {
-			password: password
+			password: password,
+			id: id
 		};
 		return (
 			Api(hostname)

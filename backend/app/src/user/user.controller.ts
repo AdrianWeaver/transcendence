@@ -434,8 +434,8 @@ export class UserController
 	getAllUsers()
 		: BackUserModel[]
 	{
-		// console.log("request back users model data");
-		// console.log(this.userService.getBackUserModelArray());
+		console.log("request back users model data");
+		console.log(this.userService.getBackUserModelArray());
 		return (this.userService.getBackUserModelArray());
 	}
 

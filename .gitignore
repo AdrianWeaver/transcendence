@@ -6,6 +6,7 @@
 *.swo
 *tags
 
+backend/app/public/profilePictures/*
 migrations
 node_modules
 front/app/package-lock.json

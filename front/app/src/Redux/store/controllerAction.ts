@@ -12,11 +12,12 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
+import { AnonymousUserModel, BackUserModel, CanvasModel, ChatUserModel, ControllerModel, GameEngineModel, ServerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
+import { PersistPartial } from "redux-persist/es/persistReducer";
 type MessageModel =
 {
 	sender: string,
@@ -696,7 +697,7 @@ export const registerClientWithCode = (code : string)
 			{
 				if (elem.id === data.id)
 				{
-					elem.id = data.id;
+					// elem.id = data.id;
 					elem.email = data.email;
 					elem.firstName = data.firstName;
 					elem.lastName = data.lastName;
@@ -1217,7 +1218,7 @@ export const	hashPassword = (password: string)
 	{
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
-			password, prev.server.serverLocation)
+			password, prev.server.serverLocation, prev.controller.user.id)
 		.then((data) =>
 		{
 			// console.log("okay", data);
@@ -1516,5 +1517,55 @@ export const	setFt = (isFromFortyTwo: boolean)
 			}
 		}
 		dispatch(controllerActions.setFt(response));
+	});
+}
+
+export const	setCurrentProfile = (profileId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	searchUser = prev.controller.user.chat.users.find((elem) =>
+		{
+			return (elem.profileId === profileId);
+		});
+		if (searchUser === undefined)
+			return ;
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					currentProfile: profileId
+				}
+			}
+		}
+		dispatch(controllerActions.setCurrentProfile(response));
+	});
+}
+
+export const	setCurrentProfileIsFriend = (isFriend: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					currentProfileIsFriend: isFriend
+				}
+			}
+		}
+		dispatch(controllerActions.setCurrentProfileIsFriend(response));
 	});
 }

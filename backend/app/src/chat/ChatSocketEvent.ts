@@ -448,7 +448,8 @@ export class ChatSocketEvents
 							{
 								chanMap: undefined,
 								kind: "privateMessage",
-								privateMessageMap: this.chatService.getPrivateMessageMap()
+								privateMessageMap: this.chatService.getPrivateMessageMap(),
+								chanName: chanName
 							}
 						};
 						this.server.emit("display-channels", action);
@@ -1066,6 +1067,30 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 					this.chatService.updateDatabase();
+			}
+
+			if (data.type === "is-my-conv")
+			{
+				let	isMyConv: boolean;
+				const	searchConv = this.chatService.searchPrivateConvByName(data.payload.name);
+				if (searchConv === undefined)
+					return ;
+				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
+				if (profileId === undefined)
+					return ;
+				const	userMe = searchConv.users.find((elem) =>
+				{
+					return (elem.profileId === profileId);
+				});
+				if (userMe === undefined)
+					isMyConv = false;
+				else
+					isMyConv = true;
+				const	action = {
+					type: "is-my-conv",
+					payload: {isMyConv: isMyConv}
+				};
+				client.emit("is-my-conv", action);
 			}
 		}
 	}

@@ -1,115 +1,110 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import { Info } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
 import { useState } from "react";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
-import { setProfileEditView } from "../../../Redux/store/controllerAction";
+import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+import { setProfileEditView, setProfileFriendView, setProfilePublicView } from "../../../Redux/store/controllerAction";
 import EditProfile from "./EditProfile";
+// import Stats from "./Stats";
+import { useNavigate } from "react-router-dom";
+import { blue } from "@mui/material/colors";
+import { ChatUserModel } from "../../../Redux/models/redux-models";
 
 type	RightSideProps =
 {
-	rank: number,
-	gamesPlayed: number,
-	victories: number,
-	defeats: number,
-	perfectGame: number,
-	lastName: string,
-	firstName: string
-};
+	profileId: string;
+	isMe: boolean;
+}
 
 const	RightSide = (props: RightSideProps) =>
 {
-	let	editOrFriendReq;
+	let	userSelected: ChatUserModel | undefined;
 	const	dispatch = useAppDispatch();
-
-	const
-	[
-		publicProfile,
-		setPublicProfile
-	] = useState(false);
-
-	const
-	[
-		perfect,
-		setPerfect
-	] = useState("");
-
-	const
-	[
-		done,
-		setDone
-	] = useState("");
-
-	const	perfectPlay = (match: number) =>
+	const	navigate = useNavigate();
+	const	userMe = useAppSelector((state) =>
 	{
-		if (done === "done")
-			return ;
-		if (match > 0)
-			setPerfect("Perfect games (7 - 0): " + match);
-		setDone("done");
-	};
-
-	const	addUserToFriends = () =>
+		return (state.controller.user);
+	});
+	const	users = useAppSelector((state) =>
 	{
-		// const	action = {
-		// 	type: "add-friend",
-		// 	payload: {
-		// 		friendName: activeId,
-		// 	}
-		// };
-		// socketRef.current.emit("user-info", action);
-	};
-
-	const	editOrFriendRequest = () =>
+		return (state.controller.user.chat.users);
+	});
+	if (!props.isMe)
 	{
-		if (publicProfile)
-			editOrFriendReq = "ADD AS FRIEND";
-		else
+		userSelected = users.find((elem) =>
 		{
-			editOrFriendReq = "EDIT PROFILE";
+			return (props.profileId === elem.profileId);
+		});
+		if (userSelected === undefined)
+			throw new Error("User doesnt exist");
+	}
+
+	const	editRequest = () =>
+	{
+		if (!props.isMe)
+
+			if (!userMe.chat.currentProfileIsFriend)
+				dispatch(setProfilePublicView());
+			else
+				dispatch(setProfileFriendView());
+		else
 			dispatch(setProfileEditView());
-		}
 	};
 
-	perfectPlay(props.perfectGame);
+	const	displayStats = () =>
+	{
+		navigate("/stats");
+	};
+
 	return (
 		<>
 		<div className="right">
 			<Grid container>
+				{
+					(props.isMe)
+					? <Grid item xs={12}>
+						<Typography variant="h5">
+							INFOS
+						</Typography>
+						<Typography>
+							{userMe.firstName}  {userMe.lastName}
+						</Typography>
+					</Grid>
+					: <></>
+				}
 				<Grid item xs={12}>
-					<Typography variant="h5">
-						INFOS
-					</Typography>
 					<Typography>
-						{props.firstName} {props.lastName}
-					</Typography>
-				</Grid>
-				<Grid item xs={12}>
-					<Typography>
+						___________________
 						__________________
-						{/* __________________ */}
+						_________________
 					</Typography>
 				</Grid>
 				<Grid item xs={12}>
 					<Typography variant="h5">
 						STATS
 					</Typography>
-					<Typography>
-						{props.victories} victories / {props.gamesPlayed} games played.
-					</Typography>
-					<Typography>
-						{perfect}
-					</Typography>
+					<Button onClick={displayStats}>
+						click to see the stats
+					</Button>
 				</Grid>
-				{/* <Button onClick={editOrFriendRequest} variant="outlined">
-					{
-						(publicProfile)
-						? "ADD AS FRIEND"
-						: "EDIT PROFILE"
-					}
-				</Button> */}
+				{
+					(props.isMe)
+					? <Button onClick={editRequest}>
+						"EDIT PROFILE"
+					</Button>
+					: (!userMe.chat.currentProfileIsFriend)
+						? <Grid item xs={12}>
+							<Typography>
+								________________
+								__________________
+								___________________
+							</Typography>
+						</Grid>
+						: <></>
+				}
 			</Grid>
 		</div>
 		</>
