@@ -5,6 +5,23 @@ type MessageModel =
 	mode: string,
 	username: string,
 }
+
+export	interface	MatchHistoryModel
+{
+	userScore:	number,
+	opponentScore:	number,
+	opponent: string,
+	timestamp: string,
+	specialMode: boolean
+}
+
+export	interface	StatsModel
+{
+	specialModePlayed: number,
+	victories: number,
+	defeats: number,
+	lastGreatVictory: MatchHistoryModel;
+}
 export	interface ChatUserModel
 {
 	// name == pseudo
@@ -14,7 +31,10 @@ export	interface ChatUserModel
 	"id": string,
 	"avatar": string,
 	"password": string,
-	"profileId": string
+	"profileId": string,
+	// "matchHistory": MatchHistoryModel[],
+	// "Stats": StatsModel
+	// "friends": string[],
 }
 
 export interface BackUserModel
@@ -45,7 +65,9 @@ export interface ChatModel
 	"kindOfConversation": string,
 	"numberOfChannels": number,
 	"connectedUsers": ChatUserModel[],
-	"disconnectedUsers": ChatUserModel[]
+	"disconnectedUsers": ChatUserModel[],
+	"currentProfile": string;
+	"currentProfileIsFriend": boolean;
 }
 
 export interface	ProfileModel

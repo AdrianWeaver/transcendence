@@ -1,28 +1,48 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import { Info } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
 import { useState } from "react";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { setProfileEditView } from "../../../Redux/store/controllerAction";
 import EditProfile from "./EditProfile";
+// import Stats from "./Stats";
+import { useNavigate } from "react-router-dom";
 
 type	RightSideProps =
 {
-	rank: number,
-	gamesPlayed: number,
-	victories: number,
-	defeats: number,
-	perfectGame: number,
-	lastName: string,
-	firstName: string
-};
+	profileId: string;
+	isMe: boolean;
+	// isFriend: boolean;
+}
 
 const	RightSide = (props: RightSideProps) =>
 {
 	let	editOrFriendReq;
 	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.users);
+	});
+	const	userSelected = users.find((elem) =>
+	{
+		return (props.profileId === elem.profileId);
+	});
+	if (userSelected === undefined)
+		throw new Error("User doesnt exist");
+	// const	users = useAppSelector((state) =>
+	// {
+	// 	return (state.controller.allUsers);
+	// });
+	// const	userSelected = users.find((elem) =>
+	// {
+	// 	return (props.profileId === elem.id.toString());
+	// });
+	// if (userSelected === undefined)
+	// 	throw new Error("User doesnt exist");
 
 	const
 	[
@@ -73,19 +93,25 @@ const	RightSide = (props: RightSideProps) =>
 		}
 	};
 
-	perfectPlay(props.perfectGame);
+	const	displayStats = () =>
+	{
+		navigate("/stats");
+	};
+
 	return (
 		<>
 		<div className="right">
 			<Grid container>
-				<Grid item xs={12}>
+				{/* <Grid item xs={12}>
 					<Typography variant="h5">
 						INFOS
 					</Typography>
 					<Typography>
-						{props.firstName} {props.lastName}
+						{userSelected.firstName}
+						{userSelected.lastName}
+						{userSelected.location}
 					</Typography>
-				</Grid>
+				</Grid> */}
 				<Grid item xs={12}>
 					<Typography>
 						__________________
@@ -96,20 +122,20 @@ const	RightSide = (props: RightSideProps) =>
 					<Typography variant="h5">
 						STATS
 					</Typography>
-					<Typography>
-						{props.victories} victories / {props.gamesPlayed} games played.
-					</Typography>
-					<Typography>
-						{perfect}
-					</Typography>
+					<Button onClick={displayStats}>
+						click to see the stats
+					</Button>
 				</Grid>
-				{/* <Button onClick={editOrFriendRequest} variant="outlined">
+				<Button onClick={editOrFriendRequest} variant="outlined">
 					{
-						(publicProfile)
-						? "ADD AS FRIEND"
-						: "EDIT PROFILE"
+						(props.isMe)
+						? "EDIT PROFILE"
+						// : (props.isFriend)
+							// ? "ADD AS FRIEND"
+							// : ""
+						: ""
 					}
-				</Button> */}
+				</Button>
 			</Grid>
 		</div>
 		</>

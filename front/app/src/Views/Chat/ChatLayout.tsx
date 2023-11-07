@@ -57,12 +57,15 @@ import {
 	setNumberOfChannels,
 	connectChatUser,
 	addChatUser,
-	addUserAsFriend
+	addUserAsFriend,
+	setCurrentProfile,
+	setCurrentProfileIsFriend
 }	from "../../Redux/store/controllerAction";
 import { PropaneSharp } from "@mui/icons-material";
 import { ChatUserModel } from "../../Redux/models/redux-models";
 import MyProfile from "../MyProfile/MyProfile";
 import { render } from "react-dom";
+import { useNavigate } from "react-router-dom";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -251,6 +254,7 @@ const	ChatLayout = () =>
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
 	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -756,6 +760,15 @@ const	ChatLayout = () =>
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
 				setTalkingUser(data.payload.talkingUser);
+				const	searchUser = chatUsers.find((elem) =>
+				{
+					return (elem.name === data.payload.talkingUser);
+				});
+				if (searchUser)
+				{
+					dispatch(setCurrentProfile(searchUser.profileId));
+					dispatch(setCurrentProfileIsFriend(data.payload.isFriend));
+				}
 				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
 				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
@@ -1006,8 +1019,10 @@ const	ChatLayout = () =>
 		});
 		if (searchUser === undefined)
 			return ;
-		setSeeProfile(true);
+		// setSeeProfile(true);
 		setTalkingUserProfileId(searchUser.profileId);
+		// navigate(talkingUser + "/profile/");
+		navigate("/me/profile/");
 	};
 
 	const	leaveChannel = (chanName: string) =>

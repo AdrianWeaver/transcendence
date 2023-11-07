@@ -1518,3 +1518,53 @@ export const	setFt = (isFromFortyTwo: boolean)
 		dispatch(controllerActions.setFt(response));
 	});
 }
+
+export const	setCurrentProfile = (profileId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	searchUser = prev.controller.user.chat.users.find((elem) =>
+		{
+			return (elem.profileId === profileId);
+		});
+		if (searchUser === undefined)
+			return ;
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					currentProfile: profileId
+				}
+			}
+		}
+		dispatch(controllerActions.setCurrentProfile(response));
+	});
+}
+
+export const	setCurrentProfileIsFriend = (isFriend: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					currentProfileIsFriend: isFriend
+				}
+			}
+		}
+		dispatch(controllerActions.setCurrentProfileIsFriend(response));
+	});
+}

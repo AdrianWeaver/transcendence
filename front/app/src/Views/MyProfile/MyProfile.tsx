@@ -33,14 +33,7 @@ type FriendsMapModel = {
 	blocked: boolean
 };
 
-type	MyProfileProps =
-{
-	profileId: string,
-	// myView: boolean,
-	// friendView: boolean
-}
-
-const	MyProfile = (props: MyProfileProps) =>
+const	MyProfile = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
@@ -48,7 +41,9 @@ const	MyProfile = (props: MyProfileProps) =>
 	{
 		return (state.controller.previousPage);
 	});
-
+	let	isMe: boolean, isFriend: boolean;
+	isMe = false;
+	// isFriend = false;
 	const	oldPrevPage = prevPage;
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	activeId = useAppSelector((state) =>
@@ -59,48 +54,22 @@ const	MyProfile = (props: MyProfileProps) =>
 	{
 		return (state.controller.user);
 	});
-	// console.log(data);
-	let	online, status, playing, rank, gamesPlayed, victories, defeats, perfectGame;
-	let	id, lastName, firstName, login, email, active, avatar;
-
-	// const	displayStyle: React.CSSProperties = {
-	// 	textAlign: "center",
-	// 	fontSize: "8px"
-	// };
-
-	if (user !== undefined)
+	const	currentProfile = useAppSelector((state) =>
 	{
-		id = user.id;
-		lastName = user.lastName;
-		firstName = user.firstName;
-		login = user.username;
-		email = user.email;
-		console.log("avatar ", user.avatar);
-		if (user.avatar)
-			avatar = user.avatar;
-		else if (user.avatar === undefined)
-			avatar = "https://thispersondoesnotexist.com";
-		rank = 25;
-		gamesPlayed = 250;
-		victories = 19;
-		defeats = 122151;
-		perfectGame = 3;
-	}
-	else
+		return (state.controller.user.chat.currentProfile);
+	});
+	console.log("CURRENT PROFILE", currentProfile);
+	if (currentProfile === undefined)
+		throw new Error("currentProfile undefine");
+	const	userSelected = user.chat.users.find((elem) =>
 	{
-		id = "undefined";
-		lastName = "undefined";
-		firstName = "undefined";
-		login = "undefined";
-		email = "undefined";
-		active = undefined;
-		avatar = "https://thispersondoesnotexist.com";
-		rank = 5;
-		gamesPlayed = 20;
-		victories = 9;
-		defeats = 11;
-		perfectGame = 3;
-	}
+		return (elem.profileId === currentProfile);
+	});
+	if (userSelected === undefined)
+		throw new Error("user profile doesnt exist");
+	if (user.id.toString() === currentProfile)
+		isMe = true;
+	console.log(userSelected.name, "'s profile !!!");
 
 	const [
 		friendsOpen,
@@ -143,10 +112,7 @@ const	MyProfile = (props: MyProfileProps) =>
 		setPseudo
 	] = useState("");
 
-	if (active !== undefined)
-		online = "🟢";
-	else
-		online = "🔴";
+	const	online = userSelected.online ? "🟢" : "🔴";
 
 	useEffect(() =>
 	{
@@ -232,25 +198,16 @@ const	MyProfile = (props: MyProfileProps) =>
 		// TEST NEED TO VERIFY IT'S NOT USED PSEUDO
 		setPseudo(newPseudo);
 	};
-	changePseudo(login);
-// TEST
-	playing = true;
-	if (!online)
-		playing = false;
-	if (playing === true)
-		status = "playing... 🏓";
-	else if (active)
-		status = "🟢";
-	else
-		status = "🔴";
-		// console.log(status);
+	// changePseudo(login);
+	const	status = userSelected.status === "playing" ? "playing... 🏓" : online;
+
 
 	const	editOrFriendRequest = () =>
 	{
 		if (user.profile.publicView)
 		{
 			// How can I get the friend Id ?
-			dispatch(addUserAsFriend(activeId));
+			dispatch(addUserAsFriend(user.id.toString(), activeId));
 			console.log(activeId, " active id ", user.id, " id");
 		}
 		else if (user.profile.myView)
@@ -273,22 +230,18 @@ const	MyProfile = (props: MyProfileProps) =>
 						<Grid item xs={12} sm={6}>
 								<LeftSide
 									status={status}
-									pseudo={pseudo}
-									imageUrl={avatar}
+									pseudo={userSelected.name}
+									imageUrl={userSelected.avatar}
 									defaultUrl="https://thispersondoesnotexist.com/"
 									prevPage={prevPage}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
 								<RightSide
-									rank={rank}
-									gamesPlayed={gamesPlayed}
-									victories={victories}
-									defeats={defeats}
-									perfectGame={perfectGame}
-									lastName={lastName}
-									firstName={firstName}
-								/>
+									profileId={userSelected.profileId}
+									isMe={isMe}
+									// isFriend={isFriend}
+									/>
 						</Grid>
 					</Grid>
 					{

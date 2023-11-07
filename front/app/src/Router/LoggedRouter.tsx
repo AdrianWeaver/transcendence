@@ -30,6 +30,10 @@ import ChatLayout from "../Views/Chat/ChatLayout";
  * */
 const	LoggedRouter = () =>
 {
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
 	return (
 		<BrowserRouter >
 			<Routes>
@@ -51,6 +55,11 @@ const	LoggedRouter = () =>
 
 				<Route
 					path="/me/profile"
+					element={<MyProfile />}
+				/>
+
+				<Route
+					path="/profile"
 					element={<MyProfile />}
 				/>
 
