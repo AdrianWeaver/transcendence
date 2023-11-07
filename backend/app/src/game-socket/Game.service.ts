@@ -61,7 +61,7 @@ export class	GameService implements OnModuleInit
 		{
 			return (elem.getSeralizable());
 		});
-		console.log("Serialized data : ", gameInstanceSerialized);
+		// console.log("Serialized data : ", gameInstanceSerialized);
 		return ({
 			roomCount: this.roomCount,
 			instanceId: this.instanceId,
@@ -248,6 +248,19 @@ export class	GameService implements OnModuleInit
 		return (index);
 	}
 
+	public	findIndexGameInstanceWithProfileId(profileId: string)
+	{
+		const	index = this.gameInstances.findIndex((instance) =>
+		{
+			return (
+				instance.loop
+				&& (instance.playerOne.profileId === profileId
+				|| instance.playerTwo.profileId === profileId)
+			);
+		});
+		return (index);
+	}
+
 	public	findGameInstanceWithClientId(clientId: string)
 	{
 		return (
@@ -289,6 +302,13 @@ export class	GameService implements OnModuleInit
 			this.gameInstances[idGameInstance]
 				.playerTwo.profileId === profileId
 		);
+	}
+
+	public	removeGameInstance(indexGameInstance: number)
+	{
+		if (indexGameInstance === -1)
+			return ;
+		this.gameInstances.splice(indexGameInstance, 1);
 	}
 
 	// ONLY WITH PLAYER TWO

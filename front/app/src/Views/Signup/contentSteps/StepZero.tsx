@@ -20,7 +20,7 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setFt, setRegistrationProcessStart,  setUserData,  userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setFt, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 import { UserModel } from "../../../Redux/models/redux-models";
 import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
