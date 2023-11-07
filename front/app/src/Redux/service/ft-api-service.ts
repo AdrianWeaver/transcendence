@@ -240,7 +240,6 @@ const	UserServices = {
 			info: info,
 			field: field
 		};
-
 		return (
 			Api(hostname)
 			.post("/user/change-infos", data, config)

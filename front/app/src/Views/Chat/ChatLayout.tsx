@@ -288,6 +288,11 @@ const	ChatLayout = () =>
 	});
 
 	// USE STATES
+	const
+	[
+		isMyConv,
+		setIsMyConv
+	] = useState(false);
 
 	const
 	[
@@ -631,6 +636,15 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	isOneOfMyConvFunc = (name: any) =>
+		{
+			const	action = {
+				type: "is-my-conv",
+				payload: {name: name}
+			};
+			socketRef.current.emit("user-info", action);
+		};
+
 		const	updateChannels = (data: any) =>
 		{
 			if (data.type === "init-channels")
@@ -664,6 +678,10 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "privateMessage")
 					setPrivateMessage(data.payload.privateMessageMap);
 				setKindOfConversation(data.payload.kind);
+				if (data.payload.kind === "privateMessage")
+				{
+					isOneOfMyConvFunc(data.payload.chanName);
+				}
 			}
 
 			if (data.type === "destroy-channel")
@@ -851,6 +869,12 @@ const	ChatLayout = () =>
 			}
 		};
 
+		const	isMyConversation = (data: any) =>
+		{
+			console.log("is my converation data,", data.payload);
+			setIsMyConv(data.payload.isMyConv);
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -864,6 +888,7 @@ const	ChatLayout = () =>
 		socket.on("user-info", userInfo);
 		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
 		socket.on("add-chat-user", createChatUser);
+		socket.on("is-my-conv", isMyConversation);
 
         socket.connect();
 
@@ -882,6 +907,7 @@ const	ChatLayout = () =>
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
 			socket.off("add-chat-user", createChatUser);
+			socket.off("is-my-conv", isMyConversation);
         });
     }, []);
 
@@ -1609,17 +1635,14 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser}/>
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} />
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
 										return (
 											<>
-												{/* {(seeProfile)}
-												? <MyProfile
-													profileId={talkingUserProfileId} />
-												: <> */}
-												<ListItem style={listItemStyle} key={channel.id}>
+											{
+												<><ListItem style={listItemStyle} key={channel.id}>
 													<ListItemText
 														style={
 															channel.name === currentChannel
@@ -1756,7 +1779,7 @@ const	ChatLayout = () =>
 															</Button>
 														</DialogActions>
 													</Dialog>
-													{/* </> */}
+												</>}
 												</>
 											);
 										})
