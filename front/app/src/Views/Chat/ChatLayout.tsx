@@ -1023,13 +1023,15 @@ const	ChatLayout = () =>
 		});
 		if (searchUser === undefined)
 			return ;
+		dispatch(setCurrentProfile(searchUser.profileId));
 		if (isFriend)
+		{
 			dispatch(setProfileFriendView());
+			dispatch(setCurrentProfileIsFriend(true));
+		}
 		else
 			dispatch(setProfilePublicView());
-		// setSeeProfile(true);
 		setTalkingUserProfileId(searchUser.profileId);
-		// navigate(talkingUser + "/profile/");
 		navigate("/profile/");
 	};
 

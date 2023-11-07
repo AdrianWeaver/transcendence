@@ -175,6 +175,7 @@ type	EditProfileProps =
 
 const	EditProfile = (props: EditProfileProps) =>
 {
+	console.log("EDIT PROFILE");
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 

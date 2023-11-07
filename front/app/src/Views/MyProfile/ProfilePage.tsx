@@ -25,8 +25,9 @@ const	ProfilePage = () =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
-	if (currentProfile === undefined)
-		throw new Error("currentProfile undefine");
+	if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
+		throw new Error("currentProfile undefined");
+	console.log("Current Profile", currentProfile);
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);

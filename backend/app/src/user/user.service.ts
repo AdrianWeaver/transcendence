@@ -449,12 +449,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	public	getBackUserModelArray(): BackUserModel[]
 	{
 		const	users: BackUserModel[] = [];
-		let i: number;
-
-		i = 0;
 		const	searchUser = this.user.find((elem) =>
 		{
-			users[i] = {
+			const	user = {
 				id: elem.id,
 				email: elem.email,
 				username: elem.username,
@@ -463,7 +460,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				avatar: elem.avatar,
 				location: elem.location,
 			};
-			i++;
+			users.push(user);
 		});
 		return (users);
 	}
@@ -1163,9 +1160,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	async	hashPassword(password: string, id: number)
 	{
 		const	saltRounds = 10;
+		console.log("Hash password id ", id);
 		const	index = this.user.findIndex((elem) =>
 		{
-			return (id === elem.id);
+			return (id.toString() === elem.id.toString());
 		});
 		if (index === -1)
 			throw new Error("User not found - hashPassword user.service");
@@ -1291,8 +1289,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		await this.hashPassword(body.password, this.user[index].id);
 		if (this.user[index].password === "undefined" || this.user[index].password === undefined)
 			return ("ERROR");
-
-		// this.onTableCreate(userId);
 		return ("okay");
 	}
 

@@ -697,7 +697,7 @@ export const registerClientWithCode = (code : string)
 			{
 				if (elem.id === data.id)
 				{
-					elem.id = data.id;
+					// elem.id = data.id;
 					elem.email = data.email;
 					elem.firstName = data.firstName;
 					elem.lastName = data.lastName;
@@ -1218,7 +1218,7 @@ export const	hashPassword = (password: string)
 	{
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
-			password, prev.server.serverLocation)
+			password, prev.server.serverLocation, prev.controller.user.id)
 		.then((data) =>
 		{
 			// console.log("okay", data);
