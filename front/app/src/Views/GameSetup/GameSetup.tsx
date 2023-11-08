@@ -20,6 +20,11 @@ const	GameSetup = () =>
         navigate("/test-ball");
     };
 
+    const goToSpecialGame = () =>
+    {
+        navigate("/test-ball?mode=upside-down");
+    };
+
 	const	centerButtonsStyle = {
 		display: "flex",
 		justifyContent: "center",
@@ -59,7 +64,7 @@ const	GameSetup = () =>
             <div>It is now time to choose your mode:</div>
             <div style={centerButtonsStyle}>
 				<button style={buttonStyle} onClick={goToClassicGame}>Classic mode</button>
-				<button style={buttonStyle}>Special mode</button>
+				<button style={buttonStyle} onClick={goToSpecialGame}> Special mode</button>
 			</div>
         </body>
         </>
