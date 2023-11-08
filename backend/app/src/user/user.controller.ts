@@ -27,6 +27,7 @@ import { AccountPage } from "twilio/lib/rest/api/v2010/account";
 import FileConfig from "./Object/FileConfig";
 import * as readline from "readline";
 import * as twilio from "twilio";
+import Configuration from "src/Configuration";
 
 export class	RegisterStepOneDto
 {
@@ -180,13 +181,14 @@ export class UserController
 			throw new InternalServerErrorException();
 		let	retValue;
 		let	userObject: UserModel;
+		const file = new Configuration();
 		const	users = this.userService.getUserArray();
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
 		dataAPI.append("client_id", this.env.parsed.FT_UID);
 		dataAPI.append("client_secret", this.env.parsed.FT_SECRET);
-		dataAPI.append("redirect_uri", "http://localhost:3001");
+		dataAPI.append("redirect_uri", file.getRedirectURI());
 
 		this.logger.debug(dataAPI);
 		const config = {
@@ -775,15 +777,4 @@ export class UserController
 			.log("'add-friend' route requested");
 		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
-
-	// @Get("public/picture/:profileId")
-	// getPublicPicture(@Param() params: any)
-	// {
-	// 	console.log(params);
-	// 	// I want to send the address of the picture
-	// 	const	user = this.userService.getUserById(params.profileId);
-	// 	if (user === undefined)
-	// 		throw new NotFoundException();
-	// 	return ("http://localhost:3001/cdn/picture/" + user.username);
-	// }
 }

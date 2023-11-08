@@ -21,7 +21,7 @@ import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { registerClientWithCode, setFt, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
-import { UserModel } from "../../../Redux/models/redux-models";
+import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
 import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
 
@@ -91,14 +91,18 @@ const	locationIsARedirectedPage = (pathname: string) =>
 	return (true);
 };
 
-const	getUrlFT = () =>
-{
-	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code");
-};
+// const	getUrlFT = () =>
+// {
+// 	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code");
+// };
 
 const	StepZero = () =>
 {
 	const	query = useLocation();
+	const	urlFt = useAppSelector((state) =>
+	{
+		return (state.server.links.authApiUrl);
+	});
 	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
@@ -133,22 +137,22 @@ const	StepZero = () =>
 
 	const	openSameTab = () =>
 	{
-		window.open(getUrlFT(), "_self");
+		window.open(urlFt, "_self");
 	};
 
-	const	authUrl = useAppSelector((state) =>
-	{
-		return (state.server.links.authApiUrl);
-	});
+	// const	authUrl = useAppSelector((state) =>
+	// {
+	// 	return (state.server.links.authApiUrl);
+	// });
 
 	// console.log("Inside step zero link api 42", authUrl);
 
-	useEffect(() =>
-	{
-		if (authUrl === undefined)
-			dispatch(setAuthApiLinks());
-		console.log(authUrl);
-	});
+	// useEffect(() =>
+	// {
+	// 	if (authUrl === undefined)
+	// 		dispatch(setAuthApiLinks());
+	// 	console.log(authUrl);
+	// });
 	useEffect(() =>
 	{
 		const timer = setTimeout(() =>
@@ -191,7 +195,7 @@ const	StepZero = () =>
 	{
 		dispatch(setFt(false));
 		axios
-		.post("http://localhost:3000/user/register-forty-three")
+		.post("/register-forty-three")
 		.then((data) =>
 		{
 			console.log("fortythree data:", data);

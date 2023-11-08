@@ -290,7 +290,7 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 				passwordConfirm: plainObj.passwordConfirm,
 				uniquenessPassword: plainObj.uniquenessPassword,
 				ft: user.ft
-			}
+			};
 			const	config = {
 				headers: {
 					"Authorization": token
