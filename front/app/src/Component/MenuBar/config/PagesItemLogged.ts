@@ -1,7 +1,7 @@
 
 export const	pagesLinksLogged = [
 	"/",
-	"/play-game",
+	"/game-setup",
 	"/starter-pack",
 	"/stats",
 	"/the-chat"
