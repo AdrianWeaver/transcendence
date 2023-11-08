@@ -301,12 +301,35 @@ export class GameSocketEvents
 				else
 					userMessage.type = "player-two";
 				client.emit("init-message", userMessage);
+				const	instance = this.gameService
+					.findGameInstanceWithClientId(client.id);
+				if (instance === undefined)
+				{
+					this.logger.error("Must have a game instance");
+					return ;
+				}
+				let	playerOnePicture: string;
+				let	playerTwoPicture: string;
+				const	userOne = this.userService.getUserById(instance.playerOne.profileId);
+				if (userOne === undefined)
+					playerOnePicture = "undefined";
+				else
+					playerOnePicture = userOne.avatar;
+				const	userTwo = this.userService.getUserById(instance.playerTwo.profileId);
+				if (userTwo === undefined)
+					playerTwoPicture = "undefined";
+				else
+					playerTwoPicture = userTwo.avatar;
 				const	action = {
 					type: "connect",
 					payload: {
-						numberUsers: this.gameService.getUsers(),
+						numberUsers: instance.userConnected,
 						userReadyCount: this.gameService.getUserReadyNumber(),
 						socketId: client.id,
+						playerOneProfileId: instance.playerOne.profileId,
+						playerTwoProfileId: instance.playerTwo.profileId,
+						playerOnePicture: playerOnePicture,
+						playerTwoPicture: playerTwoPicture
 					}
 				};
 				this.server.to(roomName).emit("player-info", action);
@@ -378,11 +401,16 @@ export class GameSocketEvents
 			if (this.gameService.gameInstances[indexGameInstance].userConnected === 0)
 			{
 				this.gameService.removeGameInstance(indexGameInstance);
+				if (this.gameService.gameInstances.length === 0)
+				{
+					this.gameService.roomCount = 0;
+				}
 			}
 		}
 		const instance = this.gameService.findGameInstanceWithClientId(client.id);
 		if (instance)
 		{
+			this.logger.error("Test deeead code");
 			this.server.to(instance.roomName).emit("player-info", action);
 		}
 		// function to remove instance is 2 player is disconnected or undefined

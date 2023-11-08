@@ -314,3 +314,79 @@ export const	setNumberOfUsers = (usertCount: number)
 		dispatch(action.setNumberOfUsers(res));
 	});
 };
+
+export const	setPlayerOneProfileId = (playerOneId: number)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: Model = {
+			...prev.gameEngine,
+			server:
+			{
+				...prev.gameEngine.server,
+				playerOneProfileId: playerOneId
+			}
+		};
+		dispatch(action.setPlayerOneProfileId(response));
+	});
+};
+
+export const	setPlayerTwoProfileId = (playerTwoId: number)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: Model = {
+			...prev.gameEngine,
+			server:
+			{
+				...prev.gameEngine.server,
+				playerTwoProfileId: playerTwoId
+			}
+		};
+		dispatch(action.setPlayerTwoProfileId(response));
+	});
+};
+
+export const	setPlayerOnePicture = (playerOnePicture: string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: Model = {
+			...prev.gameEngine,
+			server:
+			{
+				...prev.gameEngine.server,
+				playerOnePicture: playerOnePicture
+			}
+		};
+		dispatch(action.setPlayerOnePicture(response));
+	});
+};
+
+export const	setPlayerTwoPicture = (playerTwoPicture: string)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const prev = getState();
+
+		const response: Model = {
+			...prev.gameEngine,
+			server:
+			{
+				...prev.gameEngine.server,
+				playerTwoPicture: playerTwoPicture
+			}
+		};
+		dispatch(action.setPlayerTwoPicture(response));
+	});
+};

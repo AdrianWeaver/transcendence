@@ -23,7 +23,11 @@ import {
 	setPlTwoScore,
 	setReadyPlayerCount,
 	setScaleServer,
-	setServerDimension
+	setServerDimension,
+	setPlayerOneProfileId,
+	setPlayerTwoProfileId,
+	setPlayerOnePicture,
+	setPlayerTwoPicture
 } from "../../Redux/store/gameEngineAction";
 import {
 	Backdrop,
@@ -32,7 +36,10 @@ import {
 	Card,
 	Box,
 	CardContent,
-	IconButton
+	IconButton,
+	Grid,
+	Paper,
+	Avatar
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
@@ -44,10 +51,19 @@ type	ActionSocket = {
 	payload?: any
 };
 
-const	WaitingActive = () =>
+type WaitingActiveProps = {
+	connected: boolean,
+	playerOneProfileId: string,
+	playerTwoProfileId: string,
+	playerOnePicture: string,
+	playerTwoPicture: string,
+	numberOfUser: number,
+};
+
+const	WaitingActive = (props: WaitingActiveProps) =>
 {
 	// use proper condition to set as false for start game
-	const	devTestValue = false;
+	const	devTestValue = true;
 
 	const theme = useTheme();
 
@@ -57,8 +73,67 @@ const	WaitingActive = () =>
 		setRender
 	] = useState(<></>);
 
+	const
+	[
+		title,
+		setTitle
+	] = useState("");
+
+	const
+	[
+		description,
+		setDescription
+	] = useState("");
+
+	const
+	[
+		userCount,
+		setUserCount
+	] = useState(0);
+
+	const userOnePicture = useAppSelector((state) =>
+	{
+		return (state.gameEngine.server.playerOnePicture);
+	});
+
+	const userTwoPicture = useAppSelector((state) =>
+	{
+		return (state.gameEngine.server.playerTwoPicture);
+	});
+
+	console.info(userOnePicture);
+	console.info(userTwoPicture);
+
+	const	avatarPlayerOne = (
+		<Avatar
+				src={userOnePicture}
+				sx={{
+					width: 100,
+					height: 100
+				}}
+			/>
+		);
+	const	avatarPlayerTwo = (
+		<Avatar
+			src={userTwoPicture}
+			sx={{
+				width: 100,
+				height: 100
+			}}
+		/>
+	);
 	useEffect(() =>
 	{
+		if (props.connected === true)
+		{
+			setTitle("Partie Random");
+			setDescription("En attente d'un adversaire");
+		}
+		else
+		{
+			setTitle("Deconnecte !");
+			setDescription("Veillez rafraichir la page");
+		}
 		if (devTestValue === true)
 		{
 			setRender(
@@ -86,27 +161,73 @@ const	WaitingActive = () =>
 								{
 									display: "flex",
 									flexDirection: "column",
-									// border: "1px solid red"
+									border: "1px solid red"
 								}}>
-								<CardContent sx={{ flex: "1 0 auto" }}>
-									<Typography component="div" variant="h5">
-										Partie random
-									</Typography>
-									<Typography
-										variant="subtitle1"
-										color="text.secondary"
-										component="div">
-										En attente d'un adversaire
-									</Typography>
-								</CardContent>
-								<Box sx={
-									{
-										display: "flex",
+								<Grid
+									container
+									component={Card}
+									sx={{
+										flexDirection: "row",
 										pl: 1,
 										pb: 1
 									}}
 								>
-									<IconButton aria-label="play/pause">
+									<CardContent sx={{ flex: "1 0 auto" }}>
+									<Grid
+										item
+										xs={12}
+										sx={{
+											flex: "1 0 auto",
+											// border: "1px solid blue"
+										}}
+									>
+										<Typography
+											component="div"
+											variant="h5"
+										>
+											{title}
+										</Typography>
+										<Typography
+											variant="subtitle1"
+											color="text.secondary"
+											component="div">
+											{description}
+											{/* 
+											<br	/>{props.playerTwoProfileId} */}
+										</Typography>
+									</Grid>
+									</CardContent>
+									<Grid
+										item
+										xs={6}
+										sx={{
+											flex: "1 0 auto",
+											// border: "1px solid blue"
+										}}
+									>
+										{avatarPlayerOne}
+									</Grid>
+									<Grid
+										item
+										xs={6}
+										sx={{
+											flex: "1 0 auto",
+											// border: "1px solid blue"
+										}}
+									>
+										{avatarPlayerTwo}
+									</Grid>
+								</Grid>
+								<Box sx={
+									{
+										display: "flex",
+										pl: 1,
+										pb: 1,
+										// border: "1px solid red"
+
+									}}
+								>
+									<IconButton aria-label="waiting">
 										<HourglassBottomIcon sx={{
 											height: 38,
 											width: 38
@@ -131,7 +252,7 @@ const	WaitingActive = () =>
 				<>game is started</>
 			);
 		}
-	}, [devTestValue]);
+	}, [props.connected]);
 	return (render);
 };
 
@@ -222,6 +343,7 @@ const	TestBall = () =>
 			};
 			socket.emit("info", action);
 			setConnected(true);
+			setConnectedStore
 		};
 
 		const disconnect = () =>
@@ -294,6 +416,8 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
+			console.log(data.payload);
+
 			switch (data.type)
 			{
 				case "connect":
@@ -310,6 +434,18 @@ const	TestBall = () =>
 						game.playerTwo.socketId = data.payload.socketId;
 						dispatch(setPlTwoSocket(data.payload.socketId));
 					}
+					dispatch(
+						setPlayerOneProfileId(data.payload.playerOneProfileId)
+					);
+					dispatch(
+						setPlayerTwoProfileId(data.payload.playerTwoProfileId)
+					);
+					dispatch(
+						setPlayerOnePicture(data.payload.playerOnePicture)
+					);
+					dispatch(
+						setPlayerTwoPicture(data.payload.playerTwoPicture)
+					);
 					break ;
 				case "disconnect":
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
@@ -517,7 +653,22 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
-			<WaitingActive />
+			<WaitingActive
+				connected={connected}
+				playerOneProfileId={
+					theServer.playerOneProfileId.toString()
+				}
+				playerTwoProfileId={
+					theServer.playerTwoProfileId.toString()
+				}
+				playerOnePicture={
+					theServer.playerOnePicture.toString()
+				}
+				playerTwoPicture={
+					theServer.playerTwoPicture.toString()
+				}
+				numberOfUser={theServer.numberOfUser}
+			/>
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
