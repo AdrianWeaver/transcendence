@@ -121,6 +121,7 @@ export class GameSocketEvents
 	async handleConnection(client: Socket)
 	{
 		let	profileId: string;
+		console.log(client.handshake);
 		if (client.handshake.auth)
 		{
 			const	secret = this.userService.getSecret();

@@ -9,6 +9,7 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
+import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import {
 	setBallPosition,
@@ -25,6 +26,8 @@ import {
 	setScaleServer,
 	setServerDimension
 } from "../../Redux/store/gameEngineAction";
+import { useLocation } from "react-router-dom";
+import getGameMode from "./extra/queryParamsMode";
 import {
 	Backdrop,
 	Alert,
@@ -137,6 +140,9 @@ const	WaitingActive = () =>
 
 const	TestBall = () =>
 {
+	const	query = useLocation();
+	const mode = getGameMode(query);
+
 	const	profileToken = useAppSelector((state) =>
 	{
 		return (state.controller.user.bearerToken);
@@ -208,7 +214,8 @@ const	TestBall = () =>
 			reconnectionAttempts: 5,
 			auth:
 			{
-				token: profileToken
+				token: profileToken,
+				mode: mode,
 			}
 		});
 
@@ -559,14 +566,32 @@ const	TestBall = () =>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
-			<div style={{textAlign: "center"}}>
+
+			<div style={{ textAlign: "center" }}>
+			<motion.div
+				initial={{ rotate: 0 }}
+				animate={{ rotate: mode === "upside-down" ? 180 : 0}}
+				style={{
+				width: game.board.canvas?.width,
+				height: game.board.canvas?.height,
+				}}
+			>
+				<canvas
+				height={game.board.canvas?.height}
+				width={game.board.canvas?.width}
+				ref={game.board.canvasRef}
+				/>
+			</motion.div>
+			</div>
+
+			{/* <div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}
 					width={game.board.canvas?.width}
 					ref={game.board.canvasRef}
 				>
 				</canvas>
-			</div>
+			</div> */}
 		</>
 	);
 };
