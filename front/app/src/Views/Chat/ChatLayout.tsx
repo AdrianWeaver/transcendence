@@ -1244,17 +1244,38 @@ const	ChatLayout = () =>
 	{
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
-
-		console.log("profileID ?  ", data);
-		const	action = {
-			type: "invite-member",
-			payload: {
-				chanName: channelToInvite,
-				userName: data,
+		let	profileId: string;
+		profileId = data.toString();
+		console.log("isNaN(Number(data))", isNaN(Number(data)));
+		if (data.length !== 5 || isNaN(Number(data)))
+		{
+			console.log("ici ?", chatUsers, " ", data.length);
+			const	searchUser = chatUsers.find((elem) =>
+			{
+				console.log("data", data, "name", elem.name, " === ", data === elem.name);
+				return (data === elem.name);
+			});
+			console.log("seartchUs", searchUser);
+			if (searchUser !== undefined)
+			{
+				profileId = searchUser.profileId;
+				console.log("profileID ?  ", profileId);
+				inviteUserToChannel(profileId);
 			}
-		};
-		console.log("Action : invite", action);
-		socketRef.current.emit("user-info", action);
+		}
+		else
+		{
+			console.log("profileID Ok: ", profileId);
+			const	action = {
+				type: "invite-member",
+				payload: {
+					chanName: channelToInvite,
+					userName: profileId,
+				}
+			};
+			console.log("Action : invite", action);
+			socketRef.current.emit("user-info", action);
+		}
 	};
 
 	// END OF INVITE
