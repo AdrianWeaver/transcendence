@@ -159,7 +159,6 @@ export	const	getServerConnection = ()
 			dispatch(
 				setServerConnectionSuccess(data.availableSince, data.links)
 			);
-			
 		}
 	});
 };
