@@ -1554,63 +1554,59 @@ public	register(data: UserModel)
 		return (true);
 	}
 
-	public	resetUser()
-	{
-		console.log("------user before reset", this.user);
-		// const	searchUser = this.user.find((elem) =>
-		// {
-		// 	return (elem.id === -1);
-		// });
-		const	freshUser: UserModel =	{
-			registrationStarted: false,
-			registrationProcessEnded: false,
-			ftApi: {
-				accessToken: "",
-				tokenType: "",
-				expiresIn: "",
-				refreshToken: "",
-				scope: "public",
-				createdAt: "",
-				secretValidUntil: ""
-			},
-			retStatus: -1,
-			date: "",
-			id: -1,
-			email: "",
-			username: "",
-			login: "",
-			online: false,
-			status: "",
-			firstName: "",
-			lastName: "",
-			url: "",
-			avatar: "",
-			ftAvatar: {
-				link: "",
-				version: {
-				large: "",
-				medium: "",
-				mini: "",
-				small: ""
-				}
-			},
-			location: "",
-			revokedConnectionRequest: false,
-			authService: {
-				token: "",
-				expAt: -1,
-				doubleAuth: {
-				enable: false,
-				lastIpClient: "",
-				phoneNumber: "",
-				phoneRegistered: false,
-				validationCode: "",
-				valid: false
-				}
-			},
-			password: "",
-			friendsProfileId: []
-		};
-		console.log("------user after reset");
-	}
+	// public	resetUser()
+	// {
+	// 	console.log("------user before reset", this.user);
+	// 	// const	freshUser: UserModel =	{
+	// 	// 	registrationStarted: false,
+	// 	// 	registrationProcessEnded: false,
+	// 	// 	ftApi: {
+	// 	// 		accessToken: "undefined",
+	// 	// 		tokenType: "undefined",
+	// 	// 		expiresIn: "undefined",
+	// 	// 		refreshToken: "undefined",
+	// 	// 		scope: "public",
+	// 	// 		createdAt: "undefined",
+	// 	// 		secretValidUntil: "undefined"
+	// 	// 	},
+	// 	// 	retStatus: -1,
+	// 	// 	date: "undefined",
+	// 	// 	id: -1,
+	// 	// 	email: "undefined",
+	// 	// 	username: "undefined",
+	// 	// 	login: "undefined",
+	// 	// 	online: false,
+	// 	// 	status: "undefined",
+	// 	// 	firstName: "undefined",
+	// 	// 	lastName: "undefined",
+	// 	// 	url: "undefined",
+	// 	// 	avatar: "undefined",
+	// 	// 	ftAvatar: {
+	// 	// 		link: "undefined",
+	// 	// 		version: {
+	// 	// 		large: "undefined",
+	// 	// 		medium: "undefined",
+	// 	// 		mini: "undefined",
+	// 	// 		small: "undefined"
+	// 	// 		}
+	// 	// 	},
+	// 	// 	location: "undefined",
+	// 	// 	revokedConnectionRequest: false,
+	// 	// 	authService: {
+	// 	// 		token: "undefined",
+	// 	// 		expAt: -1,
+	// 	// 		doubleAuth: {
+	// 	// 		enable: false,
+	// 	// 		lastIpClient: "undefined",
+	// 	// 		phoneNumber: "undefined",
+	// 	// 		phoneRegistered: false,
+	// 	// 		validationCode: "undefined",
+	// 	// 		valid: false
+	// 	// 		}
+	// 	// 	},
+	// 	// 	password: "undefined",
+	// 	// 	friendsProfileId: []
+	// 	// };
+	// 	console.log("------user after reset");
+	// }
 }

@@ -205,7 +205,10 @@ export class UserController
 					return (elem.ftApi.accessToken === data.access_token);
 				});
 				if (searchUser)
+				{
+					this.logger.error("User Already register ");
 					return ("already exists");
+				}
 				// this.logger.debug(data);
 				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
@@ -221,7 +224,10 @@ export class UserController
 			.then((newObject : any) =>
 			{
 				if (newObject === "already exists")
+				{
+					res.status(400).json({error: "you are already register"});
 					return ;
+				}
 				const config = {
 					method: "get",
 					maxBodyLength: Infinity,
@@ -239,7 +245,6 @@ export class UserController
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
-						this.userService.resetUser();
 						res.status(400).json({error: "you are already register"});
 					}
 					else
