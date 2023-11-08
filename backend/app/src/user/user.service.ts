@@ -890,121 +890,122 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		toDB: newUser
 	});
 }
-	public	register(data: UserModel)
-		: {res: UserRegisterResponseModel, toDB: UserModel}
+
+public	register(data: UserModel)
+: {res: UserRegisterResponseModel, toDB: UserModel}
+{
+	const	searchUser = this.user.find((user) =>
 	{
-		const	searchUser = this.user.find((user) =>
+		return (user.id === data.id);
+	});
+	if (searchUser?.registrationProcessEnded === true)
+		throw new BadRequestException("Account already created");
+	if (searchUser !== undefined)
+	{
+		const	index = this.user.findIndex((user) =>
 		{
 			return (user.id === data.id);
 		});
-		if (searchUser?.registrationProcessEnded === true)
-			throw new BadRequestException("Account already created");
-		if (searchUser !== undefined)
-		{
-			const	index = this.user.findIndex((user) =>
-			{
-				return (user.id === data.id);
-			});
-			if (index !== -1)
-				this.user.splice(index, 1);
-		}
-		// const	secretToken = randomBytes(64).toString("hex");
-		const newUser : UserModel= {
-			registrationProcessEnded: false,
-			ftApi: data.ftApi,
-			retStatus: data.retStatus,
-			date: data.date,
-			id: data.id,
-			email: data.email,
-			username: data.username,
-			login: data.login,
-			online: data.online,
-			status: data.status,
-			firstName: data.firstName,
-			lastName: data.lastName,
-			url: data.url,
-			avatar: data.avatar,
-			ftAvatar: data.ftAvatar,
-			location: data.location,
-			revokedConnectionRequest: data.revokedConnectionRequest,
-			authService:
-			{
-				token: "Bearer " + jwt.sign(
-					{
-						id: data.id,
-						email: data.email
-					},
-					this.secret,
-					{
-						expiresIn: "1d"
-					}
-				),
-				expAt: Date.now() + (1000 * 60 * 60 * 24),
-				doubleAuth:
-				{
-					enable: data.authService.doubleAuth.enable,
-					lastIpClient: data.authService.doubleAuth.lastIpClient,
-					phoneNumber: data.authService.doubleAuth.phoneNumber,
-					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
-					validationCode: data.authService.doubleAuth.validationCode,
-					valid: data.authService.doubleAuth.valid,
-				}
-			},
-			password: data.password,
-			friendsProfileId: []
-			// tokenSecret: secretToken
-		};
-		this.user.push(newUser);
-		const	response: UserRegisterResponseModel = {
-			message: "Your session has been created, you must loggin",
-			token: newUser.authService.token,
-			id: newUser.id,
-			email: newUser.email,
-			statusCode: newUser.retStatus,
-			username: newUser.username,
-			login: newUser.login,
-			firstName: newUser.firstName,
-			lastName: newUser.lastName,
-			avatar: newUser.avatar,
-			ftAvatar: newUser.ftAvatar
-		};
-		return (
-		{
-			res: response,
-			toDB: newUser
-		});
+		if (index !== -1)
+			this.user.splice(index, 1);
 	}
-
-	public	login(id: any, email:string)
-		: UserLoginResponseModel
-	{
-		const	searchUser = this.user.find((user) =>
+	// const	secretToken = randomBytes(64).toString("hex");
+	const newUser : UserModel= {
+		registrationProcessEnded: false,
+		ftApi: data.ftApi,
+		retStatus: data.retStatus,
+		date: data.date,
+		id: data.id,
+		email: data.email,
+		username: data.username,
+		login: data.login,
+		online: data.online,
+		status: data.status,
+		firstName: data.firstName,
+		lastName: data.lastName,
+		url: data.url,
+		avatar: data.avatar,
+		ftAvatar: data.ftAvatar,
+		location: data.location,
+		revokedConnectionRequest: data.revokedConnectionRequest,
+		authService:
 		{
-			return (user.id.toString() === id.toString()
-				&& user.email === email);
-		});
-		if (searchUser === undefined)
-			throw new ForbiddenException("Invalid credential");
-		else
-
-			searchUser.authService.token = "Bearer " + jwt.sign(
+			token: "Bearer " + jwt.sign(
 				{
-					id: searchUser.id,
-					email: searchUser.email
+					id: data.id,
+					email: data.email
 				},
 				this.secret,
 				{
 					expiresIn: "1d"
 				}
-			);
+			),
+			expAt: Date.now() + (1000 * 60 * 60 * 24),
+			doubleAuth:
+			{
+				enable: data.authService.doubleAuth.enable,
+				lastIpClient: data.authService.doubleAuth.lastIpClient,
+				phoneNumber: data.authService.doubleAuth.phoneNumber,
+				phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+				validationCode: data.authService.doubleAuth.validationCode,
+				valid: data.authService.doubleAuth.valid,
+			}
+		},
+		password: data.password,
+		friendsProfileId: []
+		// tokenSecret: secretToken
+	};
+	this.user.push(newUser);
+	const	response: UserRegisterResponseModel = {
+		message: "Your session has been created, you must loggin",
+		token: newUser.authService.token,
+		id: newUser.id,
+		email: newUser.email,
+		statusCode: newUser.retStatus,
+		username: newUser.username,
+		login: newUser.login,
+		firstName: newUser.firstName,
+		lastName: newUser.lastName,
+		avatar: newUser.avatar,
+		ftAvatar: newUser.ftAvatar
+	};
+	return (
+	{
+		res: response,
+		toDB: newUser
+	});
+	}
 
-			const	response: UserLoginResponseModel = {
-				message:
-					"You are successfully connected as " + searchUser.login,
-				token: searchUser.authService.token,
-				expireAt: searchUser.authService.expAt
-			};
-			return (response);
+		public	login(id: any, email:string)
+			: UserLoginResponseModel
+		{
+			const	searchUser = this.user.find((user) =>
+			{
+				return (user.id.toString() === id.toString()
+					&& user.email === email);
+			});
+			if (searchUser === undefined)
+				throw new ForbiddenException("Invalid credential");
+			else
+
+				searchUser.authService.token = "Bearer " + jwt.sign(
+					{
+						id: searchUser.id,
+						email: searchUser.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				);
+
+				const	response: UserLoginResponseModel = {
+					message:
+						"You are successfully connected as " + searchUser.login,
+					token: searchUser.authService.token,
+					expireAt: searchUser.authService.expAt
+				};
+				return (response);
 	}
 
 	public	userIdentifiedRequestEndOfSession(id: any)
@@ -1533,4 +1534,19 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			return (false);
 		return (true);
 	}
+
+	public	validateRegistration(userId: string | number)
+	: boolean
+{
+	console.log("VALIDATE REGISTRATION", userId);
+	const	index = this.user.findIndex((elem) =>
+	{
+		return (userId.toString() === elem.id.toString());
+	});
+	if (index === -1)
+		return (false);
+	this.user[index].registrationProcessEnded = true;
+	console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
+	return (true);
+}
 }

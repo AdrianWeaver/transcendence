@@ -929,18 +929,24 @@ export const	setPhoneNumber = (data: string)
 	});
 }
 
-export const	setRegistered = (data: boolean)
+export const	setRegistered = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
+		const	data: any = UserServices.registrationValidation(prev.controller.user.bearerToken, prev.server.serverLocation);
+		if (data === "error")
+		{
+			console.log("TEST error");
+			return ;
+		}
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
 			{
 				...prev.controller.user,
-				registered: data,
+				registered: true,
 			}
 		}
 		dispatch(controllerActions.setRegistered(response));

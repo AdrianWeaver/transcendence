@@ -449,6 +449,23 @@ export class UserController
 		return (this.userService.login(body.id, body.email));
 	}
 
+	@Post("validate-registration")
+	@UseGuards(UserAuthorizationGuard)
+	userValidateRegistration(
+		// @Body() body: any,
+		@Req() req: any,
+		@Res() res: Response)
+	{
+		this.logger
+			.log("'validate-registration' route requested with id: ", req.user.id);
+		const isOK = this.userService.validateRegistration(req.user.id);
+		if (isOK)
+			res.status(200).send("ok");
+		else
+			res.status(401).send("Not ok");
+	}
+
+
 	// Our token 
 	@Post("verify-token")
 	@UseGuards(UserAuthorizationGuard)
