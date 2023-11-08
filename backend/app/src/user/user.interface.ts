@@ -19,6 +19,23 @@ export interface UserPublicResponseModel
 	lastName: string;
 	username: string;
 }
+
+export interface HistoryModel
+{
+	timestamp: string;
+	playerOne:
+	{
+		id: string;
+		score: number;
+	};
+	playerTwo:
+	{
+		id: string;
+		score: number;
+	};
+}
+
+
 export	interface ChatUserModel
 {
 	// name == pseudo
@@ -81,6 +98,7 @@ export interface UserDBModel
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;
+	registrationStarted: boolean,
 	retStatus: number;
 	date: string;
 	id: any;

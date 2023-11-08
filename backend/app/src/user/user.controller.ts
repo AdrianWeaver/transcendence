@@ -182,6 +182,7 @@ export class UserController
 		let	retValue;
 		let	userObject: UserModel;
 		const file = new Configuration();
+		const	users = this.userService.getUserArray();
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
@@ -201,7 +202,15 @@ export class UserController
 			.then((res) =>
 			{
 				const	data = res.data;
-
+				const	searchUser = users.find((elem) =>
+				{
+					return (elem.ftApi.accessToken === data.access_token);
+				});
+				if (searchUser)
+				{
+					this.logger.error("User Already register ");
+					return ("already exists");
+				}
 				// this.logger.debug(data);
 				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
@@ -216,6 +225,11 @@ export class UserController
 			})
 			.then((newObject : any) =>
 			{
+				if (newObject === "already exists")
+				{
+					res.status(400).json({error: "you are already register"});
+					return ;
+				}
 				const config = {
 					method: "get",
 					maxBodyLength: Infinity,
@@ -229,42 +243,7 @@ export class UserController
 				.then(async (resData) =>
 				{
 					const	data = resData.data;
-					userObject = {
-						registrationProcessEnded: false,
-						ftApi: newObject,
-						retStatus: resData.status,
-						date: resData.headers.date,
-						id: data.id,
-						email: data.email,
-						username: data.login,
-						online: false,
-						status: "offline",
-						login: data.login,
-						firstName: data.first_name,
-						lastName: data.last_name,
-						url: data.url,
-						avatar: data.image?.link,
-						ftAvatar: data.image,
-						location: data.location,
-						revokedConnectionRequest: false,
-						authService:
-						{
-							token: "",
-							expAt: 0,
-							doubleAuth:
-							{
-								enable: false,
-								lastIpClient: "undefined",
-								phoneNumber: "undefined",
-								phoneRegistered: false,
-								validationCode: "undefined",
-								valid: false,
-							}
-						},
-						password: "undefined",
-						friendsProfileId: []
-					};
-					const userTempCheck: UserModel | undefined = this.userService.getUserById(userObject.id);
+					const userTempCheck: UserModel | undefined = this.userService.getUserById(data.id);
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
@@ -272,6 +251,42 @@ export class UserController
 					}
 					else
 					{
+						userObject = {
+							registrationProcessEnded: false,
+							registrationStarted: true,
+							ftApi: newObject,
+							retStatus: resData.status,
+							date: resData.headers.date,
+							id: data.id,
+							email: data.email,
+							username: data.login,
+							online: false,
+							status: "offline",
+							login: data.login,
+							firstName: data.first_name,
+							lastName: data.last_name,
+							url: data.url,
+							avatar: data.image?.link,
+							ftAvatar: data.image,
+							location: data.location,
+							revokedConnectionRequest: false,
+							authService:
+							{
+								token: "",
+								expAt: 0,
+								doubleAuth:
+								{
+									enable: false,
+									lastIpClient: "undefined",
+									phoneNumber: "undefined",
+									phoneRegistered: false,
+									validationCode: "undefined",
+									valid: false,
+								}
+							},
+							password: "undefined",
+							friendsProfileId: []
+						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
 						retValue = this.userService.register(newUserObj);
@@ -338,6 +353,7 @@ export class UserController
 			profileId = Math.floor((Math.random() * 100000) + 1);
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
+			registrationStarted: true,
 			ftApi: {
 				accessToken: "undefined",
 				tokenType: "undefined",
@@ -450,6 +466,23 @@ export class UserController
 			.log("login route requested with id: ", body.id);
 		return (this.userService.login(body.id, body.email));
 	}
+
+	@Post("validate-registration")
+	@UseGuards(UserAuthorizationGuard)
+	userValidateRegistration(
+		// @Body() body: any,
+		@Req() req: any,
+		@Res() res: Response)
+	{
+		this.logger
+			.log("'validate-registration' route requested with id: ", req.user.id);
+		const isOK = this.userService.validateRegistration(req.user.id);
+		if (isOK)
+			res.status(200).send("ok");
+		else
+			res.status(401).send("Not ok");
+	}
+
 
 	// Our token 
 	@Post("verify-token")

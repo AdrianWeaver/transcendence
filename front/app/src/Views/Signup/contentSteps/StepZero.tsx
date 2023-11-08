@@ -171,8 +171,9 @@ const	StepZero = () =>
 	{
 		dispatch(registerClientWithCode(responseQuery.code));
 	}
-	if (user.bearerToken !== "undefined")
+	if (user.bearerToken !== "undefined" && !user.alreadyExists)
 	{
+		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}

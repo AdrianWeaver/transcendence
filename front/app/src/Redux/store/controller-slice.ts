@@ -108,7 +108,8 @@ const	initialControllerState: ControllerModel = {
 		},
 		password: "undefined",
 		location: "undefined",
-		ft: true
+		ft: true,
+		alreadyExists: false
 	},
 	registration:
 	{
@@ -433,6 +434,10 @@ const	controllerSlice = createSlice(
 		setCurrentProfileIsFriend(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.currentProfileIsFriend = action.payload.user.chat.currentProfileIsFriend;
+		},
+		setAlreadyExists(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.alreadyExists = action.payload.user.alreadyExists;
 		},
 	}
 });

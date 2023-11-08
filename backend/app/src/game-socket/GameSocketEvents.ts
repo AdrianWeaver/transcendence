@@ -75,6 +75,17 @@ export class GameSocketEvents
 			if (instance.loop && instance.loop.gameActive === false)
 				return ;
 			this.update(instance);
+
+			const	scorePlayerOne = instance.playerOne.score;
+			const	scorePlayerTwo = instance.playerTwo.score;
+			if (scorePlayerOne === instance.scoreLimit)
+			{
+				console.log("User one has won ");
+			}
+			if (scorePlayerTwo === instance.scoreLimit)
+			{
+				console.log("User two has won");
+			}
 			const action = {
 				type: "game-data",
 				payload:
