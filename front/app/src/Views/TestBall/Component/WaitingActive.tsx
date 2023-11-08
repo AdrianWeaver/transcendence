@@ -23,6 +23,38 @@ import pong from "../assets/pong.jpeg";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { useEffect, useState } from "react";
 
+type DisplayUsersAvatarProps = {
+	avatarPlayerOne: JSX.Element,
+	avatarPlayerTwo: JSX.Element
+};
+
+const	DisplayUsersAvatar = (props: any) =>
+{
+	return (
+		<>
+			<Grid
+				item
+				xs={6}
+				sx={{
+					flex: "1 0 auto",
+					// border: "1px solid blue"
+				}}
+			>
+				{props.avatarPlayerOne}
+			</Grid>
+			<Grid
+				item
+				xs={6}
+				sx={{
+					flex: "1 0 auto",
+					// border: "1px solid blue"
+				}}
+			>
+				{props.avatarPlayerTwo}
+			</Grid>
+		</>
+	);
+};
 
 type WaitingActiveProps = {
 	connected: boolean,
@@ -36,6 +68,10 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 	const	devTestValue = true;
 
 	const theme = useTheme();
+	const numberOfUser = useAppSelector((state) =>
+	{
+		return (state.gameEngine.server.numberOfUser);
+	});
 
 	const
 	[
@@ -43,11 +79,7 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 		setRender
 	] = useState(<></>);
 
-	const
-	[
-		title,
-		setTitle
-	] = useState("");
+	let title;
 
 	const
 	[
@@ -94,21 +126,61 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 		/>
 	);
 
+	let	avatars;
+	let logos;
+
+	if (props.disconnected !== undefined)
+	{
+		avatars = (
+			<DisplayUsersAvatar
+				avatarPlayerOne={avatarPlayerOne}
+				avatarPlayerTwo={avatarPlayerTwo}
+			/>
+		);
+		logos = (
+			<Box sx={
+				{
+					display: "flex",
+					pl: 1,
+					pb: 1,
+					// border: "1px solid red"
+				}}
+			>
+				<IconButton aria-label="waiting">
+					<HourglassBottomIcon sx={{
+						height: 38,
+						width: 38
+					}} />
+				</IconButton>
+			</Box>
+		);
+		if (statusConnected === true)
+		{
+			title = "Partie Random";
+		}
+		else
+		{
+			title = "Deconnecte";
+		}
+	}
+	else
+	{
+		avatars = <></>;
+		logos = <></>;
+		title = "Erreur";
+	}
 	useEffect(() =>
 	{
 		if (statusConnected === true)
 		{
-			setTitle("Partie Random");
 			setDescription("En attente d'un adversaire");
 		}
 		else
 		{
-			setTitle("Deconnecte !");
 			setDescription("Veillez rafraichir la page");
 		}
 		if (props.disconnected === undefined)
 		{
-			setTitle("Erreur");
 			setDescription("Il semblerait que vous soyez connectee ailleur");
 		}
 	}, [statusConnected]);
@@ -173,43 +245,9 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 								</Typography>
 							</Grid>
 							</CardContent>
-							<Grid
-								item
-								xs={6}
-								sx={{
-									flex: "1 0 auto",
-									// border: "1px solid blue"
-								}}
-							>
-								{avatarPlayerOne}
-							</Grid>
-							<Grid
-								item
-								xs={6}
-								sx={{
-									flex: "1 0 auto",
-									// border: "1px solid blue"
-								}}
-							>
-								{avatarPlayerTwo}
-							</Grid>
+							{avatars}
 						</Grid>
-						<Box sx={
-							{
-								display: "flex",
-								pl: 1,
-								pb: 1,
-								// border: "1px solid red"
-
-							}}
-						>
-							<IconButton aria-label="waiting">
-								<HourglassBottomIcon sx={{
-									height: 38,
-									width: 38
-								}} />
-							</IconButton>
-						</Box>
+						{logos}
 					</Box>
 					<CardMedia
 						component="img"
@@ -221,6 +259,7 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 			</Backdrop>
 		</>
 	);
+
 	return (renderView);
 };
 

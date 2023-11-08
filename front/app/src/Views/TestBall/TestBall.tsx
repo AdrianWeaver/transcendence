@@ -502,20 +502,20 @@ const	TestBall = () =>
 			{/* This is the canvas part */}
 
 			<div style={{ textAlign: "center" }}>
-			<motion.div
-				initial={{ rotate: 0 }}
-				animate={{ rotate: mode === "upside-down" ? 180 : 0}}
-				style={{
-				width: game.board.canvas?.width,
-				height: game.board.canvas?.height,
-				}}
-			>
-				<canvas
-				height={game.board.canvas?.height}
-				width={game.board.canvas?.width}
-				ref={game.board.canvasRef}
-				/>
-			</motion.div>
+				<motion.div
+					initial={{ rotate: 0 }}
+					animate={{ rotate: mode?.mode === "upside-down" ? 180 : 0}}
+					style={{
+					width: game.board.canvas?.width,
+					height: game.board.canvas?.height,
+					}}
+				>
+					<canvas
+					height={game.board.canvas?.height}
+					width={game.board.canvas?.width}
+					ref={game.board.canvasRef}
+					/>
+				</motion.div>
 			</div>
 
 			{/* <div style={{textAlign: "center"}}>

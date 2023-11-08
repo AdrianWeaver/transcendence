@@ -1,6 +1,15 @@
-import { Controller, Get, Logger } from "@nestjs/common";
+/* eslint-disable max-classes-per-file */
+import { Body, Controller, Get, Logger, Param, UseGuards } from "@nestjs/common";
 import { GameApiService } from "./game-api.service";
 import { UserService } from "src/user/user.service";
+import { UserAuthorizationGuard } from "../user/user.authorizationGuard";
+import { IsNotEmpty, IsNumberString} from "class-validator";
+
+class InviteDto
+{
+    @IsNotEmpty()
+    friend: string;
+}
 
 @Controller("api/game")
 export class GameApiController
@@ -38,5 +47,14 @@ export class GameApiController
     getGameServiceCopy()
     {
         return (this.gameApiService.getGameServiceCopy());
+    }
+
+    @Get("/invite/friends")
+    // @UseGuards(UserAuthorizationGuard)
+    inviteFriend(@Param("invited") friend: string)
+    {
+
+        console.log(friend);
+        return ("hello");
     }
 }

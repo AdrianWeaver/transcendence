@@ -32,7 +32,7 @@ class GameServe
 	public isSocketIdExistGameInstance: (clientId: string) => boolean;
 
 	public getSeralizable: () => any;
-
+	public gameMode: string;
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
@@ -51,6 +51,7 @@ class GameServe
 		this.continueAnimating = true;
 		this.loop = undefined;
 		this.userConnected = 0;
+		this.gameMode = "undefined";
 
 		this.initPlayers = () =>
 		{
@@ -77,6 +78,7 @@ class GameServe
 		{
 			return ({
 				uuid: this.uuid,
+				gameMode: this.gameMode,
 				roomName: this.roomName,
 				frameRate: this.frameRate,
 				frameCount: this.frameCount,

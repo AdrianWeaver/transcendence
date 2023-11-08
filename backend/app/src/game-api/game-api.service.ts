@@ -23,4 +23,9 @@ export class GameApiService
 	{
 		return (this.gameService.getGameServiceCopy());
 	}
+
+	public	inviteFriends(myProfileId: string, friendProfileId: string): any
+	{
+		// this.gameService.
+	}
 }

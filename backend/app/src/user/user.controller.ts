@@ -346,11 +346,12 @@ export class UserController
 			|| !this.env.parsed.FT_SECRET)
 			throw new InternalServerErrorException();
 		let	retValue;
-		// let	userObject: UserModel;
+
 		let	profileId: number;
 		profileId = Math.floor((Math.random() * 100000) + 1);
 		while (!this.userService.isProfileIDUnique(profileId))
 			profileId = Math.floor((Math.random() * 100000) + 1);
+		// const profileId = 10101042;
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
 			registrationStarted: true,
