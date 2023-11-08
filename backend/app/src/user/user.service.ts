@@ -826,6 +826,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	}
 	// const	secretToken = randomBytes(64).toString("hex");
 	const newUser : UserModel= {
+		registrationStarted: true,
 		registrationProcessEnded: false,
 		ftApi: data.ftApi,
 		retStatus: data.retStatus,
@@ -911,6 +912,7 @@ public	register(data: UserModel)
 	}
 	// const	secretToken = randomBytes(64).toString("hex");
 	const newUser : UserModel= {
+		registrationStarted: true,
 		registrationProcessEnded: false,
 		ftApi: data.ftApi,
 		retStatus: data.retStatus,
@@ -1382,6 +1384,7 @@ public	register(data: UserModel)
 		// UserModel stringified
 		const	objToDB: UserModel = {
 			// date of creation - 1h
+			registrationStarted: user.registrationStarted,
 			ftApi: {...user.ftApi},
 			registrationProcessEnded: user.registrationProcessEnded,
 			retStatus: user.retStatus,
@@ -1470,6 +1473,7 @@ public	register(data: UserModel)
 		const	newUsers: UserModel[] = [];
 
 		const	toObj: UserModel = {
+			registrationStarted: data.registrationStarted,
 			registrationProcessEnded: data.registrationProcessEnded,
 			ftApi: data.ftApi,
 			retStatus: data.retStatus,
@@ -1552,8 +1556,13 @@ public	register(data: UserModel)
 
 	public	resetUser()
 	{
-		console.log("------user before reset");
+		console.log("------user before reset", this.user);
+		// const	searchUser = this.user.find((elem) =>
+		// {
+		// 	return (elem.id === -1);
+		// });
 		const	freshUser: UserModel =	{
+			registrationStarted: false,
 			registrationProcessEnded: false,
 			ftApi: {
 				accessToken: "",

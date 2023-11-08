@@ -98,6 +98,7 @@ export interface UserDBModel
 export interface UserModel
 {
 	ftApi: ApplicationUserModel;
+	registrationStarted: boolean,
 	retStatus: number;
 	date: string;
 	id: any;

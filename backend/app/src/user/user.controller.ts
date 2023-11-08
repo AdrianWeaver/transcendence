@@ -180,6 +180,7 @@ export class UserController
 			throw new InternalServerErrorException();
 		let	retValue;
 		let	userObject: UserModel;
+		const	users = this.userService.getUserArray();
 		const dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
@@ -199,7 +200,12 @@ export class UserController
 			.then((res) =>
 			{
 				const	data = res.data;
-
+				const	searchUser = users.find((elem) =>
+				{
+					return (elem.ftApi.accessToken === data.access_token);
+				});
+				if (searchUser)
+					return ("already exists");
 				// this.logger.debug(data);
 				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
@@ -214,6 +220,8 @@ export class UserController
 			})
 			.then((newObject : any) =>
 			{
+				if (newObject === "already exists")
+					return ;
 				const config = {
 					method: "get",
 					maxBodyLength: Infinity,
@@ -238,6 +246,7 @@ export class UserController
 					{
 						userObject = {
 							registrationProcessEnded: false,
+							registrationStarted: true,
 							ftApi: newObject,
 							retStatus: resData.status,
 							date: resData.headers.date,
@@ -337,6 +346,7 @@ export class UserController
 			profileId = Math.floor((Math.random() * 100000) + 1);
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
+			registrationStarted: true,
 			ftApi: {
 				accessToken: "undefined",
 				tokenType: "undefined",
