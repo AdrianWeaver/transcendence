@@ -128,7 +128,7 @@ const	SecondStepFormContent = () =>
 		{
 			dispatch(setDoubleAuth(false));
 			dispatch(setPhoneNumber("undefined"));
-			dispatch(setRegistered(true));
+			dispatch(setRegistered());
 			dispatch(setUserLoggedIn());
 			dispatch(setProfileMyView());
 			dispatch(setAllUsers());
@@ -200,7 +200,7 @@ const	SecondStepFormContent = () =>
 				// if (user.codeValidated)
 				// {
 				// 	dispatch(setUserLoggedIn());
-				// 	dispatch(setRegistered(true));
+				// 	dispatch(setRegistered());
 				// 	dispatch(setAllUsers());
 				// }
 			}
@@ -252,7 +252,7 @@ const	SecondStepFormContent = () =>
 			if (user.codeValidated)
 			{
 				dispatch(setUserLoggedIn());
-				dispatch(setRegistered(true));
+				dispatch(setRegistered());
 				dispatch(setAllUsers());
 				dispatch(addFrontUser(user));
 			}

@@ -24,6 +24,10 @@ export const	initialGameEngineState: Model = {
 		frameNumber: 0,
 		numberOfUser: 0,
 		readyPlayerCount: 0,
+		playerOneProfileId: 0,
+		playerTwoProfileId: 0,
+		playerOnePicture: "",
+		playerTwoPicture: "",
 	},
 	board:
 	{
@@ -57,8 +61,11 @@ export const	initialGameEngineState: Model = {
 			}
 		},
 		plOneScore: 0,
-		plTwoScore: 0
-	}
+		plTwoScore: 0,
+		plOneSocket: "undefined",
+		plTwoSocket: "undefined"
+	},
+	meConnected: false,
 };
 
 const	gameEngineSlice = createSlice(
@@ -127,6 +134,30 @@ const	gameEngineSlice = createSlice(
 		{
 			state.server.numberOfUser = action.payload.server.numberOfUser;
 		},
+		setPlayerOneProfileId(state, action: PayloadAction<Model>)
+		{
+			state.server.playerOneProfileId
+			= action.payload.server.playerOneProfileId;
+		},
+		setPlayerTwoProfileId(state, action: PayloadAction<Model>)
+		{
+			state.server.playerTwoProfileId
+			= action.payload.server.playerTwoProfileId;
+		},
+		setPlayerOnePicture(state, action: PayloadAction<Model>)
+		{
+			state.server.playerOnePicture
+			= action.payload.server.playerOnePicture;
+		},
+		setPlayerTwoPicture(state, action: PayloadAction<Model>)
+		{
+			state.server.playerTwoPicture
+			= action.payload.server.playerTwoPicture;
+		},
+		setConnectedStore(state, action: PayloadAction<Model>)
+		{
+			state.meConnected = action.payload.meConnected;
+		}
 	}
 });
 

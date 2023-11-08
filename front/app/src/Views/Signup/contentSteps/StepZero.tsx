@@ -99,6 +99,7 @@ const	getUrlFT = () =>
 const	StepZero = () =>
 {
 	const	query = useLocation();
+	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
 
@@ -166,8 +167,9 @@ const	StepZero = () =>
 	{
 		dispatch(registerClientWithCode(responseQuery.code));
 	}
-	if (user.bearerToken !== "undefined")
+	if (user.bearerToken !== "undefined" && !user.alreadyExists)
 	{
+		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}

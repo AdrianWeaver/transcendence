@@ -342,6 +342,30 @@ const	UserServices = {
 			})
 		);
 	},
+	async	registrationValidation(token: string, hostname: string)
+	{
+		console.log("Validate registration in back");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		return (
+			Api(hostname)
+			.post("user/validate-registration", {}, config)
+			.then((data) =>
+			{
+				console.log(data);
+				return ("OK");
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;
