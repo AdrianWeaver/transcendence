@@ -1537,16 +1537,71 @@ public	register(data: UserModel)
 
 	public	validateRegistration(userId: string | number)
 	: boolean
-{
-	console.log("VALIDATE REGISTRATION", userId);
-	const	index = this.user.findIndex((elem) =>
 	{
-		return (userId.toString() === elem.id.toString());
-	});
-	if (index === -1)
-		return (false);
-	this.user[index].registrationProcessEnded = true;
-	console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
-	return (true);
-}
+		console.log("VALIDATE REGISTRATION", userId);
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (userId.toString() === elem.id.toString());
+		});
+		if (index === -1)
+			return (false);
+		this.user[index].registrationProcessEnded = true;
+		console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
+		return (true);
+	}
+
+	public	resetUser()
+	{
+		console.log("------user before reset");
+		const	freshUser: UserModel =	{
+			registrationProcessEnded: false,
+			ftApi: {
+				accessToken: "",
+				tokenType: "",
+				expiresIn: "",
+				refreshToken: "",
+				scope: "public",
+				createdAt: "",
+				secretValidUntil: ""
+			},
+			retStatus: -1,
+			date: "",
+			id: -1,
+			email: "",
+			username: "",
+			login: "",
+			online: false,
+			status: "",
+			firstName: "",
+			lastName: "",
+			url: "",
+			avatar: "",
+			ftAvatar: {
+				link: "",
+				version: {
+				large: "",
+				medium: "",
+				mini: "",
+				small: ""
+				}
+			},
+			location: "",
+			revokedConnectionRequest: false,
+			authService: {
+				token: "",
+				expAt: -1,
+				doubleAuth: {
+				enable: false,
+				lastIpClient: "",
+				phoneNumber: "",
+				phoneRegistered: false,
+				validationCode: "",
+				valid: false
+				}
+			},
+			password: "",
+			friendsProfileId: []
+		};
+		console.log("------user after reset");
+	}
 }

@@ -231,6 +231,7 @@ export class UserController
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
+						this.userService.resetUser();
 						res.status(400).json({error: "you are already register"});
 					}
 					else
