@@ -161,6 +161,15 @@ class Configuration
 		this.generateFull();
 		return (this.ftAuthUrl);
 	}
+
+	public	getRedirectURI()
+	{
+		return (this.redirectProtocol
+			+ "://"
+			+ this.redirectDomain
+			+ ":"
+			+ this.redirectPort);
+	}
 }
 
 export default Configuration;

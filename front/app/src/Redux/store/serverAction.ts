@@ -65,16 +65,17 @@ export const	increaseConnectionAttempt = ()
 export const	resetState = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch) =>
+	return ((dispatch, getState) =>
 	{
+		const prev = getState();
 		const	response: ServerModel = {
+			...prev.server,
 			isFetching: false,
 			connexionEnabled: false,
 			connexionAttempt: 0,
 			error: false,
 			message: "",
 			serverActiveSince: "unknow",
-			serverLocation: "localhost",
 			links: {
 				authApiUrl: "undefined",
 			}
@@ -121,6 +122,7 @@ export const	setServerConnectionSuccess = (
 		};
 		// console.log(response);
 		dispatch(serverActions.setServerConnectionSuccess(response));
+		dispatch(serverActions.setAuthApiLinks(response));
 	});
 };
 
@@ -153,10 +155,11 @@ export	const	getServerConnection = ()
 		}
 		else
 		{
-			console.log("Flag response server-status: ", data);
+			console.log("Flag response server-status: ", data.links.authApiUrl);
 			dispatch(
 				setServerConnectionSuccess(data.availableSince, data.links)
 			);
+			
 		}
 	});
 };
