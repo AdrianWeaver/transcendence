@@ -929,10 +929,10 @@ export const	setPhoneNumber = (data: string)
 	});
 }
 
-export const	setRegistered = (data: boolean)
+export const	setAlreadyExists = (exists: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	return ((dispatch, getState) =>
+	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 		const	response: ControllerModel = {
@@ -940,7 +940,32 @@ export const	setRegistered = (data: boolean)
 			user:
 			{
 				...prev.controller.user,
-				registered: data,
+				alreadyExists: exists
+			}
+		}
+		dispatch(controllerActions.setAlreadyExists(response));
+	});
+}
+
+export const	setRegistered = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	data: any = UserServices.registrationValidation(prev.controller.user.bearerToken, prev.server.serverLocation);
+		if (data === "error")
+		{
+			console.log("TEST error");
+			setAlreadyExists(true);
+			return ;
+		}
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				registered: true,
 			}
 		}
 		dispatch(controllerActions.setRegistered(response));

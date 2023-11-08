@@ -568,11 +568,14 @@ export class ChatSocketEvents
 				if (searchChannel.isBanned(client.id) === true)
 					action.payload.message = "You have been banned from this channel";
 				client.emit("display-channels", action);
+				const	userMe = this.chatService.getUserBySocketId(client.id);
+				if (userMe === undefined)
+					return ;
 				if (action.payload.message === "")
 				{
 					client.join(data.payload.chanName);
 					const id = searchChannel.messages.length + 1;
-					const	messageText = "Welcome to the channel, " + client.id + " !";
+					const	messageText = "Welcome to the channel, " + userMe.name + " !";
 					const newMessage: MessageModel = {
 						sender: "server",
 						message: messageText,

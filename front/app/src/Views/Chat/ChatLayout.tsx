@@ -1245,42 +1245,37 @@ const	ChatLayout = () =>
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
 		let	profileId: string;
-
-		profileId = "";
-		const	searchProfilId = chatUsers.find((elem) =>
+		profileId = data.toString();
+		console.log("isNaN(Number(data))", isNaN(Number(data)));
+		if (data.length !== 5 || isNaN(Number(data)))
 		{
-			return (data === elem.profileId);
-		});
-		if (searchProfilId !== undefined)
-			profileId = data;
-		else
-		{
+			console.log("ici ?", chatUsers, " ", data.length);
 			const	searchUser = chatUsers.find((elem) =>
 			{
-				return (data === elem.id);
+				console.log("data", data, "name", elem.name, " === ", data === elem.name);
+				return (data === elem.name);
 			});
-			if (searchUser)
-				profileId = searchUser.profileId;
-			else
+			console.log("seartchUs", searchUser);
+			if (searchUser !== undefined)
 			{
-				const	searchUsername = chatUsers.find((elem) =>
-				{
-					return (data === elem.name);
-				});
-				if (searchUsername)
-					profileId = searchUsername?.profileId;
+				profileId = searchUser.profileId;
+				console.log("profileID ?  ", profileId);
+				inviteUserToChannel(profileId);
 			}
 		}
-		console.log("profileID ?  ", profileId);
-		const	action = {
-			type: "invite-member",
-			payload: {
-				chanName: channelToInvite,
-				userName: profileId,
-			}
-		};
-		console.log("Action : invite", action);
-		socketRef.current.emit("user-info", action);
+		else
+		{
+			console.log("profileID Ok: ", profileId);
+			const	action = {
+				type: "invite-member",
+				payload: {
+					chanName: channelToInvite,
+					userName: profileId,
+				}
+			};
+			console.log("Action : invite", action);
+			socketRef.current.emit("user-info", action);
+		}
 	};
 
 	// END OF INVITE
@@ -1626,7 +1621,8 @@ const	ChatLayout = () =>
 																						<DialogActions>
 																							<Button onClick={() =>
 																								{
-																									inviteUserToChannel(member.name);
+																									getProfileId(member.name);
+																									inviteUserToChannel(userToInvite);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
 																								Invite
@@ -1825,7 +1821,8 @@ const	ChatLayout = () =>
 																							<Button onClick={() =>
 																								{
 																									setSeeProfile(false);
-																									inviteUserToChannel(talkingUser);
+																									getProfileId(talkingUser);
+																									inviteUserToChannel(userToInvite);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
 																								Invite
