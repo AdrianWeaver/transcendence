@@ -109,7 +109,8 @@ export interface	UserModel
 	"profile": ProfileModel,
 	"password": string,
 	"location": string,
-	"ft": boolean
+	"ft": boolean,
+	"alreadyExists": boolean
 }
 
 export interface	AnonymousUserModel

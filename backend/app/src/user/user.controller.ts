@@ -227,42 +227,7 @@ export class UserController
 				.then(async (resData) =>
 				{
 					const	data = resData.data;
-					userObject = {
-						registrationProcessEnded: false,
-						ftApi: newObject,
-						retStatus: resData.status,
-						date: resData.headers.date,
-						id: data.id,
-						email: data.email,
-						username: data.login,
-						online: false,
-						status: "offline",
-						login: data.login,
-						firstName: data.first_name,
-						lastName: data.last_name,
-						url: data.url,
-						avatar: data.image?.link,
-						ftAvatar: data.image,
-						location: data.location,
-						revokedConnectionRequest: false,
-						authService:
-						{
-							token: "",
-							expAt: 0,
-							doubleAuth:
-							{
-								enable: false,
-								lastIpClient: "undefined",
-								phoneNumber: "undefined",
-								phoneRegistered: false,
-								validationCode: "undefined",
-								valid: false,
-							}
-						},
-						password: "undefined",
-						friendsProfileId: []
-					};
-					const userTempCheck: UserModel | undefined = this.userService.getUserById(userObject.id);
+					const userTempCheck: UserModel | undefined = this.userService.getUserById(data.id);
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
@@ -270,6 +235,41 @@ export class UserController
 					}
 					else
 					{
+						userObject = {
+							registrationProcessEnded: false,
+							ftApi: newObject,
+							retStatus: resData.status,
+							date: resData.headers.date,
+							id: data.id,
+							email: data.email,
+							username: data.login,
+							online: false,
+							status: "offline",
+							login: data.login,
+							firstName: data.first_name,
+							lastName: data.last_name,
+							url: data.url,
+							avatar: data.image?.link,
+							ftAvatar: data.image,
+							location: data.location,
+							revokedConnectionRequest: false,
+							authService:
+							{
+								token: "",
+								expAt: 0,
+								doubleAuth:
+								{
+									enable: false,
+									lastIpClient: "undefined",
+									phoneNumber: "undefined",
+									phoneRegistered: false,
+									validationCode: "undefined",
+									valid: false,
+								}
+							},
+							password: "undefined",
+							friendsProfileId: []
+						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
 						retValue = this.userService.register(newUserObj);

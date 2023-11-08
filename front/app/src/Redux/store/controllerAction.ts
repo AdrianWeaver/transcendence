@@ -929,6 +929,24 @@ export const	setPhoneNumber = (data: string)
 	});
 }
 
+export const	setAlreadyExists = (exists: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				alreadyExists: exists
+			}
+		}
+		dispatch(controllerActions.setAlreadyExists(response));
+	});
+}
+
 export const	setRegistered = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -939,6 +957,7 @@ export const	setRegistered = ()
 		if (data === "error")
 		{
 			console.log("TEST error");
+			setAlreadyExists(true);
 			return ;
 		}
 		const	response: ControllerModel = {
