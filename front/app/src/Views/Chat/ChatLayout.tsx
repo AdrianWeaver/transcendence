@@ -1244,39 +1244,13 @@ const	ChatLayout = () =>
 	{
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
-		let	profileId: string;
 
-		profileId = "";
-		const	searchProfilId = chatUsers.find((elem) =>
-		{
-			return (data === elem.profileId);
-		});
-		if (searchProfilId !== undefined)
-			profileId = data;
-		else
-		{
-			const	searchUser = chatUsers.find((elem) =>
-			{
-				return (data === elem.id);
-			});
-			if (searchUser)
-				profileId = searchUser.profileId;
-			else
-			{
-				const	searchUsername = chatUsers.find((elem) =>
-				{
-					return (data === elem.name);
-				});
-				if (searchUsername)
-					profileId = searchUsername?.profileId;
-			}
-		}
-		console.log("profileID ?  ", profileId);
+		console.log("profileID ?  ", data);
 		const	action = {
 			type: "invite-member",
 			payload: {
 				chanName: channelToInvite,
-				userName: profileId,
+				userName: data,
 			}
 		};
 		console.log("Action : invite", action);
@@ -1626,7 +1600,8 @@ const	ChatLayout = () =>
 																						<DialogActions>
 																							<Button onClick={() =>
 																								{
-																									inviteUserToChannel(member.name);
+																									getProfileId(member.name);
+																									inviteUserToChannel(userToInvite);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
 																								Invite
@@ -1825,7 +1800,8 @@ const	ChatLayout = () =>
 																							<Button onClick={() =>
 																								{
 																									setSeeProfile(false);
-																									inviteUserToChannel(talkingUser);
+																									getProfileId(talkingUser);
+																									inviteUserToChannel(userToInvite);
 																									setInviteDialogOpen(false);
 																								}} color="primary">
 																								Invite
