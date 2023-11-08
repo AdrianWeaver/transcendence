@@ -23,116 +23,18 @@ import {
 	setPlTwoScore,
 	setReadyPlayerCount,
 	setScaleServer,
-	setServerDimension
+	setServerDimension,
+	setPlayerOneProfileId,
+	setPlayerTwoProfileId,
+	setPlayerOnePicture,
+	setPlayerTwoPicture,
+	setConnectedStore
 } from "../../Redux/store/gameEngineAction";
-import {
-	Backdrop,
-	Alert,
-	Typography,
-	Card,
-	Box,
-	CardContent,
-	IconButton
-} from "@mui/material";
-import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import CardMedia from "@mui/material/CardMedia";
-import pong from "./assets/pong.jpeg";
+import WaitingActive from "./Component/WaitingActive";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
-};
-
-const	WaitingActive = () =>
-{
-	// use proper condition to set as false for start game
-	const	devTestValue = false;
-
-	const theme = useTheme();
-
-	const
-	[
-		render,
-		setRender
-	] = useState(<></>);
-
-	useEffect(() =>
-	{
-		if (devTestValue === true)
-		{
-			setRender(
-				<>
-					<Backdrop
-						sx={
-						{
-							color: "#fff",
-							zIndex: (theme) =>
-							{
-								return (theme.zIndex.drawer + 1);
-							}
-						}}
-						open={true}
-					>
-						{/* <>en attente d'un adversaire</> */}
-						<Card sx={{
-							display: "flex",
-							justifyContent: "flex-start",
-							backgroundColor: theme.palette.background.default,
-							// width: "80%",
-						}}>
-							<Box
-								sx={
-								{
-									display: "flex",
-									flexDirection: "column",
-									// border: "1px solid red"
-								}}>
-								<CardContent sx={{ flex: "1 0 auto" }}>
-									<Typography component="div" variant="h5">
-										Partie random
-									</Typography>
-									<Typography
-										variant="subtitle1"
-										color="text.secondary"
-										component="div">
-										En attente d'un adversaire
-									</Typography>
-								</CardContent>
-								<Box sx={
-									{
-										display: "flex",
-										pl: 1,
-										pb: 1
-									}}
-								>
-									<IconButton aria-label="play/pause">
-										<HourglassBottomIcon sx={{
-											height: 38,
-											width: 38
-										}} />
-									</IconButton>
-								</Box>
-							</Box>
-							<CardMedia
-								component="img"
-								sx={{ width: 200 }}
-								image={pong}
-								alt="Image de pong"
-							/>
-						</Card>
-					</Backdrop>
-				</>
-			);
-		}
-		else
-		{
-			setRender(
-				<>game is started</>
-			);
-		}
-	}, [devTestValue]);
-	return (render);
 };
 
 const	TestBall = () =>
@@ -222,12 +124,14 @@ const	TestBall = () =>
 			};
 			socket.emit("info", action);
 			setConnected(true);
+			dispatch(setConnectedStore(true));
 		};
 
 		const disconnect = () =>
 		{
 			// console.log("ws disconnected");
 			setConnected(false);
+			setConnectedStore(false);
 		};
 
 		const	connectError = (error: Error) =>
@@ -294,6 +198,8 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
+			console.log(data.payload);
+
 			switch (data.type)
 			{
 				case "connect":
@@ -310,6 +216,18 @@ const	TestBall = () =>
 						game.playerTwo.socketId = data.payload.socketId;
 						dispatch(setPlTwoSocket(data.payload.socketId));
 					}
+					dispatch(
+						setPlayerOneProfileId(data.payload.playerOneProfileId)
+					);
+					dispatch(
+						setPlayerTwoProfileId(data.payload.playerTwoProfileId)
+					);
+					dispatch(
+						setPlayerOnePicture(data.payload.playerOnePicture)
+					);
+					dispatch(
+						setPlayerTwoPicture(data.payload.playerTwoPicture)
+					);
 					break ;
 				case "disconnect":
 					dispatch(setNumberOfUsers(data.payload.numberUsers));
@@ -517,7 +435,11 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
-			<WaitingActive />
+			<WaitingActive
+				connected={connected}
+				numberOfUser={theServer.numberOfUser}
+				disconnected={socketRef.current?.active}
+			/>
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
@@ -559,6 +481,7 @@ const	TestBall = () =>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
+
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}

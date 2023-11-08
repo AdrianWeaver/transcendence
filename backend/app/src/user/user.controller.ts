@@ -9,7 +9,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import { Request, Response } from "express";
@@ -742,4 +742,15 @@ export class UserController
 			.log("'add-friend' route requested");
 		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
+
+	// @Get("public/picture/:profileId")
+	// getPublicPicture(@Param() params: any)
+	// {
+	// 	console.log(params);
+	// 	// I want to send the address of the picture
+	// 	const	user = this.userService.getUserById(params.profileId);
+	// 	if (user === undefined)
+	// 		throw new NotFoundException();
+	// 	return ("http://localhost:3001/cdn/picture/" + user.username);
+	// }
 }

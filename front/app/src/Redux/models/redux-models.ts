@@ -208,6 +208,10 @@ export interface	GameEngineModel
 		frameNumber: number,
 		numberOfUser: number,
 		readyPlayerCount: number,
+		playerOneProfileId: number,
+		playerTwoProfileId: number,
+		playerOnePicture: string,
+		playerTwoPicture: string,
 	},
 	board:
 	{
@@ -228,5 +232,6 @@ export interface	GameEngineModel
 		plTwoSocket: string,
 		plOneScore: number,
 		plTwoScore:number
-	}
+	},
+	meConnected: boolean,
 }
