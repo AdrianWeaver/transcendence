@@ -232,5 +232,6 @@ export interface	GameEngineModel
 		plTwoSocket: string,
 		plOneScore: number,
 		plTwoScore:number
-	}
+	},
+	meConnected: boolean,
 }

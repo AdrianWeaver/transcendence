@@ -390,3 +390,18 @@ export const	setPlayerTwoPicture = (playerTwoPicture: string)
 		dispatch(action.setPlayerTwoPicture(response));
 	});
 };
+
+export const	setConnectedStore = (value: boolean)
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const response: Model = {
+			...prev.gameEngine,
+			meConnected: value
+		};
+		dispatch(action.setConnectedStore(response));
+	});
+};

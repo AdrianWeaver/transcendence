@@ -27,233 +27,14 @@ import {
 	setPlayerOneProfileId,
 	setPlayerTwoProfileId,
 	setPlayerOnePicture,
-	setPlayerTwoPicture
+	setPlayerTwoPicture,
+	setConnectedStore
 } from "../../Redux/store/gameEngineAction";
-import {
-	Backdrop,
-	Alert,
-	Typography,
-	Card,
-	Box,
-	CardContent,
-	IconButton,
-	Grid,
-	Paper,
-	Avatar
-} from "@mui/material";
-import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import CardMedia from "@mui/material/CardMedia";
-import pong from "./assets/pong.jpeg";
+import WaitingActive from "./Component/WaitingActive";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
-};
-
-type WaitingActiveProps = {
-	connected: boolean,
-	playerOneProfileId: string,
-	playerTwoProfileId: string,
-	playerOnePicture: string,
-	playerTwoPicture: string,
-	numberOfUser: number,
-};
-
-const	WaitingActive = (props: WaitingActiveProps) =>
-{
-	// use proper condition to set as false for start game
-	const	devTestValue = true;
-
-	const theme = useTheme();
-
-	const
-	[
-		render,
-		setRender
-	] = useState(<></>);
-
-	const
-	[
-		title,
-		setTitle
-	] = useState("");
-
-	const
-	[
-		description,
-		setDescription
-	] = useState("");
-
-	const
-	[
-		userCount,
-		setUserCount
-	] = useState(0);
-
-	const userOnePicture = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.playerOnePicture);
-	});
-
-	const userTwoPicture = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.playerTwoPicture);
-	});
-
-	console.info(userOnePicture);
-	console.info(userTwoPicture);
-
-	const	avatarPlayerOne = (
-		<Avatar
-				src={userOnePicture}
-				sx={{
-					width: 100,
-					height: 100
-				}}
-			/>
-		);
-	const	avatarPlayerTwo = (
-		<Avatar
-			src={userTwoPicture}
-			sx={{
-				width: 100,
-				height: 100
-			}}
-		/>
-	);
-	useEffect(() =>
-	{
-		if (props.connected === true)
-		{
-			setTitle("Partie Random");
-			setDescription("En attente d'un adversaire");
-		}
-		else
-		{
-			setTitle("Deconnecte !");
-			setDescription("Veillez rafraichir la page");
-		}
-		if (devTestValue === true)
-		{
-			setRender(
-				<>
-					<Backdrop
-						sx={
-						{
-							color: "#fff",
-							zIndex: (theme) =>
-							{
-								return (theme.zIndex.drawer + 1);
-							}
-						}}
-						open={true}
-					>
-						{/* <>en attente d'un adversaire</> */}
-						<Card sx={{
-							display: "flex",
-							justifyContent: "flex-start",
-							backgroundColor: theme.palette.background.default,
-							// width: "80%",
-						}}>
-							<Box
-								sx={
-								{
-									display: "flex",
-									flexDirection: "column",
-									border: "1px solid red"
-								}}>
-								<Grid
-									container
-									component={Card}
-									sx={{
-										flexDirection: "row",
-										pl: 1,
-										pb: 1
-									}}
-								>
-									<CardContent sx={{ flex: "1 0 auto" }}>
-									<Grid
-										item
-										xs={12}
-										sx={{
-											flex: "1 0 auto",
-											// border: "1px solid blue"
-										}}
-									>
-										<Typography
-											component="div"
-											variant="h5"
-										>
-											{title}
-										</Typography>
-										<Typography
-											variant="subtitle1"
-											color="text.secondary"
-											component="div">
-											{description}
-											{/* 
-											<br	/>{props.playerTwoProfileId} */}
-										</Typography>
-									</Grid>
-									</CardContent>
-									<Grid
-										item
-										xs={6}
-										sx={{
-											flex: "1 0 auto",
-											// border: "1px solid blue"
-										}}
-									>
-										{avatarPlayerOne}
-									</Grid>
-									<Grid
-										item
-										xs={6}
-										sx={{
-											flex: "1 0 auto",
-											// border: "1px solid blue"
-										}}
-									>
-										{avatarPlayerTwo}
-									</Grid>
-								</Grid>
-								<Box sx={
-									{
-										display: "flex",
-										pl: 1,
-										pb: 1,
-										// border: "1px solid red"
-
-									}}
-								>
-									<IconButton aria-label="waiting">
-										<HourglassBottomIcon sx={{
-											height: 38,
-											width: 38
-										}} />
-									</IconButton>
-								</Box>
-							</Box>
-							<CardMedia
-								component="img"
-								sx={{ width: 200 }}
-								image={pong}
-								alt="Image de pong"
-							/>
-						</Card>
-					</Backdrop>
-				</>
-			);
-		}
-		else
-		{
-			setRender(
-				<>game is started</>
-			);
-		}
-	}, [props.connected]);
-	return (render);
 };
 
 const	TestBall = () =>
@@ -343,13 +124,14 @@ const	TestBall = () =>
 			};
 			socket.emit("info", action);
 			setConnected(true);
-			setConnectedStore
+			dispatch(setConnectedStore(true));
 		};
 
 		const disconnect = () =>
 		{
 			// console.log("ws disconnected");
 			setConnected(false);
+			setConnectedStore(false);
 		};
 
 		const	connectError = (error: Error) =>
@@ -655,19 +437,8 @@ const	TestBall = () =>
 			< MenuBar />
 			<WaitingActive
 				connected={connected}
-				playerOneProfileId={
-					theServer.playerOneProfileId.toString()
-				}
-				playerTwoProfileId={
-					theServer.playerTwoProfileId.toString()
-				}
-				playerOnePicture={
-					theServer.playerOnePicture.toString()
-				}
-				playerTwoPicture={
-					theServer.playerTwoPicture.toString()
-				}
 				numberOfUser={theServer.numberOfUser}
+				disconnected={socketRef.current?.active}
 			/>
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
@@ -710,6 +481,7 @@ const	TestBall = () =>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
+
 			<div style={{textAlign: "center"}}>
 				<canvas
 					height={game.board.canvas?.height}

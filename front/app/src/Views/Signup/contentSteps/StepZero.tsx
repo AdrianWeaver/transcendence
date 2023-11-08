@@ -99,6 +99,7 @@ const	getUrlFT = () =>
 const	StepZero = () =>
 {
 	const	query = useLocation();
+	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
 

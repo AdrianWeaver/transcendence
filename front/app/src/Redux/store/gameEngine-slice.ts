@@ -64,7 +64,8 @@ export const	initialGameEngineState: Model = {
 		plTwoScore: 0,
 		plOneSocket: "undefined",
 		plTwoSocket: "undefined"
-	}
+	},
+	meConnected: false,
 };
 
 const	gameEngineSlice = createSlice(
@@ -152,6 +153,10 @@ const	gameEngineSlice = createSlice(
 		{
 			state.server.playerTwoPicture
 			= action.payload.server.playerTwoPicture;
+		},
+		setConnectedStore(state, action: PayloadAction<Model>)
+		{
+			state.meConnected = action.payload.meConnected;
 		}
 	}
 });

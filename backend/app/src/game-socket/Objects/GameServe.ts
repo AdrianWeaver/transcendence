@@ -75,22 +75,6 @@ class GameServe
 
 		this.getSeralizable = () =>
 		{
-			// console.log("getSeralizable inside  GameServe.ts", {
-			// 	uuid: this.uuid,
-			// 	roomName: this.roomName,
-			// 	frameRate: this.frameRate,
-			// 	frameCount: this.frameCount,
-			// 	playerOne: this.playerOne.getSerializable(),
-			// 	plpayerTwo: this.playerTwo.getSerializable(),
-			// 	board: this.board.getSeralizable(),
-			// 	ball: this.ball.getSeralizable(),
-			// 	net: this.net.getSerializable(),
-			// 	scoreLimit: this.scoreLimit,
-			// 	actionKeyPress: this.actionKeyPress,
-			// 	startDisplayed: this.startDisplayed,
-			// 	continueAnimating: this.continueAnimating,
-			// 	loop: this.loop?.getSerializable(),
-			// });
 			return ({
 				uuid: this.uuid,
 				roomName: this.roomName,
@@ -118,27 +102,6 @@ class GameServe
 				return (true);
 			return (false);
 		};
-		// this.isGameInstanceEmpty = () =>
-		// {
-		// 	const	sockOne = this.playerOne.socketId;
-		// 	const	sockTwo = this.playerTwo.socketId;
-
-		// 	if (sockOne !== "undefined")
-		// 	{
-		// 		if (sockOne !== "disconnected")
-		// 		{
-		// 			return (false);
-		// 		}
-		// 	}
-		// 	if (sockTwo !== "undefined")
-		// 	{
-		// 		if (sockTwo !== "disconnected")
-		// 		{
-		// 			return (false);
-		// 		}
-		// 	}
-		// 	return (true);
-		// };
 	}
 }
 
