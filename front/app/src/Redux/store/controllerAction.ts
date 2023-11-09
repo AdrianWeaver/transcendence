@@ -629,7 +629,7 @@ export const	verifyTokenAtRefresh = ()
 		const	data = await UserServices
 			.verifyToken(
 				user.bearerToken,
-				prevState.server.serverLocation
+				prevState.server.uri
 			);
 		if (data === "ERROR")
 		{
