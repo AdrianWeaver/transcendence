@@ -262,7 +262,10 @@ const DropZoneImage = () =>
 	{
 		return (state.controller.user.bearerToken);
 	});
-
+	const	uri = useAppSelector((state) =>
+	{
+		return (state.server.uri);
+	});
 	const	handleAddFile = (newFile: any) =>
 	{
 		console.log(newFile);
@@ -321,7 +324,7 @@ const DropZoneImage = () =>
 		const	formData = new FormData();
 		formData.append("image", files[0]);
 // localhost
-		axios.post("http://made-f0br4s4.clusters.42paris.fr/:3000/user/update-photo", formData, {
+		axios.post(uri + ":3000/user/update-photo", formData, {
 			headers: {
 				// "Content-Type": "multipart/form-data",
 				"Authorization": token

@@ -30,7 +30,7 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
+import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
 	type: string,
@@ -94,11 +94,11 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			// instrument(this.server,
-			// 	{
-			// 		auth: false,
-			// 		mode: "development"
-			// 	});
+			instrument(this.server,
+				{
+					auth: false,
+					mode: "development"
+				});
 		}
 
 		handleConnection(client: Socket)
