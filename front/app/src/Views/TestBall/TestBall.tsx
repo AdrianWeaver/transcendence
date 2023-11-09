@@ -97,7 +97,7 @@ const	TestBall = () =>
 
 	const	url = useAppSelector((state) =>
 	{
-		return ("http://" + state.server.serverLocation + ":3000");
+		return (state.server.uri + ":3000");
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);

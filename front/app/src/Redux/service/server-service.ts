@@ -173,7 +173,7 @@ const	ServerService = {
 					return ("ERROR");
 				})
 		);
-	}
+	},
 };
 
 export default ServerService;

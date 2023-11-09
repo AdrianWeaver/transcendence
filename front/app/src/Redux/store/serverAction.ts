@@ -139,7 +139,7 @@ export	const	getServerConnection = ()
 		// const	user = prevState.controller.user;
 
 		const	data = await ServerService
-			.getConnection(prevState.server.serverLocation);
+			.getConnection(prevState.server.uri);
 		if (data.success === false)
 		{
 			// console.log("data tyes", data);
@@ -173,7 +173,7 @@ export	const	setErrorService = (server: ServerModel)
 	});
 };
 
-export const	setServerLocation = (locationServer: string)
+export const	setServerLocation = (protocole: string, locationServer: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
@@ -183,6 +183,7 @@ export const	setServerLocation = (locationServer: string)
 		const	response: ServerModel = {
 			...prevState.server,
 			serverLocation: locationServer,
+			uri: protocole + "//" + locationServer
 		};
 		dispatch(serverActions.setServerLocation(response));
 	});
@@ -196,7 +197,7 @@ export const	setAuthApiLinks = ()
 		const prev = getState();
 
 		const	data = await ServerService
-		.getAuthApiLinks(prev.server.serverLocation);
+		.getAuthApiLinks(prev.server.uri);
 		if (data.success === true)
 		{
 			console.log("Action reducer data set auth links: ", data);
