@@ -339,7 +339,30 @@ export class	GameService implements OnModuleInit
 		return (array);
 	}
 
-	public	findIndexGameInstanceUserProfileAndGameUuid(myProfileId: string, gameUuid: string)
+	public	findIndexAllInstanceByProfileIdAndKeyFilter(
+		myProfileId: string, filter: string
+	)
+	{
+		const	arrayIndex: Array<number> = [];
+		let		index;
+
+		index = 0;
+		for (const instance of this.gameInstances)
+		{
+			if (instance.gameMode === filter)
+			{
+				if (instance.playerOne.profileId === myProfileId
+					|| instance.playerTwo.profileId === myProfileId)
+					arrayIndex.push(index);
+			}
+			index += 1;
+		}
+		return (arrayIndex);
+	}
+
+	public	findIndexGameInstanceUserProfileAndGameUuid(
+		myProfileId: string, gameUuid: string
+	)
 	{
 		return (
 			this.gameInstances.findIndex((instance) =>

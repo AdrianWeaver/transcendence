@@ -1,11 +1,25 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import { Container, Typography, Stack, Button, Box, Card, CardActions, CardContent, CardMedia, Grid } from "@mui/material";
+import {
+	Container,
+	Typography,
+	Stack,
+	Button,
+	Box,
+	Card,
+	CardActions,
+	CardContent,
+	CardMedia,
+	Grid
+} from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Profiler, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { getMyActiveGame, revokeGameWithUuid } from "../../Redux/store/gameEngineAction";
+import {
+	getMyActiveGame,
+	revokeGameWithUuid
+} from "../../Redux/store/gameEngineAction";
 
 const	Header = () =>
 {
@@ -148,8 +162,7 @@ const	GamePreview = (props: GamePreviewProps) =>
 	);
 };
 
-const cards = [];
-const cardsAlone = [];
+const cardsAlone: any = [];
 
 
 type ButtonJoinPartyProps = {
@@ -275,246 +288,318 @@ const	FriendsParty = () =>
 		return (state.gameEngine.myGameActive.friend);
 	});
 
-	return (
-		<Container sx={{ py: 8 }} maxWidth="md">
-			<Typography
-				component="h2"
-				variant="h3"
-				align="center"
-				color="text.primary"
-				gutterBottom
-			>
-				Parties entre amis
-			</Typography>
-			<Grid container spacing={4}>
-			{
-				arrayGameFriends.map((game: any, index: number) =>
+	let	render;
+	if (arrayGameFriends.length !== 0)
+	{
+		render = (
+			<Container sx={{ py: 8 }} maxWidth="md">
+				<Typography
+					component="h2"
+					variant="h3"
+					align="center"
+					color="text.primary"
+					gutterBottom
+				>
+					Parties entre amis
+				</Typography>
+				<Grid container spacing={4}>
 				{
-					const	userConnected = game.userConnected;
-					const	gameMode = game.gameMode;
-					const	uuid = game.uuid;
-					const	roomName = game.roomName;
-					const	playerOne = game.playerOne;
-					const	playerTwo = game.playerTwo;
-					const	board = game.board;
-					const 	loop = game.loop;
-					const	ball = game.ball;
-					const	revoked = game.revoked;
-
-					const	score = game.playerOne.score
-						+ ":" + game.playerTwo.score;
-					// check doublon dans les loop et GameServe
-					let elapsedTime;
-					if (loop.frameNumber === 0)
-						elapsedTime = "aucun";
-					else
+					arrayGameFriends.map((game: any, index: number) =>
 					{
-						elapsedTime
-							= loop.frameNumber / loop.frameRate + " sec.";
-					}
-					let userOneAvatar;
-					if (playerOne.profileId !== "undefined")
-						userOneAvatar = playerOne.profilePicture;
-					else
-						userOneAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
-					let userTwoAvatar;
-						if (playerTwo.profileId !== "undefined")
-							userTwoAvatar = playerTwo.profilePicture;
+						const	userConnected = game.userConnected;
+						const	gameMode = game.gameMode;
+						const	uuid = game.uuid;
+						const	roomName = game.roomName;
+						const	playerOne = game.playerOne;
+						const	playerTwo = game.playerTwo;
+						const	board = game.board;
+						const 	loop = game.loop;
+						const	ball = game.ball;
+						const	revoked = game.revoked;
+
+						const	score = game.playerOne.score
+							+ ":" + game.playerTwo.score;
+						// check doublon dans les loop et GameServe
+						let elapsedTime;
+						if (loop.frameNumber === 0)
+							elapsedTime = "aucun";
 						else
-							userTwoAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
-					console.log("please use correct call to URL :) ",
-						userOneAvatar + " " + userTwoAvatar);
-					console.log(game);
-					return (
-						<Grid item key={index} xs={12} sm={6} md={4}>
-							<Card
-								sx={{
-									height: "100%",
-									display: "flex",
-									flexDirection: "column"
-								}}
-							>
-								<Grid
-									container
+						{
+							elapsedTime
+								= loop.frameNumber / loop.frameRate + " sec.";
+						}
+						let userOneAvatar;
+						if (playerOne.profileId !== "undefined")
+							userOneAvatar = playerOne.profilePicture;
+						else
+							userOneAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
+						let userTwoAvatar;
+							if (playerTwo.profileId !== "undefined")
+								userTwoAvatar = playerTwo.profilePicture;
+							else
+								userTwoAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
+						console.log("please use correct call to URL :) ",
+							userOneAvatar + " " + userTwoAvatar);
+						console.log(game);
+						return (
+							<Grid item key={index} xs={12} sm={6} md={4}>
+								<Card
 									sx={{
-										flexDirection: "row",
-										border: "1px solid blue"
+										height: "100%",
+										display: "flex",
+										flexDirection: "column"
 									}}
 								>
-									{/* // player one  */}
-									<Grid item xs={6}
+									<Grid
+										container
 										sx={{
+											flexDirection: "row",
 											border: "1px solid blue"
 										}}
 									>
-										<CardMedia
-											component="div"
+										{/* // player one  */}
+										<Grid item xs={6}
 											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
+												border: "1px solid blue"
 											}}
-											image={userOneAvatar}
-										/>
-									</ Grid>
-									{/* // player Two */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
+										>
+											<CardMedia
+												component="div"
+												sx={{
+													// 16:9
+													// pt: "56.25%",
+													pt: "100%",
+												}}
+												image={userOneAvatar}
+											/>
+										</ Grid>
+										{/* // player Two */}
+										<Grid item xs={6}
 											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
+												border: "1px solid blue"
 											}}
-											image={userTwoAvatar}
-										/>
+										>
+											<CardMedia
+												component="div"
+												sx={{
+													// 16:9
+													// pt: "56.25%",
+													pt: "100%",
+												}}
+												image={userTwoAvatar}
+											/>
+										</ Grid>
 									</ Grid>
-								</ Grid>
-								<GamePreview
-									ball={ball}
-									board={board}
-									playerOne={playerOne}
-									playerTwo={playerTwo}
-								/>
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography
-										gutterBottom
-										variant="h5"
-										component="h2"
-									>
-										Instance: {roomName} <br />
-									</Typography>
-									<Typography>
-										Partie en mode: "{gameMode}"
-										<br />
-										Score : {score}
-										<br />
-										Temps passe en jeu : {elapsedTime}
-										<br />
-										Joueur dans le salon : {userConnected}
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<ButtonJoinParty
+									<GamePreview
+										ball={ball}
+										board={board}
 										playerOne={playerOne}
 										playerTwo={playerTwo}
 									/>
-									<ButtonRemoveGame
-										uuid={uuid}
-										revoked={revoked}
-									/>
-								</CardActions>
-							</Card>
-						</Grid>
-					);
-				})
-			}
-			</Grid>
-		</Container>
+									<CardContent sx={{ flexGrow: 1 }}>
+										<Typography
+											gutterBottom
+											variant="h5"
+											component="h2"
+										>
+											Instance: {roomName} <br />
+										</Typography>
+										<Typography>
+											Partie en mode: "{gameMode}"
+											<br />
+											Score : {score}
+											<br />
+											Temps passe en jeu : {elapsedTime}
+											<br />
+											Joueur dans le salon :
+											{userConnected}
+										</Typography>
+									</CardContent>
+									<CardActions>
+										<ButtonJoinParty
+											playerOne={playerOne}
+											playerTwo={playerTwo}
+										/>
+										<ButtonRemoveGame
+											uuid={uuid}
+											revoked={revoked}
+										/>
+									</CardActions>
+								</Card>
+							</Grid>
+						);
+					})
+				}
+				</Grid>
+			</Container>
+		);
+	}
+	else
+	{
+		render = (
+			<Container sx={{ py: 8 }} maxWidth="md">
+				<Typography
+					component="h2"
+					variant="h3"
+					align="center"
+					color="text.primary"
+					gutterBottom
+				>
+					Defiez vos amis !
+				</Typography>
+				<Typography
+					component="p"
+					align="center"
+					color="text.primary"
+				>
+					Aucune invitation
+				</Typography>
+			</Container>
+		);
+	}
+	return (
+		<>
+			{render}
+		</>
 	);
 };
 
+// cardAlone is just for test
 const	PrivateParty = () =>
 {
-	return (
-		<Container sx={{ py: 8 }} maxWidth="md">
-			<Typography
-				component="h2"
-				variant="h3"
-				align="center"
-				color="text.primary"
-				gutterBottom
-			>
-				Partie random
-			</Typography>
-			<Grid container spacing={4}>
-			{
-				cardsAlone.map((card) =>
+	let	render;
+
+	if (cardsAlone.length !== 0)
+	{
+		render = (
+			<Container sx={{ py: 8 }} maxWidth="md">
+				<Typography
+					component="h2"
+					variant="h3"
+					align="center"
+					color="text.primary"
+					gutterBottom
+				>
+					Partie random
+				</Typography>
+				<Grid container spacing={4}>
 				{
-					return (
-						<Grid item key={card} xs={12} sm={6} md={4}>
-							<Card
-								sx={{
-									height: "100%",
-									display: "flex",
-									flexDirection: "column"
-								}}
-							>
-								<Grid
-									container
+					cardsAlone.map((card: any) =>
+					{
+						return (
+							<Grid item key={card} xs={12} sm={6} md={4}>
+								<Card
 									sx={{
-										flexDirection: "row",
-										border: "1px solid blue"
+										height: "100%",
+										display: "flex",
+										flexDirection: "column"
 									}}
 								>
-									{/* // player one  */}
-									<Grid item xs={6}
+									<Grid
+										container
 										sx={{
+											flexDirection: "row",
 											border: "1px solid blue"
 										}}
 									>
-										<CardMedia
-											component="div"
+										{/* // player one  */}
+										<Grid item xs={6}
 											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
+												border: "1px solid blue"
 											}}
-											image="https://source.unsplash.com/random?wallpapers"
-										/>
-									</ Grid>
-									{/* // player Two */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
+										>
+											<CardMedia
+												component="div"
+												sx={{
+													// 16:9
+													// pt: "56.25%",
+													pt: "100%",
+												}}
+												image="https://source.unsplash.com/random?wallpapers"
+											/>
+										</ Grid>
+										{/* // player Two */}
+										<Grid item xs={6}
 											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
+												border: "1px solid blue"
 											}}
-											image="https://source.unsplash.com/random?wallpapers"
-										/>
+										>
+											<CardMedia
+												component="div"
+												sx={{
+													// 16:9
+													// pt: "56.25%",
+													pt: "100%",
+												}}
+												image="https://source.unsplash.com/random?wallpapers"
+											/>
+										</ Grid>
 									</ Grid>
-								</ Grid>
-								<GamePreview />
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography
-										gutterBottom
-										variant="h5"
-										component="h2"
-									>
-										Heading
-									</Typography>
-									<Typography>
-										This is a media card.
-										You can use this section to describe the
-										content.
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<Button size="small">Entrer en jeu</Button>
-									<Button size="small">Supprimer</Button>
-								</CardActions>
-							</Card>
-						</Grid>
-					);
-				})
-			}
-			</Grid>
-		</Container>
+									{/* <GamePreview /> */}
+									<CardContent sx={{ flexGrow: 1 }}>
+										<Typography
+											gutterBottom
+											variant="h5"
+											component="h2"
+										>
+											Heading
+										</Typography>
+										<Typography>
+											This is a media card.
+											You can use this section to describe the
+											content.
+										</Typography>
+									</CardContent>
+									<CardActions>
+										<Button size="small">Entrer en jeu</Button>
+										<Button size="small">Supprimer</Button>
+									</CardActions>
+								</Card>
+							</Grid>
+						);
+					})
+				}
+				</Grid>
+			</Container>
+		);
+	}
+	else
+	{
+		render = (
+			<Container sx={{ py: 8 }} maxWidth="md">
+				<Typography
+					component="h2"
+					variant="h3"
+					align="center"
+					color="text.primary"
+					gutterBottom
+				>
+					Partie random
+				</Typography>
+				<Typography
+					component="p"
+					align="center"
+					color="text.primary"
+				>
+					Aucune partie en cours
+				</Typography>
+			</Container>
+		);
+	}
+	return (
+		<>
+			{render}
+		</>
 	);
 };
 
 const	MyActiveGame = () =>
 {
+	const dispatch = useAppDispatch();
+	useEffect(() =>
+	{
+		dispatch(getMyActiveGame());
+	}, []);
 	return (
 		<>
 			<MenuBar />
