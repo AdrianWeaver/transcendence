@@ -15,10 +15,12 @@ export const	initialServerState: ServerModel = {
 	connexionAttempt: 0,
 	error: false,
 	message: "",
-	serverLocation: "localhost",
+	// localhost
+	serverLocation: "http://made-f0br4s4.clusters.42paris.fr/",
 	links: {
 		authApiUrl: "undefined",
-	}
+	},
+	uri: "undefined"
 };
 
 const	serverSlice = createSlice(
@@ -72,6 +74,7 @@ const	serverSlice = createSlice(
 		setServerLocation(state, action: PayloadAction<ServerModel>)
 		{
 			state.serverLocation = action.payload.serverLocation;
+			state.uri = action.payload.uri;
 		},
 		setAuthApiLinks(state, action: PayloadAction<ServerModel>)
 		{

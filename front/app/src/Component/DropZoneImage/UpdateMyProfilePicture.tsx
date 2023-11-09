@@ -58,7 +58,7 @@ const	getText = (props: MyAvatarCardProps) =>
 		contentText: contentText,
 		displayedCard: displayedCard
 	});
-}
+};
 
 
 const	MyAvatarCard = (props: MyAvatarCardProps) =>
@@ -125,7 +125,7 @@ const CropMyImage = (props: CropMyImageProps) =>
 	[
 		zoom,
 		setZoom
-	] =  useState(1);
+	] = useState(1);
 
 	const	editor: React.RefObject<AvatarEditor> | null = useRef(null);
 	const	borderColor = [
@@ -226,7 +226,7 @@ const CropMyImage = (props: CropMyImageProps) =>
 			</Card>
 		</>
 	);
-}
+};
 
 type	DisplayAreaProps = {
 	remplacementFile?: FileObject[],

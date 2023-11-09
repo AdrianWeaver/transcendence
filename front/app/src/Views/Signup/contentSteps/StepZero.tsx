@@ -93,7 +93,7 @@ const	locationIsARedirectedPage = (pathname: string) =>
 
 // const	getUrlFT = () =>
 // {
-// 	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Flocalhost%3A3001&response_type=code");
+// 	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Fmade-f0Br4s4.clusters.42paris.fr&response_type=code");
 // };
 
 const	StepZero = () =>
@@ -106,7 +106,14 @@ const	StepZero = () =>
 	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
-
+	const	ftUrl = useAppSelector((state) =>
+	{
+		return (state.server.links.authApiUrl);
+	});
+	const	uri = useAppSelector((state) =>
+	{
+		return (state.server.uri);
+	});
 	const
 	[
 		visible,
@@ -137,7 +144,7 @@ const	StepZero = () =>
 
 	const	openSameTab = () =>
 	{
-		window.open(urlFt, "_self");
+		window.open(ftUrl, "_self");
 	};
 
 	// const	authUrl = useAppSelector((state) =>
@@ -195,7 +202,7 @@ const	StepZero = () =>
 	{
 		dispatch(setFt(false));
 		axios
-		.post("/register-forty-three")
+		.post(uri + ":3000/user/register-forty-three")
 		.then((data) =>
 		{
 			console.log("fortythree data:", data);

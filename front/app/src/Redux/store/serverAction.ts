@@ -178,9 +178,11 @@ export const	setServerLocation = (locationServer: string)
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
+		const	uri = "http://" + locationServer;
 		const	response: ServerModel = {
 			...prevState.server,
-			serverLocation: locationServer
+			serverLocation: locationServer,
+			uri: uri
 		};
 		dispatch(serverActions.setServerLocation(response));
 	});

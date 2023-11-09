@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import { useState } from "react";
@@ -292,6 +293,10 @@ const	FirstStepFormContentNoData = () =>
 	{
 		return (state.controller.user);
 	});
+	const	server = useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	[
 		firstTriggerPassword,
 		setPasswordFirstTrigger
@@ -379,7 +384,7 @@ const	FirstStepFormContentNoData = () =>
 		event.preventDefault();
 		setHasError(false);
 		setErrorMessage("");
-		
+
 		const	data = new FormData(event.currentTarget);
 		const	userSignup = new UserRegistration(data);
 		userSignup.check();
@@ -409,16 +414,15 @@ const	FirstStepFormContentNoData = () =>
 				passwordConfirm: plainObj.passwordConfirm,
 				uniquenessPassword: plainObj.uniquenessPassword,
 				ft: user.ft
-			}
+			};
 			const	config = {
 				headers: {
 					"Authorization": token
 				}
 			};
-			console.log("PLAIN OBJ", objToSend);
+			console.log("PLAIN OBJ", objToSend, " uri: ", server.uri);
 			axios
-			// .post("http://localhost:3000/user/register-forty-three/step-one",
-			.post("http://localhost:3000/user/register/step-one",
+			.post(server.uri + ":3000/user/register/step-one",
 				objToSend,
 				config
 			)

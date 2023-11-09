@@ -157,8 +157,8 @@ class Configuration
 		this.isValidConfiguration();
 		if (!this.validConfiguration)
 			return ("");
-		// console.log(this);
 		this.generateFull();
+		console.log("VOICI", this.ftAuthUrl);
 		return (this.ftAuthUrl);
 	}
 

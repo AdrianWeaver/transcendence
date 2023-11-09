@@ -189,8 +189,9 @@ export class UserController
 		dataAPI.append("client_id", this.env.parsed.FT_UID);
 		dataAPI.append("client_secret", this.env.parsed.FT_SECRET);
 		dataAPI.append("redirect_uri", file.getRedirectURI());
+		console.log("url", file.getRedirectURI());
 
-		this.logger.debug(dataAPI);
+		this.logger.debug("DATA API", dataAPI);
 		const config = {
 			method: "post",
 			maxBodyLength: Infinity,

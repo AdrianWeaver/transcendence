@@ -1,7 +1,8 @@
 // socketService.js
 import { io } from "socket.io-client";
-
-const URL = "http://localhost:3000";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+// localhost
+const URL = "http://made-f0br4s4.clusters.42paris.fr/:3000";
 
 const socket = io(URL, {
   autoConnect: false,

@@ -169,6 +169,10 @@ type	FirstStepFormContentProps =
 const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 {
 	const	dispatch = useAppDispatch();
+	const	server = useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	user = useAppSelector((state) =>
 	{
 		return (state.controller.user);
@@ -296,8 +300,9 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 					"Authorization": token
 				}
 			};
+			console.log("URI: (should have no port", server.uri);
 			axios
-			.post("http://localhost:3000/user/register/step-one",
+			.post(server.uri + ":3000/user/register/step-one",
 				objToSend,
 				config
 			)
