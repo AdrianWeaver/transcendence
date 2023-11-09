@@ -41,10 +41,10 @@ const	ProfilePage = () =>
 		<>
 			<MenuBar />
 			{
-				(user.profile.editView)
-				? 	<EditProfile
-						setting={false} />
-				: <div className="wrapper">
+				// (user.profile.editView)
+				// ? 	<EditProfile
+				// 		setting={false} />
+				<div className="wrapper">
 					<Grid container>
 						<Grid item xs={12} sm={6}>
 								<LeftSide
