@@ -285,6 +285,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	async onModuleInit()
 	{
 		console.log("GET USER BACK FROM DB");
+		console.log("heer ", this.cdnConfig.uri);
 		this.loadTableToMemory();
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
@@ -612,16 +613,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					this.logger.log("Succesfully save micro file");
 					const newUserObj: UserModel = {
 						...userObj,
-						avatar: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+						avatar: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 						ftAvatar:
 						{
-							link: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+							link: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 							version:
 							{
-								large: "http://localhost:3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
-								medium: "http://localhost:3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
-								mini: "http://localhost:3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
-								small: "http://localhost:3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
+								large: this.cdnConfig.uri + ":3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
+								medium: this.cdnConfig.uri + ":3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
+								mini: this.cdnConfig.uri + ":3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
+								small: this.cdnConfig.uri + ":3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
 							}
 						}
 					};

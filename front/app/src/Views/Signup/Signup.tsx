@@ -38,6 +38,10 @@ const	Signup = () =>
 	{
 		return (state.controller);
 	});
+	const	uri = useAppSelector((state) =>
+	{
+		return (state.server.uri);
+	});
 	const	redirectRegistration = useRedirectRegistration();
 	const	stepper = controllerState.registration.step;
 
@@ -63,7 +67,7 @@ const	Signup = () =>
 					<HorizontalStepper activeStep={stepper} />
 				</Box>
 				{ content }
-				<Copyright />
+				<Copyright uri={uri}/>
 			</Container>
 		</>
 	);

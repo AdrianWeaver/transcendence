@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -240,7 +241,6 @@ const	CropMyImage = (props: CropMyImageProps) =>
 	}
 };
 
-
 const DropZoneImage = () =>
 {
 	const	[
@@ -262,7 +262,10 @@ const DropZoneImage = () =>
 	{
 		return (state.controller.user.bearerToken);
 	});
-
+	const	uri = useAppSelector((state) =>
+	{
+		return (state.server.uri);
+	});
 	const	handleAddFile = (newFile: any) =>
 	{
 		console.log(newFile);
@@ -320,8 +323,8 @@ const DropZoneImage = () =>
 			return ;
 		const	formData = new FormData();
 		formData.append("image", files[0]);
-
-		axios.post("http://localhost:3000/user/update-photo", formData, {
+// localhost
+		axios.post(uri + ":3000/user/update-photo", formData, {
 			headers: {
 				// "Content-Type": "multipart/form-data",
 				"Authorization": token

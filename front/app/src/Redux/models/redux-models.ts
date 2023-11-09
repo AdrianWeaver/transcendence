@@ -110,7 +110,7 @@ export interface	UserModel
 	"password": string,
 	"location": string,
 	"ft": boolean,
-	"alreadyExists": boolean
+	"alreadyExists": boolean,
 }
 
 export interface	AnonymousUserModel
@@ -168,6 +168,7 @@ export interface	ServerModel
 	"links": {
 		"authApiUrl" : string
 	},
+	"uri": string
 }
 
 export interface	CanvasModel

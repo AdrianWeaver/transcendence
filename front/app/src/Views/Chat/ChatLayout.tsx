@@ -29,8 +29,6 @@ import {
 import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
 import FriendItem from "./components/FriendItem";
-
-const URL = "http://localhost:3000/";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -258,6 +256,10 @@ const	ChatLayout = () =>
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	server	= useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -557,7 +559,7 @@ const	ChatLayout = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(URL,
+		const socket = io(server.uri + ":3000",
 			{
 				path: "/socket-chat",
 				autoConnect: false,

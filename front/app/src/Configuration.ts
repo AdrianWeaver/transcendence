@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
+// import { configDotenv } from "dotenv";
 import	* as dotenv from "dotenv";
 
 export type TokenModel = {
@@ -11,7 +12,7 @@ export type TokenModel = {
 class Configuration
 {
 	private				validConfiguration: boolean;
-	private 			env: dotenv.DotenvConfigOutput | null;
+	private 			env: any | null;
 
 	private	readonly	twillioSID: string | undefined;
 	private readonly	twillioAuthToken: string | undefined;
@@ -30,7 +31,7 @@ class Configuration
 	// for the redirecttion // also the front 
 	private readonly	redirectProtocol: string | undefined;
 	private readonly	redirectDomain: string | undefined;
-	private	readonly	redirectPort: string;
+	private	readonly	redirectPort: string | undefined;
 
 	private	readonly	backDomain: string | undefined;
 	private readonly	backProtocol: string | undefined;
@@ -47,7 +48,8 @@ class Configuration
 	{
 		this.validConfiguration = false;
 		this.env = dotenv.config();
-
+		// set as default
+		this.ftAuthUrl = "";
 		if (this.env.parsed === undefined)
 		{
 			console.error("Env is not provided !");
@@ -79,9 +81,6 @@ class Configuration
 		this.pgUser = e.POSTGRES_USER;
 		this.pgPassword = e.POSTGRES_PASSWORD;
 		this.pgURL = e.DATABASE_URL;
-
-		// set as default
-		this.ftAuthUrl = "";
 	}
 
 	public isValidConfiguration()
@@ -169,6 +168,13 @@ class Configuration
 			+ this.redirectDomain
 			+ ":"
 			+ this.redirectPort);
+	}
+
+	public	getURI()
+	{
+		return (this.redirectProtocol
+			+ "://"
+			+ this.redirectDomain);
 	}
 }
 
