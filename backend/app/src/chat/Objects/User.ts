@@ -74,11 +74,14 @@ class User
 			if (clientSocket === null)
 			{
 				// NEED TO SEE WHAT WE DO HERE
-				this.id = "to_implement";
+				this.id = "undefined";
 				this.client = null;
 			}
 			else
+			{
 				this.id = clientSocket.id;
+				this.client = clientSocket;
+			}
 		};
 		// TEST NOT SURE IF NECESSARY
 		this.setId = (id: string) =>
@@ -88,7 +91,7 @@ class User
 		this.setAvatar = (avatar: string) =>
 		{
 			if (avatar === undefined)
-				this.avatar = "https://doesnotexist.com/";
+				this.avatar = "https://thispersondoesnotexist.com/";
 			this.avatar = avatar;
 		};
 		this.setStatus = (status: string) =>

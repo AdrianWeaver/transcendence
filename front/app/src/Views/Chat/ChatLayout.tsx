@@ -1267,7 +1267,7 @@ const	ChatLayout = () =>
 		}
 		else
 		{
-			console.log("profileID Ok: ", profileId);
+			console.log("channleToInvite Ok: ", channelToInvite);
 			const	action = {
 				type: "invite-member",
 				payload: {
