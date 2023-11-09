@@ -16,7 +16,7 @@ export const	initialServerState: ServerModel = {
 	error: false,
 	message: "",
 	// localhost 
-	serverLocation: "http://made-f0br4s4.clusters.42paris.fr/",
+	serverLocation: "undefined",
 	links: {
 		authApiUrl: "undefined",
 	},

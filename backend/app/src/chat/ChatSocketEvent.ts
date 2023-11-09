@@ -263,18 +263,15 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
-				console.log("PUTAIN", client.id, " ");
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				const copyUsers = this.chatService.getAllUsers();
 
 				const	me = this.chatService.getUserBySocketId(client.id);
 				if (me === undefined)
 					return ;
-				console.log("PUTAIN me ok");
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
-				console.log("PUTAIN regularUsers ok");
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);

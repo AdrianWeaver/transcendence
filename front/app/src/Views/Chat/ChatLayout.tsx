@@ -559,7 +559,7 @@ const	ChatLayout = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(server.uri + ":3001",
+		const socket = io(server.uri + ":3000",
 			{
 				path: "/socket-chat",
 				autoConnect: false,
