@@ -235,4 +235,9 @@ export interface	GameEngineModel
 		plTwoScore:number
 	},
 	meConnected: boolean,
+	myGameActive:
+	{
+		random: any[],
+		friend: any[]
+	}
 }

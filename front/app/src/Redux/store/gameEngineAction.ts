@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-statements */
 
 import	gameEngineSlice from "./gameEngine-slice";
 import
@@ -9,6 +11,7 @@ import
 import { RootState } from "./index";
 
 import { GameEngineModel as Model } from "../models/redux-models";
+import ServerService from "../service/server-service";
 
 export const	action = gameEngineSlice.actions;
 
@@ -403,5 +406,81 @@ export const	setConnectedStore = (value: boolean)
 			meConnected: value
 		};
 		dispatch(action.setConnectedStore(response));
+	});
+};
+
+export const	getMyActiveGame = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+
+		const data = await ServerService
+			.getMyActiveGame(token, prev.server.serverLocation);
+		console.log(data);
+		if (data.success === true)
+		{
+			console.log("getMyGameActive success called", data);
+			const	response: Model = {
+				...prev.gameEngine,
+				myGameActive:
+				{
+					random: data.random,
+					friend: data.friend
+				}
+			};
+			dispatch(action.getMyActiveGame(response));
+		}
+		else
+		{
+			console.log("getMyGameActive Failure");
+			dispatch(action.getMyActiveGame({...prev.gameEngine}));
+		}
+	});
+};
+
+export const	revokeGameWithUuid = (gameUuid: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	serverLoc = prev.server.serverLocation;
+		const	data = await ServerService
+			.revokeGameWithUuid(token, serverLoc, gameUuid);
+		console.log("data");
+		if (data.success === true)
+		{
+			console.log("revoke game success");
+			// const newData = await ServerService
+			// 	.getMyActiveGame(token, prev.server.serverLocation);
+			// console.log(newData);
+			// if (newData.success === true)
+			// {
+			// 	console.log("getMyGameActive success called", data);
+			// 	const	response: Model = {
+			// 		...prev.gameEngine,
+			// 		myGameActive:
+			// 		{
+			// 			random: newData.random,
+			// 			friend: data.friend
+			// 		}
+			// 	};
+			// 	dispatch(action.revokeMyGame(response));
+			// }
+			// else
+			// {
+			// 	console.log("getMyGameActive Failure");
+				dispatch(action.revokeMyGame({...prev.gameEngine}));
+			// }
+		}
+		else
+		{
+			console.log("revoke game abort");
+			dispatch(action.revokeMyGame({...prev.gameEngine}));
+		}
 	});
 };

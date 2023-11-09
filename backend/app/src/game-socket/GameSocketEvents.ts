@@ -134,9 +134,10 @@ export class GameSocketEvents
 		switch (gameMode)
 		{
 			case "classical":
-				return (true);
 			case "upside-down":
+			case "friend":
 				return (true);
+				break ;
 			default:
 				return false;
 		}

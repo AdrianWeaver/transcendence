@@ -159,7 +159,6 @@ export	const	getServerConnection = ()
 			dispatch(
 				setServerConnectionSuccess(data.availableSince, data.links)
 			);
-			
 		}
 	});
 };
@@ -195,7 +194,7 @@ export const	setAuthApiLinks = ()
 		const prev = getState();
 
 		const	data = await ServerService
-		.getAuthApiLinks(prev.server.serverLocation);
+			.getAuthApiLinks(prev.server.serverLocation);
 		if (data.success === true)
 		{
 			console.log("Action reducer data set auth links: ", data);

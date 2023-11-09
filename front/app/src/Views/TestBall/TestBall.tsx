@@ -55,7 +55,7 @@ type	ActionSocket = {
 const	TestBall = () =>
 {
 	const	query = useLocation();
-	const mode = getGameMode(query);
+	const	gameMode = getGameMode(query);
 
 	const	profileToken = useAppSelector((state) =>
 	{
@@ -129,7 +129,8 @@ const	TestBall = () =>
 			auth:
 			{
 				token: profileToken,
-				mode: mode,
+				mode: gameMode.mode,
+				friendProfile: gameMode
 			}
 		});
 
@@ -150,7 +151,7 @@ const	TestBall = () =>
 		{
 			// console.log("ws disconnected");
 			setConnected(false);
-			setConnectedStore(false);
+			dispatch(setConnectedStore(false));
 		};
 
 		const	connectError = (error: Error) =>
@@ -504,7 +505,7 @@ const	TestBall = () =>
 			<div style={{ textAlign: "center" }}>
 				<motion.div
 					initial={{ rotate: 0 }}
-					animate={{ rotate: mode?.mode === "upside-down" ? 180 : 0}}
+					animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
 					style={{
 					width: game.board.canvas?.width,
 					height: game.board.canvas?.height,

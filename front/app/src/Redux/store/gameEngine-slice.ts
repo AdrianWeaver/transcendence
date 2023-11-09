@@ -66,6 +66,11 @@ export const	initialGameEngineState: Model = {
 		plTwoSocket: "undefined"
 	},
 	meConnected: false,
+	myGameActive:
+	{
+		random: [],
+		friend: [],
+	}
 };
 
 const	gameEngineSlice = createSlice(
@@ -157,7 +162,15 @@ const	gameEngineSlice = createSlice(
 		setConnectedStore(state, action: PayloadAction<Model>)
 		{
 			state.meConnected = action.payload.meConnected;
-		}
+		},
+		getMyActiveGame(state, action: PayloadAction<Model>)
+		{
+			state.myGameActive = action.payload.myGameActive;
+		},
+		revokeMyGame(state, action: PayloadAction<Model>)
+		{
+			state.myGameActive = action.payload.myGameActive;
+		},
 	}
 });
 

@@ -33,6 +33,7 @@ class GameServe
 
 	public getSeralizable: () => any;
 	public gameMode: string;
+	public	revoked: boolean;
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
@@ -52,6 +53,7 @@ class GameServe
 		this.loop = undefined;
 		this.userConnected = 0;
 		this.gameMode = "undefined";
+		this.revoked = false;
 
 		this.initPlayers = () =>
 		{
@@ -92,7 +94,8 @@ class GameServe
 				startDisplayed: this.startDisplayed,
 				continueAnimating: this.continueAnimating,
 				loop: this.loop?.getSerializable(),
-				userConnected: this.userConnected
+				userConnected: this.userConnected,
+				revoked: this.revoked
 			});
 		};
 		this.isSocketIdExistGameInstance = (clientId: string) =>

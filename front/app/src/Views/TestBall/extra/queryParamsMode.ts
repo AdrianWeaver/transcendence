@@ -45,7 +45,7 @@ const getGameMode = (pQuery: object) =>
 					break ;
 			}
 		}
-		else if (key === "friend")
+		else if (key === "id")
 		{
 			if (value)
 				gameMode.friendProfileId = value;

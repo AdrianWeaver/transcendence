@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 import {
 	Injectable,
@@ -320,5 +321,45 @@ export class	GameService implements OnModuleInit
 				return (instance.playerTwo.profileId === "undefined");
 			})
 		);
+	}
+
+	public	getAllInstancesByUserIdAndFilter(myProfileId: string, filter: string)
+	{
+		const array: Array<any> = [];
+
+		for (const instance of this.gameInstances)
+		{
+			if (instance.gameMode === filter)
+			{
+				if (instance.playerOne.profileId === myProfileId
+					|| instance.playerTwo.profileId === myProfileId)
+					array.push({...instance.getSeralizable()});
+			}
+		}
+		return (array);
+	}
+
+	public	findIndexGameInstanceUserProfileAndGameUuid(myProfileId: string, gameUuid: string)
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (instance.uuid === gameUuid
+					&& (instance.playerOne.profileId === myProfileId
+							|| instance.playerTwo.profileId === myProfileId));
+			})
+		);
+	}
+
+	public	setUserRevokedInstance(myProfileId: string, indexInstance: number)
+	{
+		if (indexInstance !== -1)
+		{
+			if (this.gameInstances[indexInstance]
+					.playerOne.profileId === myProfileId
+				|| this.gameInstances[indexInstance]
+					.playerTwo.profileId === myProfileId)
+				this.gameInstances[indexInstance].revoked = true;
+		}
 	}
 }
