@@ -78,7 +78,10 @@ class User
 				this.client = null;
 			}
 			else
+			{
 				this.id = clientSocket.id;
+				this.client = clientSocket;
+			}
 		};
 		// TEST NOT SURE IF NECESSARY
 		this.setId = (id: string) =>

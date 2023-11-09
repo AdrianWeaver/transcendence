@@ -195,7 +195,7 @@ const	StepZero = () =>
 	{
 		dispatch(setFt(false));
 		axios
-		.post("/register-forty-three")
+		.post("http://localhost:3000/user/register-forty-three")
 		.then((data) =>
 		{
 			console.log("fortythree data:", data);

@@ -30,7 +30,7 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
+import { instrument } from "@socket.io/admin-ui";
 
 type	ActionSocket = {
 	type: string,
@@ -94,11 +94,11 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			// instrument(this.server,
-			// 	{
-			// 		auth: false,
-			// 		mode: "development"
-			// 	});
+			instrument(this.server,
+				{
+					auth: false,
+					mode: "development"
+				});
 		}
 
 		handleConnection(client: Socket)
@@ -283,7 +283,7 @@ export class ChatSocketEvents
 				{
 					friendsList.push(elem.name);
 				});
-				console.log("friendsList here", friendsList);
+				// console.log("friendsList here", friendsList);
 				copyUsers.forEach((elem) =>
 				{
 					newArray.map((element) =>
@@ -650,7 +650,7 @@ export class ChatSocketEvents
 					return ;
 				channel.leaveChannel(client);
 				client.leave(channel.name);
-				const message = user.name + "has left this channel.";
+				const message = user.name + " has left this channel.";
 				const id = channel.messages.length + 1;
 				const newMessage: MessageModel = {
 					sender: "server",
@@ -665,6 +665,7 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 						message: message,
 						messages: channel.messages,
+						kind: "channel",
 					}
 				};
 				this.server.to(data.payload.chanName).emit("update-messages", action);
@@ -730,6 +731,7 @@ export class ChatSocketEvents
 						message: message,
 						messages: channel.messages,
 						chanName: channel.name,
+						kind: "channel",
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
@@ -951,16 +953,12 @@ export class ChatSocketEvents
 					this.logger.error("Channel is undefined ");
 					return ;
 				}
-				console.log("invite-member, channel exists", channel.name);
-				console.log("data.payload", data.payload);
 				const	searchUser = this.chatService.getUserWithProfileId(data.payload.userName);
-				console.log("invite-member, searchUser 0 exists", searchUser);
 				if (searchUser === undefined)
 				{
 					return ;
 				}
-				const	targetClient = searchUser?.client;
-				console.log("TARGET CLIENT", targetClient);
+				const	targetClient = searchUser.client;
 				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
@@ -969,7 +967,6 @@ export class ChatSocketEvents
 						message: "",
 					}
 				};
-				console.log("invite-member, targetClient 2 exists", targetClient.id);
 				if (channel.isMember(client.id) === false)
 				{
 					action.payload.message = "You are not in the channel " + channel.name;

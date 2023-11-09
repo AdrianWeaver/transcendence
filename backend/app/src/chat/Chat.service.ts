@@ -19,6 +19,7 @@ import { Socket, Server, Namespace } from "socket.io";
 // 	date: string
 // }
 
+
 export interface MessageRoomModel
 {
 	"roomName": string,
@@ -26,6 +27,7 @@ export interface MessageRoomModel
 	"privateConv": boolean,
 	"content": string[]
 }
+
 export	interface ChatUserModel
 {
 	"name": string,
