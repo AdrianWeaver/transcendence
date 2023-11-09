@@ -648,7 +648,7 @@ export const verifyToken = ()
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
-		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());

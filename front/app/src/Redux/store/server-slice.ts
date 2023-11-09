@@ -80,6 +80,10 @@ const	serverSlice = createSlice(
 		{
 			state.links.authApiUrl = action.payload.links.authApiUrl;
 		},
+		setUri(state, action: PayloadAction<ServerModel>)
+		{
+			state.uri = action.payload.uri;
+		},
 	}
 });
 

@@ -12,6 +12,7 @@ import
 	ServerModel
 }	from "../models/redux-models";
 import ServerService from "../service/server-service";
+import Configuration from "../../Configuration";
 
 export const	serverActions = serverSlice.actions;
 
@@ -178,11 +179,10 @@ export const	setServerLocation = (locationServer: string)
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
-		const	uri = "http://" + locationServer;
+
 		const	response: ServerModel = {
 			...prevState.server,
 			serverLocation: locationServer,
-			uri: uri
 		};
 		dispatch(serverActions.setServerLocation(response));
 	});
@@ -214,5 +214,20 @@ export const	setAuthApiLinks = ()
 			console.log("Set auth links fails");
 			dispatch(serverActions.setAuthApiLinks({...prev.server}));
 		}
+	});
+};
+
+export const	setUri = (uri: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const prev = getState();
+			console.log("setUri: ", uri);
+			const	response: ServerModel = {
+				...prev.server,
+				uri: uri
+			};
+			dispatch(serverActions.setUri(response));
 	});
 };
