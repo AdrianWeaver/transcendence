@@ -613,16 +613,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					this.logger.log("Succesfully save micro file");
 					const newUserObj: UserModel = {
 						...userObj,
-						avatar: this.cdnConfig.uri + "/cdn/image/profile/" + userObj.username + ".jpeg",
+						avatar: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 						ftAvatar:
 						{
-							link: this.cdnConfig.uri + "/cdn/image/profile/" + userObj.username + ".jpeg",
+							link: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 							version:
 							{
-								large: this.cdnConfig.uri + "/cdn/image/profile/large/" + userObj.username + ".jpeg",
-								medium: this.cdnConfig.uri + "/cdn/image/profile/medium/" + userObj.username + ".jpeg",
-								mini: this.cdnConfig.uri + "/cdn/image/profile/micro/" + userObj.username + ".jpeg",
-								small: this.cdnConfig.uri + "/cdn/image/profile/small/" + userObj.username + ".jpeg",
+								large: this.cdnConfig.uri + ":3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
+								medium: this.cdnConfig.uri + ":3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
+								mini: this.cdnConfig.uri + ":3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
+								small: this.cdnConfig.uri + ":3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
 							}
 						}
 					};

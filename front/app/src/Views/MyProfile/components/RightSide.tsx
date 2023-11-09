@@ -44,14 +44,7 @@ const	RightSide = (props: RightSideProps) =>
 
 	const	editRequest = () =>
 	{
-		if (!props.isMe)
-
-			if (!userMe.chat.currentProfileIsFriend)
-				dispatch(setProfilePublicView());
-			else
-				dispatch(setProfileFriendView());
-		else
-			dispatch(setProfileEditView());
+		dispatch(setProfileEditView());
 	};
 
 	const	displayStats = () =>
@@ -93,7 +86,7 @@ const	RightSide = (props: RightSideProps) =>
 				{
 					(props.isMe)
 					? <Button onClick={editRequest}>
-						"EDIT PROFILE"
+						EDIT PROFILE
 					</Button>
 					: (!userMe.chat.currentProfileIsFriend)
 						? <Grid item xs={12}>
