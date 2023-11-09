@@ -752,6 +752,7 @@ const	ChatLayout = () =>
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
 			}
+			goToChannel(data.payload.chanName, data.payload.kind);
 		};
 
 		const	channelInfo = (data: any) =>
