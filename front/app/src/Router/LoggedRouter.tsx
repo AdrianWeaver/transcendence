@@ -24,6 +24,7 @@ import { Landing } from "../Views/Chat/Landing";
 import ChatLayout from "../Views/Chat/ChatLayout";
 import { useDispatch } from "react-redux";
 import ProfilePage from "../Views/MyProfile/ProfilePage";
+import MyStats from "../Views/MyStats/MyStats";
 
 
 /**
@@ -107,8 +108,11 @@ const	LoggedRouter = () =>
 				<Route
 					path="the-chat-layout"
 					element={<ChatLayout />}
-        />
-
+				/>
+				<Route
+					path="/my-stats"
+					element={<MyStats />}
+				/>
 				<Route
 					path="*"
 					element={<h1>Error 404: Logged User</h1>}

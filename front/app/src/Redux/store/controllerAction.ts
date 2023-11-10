@@ -18,6 +18,7 @@ import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
 import { PersistPartial } from "redux-persist/es/persistReducer";
+import ServerService from "../service/server-service";
 type MessageModel =
 {
 	sender: string,
@@ -1595,4 +1596,26 @@ export const	setCurrentProfileIsFriend = (isFriend: boolean)
 		}
 		dispatch(controllerActions.setCurrentProfileIsFriend(response));
 	});
+}
+
+export const	getMyStats = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await ServerService.getMyStats(token, uri);
+		if (data.success)
+		{
+			const	response: ControllerModel = {
+				...prev.controller,
+				myStats: data.data
+			}
+			dispatch(controllerActions.setMyStats(response));
+		}
+		else
+			dispatch(controllerActions.setMyStats(prev.controller));
+	})
 }

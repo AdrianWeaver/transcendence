@@ -124,6 +124,7 @@ const	initialControllerState: ControllerModel = {
 		height: window.innerHeight,
 		width: window.innerWidth
 	},
+	myStats: []
 };
 
 const	controllerSlice = createSlice(
@@ -439,6 +440,10 @@ const	controllerSlice = createSlice(
 		{
 			state.user.alreadyExists = action.payload.user.alreadyExists;
 		},
+		setMyStats(state, action: PayloadAction<ControllerModel>)
+		{
+			state.myStats = action.payload.myStats;
+		}
 	}
 });
 

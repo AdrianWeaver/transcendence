@@ -1555,59 +1555,43 @@ public	register(data: UserModel)
 		return (true);
 	}
 
-	// public	resetUser()
-	// {
-	// 	console.log("------user before reset", this.user);
-	// 	// const	freshUser: UserModel =	{
-	// 	// 	registrationStarted: false,
-	// 	// 	registrationProcessEnded: false,
-	// 	// 	ftApi: {
-	// 	// 		accessToken: "undefined",
-	// 	// 		tokenType: "undefined",
-	// 	// 		expiresIn: "undefined",
-	// 	// 		refreshToken: "undefined",
-	// 	// 		scope: "public",
-	// 	// 		createdAt: "undefined",
-	// 	// 		secretValidUntil: "undefined"
-	// 	// 	},
-	// 	// 	retStatus: -1,
-	// 	// 	date: "undefined",
-	// 	// 	id: -1,
-	// 	// 	email: "undefined",
-	// 	// 	username: "undefined",
-	// 	// 	login: "undefined",
-	// 	// 	online: false,
-	// 	// 	status: "undefined",
-	// 	// 	firstName: "undefined",
-	// 	// 	lastName: "undefined",
-	// 	// 	url: "undefined",
-	// 	// 	avatar: "undefined",
-	// 	// 	ftAvatar: {
-	// 	// 		link: "undefined",
-	// 	// 		version: {
-	// 	// 		large: "undefined",
-	// 	// 		medium: "undefined",
-	// 	// 		mini: "undefined",
-	// 	// 		small: "undefined"
-	// 	// 		}
-	// 	// 	},
-	// 	// 	location: "undefined",
-	// 	// 	revokedConnectionRequest: false,
-	// 	// 	authService: {
-	// 	// 		token: "undefined",
-	// 	// 		expAt: -1,
-	// 	// 		doubleAuth: {
-	// 	// 		enable: false,
-	// 	// 		lastIpClient: "undefined",
-	// 	// 		phoneNumber: "undefined",
-	// 	// 		phoneRegistered: false,
-	// 	// 		validationCode: "undefined",
-	// 	// 		valid: false
-	// 	// 		}
-	// 	// 	},
-	// 	// 	password: "undefined",
-	// 	// 	friendsProfileId: []
-	// 	// };
-	// 	console.log("------user after reset");
-	// }
+	public	getMyStats()
+	{
+		const fakeRows = [
+			{
+				id: 1,
+				date: "Yesterday Night",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 2,
+				date: "Yesterday ",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 3,
+				date: "Toto",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+		];
+		return (fakeRows);
+	}
 }
