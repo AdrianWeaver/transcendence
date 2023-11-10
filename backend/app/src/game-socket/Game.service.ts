@@ -12,7 +12,7 @@ type	MapSocketIdProfileId = {
 	profileId: string
 };
 
-type	MatchHistoryModel = {
+export type	MatchHistoryModel = {
 	uuid				: string | undefined;
 	playerOneProfileId	: string | undefined;
 	playerTwoProfileId	: string | undefined;
@@ -340,8 +340,9 @@ export class	GameService implements OnModuleInit
 
 	public	recordMatchHistory(instance: GameServe)
 	{
+		const	date = new Date(Date.now());
 		const	record: MatchHistoryModel = {
-			date: Date.now().toLocaleString(),
+			date: date.toLocaleDateString(),
 			frameCount: instance.loop?.frameNumber,
 			frameRate: instance.loop?.frameRate,
 			gameMode: instance.gameMode,

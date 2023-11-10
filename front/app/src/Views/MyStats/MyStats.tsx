@@ -6,7 +6,8 @@ import {
 	Typography,
 	Stack,
 	Button,
-	Box
+	Box,
+	Avatar
 } from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
@@ -30,6 +31,30 @@ const	columns: GridColDef[] = [
 		field: "gameMode",
 		headerName: "Game Mode",
 		type: "string"
+	},
+	{
+		field: "myAvatar",
+		headerName: "",
+		renderCell: (params) =>
+		{
+			return (
+				<Avatar
+					alt={params.row.myAvatar}
+					src={params.row.myAvatar}/>
+				);
+		}
+	},
+	{
+		field: "adversaireAvatar",
+		headerName: "",
+		renderCell: (params) =>
+		{
+			return (
+				<Avatar
+					alt={params.row.adversaireAvatar}
+					src={params.row.adversaireAvatar}/>
+				);
+		}
 	},
 	{
 		field: "adversaire",

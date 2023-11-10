@@ -1566,6 +1566,8 @@ public	register(data: UserModel)
 				myScore: "7",
 				advScore: "0",
 				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
 			},
 			{
 				id: 2,
@@ -1575,6 +1577,8 @@ public	register(data: UserModel)
 				myScore: "7",
 				advScore: "0",
 				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
 			},
 			{
 				id: 3,
@@ -1584,6 +1588,8 @@ public	register(data: UserModel)
 				myScore: "7",
 				advScore: "0",
 				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
 			},
 		];
 		return (fakeRows);

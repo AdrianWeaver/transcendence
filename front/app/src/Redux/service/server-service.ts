@@ -185,7 +185,7 @@ const	ServerService = {
 		};
 		return (
 			Api(serverLocation)
-				.post("/user/my-stats")
+				.post("/user/my-stats", {}, config)
 				.then((res) =>
 				{
 					return (res.data);

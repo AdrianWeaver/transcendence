@@ -12,7 +12,7 @@
 import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import	Api from "../Api";
 import	ApiTwilio from "../Api-twilio";
 
@@ -28,6 +28,19 @@ import FileConfig from "./Object/FileConfig";
 import * as readline from "readline";
 import * as twilio from "twilio";
 import Configuration from "src/Configuration";
+import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+
+type	ResponseRow = {
+	id: number;
+	date: string;
+	gameMode: string,
+	adversaire: string,
+	myScore: string,
+	advScore: string,
+	elapsedTime: string,
+	adversaireAvatar: string,
+	myAvatar: string,
+};
 
 export class	RegisterStepOneDto
 {
@@ -108,11 +121,15 @@ export class UserController
 	private	readonly logger;
 	private	readonly env;
 
-	constructor(private readonly userService: UserService)
+	constructor(
+		private readonly userService: UserService,
+		private readonly gameService: GameService
+	)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
 		this.env = dotenv.config();
+		this.logger.log("instance GameService loaded with instance if : " + this.gameService.getInstanceId());
 	}
 
 	// to delete
@@ -780,9 +797,62 @@ export class UserController
 	}
 
 	@Post("/my-stats")
-	// @UseGuards(UserAuthorizationGuard)
-	getMyStats()
+	@UseGuards(UserAuthorizationGuard)
+	getMyStats(@Req() req: any)
 	{
-		return (this.userService.getMyStats());
+		// return (["toto"]);
+		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
+		{
+			return (
+				record.playerOneProfileId === (req.user.id)
+				|| record.playerTwoProfileId === (req.user.id)
+			);
+		});
+		console.log(myStats);
+		const	array: ResponseRow[] = [];
+
+		myStats.map((stat: MatchHistoryModel, index: number) =>
+		{
+			console.log(stat);
+			const	amIPlayOne = stat.playerOneProfileId === req.user.id;
+			const	frameCount = stat.frameCount as number;
+			const	frameRate = stat.frameRate as number;
+			let		adversaireProfileId: string;
+
+			const	elem: ResponseRow = {
+				id: index,
+				date: stat.date,
+				gameMode: stat.gameMode,
+				adversaire: "unset",
+				advScore: "unset",
+				elapsedTime: (frameCount / frameRate) + " secondes",
+				myScore: "unset",
+				adversaireAvatar: "unset",
+				myAvatar: "unset"
+			};
+			if (amIPlayOne)
+			{
+				adversaireProfileId = stat.playerTwoProfileId as string;
+				elem.advScore = stat.scorePlayerTwo.toString();
+				elem.myScore = stat.scorePlayerOne.toString();
+			}
+			else
+			{
+				adversaireProfileId = stat.playerOneProfileId as string;
+				elem.advScore = stat.scorePlayerOne.toString();
+				elem.myScore = stat.scorePlayerTwo.toString();
+			}
+			const userAdversaire = this.userService.getUserById(adversaireProfileId);
+			if (userAdversaire === undefined)
+				elem.adversaire = "Deleted user";
+			else
+			{
+				elem.adversaire = userAdversaire.username;
+				elem.adversaireAvatar = userAdversaire.avatar;
+			}
+			elem.myAvatar = req.user.avatar;
+			array.push(elem);
+		});
+		return (array);
 	}
 }
