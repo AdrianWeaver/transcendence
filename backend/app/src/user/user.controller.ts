@@ -109,14 +109,13 @@ export class UserController
 {
 	private	readonly logger;
 	private	readonly env;
-	private	chatService: ChatService;
 
-	constructor(private readonly userService: UserService)
+	constructor(private readonly userService: UserService, private readonly chatService: ChatService)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
+		this.logger.log("instance ChatService loaded with the instance id: " + this.chatService.getChatInstanceId());
 		this.env = dotenv.config();
-		this.chatService = new ChatService();
 	}
 
 	// to delete
