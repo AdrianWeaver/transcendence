@@ -777,7 +777,7 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("DISPLAY MEMBERS", data.payload, );
 				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
