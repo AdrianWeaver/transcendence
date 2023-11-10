@@ -1515,6 +1515,7 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
+															console.log("CURRENT CHANNEL: " + channel.name);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1811,7 +1812,7 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					<Button onClick={() =>
+																					{/* <Button onClick={() =>
 																					{
 																						setSeeProfile(false);
 																						setInviteDialogOpen(true);
@@ -1855,7 +1856,7 @@ const	ChatLayout = () =>
 																							Cancel
 																							</Button>
 																						</DialogActions>
-																					</Dialog>
+																					</Dialog> */}
 																				</>
 																			</>
 																			: <></>
