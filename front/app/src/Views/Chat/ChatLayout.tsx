@@ -1904,7 +1904,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 0</h1>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1939,7 +1939,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 1</h1>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1960,7 +1960,21 @@ const	ChatLayout = () =>
 								);
 							})}
 					</TabPanel>
-
+					<TabPanel
+						area={"true"}
+						value={value}
+						index={2}
+						dir={style.direction}
+						style={style}
+					>
+						{/* <List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							> */}
+							<h1>tabpanel 2</h1>
+					</TabPanel>
 					<Divider />
 
 					<Grid
