@@ -12,6 +12,17 @@ type	MapSocketIdProfileId = {
 	profileId: string
 };
 
+type	MatchHistoryModel = {
+	uuid				: string | undefined;
+	playerOneProfileId	: string | undefined;
+	playerTwoProfileId	: string | undefined;
+	scorePlayerOne		: number;
+	scorePlayerTwo		: number;
+	frameCount			: number | undefined;
+	frameRate			: number | undefined;
+	gameMode			: string;
+	date				: string;
+};
 @Injectable()
 export class	GameService implements OnModuleInit
 {
@@ -28,6 +39,8 @@ export class	GameService implements OnModuleInit
 	public				socketIdReady	: Array<MapSocketIdProfileId>;
 	public				gameInstances	: Array<GameServe>;
 
+	public				matchHistory	: Array<MatchHistoryModel>;
+
 	public constructor()
 	{
 		this.logger.error("Service constructed with ID: " + this.instanceId);
@@ -42,6 +55,8 @@ export class	GameService implements OnModuleInit
 		this.userReady = 0;
 		this.socketIdReady = [];
 		this.gameInstances = [];
+
+		this.matchHistory = [];
 	}
 
 	onModuleInit()
@@ -73,6 +88,7 @@ export class	GameService implements OnModuleInit
 			userReady: this.userReady,
 			socketIdReady: this.socketIdReady,
 			gameInstances: gameInstanceSerialized,
+			matchHistory: this.matchHistory,
 		});
 	}
 
@@ -320,5 +336,21 @@ export class	GameService implements OnModuleInit
 				return (instance.playerTwo.profileId === "undefined");
 			})
 		);
+	}
+
+	public	recordMatchHistory(instance: GameServe)
+	{
+		const	record: MatchHistoryModel = {
+			date: Date.now().toLocaleString(),
+			frameCount: instance.loop?.frameNumber,
+			frameRate: instance.loop?.frameRate,
+			gameMode: instance.gameMode,
+			playerOneProfileId: instance.playerOne.profileId,
+			playerTwoProfileId: instance.playerTwo.profileId,
+			scorePlayerOne: instance.playerOne.score,
+			scorePlayerTwo: instance.playerTwo.score,
+			uuid: instance.uuid,
+		};
+		this.matchHistory.push(record);
 	}
 }
