@@ -14,6 +14,7 @@ import Signin from "../Views/Signin/Signin";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
 // import Chat from "../Views/Chat/Chat";
 import ChatLayout from "../Views/Chat/ChatLayout";
+import MyStats from "../Views/MyStats/MyStats";
 
 /**
  * This is unauth router
@@ -61,11 +62,17 @@ const	VisitorRouter = () =>
 					path="the-chat"
 					element={<Navigate to="/"/>}
 				/>
+				<Route
+					path="/my-stats"
+					element={<MyStats />}
+				/>
 				{/* show 404 when route not found */}
 				<Route
 					path="*"
 					element={<h1>Error 404: visitor router</h1>}
 				/>
+
+
 			</Routes>
 		</BrowserRouter>
 	);
