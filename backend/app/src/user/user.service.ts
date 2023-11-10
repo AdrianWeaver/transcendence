@@ -54,6 +54,7 @@ import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
+import Chat from "src/chat/Objects/Chat";
 
 
 @Injectable()
@@ -62,6 +63,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	user: Array<UserModel> = [];
 	private	matchHistory: Array<HistoryModel> = [];
 	private	secret: string;
+
 	// private	userDB: Array<UserDBModel> = [];
 	// private userDBString: Array<string> = [];
 
@@ -1221,21 +1223,21 @@ public	register(data: UserModel)
 
 	public	changeInfos(data: any, id: string)
 	{
-		const	searchUser = this.user.find((elem) =>
+		const	index = this.user.findIndex((elem) =>
 		{
 			return (elem.id === id);
 		});
-		if (searchUser !== undefined)
+		if (index !== -1)
 		{
 			if (data.info?.length)
-				if (data.field === "username" && data.info !== searchUser.username)
-					searchUser.username = data.info;
-				else if (data.field === "email" && data.info !== searchUser.email)
-					searchUser.email = data.info;
-				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
-					searchUser.authService.doubleAuth.phoneNumber = data.info;
+				if (data.field === "username" && data.info !== this.user[index].username)
+					this.user[index].username = data.info;
+				else if (data.field === "email" && data.info !== this.user[index].email)
+					this.user[index].email = data.info;
+				else if (data.field === "phoneNumber" && data.info !== this.user[index].authService.doubleAuth.phoneNumber)
+					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id, searchUser.email);
+					this.decodePassword(data.info, id, this.user[index].email);
 
 			// console.log(searchUser);
 			return ("okay");

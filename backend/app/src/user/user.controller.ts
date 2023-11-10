@@ -28,6 +28,8 @@ import FileConfig from "./Object/FileConfig";
 import * as readline from "readline";
 import * as twilio from "twilio";
 import Configuration from "src/Configuration";
+import Chat from "src/chat/Objects/Chat";
+import { ChatService } from "src/chat/Chat.service";
 
 export class	RegisterStepOneDto
 {
@@ -107,12 +109,14 @@ export class UserController
 {
 	private	readonly logger;
 	private	readonly env;
+	private	chatService: ChatService;
 
 	constructor(private readonly userService: UserService)
 	{
 		this.logger = new Logger("user-controller");
 		this.logger.log("instance UserService loaded with the instance id: " + this.userService.getUuidInstance());
 		this.env = dotenv.config();
+		this.chatService = new ChatService();
 	}
 
 	// to delete
@@ -728,8 +732,12 @@ export class UserController
 		: string
 	{
 		this.logger
-			.log("'change-infos' route request");
-		return (this.userService.changeInfos(data, req.user.id));
+			.log("'change-infos' user route request");
+		const	chatUsers = this.chatService.changeInfos(data, req.user.id);
+		const	users = this.userService.changeInfos(data, req.user.id);
+		if (chatUsers === "user doesnt exist" || users === "user doesnt exist")
+			return ("user doesnt exist");
+		return ("okay");
 	}
 
 	@Post("revoke-token")

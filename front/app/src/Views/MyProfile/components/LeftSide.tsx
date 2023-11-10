@@ -49,8 +49,11 @@ const	LeftSide = (props: LeftSideProps) =>
 					{
 						(props.isMe)
 						? <>
-							♡ {props.pseudo}'s profile ♡
-							♡♡♡
+							<Typography></Typography>
+								♡ {props.pseudo}'s profile ♡
+							<Typography>
+								♡♡♡
+							</Typography>
 						</>
 						: <Typography>
 							{
