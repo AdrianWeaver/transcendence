@@ -1555,6 +1555,40 @@ public	register(data: UserModel)
 		return (true);
 	}
 
+	public	getMyStats()
+	{
+		const fakeRows = [
+			{
+				id: 1,
+				date: "Yesterday Night",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+			},
+			{
+				id: 2,
+				date: "Yesterday ",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+			},
+			{
+				id: 3,
+				date: "Toto",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+			},
+		];
+		return (fakeRows);
+	}
+
 	// public	resetUser()
 	// {
 	// 	console.log("------user before reset", this.user);

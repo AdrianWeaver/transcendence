@@ -1,3 +1,5 @@
+/* eslint-disable max-statements */
+/* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 import {
 	Container,
@@ -7,9 +9,11 @@ import {
 	Box
 } from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { useEffect } from "react";
+import { getMyStats } from "../../Redux/store/controllerAction";
 
 const	columns: GridColDef[] = [
 	{
@@ -50,68 +54,52 @@ const	columns: GridColDef[] = [
 
 ];
 
-const fakeRows = [
-	{
-		id: 1,
-		date: "Yesterday Night",
-		gameMode: "classical",
-		adversaire: "Adversaire 1 (username)",
-		myScore: "7",
-		advScore: "0",
-		elapsedTime: "42 secondes",
-	},
-	{
-		id: 2,
-		date: "Yesterday ",
-		gameMode: "classical",
-		adversaire: "Adversaire 1 (username)",
-		myScore: "7",
-		advScore: "0",
-		elapsedTime: "42 secondes",
-	},
-	{
-		id: 3,
-		date: "Yesterday Night",
-		gameMode: "classical",
-		adversaire: "Adversaire 1 (username)",
-		myScore: "7",
-		advScore: "0",
-		elapsedTime: "42 secondes",
-	},
-];
+const	fakeRows: any = [];
 
 const	HistoryTable = () =>
 {
-	return (
-		<>
-			<div
-				style={{
-					width: "100%",
-				}}>
-				<DataGrid
-					rows={fakeRows}
-					columns={columns}
-					initialState={{
-						pagination: {
-							paginationModel: {
-								page: 0,
-								pageSize: 10
+	const	rowStats = useAppSelector((state) =>
+	{
+		return (state.controller.myStats);
+	});
+	if (rowStats.length === 0)
+	{
+		return (
+			<>Aucune partie jouee</>
+		);
+	}
+	else
+		return (
+			<>
+				<div
+					style={{
+						width: "100%",
+					}}>
+					<DataGrid
+						rows={rowStats}
+						columns={columns}
+						initialState={{
+							pagination: {
+								paginationModel: {
+									page: 0,
+									pageSize: 10
+								}
 							}
-						}
-					}}
-					pageSizeOptions={[
-						10,
-						100
-					]}
-				/>
-			</div>
-		</>
-	);
+						}}
+						pageSizeOptions={[
+							10,
+							100
+						]}
+					/>
+				</div>
+			</>
+		);
 };
 
 
 const	Header = () =>
 {
+	const	dispatch = useAppDispatch();
 	return (
 		<>
 			<Box
@@ -137,7 +125,8 @@ const	Header = () =>
 						color="text.secondary"
 						paragraph
 					>
-						C'est ici que tu retrouves ton historique des differentes parties jouees
+						C'est ici que tu retrouves ton 
+						historique des differentes parties jouees
 					</Typography>
 					<Stack
 						sx={{ pt: 4 }}
@@ -145,15 +134,18 @@ const	Header = () =>
 						spacing={2}
 						justifyContent="center"
 					>
-						{/* <Button
+						<Button
 							variant="contained"
 							onClick={() =>
 							{
 								// dispatch(getMyActiveGame());
+								dispatch(getMyStats());
 							}}>
 							Rafraichir
 						</Button>
-						<Button variant="outlined">Secondary action</Button> */}
+						{/* 
+							<Button variant="outlined">Secondary 
+							action</Button>  */}
 					</Stack>
 				</Container>
 			</Box>
@@ -164,12 +156,17 @@ const	Header = () =>
 const	MyStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
 
+	useEffect(() =>
+	{
+		dispatch(getMyStats());
+	}, []);
 	savePrevPage("/my-stays");
 	return (
 		<>
 			<MenuBar />
-			<Header /> 
+			<Header />
 			<HistoryTable />
 			<></>
 		</>

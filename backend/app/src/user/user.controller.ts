@@ -778,4 +778,11 @@ export class UserController
 			.log("'add-friend' route requested");
 		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
+
+	@Post("/my-stats")
+	// @UseGuards(UserAuthorizationGuard)
+	getMyStats()
+	{
+		return (this.userService.getMyStats());
+	}
 }
