@@ -3,6 +3,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
+// import * as SocketIOClient from "socket.io-client";
 
 import {
 	Box,
@@ -777,7 +778,7 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("DISPLAY MEMBERS", data.payload, );
 				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
@@ -1267,7 +1268,7 @@ const	ChatLayout = () =>
 		}
 		else
 		{
-			console.log("profileID Ok: ", profileId);
+			console.log("channleToInvite Ok: ", channelToInvite);
 			const	action = {
 				type: "invite-member",
 				payload: {

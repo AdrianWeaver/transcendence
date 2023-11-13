@@ -1223,7 +1223,7 @@ export const	registerInfosInBack = (info: string, field: string)
 		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.uri)
 		.then(() =>
 		{
-			console.log("okay");
+			console.log("okay registered in back");
 		})
 		.catch((error) =>
 		{
@@ -1461,7 +1461,7 @@ export const	addChatUser = (user: ChatUserModel)
 				}
 			}
 		}
-		dispatch(controllerActions.addChatUser(response));
+		dispatch(controllerActions.updateChatUsers(response));
 	});
 }
 
@@ -1596,6 +1596,34 @@ export const	setCurrentProfileIsFriend = (isFriend: boolean)
 		}
 		dispatch(controllerActions.setCurrentProfileIsFriend(response));
 	});
+}
+
+export const	updateChatUsers = (profileId: string, newPseudo: string)
+  : ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+      const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
+      {
+        return (elem.profileId === profileId);
+      });
+      const	updatedUsers = [...prev.controller.user.chat.users];
+      if (index !== -1)
+        updatedUsers[index].name = newPseudo;
+      const	response: ControllerModel = {
+        ...prev.controller,
+        user:
+        {
+          ...prev.controller.user,
+          chat:
+          {
+            ...prev.controller.user.chat,
+            users: updatedUsers
+          }
+        }
+      }
+      dispatch(controllerActions.updateChatUsers(response));
+  });
 }
 
 export const	getMyStats = ()

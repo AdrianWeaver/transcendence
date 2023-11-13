@@ -415,7 +415,7 @@ const	controllerSlice = createSlice(
 		{
 			state.user.chat.users = action.payload.user.chat.users;
 		},
-		addChatUser(state, action: PayloadAction<ControllerModel>)
+		updateChatUsers(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
 		},

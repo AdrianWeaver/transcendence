@@ -23,16 +23,14 @@ type	LeftSideProps =
 
 const	LeftSide = (props: LeftSideProps) =>
 {
-	const	user = useAppSelector((state) =>
-	{
-		return (state.controller.user);
-	});
-
 	const	navigate = useNavigate();
 
 	const	handleLeaveProfile = () =>
 	{
-		navigate(props.prevPage);
+		if (!props.isMe)
+			navigate(props.prevPage);
+		else
+			navigate("/");
 	};
 
 	return (
@@ -51,8 +49,11 @@ const	LeftSide = (props: LeftSideProps) =>
 					{
 						(props.isMe)
 						? <>
-							♡ {props.pseudo}'s profile ♡
-							♡♡♡
+							<Typography></Typography>
+								♡ {props.pseudo}'s profile ♡
+							<Typography>
+								♡♡♡
+							</Typography>
 						</>
 						: <Typography>
 							{
