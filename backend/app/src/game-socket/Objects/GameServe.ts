@@ -25,6 +25,7 @@ class GameServe
 	public continueAnimating: boolean;
 	public loop: NodeAnimationFrame | undefined;
 	public userConnected: number;
+	public paddleCount: number;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
@@ -53,6 +54,7 @@ class GameServe
 		this.loop = undefined;
 		this.userConnected = 0;
 		this.gameMode = "undefined";
+		this.paddleCount = 0;
 
 		this.initPlayers = () =>
 		{
