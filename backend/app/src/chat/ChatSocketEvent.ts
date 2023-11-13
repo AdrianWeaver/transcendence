@@ -273,6 +273,7 @@ export class ChatSocketEvents
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
+				console.log("les users ?", copyUsers, " ", regularUsers);
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);
@@ -290,6 +291,9 @@ export class ChatSocketEvents
 				{
 					newArray.map((element) =>
 					{
+						console.log(typeof elem.profileId, " ", typeof element.id, " ", elem.profileId === element.id.toString(), " ", elem.name, " ", element.username, " ", elem.name !== element.username)
+						if (elem.profileId === element.id && elem.name !== element.username)
+							elem.name = element.username;
 						if (elem.name === element.username)
 						{
 							elem.online = element.online;
@@ -297,6 +301,7 @@ export class ChatSocketEvents
 						}
 					});
 				});
+				console.log("ICI", copyUsers);
 				const action = {
 					type: "sending-list-user",
 					payload:

@@ -3,7 +3,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
-import "socket.io-client";
+// import * as SocketIOClient from "socket.io-client";
 
 import {
 	Box,
