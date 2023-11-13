@@ -174,6 +174,41 @@ const	ServerService = {
 				})
 		);
 	},
+	async	getMyStats(token: string, serverLocation: string)
+	{
+		const	config:AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+		return (
+			Api(serverLocation)
+				.post("/user/my-stats", {}, config)
+				.then((res) =>
+				{
+					return (res.data);
+				})
+				.then((data) =>
+				{
+					return (
+						{
+							success: true,
+							data: data
+						}
+					);
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+					return ({
+						success: false,
+						data: undefined
+					});
+				})
+		);
+	}
 };
 
 export default ServerService;

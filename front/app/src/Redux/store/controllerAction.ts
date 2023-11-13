@@ -18,6 +18,7 @@ import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
 import { PersistPartial } from "redux-persist/es/persistReducer";
+import ServerService from "../service/server-service";
 type MessageModel =
 {
 	sender: string,
@@ -1598,30 +1599,51 @@ export const	setCurrentProfileIsFriend = (isFriend: boolean)
 }
 
 export const	updateChatUsers = (profileId: string, newPseudo: string)
+  : ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+      const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
+      {
+        return (elem.profileId === profileId);
+      });
+      const	updatedUsers = [...prev.controller.user.chat.users];
+      if (index !== -1)
+        updatedUsers[index].name = newPseudo;
+      const	response: ControllerModel = {
+        ...prev.controller,
+        user:
+        {
+          ...prev.controller.user,
+          chat:
+          {
+            ...prev.controller.user.chat,
+            users: updatedUsers
+          }
+        }
+      }
+      dispatch(controllerActions.updateChatUsers(response));
+  });
+}
+
+export const	getMyStats = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await ServerService.getMyStats(token, uri);
+		if (data.success)
 		{
-			return (elem.profileId === profileId);
-		});
-		const	updatedUsers = [...prev.controller.user.chat.users];
-		if (index !== -1)
-			updatedUsers[index].name = newPseudo;
-		const	response: ControllerModel = {
-			...prev.controller,
-			user:
-			{
-				...prev.controller.user,
-				chat:
-				{
-					...prev.controller.user.chat,
-					users: updatedUsers
-				}
+			const	response: ControllerModel = {
+				...prev.controller,
+				myStats: data.data
 			}
+			dispatch(controllerActions.setMyStats(response));
 		}
-		dispatch(controllerActions.updateChatUsers(response));
-	});
+		else
+			dispatch(controllerActions.setMyStats(prev.controller));
+	})
 }

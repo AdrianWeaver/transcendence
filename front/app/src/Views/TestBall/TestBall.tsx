@@ -455,11 +455,11 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
-			<WaitingActive
+			{/* <WaitingActive
 				connected={connected}
 				numberOfUser={theServer.numberOfUser}
 				disconnected={socketRef.current?.active}
-			/>
+			/> */}
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
