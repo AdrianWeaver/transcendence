@@ -75,8 +75,8 @@ class Channel
 		};
 		this.setOwner = (owner: MemberSocketIdModel) =>
 		{
-			if (owner.profileId === undefined)
-				throw new Error("this.setOwner = (owner: MemberSocketIdModel) =>");
+			// if (owner.profileId === undefined)
+			// 	throw new Error("this.setOwner = (owner: MemberSocketIdModel) =>");
 			this.owner = owner;
 		};
 		this.setName = (name: string) =>
@@ -124,12 +124,13 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
-			const	profId = this.chat?.getProfileIdFromSocketId(id);
+		
+			// const	profId = this.chat?.getProfileIdFromSocketId(id);
 			for (const user of this.admins)
 			{
-				if (id === user.memberSocketId)
-					return (true);
-				if (profId === user.profileId)
+				// if (id === user.memberSocketId)
+				// 	return (true);
+				if (id === user.profileId)
 					return (true);
 			}
 			return (false);

@@ -505,11 +505,18 @@ export class ChatSocketEvents
 				}
 				else
 				{
+					console.log("I GOT HERE");
 					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
+					{
 						isAdmin = true;
+						console.log("I AM THE ADMIN");
+					}
 					else
+					{
 						isAdmin = false;
+						console.log("I AM NOT THE ADMIN");
+					}
 				}
 				let	msg;
 				msg = "";
