@@ -1458,10 +1458,10 @@ const	ChatLayout = () =>
 							</Dialog>
 							<List>
 								{
-									channels.map((channel: any) =>
+									channels.map((channel: any, index: number) =>
 									{
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
+											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
 													style={
 														channel.name === currentChannelRef.current
