@@ -509,7 +509,7 @@ export class GameSocketEvents
 		const	friendArray = this.filterGameArrayBySocketState(profileId, friendModeGame);
 		const	classicalArray = this.filterGameArrayBySocketState(profileId, classicalGameMode);
 		const	upsideDownArray = this.filterGameArrayBySocketState(profileId, upsideDownGameMode);
-
+		this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
 		//	A/ id friend not checked yet :
 		//		-- check:
 		//			if player (Two || One) is the friend profile id => PartB (the game has be created by api)
@@ -547,7 +547,7 @@ export class GameSocketEvents
 		//		-- this one: the game must reject 2 players at setter and game deleted
 		//	[X]/!\ undefined: the user never play the game
 		//		but this one nerver trigger here undefined is after search a game and setted at player Two
-		if (gameModeRequest === "classical")
+		else if (gameModeRequest === "classical")
 		{
 			this.logger.debug("Checking socket state for state of classical games");
 			if (classicalArray.filtered.disconnected.length === 0)
@@ -627,7 +627,7 @@ export class GameSocketEvents
 			if (classicalArray.filtered.undefined.length === 0)
 			{
 				this.logger.verbose("\tThe user as no undefined games");
-				this.logger.debug("Search a game with player two as undefined");
+				this.logger.debug("Search a game ");
 				const	indexClassicalAlone = this.gameService
 					.findIndexGameInstanceAloneByGameMode("classical");
 				if (indexClassicalAlone === -1)
@@ -695,6 +695,68 @@ export class GameSocketEvents
 			{
 				this.logger.verbose("\tThe user has no pending games");
 			}
+			else
+			{
+				const	indexUpsideDownDisconnected = this.gameService
+					.gameInstances.findIndex((instance) =>
+					{
+						return (
+							(
+								instance.playerOne.profileId === profileId
+								|| instance.playerTwo.profileId === profileId
+							) && instance.gameMode === "upside-down"
+						);
+					});
+				if (indexUpsideDownDisconnected === -1)
+				{
+					this.logger.error("The user must not be in this conditions !!");
+				}
+				else
+				{
+					if (this.gameService.gameInstances[indexUpsideDownDisconnected].playerOne.profileId === profileId)
+					{
+						if (this.gameService.gameInstances[indexUpsideDownDisconnected].playerOne.socketId === "disconnected")
+						{
+							this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.playerOne.socketId = client.id;
+							this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.userConnected += 1;
+							roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.roomName;
+							await client.join(roomName);
+							this.logger.verbose("The user is reconnected as player one!");
+							return ;
+						}
+						else
+						{
+							this.logger.error("Must not be in this conditions");
+							client.disconnect();
+							return ;
+						}
+					}
+					if (this.gameService.gameInstances[indexUpsideDownDisconnected].playerTwo.profileId === profileId)
+					{
+						if (this.gameService.gameInstances[indexUpsideDownDisconnected].playerTwo.socketId === "disconnected")
+						{
+							this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.playerTwo.socketId = client.id;
+							this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.userConnected += 1;
+							roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
+								.roomName;
+							await client.join(roomName);
+							this.logger.verbose("The user is reconnected as player Two!");
+							return ;
+						}
+						else
+						{
+							this.logger.error("Must not be in this conditions");
+							client.disconnect();
+							return ;
+						}
+					}
+				}
+			}
 			if (upsideDownArray.filtered.invited.length === 0)
 			{
 				this.logger.verbose("\tThe user has no invite games");
@@ -706,6 +768,58 @@ export class GameSocketEvents
 			if (upsideDownArray.filtered.undefined.length === 0)
 			{
 				this.logger.verbose("\tThe user as no undefined games");
+				this.logger.debug("Search a game with player two as undefined");
+				const	indexUpsideDownAlone = this.gameService
+					.findIndexGameInstanceAloneByGameMode("classical");
+				if (indexUpsideDownAlone === -1)
+				{
+					this.logger.debug("\tNo player Alone in this gameMode");
+					this.logger.verbose("Creating game, the user will be player one");
+					this.gameService.increaseRoomCount();
+					// can put length of room dynamically to reject connection if liimiit trigger
+					// roomNameArray.length < roomCount : reject busy server
+					roomName = "room "
+						+ roomNameArray [
+							this.gameService.getRoomCount()
+						];
+					this.logger.verbose("\tRoom name: " + roomName);
+					await client.join(roomName);
+					const	newRoom = new GameServe(roomName);
+					newRoom.gameMode = "upside-down";
+					newRoom.ball.game = newRoom;
+					newRoom.board.game = newRoom;
+					newRoom.net.game = newRoom;
+					newRoom.playerOne.socketId = client.id;
+					newRoom.playerOne.profileId = profileId;
+					newRoom.userConnected += 1;
+					newRoom.board.init();
+					newRoom.loop = new NodeAnimationFrame();
+					newRoom.loop.game = newRoom;
+					newRoom.loop.callbackFunction = this.printPerformance;
+					newRoom.loop.update(performance.now());
+					this.gameService.pushGameServeToGameInstance(newRoom);
+					this.logger.verbose("Game is created");
+				}
+				else
+				{
+					if (this.gameService.gameInstances[indexUpsideDownAlone].playerOne.socketId === "undefined")
+					{
+						this.gameService.gameInstances[indexUpsideDownAlone].playerOne.socketId = client.id;
+						this.gameService.gameInstances[indexUpsideDownAlone].playerOne.profileId = profileId;
+						this.logger.verbose("Joining game, the user will be player One");
+					}
+					else
+					{
+						this.gameService.gameInstances[indexUpsideDownAlone].playerTwo.socketId = client.id;
+						this.gameService.gameInstances[indexUpsideDownAlone].playerTwo.profileId = profileId;
+						this.logger.verbose("Joining game, the user will be player Two");
+					}
+					this.gameService.gameInstances[indexUpsideDownAlone].userConnected += 1;
+					roomName = this.gameService.gameInstances[indexUpsideDownAlone].roomName;
+					this.logger.verbose("\tRoom name: " + roomName);
+					await client.join(roomName);
+					this.logger.verbose("Joined the game");
+				}
 			}
 		}
 		this.logger.verbose("The user request game mode " + gameModeRequest);
