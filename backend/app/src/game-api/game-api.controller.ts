@@ -20,6 +20,12 @@ class RevokeTokenDto
 	uuid: string;
 }
 
+class	FriendInvitationDto
+{
+	@IsNotEmpty()
+	friendId: string
+}
+
 @Controller("api/game")
 export class GameApiController
 {
@@ -58,14 +64,7 @@ export class GameApiController
 		return (this.gameApiService.getGameServiceCopy());
 	}
 
-	@Get("/invite/friends")
-	// @UseGuards(UserAuthorizationGuard)
-	inviteFriend(@Param("invited") friend: string)
-	{
-		console.log(friend);
-		return ("hello");
-	}
-
+	
 	@Post("/instance/myActiveGame")
 	@UseGuards(UserAuthorizationGuard)
 	getMyActiveGame(
@@ -102,4 +101,17 @@ export class GameApiController
 		}
 		return ("end");
 	}
+
+	@Post("/invite/friends")
+	// @UseGuards(UserAuthorizationGuard)
+	inviteFriend(
+		@Req() req: any,
+		@Body() body: FriendInvitationDto
+	)
+	{
+		console.log(req.user.id);
+		console.log(body);
+		return ("hello");
+	}
+
 }
