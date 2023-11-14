@@ -43,9 +43,9 @@ const	MyAvatar = (props: MyAvatarProps) =>
 
 				setDefaultImage(false);
 		})
-    .catch((err) =>
+    .catch((_err) =>
 	{
-      setDefaultImage(true);
+    	setDefaultImage(true);
     });
   };
   renderImage();

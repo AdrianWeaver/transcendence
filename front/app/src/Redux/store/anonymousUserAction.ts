@@ -18,7 +18,7 @@ import
 	AnonymousUserLoginResponseModel,
 	AnonymousUserRegisterResponseModel,
 	AnonymousUserModel as Model,
-	ServerModel
+	// ServerModel
 }	from "../models/redux-models";
 
 import

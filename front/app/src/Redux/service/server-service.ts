@@ -48,7 +48,8 @@ const	ServerService = {
 				.catch((error: any) =>
 				{
 					return ({
-						success: false
+						success: false,
+						error: error,
 					});
 				})
 		);
@@ -142,7 +143,9 @@ const	ServerService = {
 				.catch((error) =>
 				{
 					console.error("login anonymous error");
-					return ({statusCode: 501});
+					return ({
+						statusCode: 501,
+						error: error});
 				})
 		);
 	},
@@ -165,7 +168,7 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
-					// console.log(data);
+					console.log(data);
 					return ("SUCCESS");
 				})
 				.catch((error) =>
@@ -195,7 +198,9 @@ const	ServerService = {
 				})
 				.catch((error: any) =>
 				{
-					return ({success: false});
+					return ({
+						success: false,
+						error: error});
 				})
 		);
 	},
@@ -229,7 +234,9 @@ const	ServerService = {
 				})
 				.catch((error) =>
 				{
-					return ({success: false});
+					return ({
+						success: false,
+						error: error});
 				})
 		);
   },

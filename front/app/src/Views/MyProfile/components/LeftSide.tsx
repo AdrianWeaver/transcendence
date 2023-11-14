@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
-import { Avatar, Badge, Button, Grid, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import MyAvatar from "./MyAvatar";
-import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
+// import { useState } from "react";
+// import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { useNavigate } from "react-router-dom";
 
 type	LeftSideProps =

@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
-import DisplayConnectionState from "./DisplayConnectionState";
+// import DisplayConnectionState from "./DisplayConnectionState";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
-import DisplayAnonymousConnection from "./DisplayAnonymousConnection";
+// import DisplayAnonymousConnection from "./DisplayAnonymousConnection";
 import { useEffect, useState } from "react";
 import ServiceChecker from "./ServiceChecker";
 import SessionUserVerificator from "./SessionUserVerificator";
