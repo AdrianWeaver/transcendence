@@ -300,7 +300,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 					"Authorization": token
 				}
 			};
-			console.log("URI: (should have no port", server.uri);
 			axios
 			.post(server.uri + ":3000/user/register/step-one",
 				objToSend,

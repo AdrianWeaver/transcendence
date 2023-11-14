@@ -168,12 +168,12 @@ export class UserController
 			return (unauthorized(401, "You are an hacker go off"), void(0));
 		this.logger.verbose("password okay and are the same");
 		const count = this.userService
-			.getNumberOfUserWithUsername(body.username);
+			.getNumberOfUserWithUsername(body.username, req.user);
 		if (count > 1)
 			return (unauthorized(401, "Username already taken"), void(0));
 		this.logger.verbose("username count okay");
 		const user = req.user;
-		console.log(user, " ", body);
+		console.log("STEP ONE", user, " ", body);
 		if (body.ft && (body.emailAddress !== user.email
 			|| body.firstName !== user.firstName
 			|| body.lastName !== user.lastName))

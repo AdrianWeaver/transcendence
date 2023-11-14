@@ -1270,10 +1270,20 @@ public	register(data: UserModel)
 		return (searchFriend.username + " added as friend");
 	}
 
-	public getNumberOfUserWithUsername(username : string)
+	public getNumberOfUserWithUsername(username : string, user: UserModel)
 		: number
 	{
-		this.logger.debug("username: " + username);
+		this.logger.debug("username: " + username, " usernameUser ", user.username);
+
+		if (username !== user.username)
+		{
+			const	index = this.user.findIndex((elem) =>
+			{
+				return (elem.username === user.username);
+			});
+			if (index !== -1)
+				this.user[index].username = username;
+		}
 		const count = this.user.filter((obj) =>
 		{
 			return (obj.username === username);
