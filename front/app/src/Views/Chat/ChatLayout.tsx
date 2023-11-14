@@ -755,6 +755,7 @@ const	ChatLayout = () =>
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
 			}
+			goToChannel(data.payload.chanName, data.payload.kind);
 		};
 
 		const	channelInfo = (data: any) =>
@@ -806,7 +807,9 @@ const	ChatLayout = () =>
 				if (currentChannelRef.current === data.payload.chanName)
 				{
 					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+					{
 						setChanMessages([]);
+					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
@@ -1073,6 +1076,16 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
+		// const act = {
+		// 	type: "did-I-join",
+		// 	payload: {
+		// 		chanName: chanName,
+		// 		kind: "channel",
+		// 		userId: undefined
+		// 	}
+		// };
+	
+		// socketRef.current.emit("channel-info", act);
 	};
 
 	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
@@ -1240,7 +1253,10 @@ const	ChatLayout = () =>
 			return (elem.name === username);
 		});
 		if (searchUser !== undefined)
-			setUserToInvite(searchUser.profileId);
+			return (searchUser.profileId);
+			// setUserToInvite(searchUser.profileId);
+		else
+			return ("undefined");
 	};
 
 	const	inviteUserToChannel = (data: string) =>
@@ -1248,37 +1264,39 @@ const	ChatLayout = () =>
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
 		let	profileId: string;
-		profileId = data.toString();
-		console.log("isNaN(Number(data))", isNaN(Number(data)));
-		if (data.length !== 5 || isNaN(Number(data)))
-		{
-			console.log("ici ?", chatUsers, " ", data.length);
-			const	searchUser = chatUsers.find((elem) =>
-			{
-				console.log("data", data, "name", elem.name, " === ", data === elem.name);
-				return (data === elem.name);
-			});
-			console.log("seartchUs", searchUser);
-			if (searchUser !== undefined)
-			{
-				profileId = searchUser.profileId;
-				console.log("profileID ?  ", profileId);
-				inviteUserToChannel(profileId);
+		// profileId = data.toString();
+		profileId = getProfileId(data);
+		// console.log("isNaN(Number(data))", isNaN(Number(data)));
+		// if (data.length !== 5 || isNaN(Number(data)))
+		// if (isNaN(Number(data)) === true)
+		// {
+		// 	console.log("ici ?", chatUsers, " ", data.length);
+		// 	const	searchUser = chatUsers.find((elem) =>
+		// 	{
+		// 		console.log("data", data, "name", elem.name, " === ", data === elem.name);
+		// 		return (data === elem.name);
+		// 	});
+		// 	console.log("seartchUs", searchUser);
+		// 	if (searchUser !== undefined)
+		// 	{
+		// 		profileId = searchUser.profileId;
+		// 		console.log("profileID ?  ", profileId);
+		// 		inviteUserToChannel(profileId);
+		// 	}
+		// }
+		// else
+		// {
+		console.log("profileID Ok: ", profileId);
+		const	action = {
+			type: "invite-member",
+			payload: {
+				chanName: channelToInvite,
+				userName: profileId,
 			}
-		}
-		else
-		{
-			console.log("channleToInvite Ok: ", channelToInvite);
-			const	action = {
-				type: "invite-member",
-				payload: {
-					chanName: channelToInvite,
-					userName: profileId,
-				}
-			};
-			console.log("Action : invite", action);
-			socketRef.current.emit("user-info", action);
-		}
+		};
+		console.log("Action : invite", action);
+		socketRef.current.emit("user-info", action);
+		// }
 	};
 
 	// END OF INVITE
@@ -1367,7 +1385,7 @@ const	ChatLayout = () =>
 									</DialogContentText>
 									<input
 										type="text"
-										placeholder="Channel name"
+										placeholder="User name"
 										value={channelName}
 										onChange={(e) =>
 										{
@@ -1443,10 +1461,10 @@ const	ChatLayout = () =>
 							</Dialog>
 							<List>
 								{
-									channels.map((channel: any) =>
+									channels.map((channel: any, index: number) =>
 									{
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
+											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
 													style={
 														channel.name === currentChannelRef.current
@@ -1500,6 +1518,7 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
+															console.log("CURRENT CHANNEL: " + channel.name);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1513,7 +1532,7 @@ const	ChatLayout = () =>
 															<DialogTitle>Invite User to Channel</DialogTitle>
 															<DialogContent>
 																<TextField
-																label="Channel Name"
+																label="User Name"
 																variant="outlined"
 																fullWidth
 																value={userToInvite}
@@ -1527,9 +1546,11 @@ const	ChatLayout = () =>
 															<DialogActions>
 																<Button onClick={() =>
 																	{
-																		getProfileId(userToInvite);
+																		console.log("USER TO INVITE: " + userToInvite);
+																		// setUserToInvite(getProfileId(userToInvite));
 																		inviteUserToChannel(userToInvite);
 																		setInviteDialogOpen(false);
+																		setUserToInvite("");
 																	}} color="primary">
 																	Invite
 																</Button>
@@ -1794,7 +1815,7 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					<Button onClick={() =>
+																					{/* <Button onClick={() =>
 																					{
 																						setSeeProfile(false);
 																						setInviteDialogOpen(true);
@@ -1838,7 +1859,7 @@ const	ChatLayout = () =>
 																							Cancel
 																							</Button>
 																						</DialogActions>
-																					</Dialog>
+																					</Dialog> */}
 																				</>
 																			</>
 																			: <></>

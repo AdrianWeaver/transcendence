@@ -39,4 +39,6 @@ export class GameApiController
     {
         return (this.gameApiService.getGameServiceCopy());
     }
+
+    // allGameStatus
 }
