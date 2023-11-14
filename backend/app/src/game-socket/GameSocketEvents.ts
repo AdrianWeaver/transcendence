@@ -98,13 +98,10 @@ export class GameSocketEvents
 
 			const	scorePlayerOne = instance.playerOne.score;
 			const	scorePlayerTwo = instance.playerTwo.score;
-			if (scorePlayerOne === instance.scoreLimit)
+			if (scorePlayerOne === instance.scoreLimit || scorePlayerTwo === instance.scoreLimit)
 			{
-				console.log("User one has won ");
-			}
-			if (scorePlayerTwo === instance.scoreLimit)
-			{
-				console.log("User two has won");
+				console.log("User one has won score " + scorePlayerOne);
+				this.gameService.recordMatchHistory(instance);
 			}
 			const action = {
 				type: "game-data",

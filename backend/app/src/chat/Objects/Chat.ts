@@ -166,10 +166,10 @@ class Chat
 			this.channels.forEach((channel) =>
 			{
 				channel.sockets.push(client);
-				channel.messages.forEach((message: MessageModel) =>
-				{
-					message.sender = client.id;
-				});
+				// channel.messages.forEach((message: MessageModel) =>
+				// {
+				// 	message.sender = client.id;
+				// });
 			});
 		};
 

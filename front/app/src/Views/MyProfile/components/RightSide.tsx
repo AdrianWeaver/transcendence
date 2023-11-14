@@ -21,7 +21,7 @@ type	RightSideProps =
 
 const	RightSide = (props: RightSideProps) =>
 {
-	let	userSelected: ChatUserModel | undefined;
+	let		userSelected: ChatUserModel | undefined;
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 	const	userMe = useAppSelector((state) =>
@@ -44,19 +44,15 @@ const	RightSide = (props: RightSideProps) =>
 
 	const	editRequest = () =>
 	{
-		if (!props.isMe)
-
-			if (!userMe.chat.currentProfileIsFriend)
-				dispatch(setProfilePublicView());
-			else
-				dispatch(setProfileFriendView());
-		else
-			dispatch(setProfileEditView());
+		dispatch(setProfileEditView());
 	};
 
 	const	displayStats = () =>
 	{
-		navigate("/stats");
+		if (props.isMe)
+			navigate("/my-stats");
+		else
+			navigate("/stats");
 	};
 
 	return (
@@ -93,7 +89,7 @@ const	RightSide = (props: RightSideProps) =>
 				{
 					(props.isMe)
 					? <Button onClick={editRequest}>
-						"EDIT PROFILE"
+						EDIT PROFILE
 					</Button>
 					: (!userMe.chat.currentProfileIsFriend)
 						? <Grid item xs={12}>

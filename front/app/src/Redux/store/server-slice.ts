@@ -15,10 +15,12 @@ export const	initialServerState: ServerModel = {
 	connexionAttempt: 0,
 	error: false,
 	message: "",
-	serverLocation: "localhost",
+	// localhost 
+	serverLocation: "undefined",
 	links: {
 		authApiUrl: "undefined",
-	}
+	},
+	uri: "undefined"
 };
 
 const	serverSlice = createSlice(
@@ -72,10 +74,15 @@ const	serverSlice = createSlice(
 		setServerLocation(state, action: PayloadAction<ServerModel>)
 		{
 			state.serverLocation = action.payload.serverLocation;
+			state.uri = action.payload.uri;
 		},
 		setAuthApiLinks(state, action: PayloadAction<ServerModel>)
 		{
 			state.links.authApiUrl = action.payload.links.authApiUrl;
+		},
+		setUri(state, action: PayloadAction<ServerModel>)
+		{
+			state.uri = action.payload.uri;
 		},
 	}
 });

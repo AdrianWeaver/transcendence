@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
@@ -96,21 +97,21 @@ const	TestBall = () =>
 
 	const	url = useAppSelector((state) =>
 	{
-		return ("http://" + state.server.serverLocation + ":3000");
+		return (state.server.uri + ":3000");
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 
-	const	game = new Game();
+	const	game = new Game("front");
 	// remove me after fix
-	try
-	{
-		throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
-	}
-	catch (error)
-	{
-		console.log(error);
-	}
+	// try
+	// {
+	// 	// throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
+	// }
+	// catch (error)
+	// {
+	// 	console.log(error);
+	// }
 	const	gameRef = useRef<Game>(game);
 	gameRef.current = game;
 	game.board.game = game;

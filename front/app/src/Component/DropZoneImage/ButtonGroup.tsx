@@ -7,17 +7,17 @@ import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import axios from "axios";
 import Spacer from "./extra/Spacer";
 
-const	sendImage = (files: FileObject[], token: string) =>
+const	sendImage = (files: FileObject[], token: string, uri: string) =>
 {
 	if (files.length === 0)
 		return ;
 	const	formData = new FormData();
 	formData.append("image", files[0].file);
-
+console.log("uri should not have port", uri);
 	const config = {
 		method: "post",
 		maxBodyLength: Infinity,
-		url: "http://localhost:3000/user/update-photo",
+		url: uri + ":3000/user/update-photo",
 		headers: {
 		"Authorization": token,
 		"Content-Type": "multipart/form-data"
@@ -45,6 +45,10 @@ export type	ButtonGroupProps = {
 const	ButtonGroup = (props: ButtonGroupProps) =>
 {
 	let		buttonValidate;
+	const	uri = useAppSelector((state) =>
+	{
+		return (state.server.uri);
+	});
 	const	token = useAppSelector((state) =>
 	{
 		return (state.controller.user.bearerToken);
@@ -79,7 +83,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 			<Button
 				onClick={() =>
 				{
-					sendImage(props.files, token);
+					sendImage(props.files, token, uri);
 					props.setDisplayModalBox(false);
 				}}
 				disabled={false}

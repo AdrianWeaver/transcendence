@@ -73,7 +73,7 @@ const	UserServices = {
 				"Authorization": token
 			}
 		};
-
+		console.log("VERIFYYYYY", hostname);
 		return (
 			Api(hostname)
 			.post("/user/verify-token", {}, config)

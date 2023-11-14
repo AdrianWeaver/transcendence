@@ -25,6 +25,7 @@ class GameServe
 	public continueAnimating: boolean;
 	public loop: NodeAnimationFrame | undefined;
 	public userConnected: number;
+	public paddleCount: number;
 	public displayStartMessage: () => void;
 	public displayEndMessage: () => void;
 	public initPlayers: () => void;
@@ -32,8 +33,10 @@ class GameServe
 	public isSocketIdExistGameInstance: (clientId: string) => boolean;
 
 	public getSeralizable: () => any;
+
 	public gameMode: string;
 	public	revoked: boolean;
+  
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
@@ -47,13 +50,14 @@ class GameServe
 		this.ball = new Ball();
 		this.net = new Net();
 		this.actionKeyPress = -1;
-		this.scoreLimit = 7;
+		this.scoreLimit = 2;
 		this.startDisplayed = true;
 		this.continueAnimating = true;
 		this.loop = undefined;
 		this.userConnected = 0;
 		this.gameMode = "undefined";
 		this.revoked = false;
+		this.paddleCount = 0;
 
 		this.initPlayers = () =>
 		{
@@ -95,7 +99,8 @@ class GameServe
 				continueAnimating: this.continueAnimating,
 				loop: this.loop?.getSerializable(),
 				userConnected: this.userConnected,
-				revoked: this.revoked
+				revoked: this.revoked,
+        paddleCount: this.paddleCount,
 			});
 		};
 		this.isSocketIdExistGameInstance = (clientId: string) =>

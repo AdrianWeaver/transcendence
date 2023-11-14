@@ -24,12 +24,14 @@ import {
 import {
 	hashPassword,
 	registerInfosInBack,
+	setChatUsers,
 	setDoubleAuth,
 	setEmail,
 	setPassword,
 	setPhoneNumber,
 	setProfileMyView,
 	setPseudo,
+	updateChatUsers,
 	userRegistrationStepThree,
 	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
 import UserSecurityChecker from "../../../Object/UserSecurityChecker";
@@ -277,7 +279,10 @@ const	EditProfile = (props: EditProfileProps) =>
 		if (filtered.length === 0)
 		{
 			if (user.username !== userChanges.username)
+			{
+				dispatch(updateChatUsers(user.id.toString(), userChanges.username));
 				dispatch(registerInfosInBack(userChanges.username, "username"));
+			}
 			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
 			if (user.password !== userChanges.password)
 			{

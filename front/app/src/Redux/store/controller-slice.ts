@@ -124,6 +124,8 @@ const	initialControllerState: ControllerModel = {
 		height: window.innerHeight,
 		width: window.innerWidth
 	},
+	myStats: [],
+	stats: []
 };
 
 const	controllerSlice = createSlice(
@@ -414,7 +416,7 @@ const	controllerSlice = createSlice(
 		{
 			state.user.chat.users = action.payload.user.chat.users;
 		},
-		addChatUser(state, action: PayloadAction<ControllerModel>)
+		updateChatUsers(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
 		},
@@ -439,6 +441,14 @@ const	controllerSlice = createSlice(
 		{
 			state.user.alreadyExists = action.payload.user.alreadyExists;
 		},
+		setMyStats(state, action: PayloadAction<ControllerModel>)
+		{
+			state.myStats = action.payload.myStats;
+		},
+		setStats(state, action: PayloadAction<ControllerModel>)
+		{
+			state.stats = action.payload.stats;
+		}
 	}
 });
 

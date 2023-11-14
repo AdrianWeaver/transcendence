@@ -3,6 +3,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
+// import * as SocketIOClient from "socket.io-client";
 
 import {
 	Box,
@@ -29,8 +30,6 @@ import {
 import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
 import FriendItem from "./components/FriendItem";
-
-const URL = "http://localhost:3000/";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -258,6 +257,10 @@ const	ChatLayout = () =>
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	server	= useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -475,6 +478,11 @@ const	ChatLayout = () =>
 		setJoiningChannelName
 	] = useState("");
 
+	const [
+		clickedChannel,
+		setClickedChannel
+	] = useState("");
+
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
@@ -557,7 +565,7 @@ const	ChatLayout = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(URL,
+		const socket = io(server.uri + ":3000",
 			{
 				path: "/socket-chat",
 				autoConnect: false,
@@ -752,6 +760,7 @@ const	ChatLayout = () =>
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
 			}
+			goToChannel(data.payload.chanName, data.payload.kind);
 		};
 
 		const	channelInfo = (data: any) =>
@@ -775,7 +784,7 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("DISPLAY MEMBERS", data.payload, );
 				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
@@ -803,7 +812,9 @@ const	ChatLayout = () =>
 				if (currentChannelRef.current === data.payload.chanName)
 				{
 					if (data.payload.kind === "channel" || kindOfConversation === "channel")
+					{
 						setChanMessages([]);
+					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
 						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
@@ -1070,6 +1081,16 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
+		// const act = {
+		// 	type: "did-I-join",
+		// 	payload: {
+		// 		chanName: chanName,
+		// 		kind: "channel",
+		// 		userId: undefined
+		// 	}
+		// };
+	
+		// socketRef.current.emit("channel-info", act);
 	};
 
 	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
@@ -1237,7 +1258,10 @@ const	ChatLayout = () =>
 			return (elem.name === username);
 		});
 		if (searchUser !== undefined)
-			setUserToInvite(searchUser.profileId);
+			return (searchUser.profileId);
+			// setUserToInvite(searchUser.profileId);
+		else
+			return ("undefined");
 	};
 
 	const	inviteUserToChannel = (data: string) =>
@@ -1245,37 +1269,39 @@ const	ChatLayout = () =>
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
 		let	profileId: string;
-		profileId = data.toString();
-		console.log("isNaN(Number(data))", isNaN(Number(data)));
-		if (data.length !== 5 || isNaN(Number(data)))
-		{
-			console.log("ici ?", chatUsers, " ", data.length);
-			const	searchUser = chatUsers.find((elem) =>
-			{
-				console.log("data", data, "name", elem.name, " === ", data === elem.name);
-				return (data === elem.name);
-			});
-			console.log("seartchUs", searchUser);
-			if (searchUser !== undefined)
-			{
-				profileId = searchUser.profileId;
-				console.log("profileID ?  ", profileId);
-				inviteUserToChannel(profileId);
+		// profileId = data.toString();
+		profileId = getProfileId(data);
+		// console.log("isNaN(Number(data))", isNaN(Number(data)));
+		// if (data.length !== 5 || isNaN(Number(data)))
+		// if (isNaN(Number(data)) === true)
+		// {
+		// 	console.log("ici ?", chatUsers, " ", data.length);
+		// 	const	searchUser = chatUsers.find((elem) =>
+		// 	{
+		// 		console.log("data", data, "name", elem.name, " === ", data === elem.name);
+		// 		return (data === elem.name);
+		// 	});
+		// 	console.log("seartchUs", searchUser);
+		// 	if (searchUser !== undefined)
+		// 	{
+		// 		profileId = searchUser.profileId;
+		// 		console.log("profileID ?  ", profileId);
+		// 		inviteUserToChannel(profileId);
+		// 	}
+		// }
+		// else
+		// {
+		console.log("profileID Ok: ", profileId);
+		const	action = {
+			type: "invite-member",
+			payload: {
+				chanName: channelToInvite,
+				userName: profileId,
 			}
-		}
-		else
-		{
-			console.log("profileID Ok: ", profileId);
-			const	action = {
-				type: "invite-member",
-				payload: {
-					chanName: channelToInvite,
-					userName: profileId,
-				}
-			};
-			console.log("Action : invite", action);
-			socketRef.current.emit("user-info", action);
-		}
+		};
+		console.log("Action : invite", action);
+		socketRef.current.emit("user-info", action);
+		// }
 	};
 
 	// END OF INVITE
@@ -1364,7 +1390,7 @@ const	ChatLayout = () =>
 									</DialogContentText>
 									<input
 										type="text"
-										placeholder="Channel name"
+										placeholder="User name"
 										value={channelName}
 										onChange={(e) =>
 										{
@@ -1440,10 +1466,10 @@ const	ChatLayout = () =>
 							</Dialog>
 							<List>
 								{
-									channels.map((channel: any) =>
+									channels.map((channel: any, index: number) =>
 									{
 										return (
-											<ListItem style={listItemStyle} key={channel.id}>
+											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
 													style={
 														channel.name === currentChannelRef.current
@@ -1459,8 +1485,10 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
+													console.log("CHANNEL NAME: ", channel.name);
+													setClickedChannel(channel.name);
 													handleDialogOpen(false);
-													setButtonSelection(channel);
+													setButtonSelection(channel.name);
 												}}>
 													Options
 												</Button>
@@ -1497,6 +1525,7 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
+															console.log("CLICKED CHANNEL: " + clickedChannel);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1510,7 +1539,7 @@ const	ChatLayout = () =>
 															<DialogTitle>Invite User to Channel</DialogTitle>
 															<DialogContent>
 																<TextField
-																label="Channel Name"
+																label="User Name"
 																variant="outlined"
 																fullWidth
 																value={userToInvite}
@@ -1518,15 +1547,17 @@ const	ChatLayout = () =>
 																{
 																	console.log("target value " + e.target.value);
 																	setUserToInvite(e.target.value);
-																	setChannelToInvite(channel.name);
+																	setChannelToInvite(clickedChannel);
 																}}/>
 															</DialogContent>
 															<DialogActions>
 																<Button onClick={() =>
 																	{
-																		getProfileId(userToInvite);
+																		console.log("USER TO INVITE: " + userToInvite);
+																		// setUserToInvite(getProfileId(userToInvite));
 																		inviteUserToChannel(userToInvite);
 																		setInviteDialogOpen(false);
+																		setUserToInvite("");
 																	}} color="primary">
 																	Invite
 																</Button>
@@ -1594,7 +1625,7 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					<Button onClick={() =>
+																					{/* <Button onClick={() =>
 																					{
 																						setInviteDialogOpen(true);
 																					}}>
@@ -1634,7 +1665,7 @@ const	ChatLayout = () =>
 																							Cancel
 																							</Button>
 																						</DialogActions>
-																					</Dialog>
+																					</Dialog> */}
 																				</>)}
 																			</li>);
 																	})
@@ -1791,7 +1822,7 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					<Button onClick={() =>
+																					{/* <Button onClick={() =>
 																					{
 																						setSeeProfile(false);
 																						setInviteDialogOpen(true);
@@ -1835,7 +1866,7 @@ const	ChatLayout = () =>
 																							Cancel
 																							</Button>
 																						</DialogActions>
-																					</Dialog>
+																					</Dialog> */}
 																				</>
 																			</>
 																			: <></>
@@ -1902,7 +1933,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 0</h1>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1937,7 +1968,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 1</h1>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1958,7 +1989,21 @@ const	ChatLayout = () =>
 								);
 							})}
 					</TabPanel>
-
+					<TabPanel
+						area={"true"}
+						value={value}
+						index={2}
+						dir={style.direction}
+						style={style}
+					>
+						{/* <List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							> */}
+							<h1>tabpanel 2</h1>
+					</TabPanel>
 					<Divider />
 
 					<Grid

@@ -22,7 +22,7 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService, ChatUserModel } from "./Chat.service";
-import { Logger } from "@nestjs/common";
+import { Body, Logger, Post, Req, UseGuards } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
@@ -30,7 +30,9 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
+import { instrument } from "@socket.io/admin-ui";
+
+import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 
 type	ActionSocket = {
 	type: string,
@@ -94,11 +96,11 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			// instrument(this.server,
-			// 	{
-			// 		auth: false,
-			// 		mode: "development"
-			// 	});
+			instrument(this.server,
+				{
+					auth: false,
+					mode: "development"
+				});
 		}
 
 		handleConnection(client: Socket)
@@ -265,12 +267,14 @@ export class ChatSocketEvents
 			{
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				const copyUsers = this.chatService.getAllUsers();
+
 				const	me = this.chatService.getUserBySocketId(client.id);
 				if (me === undefined)
 					return ;
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
+				console.log("les users ?", copyUsers, " ", regularUsers);
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);
@@ -283,11 +287,14 @@ export class ChatSocketEvents
 				{
 					friendsList.push(elem.name);
 				});
-				console.log("friendsList here", friendsList);
+				// console.log("friendsList here", friendsList);
 				copyUsers.forEach((elem) =>
 				{
 					newArray.map((element) =>
 					{
+						console.log(typeof elem.profileId, " ", typeof element.id, " ", elem.profileId === element.id.toString(), " ", elem.name, " ", element.username, " ", elem.name !== element.username)
+						if (elem.profileId === element.id && elem.name !== element.username)
+							elem.name = element.username;
 						if (elem.name === element.username)
 						{
 							elem.online = element.online;
@@ -295,6 +302,7 @@ export class ChatSocketEvents
 						}
 					});
 				});
+				console.log("ICI", copyUsers);
 				const action = {
 					type: "sending-list-user",
 					payload:
@@ -505,11 +513,18 @@ export class ChatSocketEvents
 				}
 				else
 				{
+					console.log("I GOT HERE");
 					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
+					{
 						isAdmin = true;
+						console.log("I AM THE ADMIN");
+					}
 					else
+					{
 						isAdmin = false;
+						console.log("I AM NOT THE ADMIN");
+					}
 				}
 				let	msg;
 				msg = "";
@@ -650,7 +665,7 @@ export class ChatSocketEvents
 					return ;
 				channel.leaveChannel(client);
 				client.leave(channel.name);
-				const message = user.name + "has left this channel.";
+				const message = user.name + " has left this channel.";
 				const id = channel.messages.length + 1;
 				const newMessage: MessageModel = {
 					sender: "server",
@@ -665,6 +680,7 @@ export class ChatSocketEvents
 						chanName: data.payload.chanName,
 						message: message,
 						messages: channel.messages,
+						kind: "channel",
 					}
 				};
 				this.server.to(data.payload.chanName).emit("update-messages", action);
@@ -730,6 +746,7 @@ export class ChatSocketEvents
 						message: message,
 						messages: channel.messages,
 						chanName: channel.name,
+						kind: "channel",
 					}
 				};
 				this.server.to(channel.name).emit("update-messages", action);
@@ -752,6 +769,7 @@ export class ChatSocketEvents
 				isFriend = false;
 				let	friendProfId;
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
+				const	testChatUsers = this.chatService.getAllUsersArray();
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				const	searchUser = this.chatService.getUserWithProfileId(profId);
 				if (searchUser === undefined)
@@ -770,34 +788,71 @@ export class ChatSocketEvents
 				const	memberList: MembersModel[] = [];
 				let userName: string;
 				userName = "";
-				for(const user of channel.users)
+				if (conv)
 				{
-					console.log("user ", user.profileId);
-					console.log("profID ok", profId);
-					if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
+					for(const user of testChatUsers)
 					{
-						console.log("user not undefined", user.profileId);
-						userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
-						if (user.profileId !== profId && conv)
+						console.log("user conv priv", user);
+						console.log("user ", user.profileId);
+						console.log("profID ok", profId);
+						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
-							friendProfId = user.profileId;
-							talkingUser = userName;
-							console.log("talking yser ???", talkingUser);
-							const	searchFriend = searchUser.friends.find((elem) =>
+							console.log("user not undefined", user.profileId);
+							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+							if (user.profileId !== profId && conv)
 							{
-								return (elem.name === userName);
-							});
-							if (searchFriend !== undefined)
-								isFriend = true
+								friendProfId = user.profileId;
+								talkingUser = userName;
+								console.log("talking yser ???", talkingUser);
+								const	searchFriend = searchUser.friends.find((elem) =>
+								{
+									return (elem.name === userName);
+								});
+								if (searchFriend !== undefined)
+									isFriend = true
+							}
+							const newMember: MembersModel = {
+								id: memberList.length + 1,
+								// replace socketId by profileId
+								name: user.profileId,
+								profileId: user.profileId,
+								userName: userName,
+							};
+							memberList.push(newMember);
 						}
-						const newMember: MembersModel = {
-							id: memberList.length + 1,
-							// replace socketId by profileId
-							name: user.profileId,
-							profileId: user.profileId,
-							userName: userName,
-						};
-						memberList.push(newMember);
+					}
+				}
+				else
+				{
+					for(const user of channel.users)
+					{
+						console.log("user ", user.profileId);
+						console.log("profID ok", profId);
+						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
+						{
+							console.log("user not undefined", user.profileId);
+							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+							if (user.profileId !== profId && conv)
+							{
+								friendProfId = user.profileId;
+								talkingUser = userName;
+								console.log("talking yser ???", talkingUser);
+								const	searchFriend = searchUser.friends.find((elem) =>
+								{
+									return (elem.name === userName);
+								});
+								if (searchFriend !== undefined)
+									isFriend = true
+							}
+							const newMember: MembersModel = {
+								id: memberList.length + 1,
+								// replace socketId by profileId
+								name: user.profileId,
+								profileId: user.profileId,
+								userName: userName,
+							};
+							memberList.push(newMember);
+						}
 					}
 				}
 				const	action = {
@@ -951,16 +1006,12 @@ export class ChatSocketEvents
 					this.logger.error("Channel is undefined ");
 					return ;
 				}
-				console.log("invite-member, channel exists", channel.name);
-				console.log("data.payload", data.payload);
 				const	searchUser = this.chatService.getUserWithProfileId(data.payload.userName);
-				console.log("invite-member, searchUser 0 exists", searchUser);
 				if (searchUser === undefined)
 				{
 					return ;
 				}
-				const	targetClient = searchUser?.client;
-				console.log("TARGET CLIENT", targetClient);
+				const	targetClient = searchUser.client;
 				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
@@ -969,7 +1020,6 @@ export class ChatSocketEvents
 						message: "",
 					}
 				};
-				console.log("invite-member, targetClient 2 exists", targetClient.id);
 				if (channel.isMember(client.id) === false)
 				{
 					action.payload.message = "You are not in the channel " + channel.name;
