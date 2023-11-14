@@ -167,7 +167,7 @@ const	ButtonJoinParty = (props: ButtonJoinPartyProps) =>
 	amIConnected = false;
 	if (props.playerOne.profileId === myProfileId)
 	{
-		if (props.playerOne.socketId === "undefined") // must not be on friends
+		if (props.playerOne.socketId === "undefined")
 		{
 			message = "Commencer la partie";
 		}

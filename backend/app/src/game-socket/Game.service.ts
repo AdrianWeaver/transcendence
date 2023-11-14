@@ -313,6 +313,10 @@ export class	GameService implements OnModuleInit
 	}
 
 	// ONLY WITH PLAYER TWO
+	/**
+	 * @deprecated see aloneByGameMode just below
+	 * @returns 
+	 */
 	public	findIndexGameInstanceAlonePlayer()
 	{
 		return (
@@ -323,7 +327,24 @@ export class	GameService implements OnModuleInit
 		);
 	}
 
-	public	getAllInstancesByUserIdAndFilter(myProfileId: string, filter: string)
+	// V2
+	public	findIndexGameInstanceAloneByGameMode(gameMode: string)
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (
+					instance.playerTwo.socketId === "undefined"
+					&& instance.gameMode === gameMode
+				);
+			})
+		);
+	}
+
+	public	getAllInstancesByUserIdAndFilter(
+		myProfileId: string,
+		filter: string
+	)
 	{
 		const array: Array<any> = [];
 
@@ -339,7 +360,10 @@ export class	GameService implements OnModuleInit
 		return (array);
 	}
 
-	public	findIndexGameInstanceUserProfileAndGameUuid(myProfileId: string, gameUuid: string)
+	public	findIndexGameInstanceUserProfileAndGameUuid(
+		myProfileId: string,
+		gameUuid: string
+	)
 	{
 		return (
 			this.gameInstances.findIndex((instance) =>

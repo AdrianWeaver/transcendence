@@ -130,7 +130,7 @@ const	TestBall = () =>
 			{
 				token: profileToken,
 				mode: gameMode.mode,
-				friendProfile: gameMode
+				friendId: gameMode.friendId
 			}
 		});
 
@@ -287,6 +287,15 @@ const	TestBall = () =>
 			setGameActive(data.payload.gameActive);
 		};
 
+		const	matchmakingState = (data: any) =>
+		{
+			// please make me design
+			if (data.type === "already-connected")
+			{
+				window.alert("Vous etes deja connectes a un socket veuillez visiter /my-active-games");
+			}
+		};
+
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -295,6 +304,7 @@ const	TestBall = () =>
 		socket.on("player-info", playerInfo);
 		socket.on("init-message", sendInitMessageToPlayers);
 		socket.on("game-active", activateGame);
+		socket.on("matchmaking-state", matchmakingState);
 		socket.connect();
 
 		return (() =>
@@ -307,6 +317,7 @@ const	TestBall = () =>
 			socket.off("player-info", playerInfo);
 			socket.off("init-message", sendInitMessageToPlayers);
 			socket.off("game-active", activateGame);
+			socket.off("matchmaking-state", matchmakingState);
 		});
 	}, []);
 
@@ -409,8 +420,6 @@ const	TestBall = () =>
 				game.playerTwo.pos.y = game.board.dim.height / 2;
 				game.playerTwo.racket.defineRacketSize();
 				game.playerTwo.pos.y -= game.playerTwo.racket.dim.height / 2;
-				// game.playerOne.render();
-				// game.playerTwo.render();
 			}
 			else
 			{
@@ -455,11 +464,11 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
-			<WaitingActive
+			{/* <WaitingActive
 				connected={connected}
 				numberOfUser={theServer.numberOfUser}
 				disconnected={socketRef.current?.active}
-			/>
+			/> */}
 			<div style={displayStyle}>
 				FT_TRANSCENDANCE
 			</div>
@@ -518,15 +527,6 @@ const	TestBall = () =>
 					/>
 				</motion.div>
 			</div>
-
-			{/* <div style={{textAlign: "center"}}>
-				<canvas
-					height={game.board.canvas?.height}
-					width={game.board.canvas?.width}
-					ref={game.board.canvasRef}
-				>
-				</canvas>
-			</div> */}
 		</>
 	);
 };

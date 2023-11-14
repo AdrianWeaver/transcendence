@@ -24,10 +24,30 @@ import { Logger } from "@nestjs/common";
 import { UserService } from "../user/user.service";
 import { NodeAnimationFrame } from "./NodeAnimationFrame";
 import e from "express";
+import { ContentAndApprovalsPage } from "twilio/lib/rest/content/v1/contentAndApprovals";
+import { disconnect } from "process";
+import { profileEnd } from "console";
+
+import	* as roomNameArray from "./assets/roomName.json";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
+};
+
+type	HandShakeModel = {
+	isValid: boolean,
+	gameMode: string,
+	friendId?: string,
+};
+
+type	FilteredArrayModel = {
+	filtered: {
+		undefined: GameServe[];
+		disconnected: GameServe[];
+		invited: GameServe[];
+		revoked: GameServe[];
+	}
 };
 
 @WebSocketGateway(
@@ -179,22 +199,24 @@ export class GameSocketEvents
 	}
 
 	private	isHandshakeValid(client: Socket)
-		: {
-			isValid: boolean,
-			gameMode: string,
-		}
+		: HandShakeModel
 	{
-		const	result = {
+		const	result: HandShakeModel= {
 			isValid: false,
-			gameMode: "classical"
+			gameMode: "classical",
+			friendId: undefined
 		};
 
 		if (client.handshake.auth)
 		{
 			if (client.handshake.auth.mode)
 			{
-				result.isValid = this.isGameModeValid(client.handshake.auth.mode)
+				result.isValid = this.isGameModeValid(client.handshake.auth.mode);
 				result.gameMode = client.handshake.auth.mode;
+				if (result.gameMode === "friend" && client.handshake.auth.friendId)
+					result.friendId = client.handshake.auth.friendId;
+				else if (result.gameMode === "friend" && client.handshake.auth.friendId === undefined)
+					result.isValid = false;
 			}
 			else
 			{
@@ -210,16 +232,75 @@ export class GameSocketEvents
 		return (result);
 	}
 
-	async handleConnection(client: Socket)
+	// please send a notification on disconnect 
+	public	doRenewSocketIfDisconnected(client: Socket, profileId: string, indexOldSocketId: number)
 	{
-		let		roomName: string;
+		this.logger.debug("User has already logged, will check if a game is active");
+		this.logger.verbose("Check the renew connection algorithm");
+		// expected unique instance
+		const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
+		{
+			return (
+				instance.playerOne.profileId === profileId
+				|| instance.playerTwo.profileId === profileId
+			);
+		});
+		if (indexGameInstance === -1)
+		{
+			// at this step we are shure socket id is present
+			// cf: this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+			client.disconnect();
+			return ;
+		}
+		if (this.gameService.gameInstances[indexGameInstance].playerOne.profileId === profileId)
+		{
+			if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+			{
+				// accept the renew connection
+				this.gameService.socketIdUsers[indexOldSocketId].socketId = client.id;
+				this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
+				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			}
+			else
+			{
+				// disconnect
+				this.logger.error("No multiple connection allowed for a user");
+				client.disconnect();
+				return ;
+			}
+		}
+		if (this.gameService.gameInstances[indexGameInstance].playerTwo.profileId === profileId)
+		{
+			if (this.gameService.gameInstances[indexGameInstance].playerTwo.socketId === "disconnected")
+			{
+				// accept the renew connection
+				this.gameService.socketIdUsers[indexOldSocketId].socketId = client.id;
+				this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
+				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			}
+			else
+			{
+				// disconnect
+				this.logger.error("No multiple connection allowed for a user");
+				client.disconnect();
+				return ;
+			}
+		}
+	}
 
-		const	handShake = this.isHandshakeValid(client);
+	public	createNewRoomIfNoGameInstance()
+	{
+		console.log("unimplemented");
+	}
+
+	public doHandShake(client: Socket)
+	{
+		const	handShake: HandShakeModel = this.isHandshakeValid(client);
 		if (handShake.isValid === false)
 		{
 			this.logger.warn("Client Failed handshake");
 			client.disconnect();
-			return ;
+			return ({error: true});
 		}
 		this.logger.verbose("Handshake is valid");
 		const token = this.isTokenValid(client.handshake.auth.token);
@@ -228,91 +309,281 @@ export class GameSocketEvents
 			this.logger.warn("Client try a wrong token");
 			console.log(token);
 			client.disconnect();
-			return ;
+			return ({error: true});
 		}
-		this.logger.verbose("token is valid");
-		const profileId = token.profileId;
-		const gameModeRequest = handShake.gameMode;
-		const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
+		return ({
+			handShake: handShake,
+			token: token,
+			error: false,
+		});
+	}
+
+	public	doesClientHaveActiveConnection(profileId: string)
+	{
+		const	indexSocketId = this.gameService
+			.findIndexSocketIdUserByProfileId(profileId);
+		if (indexSocketId === -1)
+			return (false);
+		this.logger.verbose("The user is already connected to the service");
+		return (true);
+	}
+
+	public	filterGameByProfileIdAndGameMode(profileId: string, gameMode: string)
+	{
+		const	filteredGame = this.gameService.gameInstances.filter((instance) =>
 		{
 			return (
 				instance.playerOne.profileId === profileId
 				|| instance.playerTwo.profileId === profileId
 			);
 		});
-		// Can be only use to random party
-		if (indexGameInstance === -1)
+		const	filteredGameByGameMode = filteredGame.filter((instance) =>
 		{
-			this.logger.verbose("User dont have a game instance running");
+			return (instance.gameMode === gameMode);
+		});
+		return (filteredGameByGameMode);
+	}
+
+	public	getUuidGameFromFilteredGame(game: GameServe[], profileId: string)
+	{
+		const	uuidGame: string[] = [];
+
+		for (const instance of game)
+		{
+			if (instance.playerOne.profileId === profileId)
+			{
+				if (instance.playerOne.socketId !== "disconnected"
+					&& instance.playerOne.socketId !== "undefined"
+					&& instance.playerOne.socketId !== "invitation"
+					&& instance.playerOne.socketId !== "revoked")
+					uuidGame.push(instance.uuid as string);
+			}
+			else if (instance.playerTwo.profileId === profileId)
+			{
+				if (instance.playerTwo.socketId !== "disconnected"
+					&& instance.playerTwo.socketId !== "undefined"
+					&& instance.playerTwo.socketId !== "invitation"
+					&& instance.playerTwo.socketId !== "revoked")
+					uuidGame.push(instance.uuid as string);
+			}
+		}
+		return (uuidGame);
+	}
+
+	public	randomGameRefreshed(client: Socket, gameMode: string, arrayGameFiltered: GameServe[])
+	{
+		const	keywordSelector = "disconnected";
+
+		if (gameMode === "friend")
+		{
+			this.logger.error("Error: This function does not handle friend game mode");
+			return ;
 		}
 		else
 		{
-			this.logger.verbose("User have a game instance running");
-			this.logger.verbose("Game mode requested: " + gameModeRequest);
-			// User have an instance
-			// check game mode
-			// 		if same game mode
-			//			continue partie
-			//		else
-			// 			ask to continue same game mode || ask to remove the instance (by emit with sockets  waiting component in front)
+			if (arrayGameFiltered.length === 0)
+			{
+				this.logger.verbose("Info: no game pause (" + gameMode + ")- no renewal");
+				return ;
+			}
+			if (arrayGameFiltered.length > 1)
+			{
+				this.logger.error("Error: more than one instance in this game mode: ", gameMode);
+				return ;
+			}
 		}
-			const	indexSocketId = this.gameService.findIndexSocketIdUserByProfileId(profileId);
-			if (indexSocketId === -1)
-				this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+	}
+
+	public	filterGameArrayBySocketState(profileId: string, arrayGameMode: GameServe[])
+		: FilteredArrayModel
+	{
+		// the socketState of a user disconnected
+		const	disconnectedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "disconnected")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "disconnected")
+					return (true);
+			return (false);
+		});
+
+		// the basic socketState of a random game (never connected)
+		const	undefinedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "undefined")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "undefined")
+					return (true);
+			return (false);
+		});
+
+		// the basic socketState of a friend games 
+		const	invitedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "invited")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "invited")
+					return (true);
+			return (false);
+		});
+
+		// the socket state of friend abandoned
+		const	revokedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "revoked")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "revoked")
+					return (true);
+			return (false);
+		});
+
+		return ({
+			filtered:
+			{
+				undefined: undefinedArray,
+				disconnected: disconnectedArray,
+				invited: invitedArray,
+				revoked: revokedArray
+			}
+		});
+	}
+
+	async handleConnection(client: Socket)
+	{
+		let		roomName: string;
+
+		const { handShake, token, error} = this.doHandShake(client);
+		if (error === true || token === undefined || handShake === undefined)
+			return ;
+		const	profileId = token.profileId;
+		const	gameModeRequest = handShake.gameMode;
+
+		const	isActiveConnection = this.doesClientHaveActiveConnection(profileId);
+		const	friendModeGame = this.filterGameByProfileIdAndGameMode(profileId, "friend");
+		const	classicalGameMode = this.filterGameByProfileIdAndGameMode(profileId, "classical");
+		const	upsideDownGameMode = this.filterGameByProfileIdAndGameMode(profileId, "upside-down");
+
+		if (isActiveConnection === true)
+		{
+			this.logger.verbose("User disconnected: already have a connection");
+			client.emit("matchmaking-state", {type: "already-connected"});
+			client.disconnect();
+			return ;
+		}
+		const	friendArray = this.filterGameArrayBySocketState(profileId, friendModeGame);
+		const	classicalArray = this.filterGameArrayBySocketState(profileId, classicalGameMode);
+		const	upsideDownArray = this.filterGameArrayBySocketState(profileId, upsideDownGameMode);
+
+		//	A/ id friend not checked yet :
+		//		-- check:
+		//			if player (Two || One) is the friend profile id => PartB (the game has be created by api)
+		// 			else: reject (may not have invited, game don't exist)
+		//	
+		//	B/ socketState:
+		//		- disconnect: okay && renew socket
+		//		- invited: okay && renew socket
+		//		- revoked: refuse connection
+		//		- undefined: must never
+		if (gameModeRequest === "friend")
+		{
+			this.logger.debug("Checking socket state for state of friend games");
+			if (friendArray.filtered.disconnected.length === 0)
+			{
+				this.logger.verbose("\tThe user has no pending games");
+			}
+			if (friendArray.filtered.invited.length === 0)
+			{
+				this.logger.verbose("\tThe user has no invite games");
+			}
+			if (friendArray.filtered.revoked.length === 0)
+			{
+				this.logger.verbose("\tThe user has no revoked games");
+			}
+			if (friendArray.filtered.undefined.length === 0)
+			{
+				this.logger.verbose("\tThe user as no undefined games");
+			}
+		}
+
+		//	[V]disconnected: user has pausing her game and other player is here : renew
+		//	[X]invited: must never be exist in this gameMode
+		//	[X]revoked: user abandon the game
+		//		-- this one: the game must reject 2 players at setter and game deleted
+		//	[X]/!\ undefined: the user never play the game
+		//		but this one nerver trigger here undefined is after search a game and setted at player Two
+		if (gameModeRequest === "classical")
+		{
+			this.logger.debug("Checking socket state for state of classical games");
+			if (classicalArray.filtered.disconnected.length === 0)
+			{
+				this.logger.verbose("\tThe user has no pending games");
+			}
 			else
 			{
-				this.logger.debug("User has already logged, will now if a game is active");
-				if (indexGameInstance !== -1)
-				{
-					if (this.gameService.gameInstances[indexGameInstance].playerOne.profileId === profileId)
-					{
-						if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
-						{
-							// accept the renew connection
-							this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
-							this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
-							this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-						}
-						else
-						{
-							// disconnect
-							this.logger.error("No multiple connection allowed for a user");
-							client.disconnect();
-							return ;
-						}
-					}
-					if (this.gameService.gameInstances[indexGameInstance].playerTwo.profileId === profileId)
-					{
-						if (this.gameService.gameInstances[indexGameInstance].playerTwo.socketId === "disconnected")
-						{
-							// accept the renew connection
-							this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
-							this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
-							this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-						}
-						else
-						{
-							this.logger.error("No multiple connection allowed for a user");
-							client.disconnect();
-							return ;
-						}
-					}
-				}
+				// renew the socket in game
+				// check length in this mode ?
 			}
-			if (indexGameInstance === -1)
+			if (classicalArray.filtered.invited.length === 0)
 			{
-				this.logger.verbose("The User has no game started");
-				this.logger.verbose("Selecting a game that have user alone");
-				// this method check player two if undefined in one game.
-				const	indexGamePlayerAlone = this.gameService.findIndexGameInstanceAlonePlayer();
-				if (indexGamePlayerAlone === -1)
+				this.logger.verbose("\tThe user has no invite games");
+			}
+			if (classicalArray.filtered.revoked.length === 0)
+			{
+				this.logger.verbose("\tThe user has no revoked games");
+			}
+			if (classicalArray.filtered.undefined.length === 0)
+			{
+				this.logger.verbose("\tThe user as no undefined games");
+				this.logger.debug("Search a game with player two as undefined");
+				const	indexClassicalAlone = this.gameService
+					.findIndexGameInstanceAloneByGameMode("classical");
+				if (indexClassicalAlone === -1)
 				{
-					this.logger.verbose("There are  no player alone");
+					this.logger.debug("\tNo player Alone in this gameMode");
+					this.logger.verbose("Creating game, the user will be player one");
 					this.gameService.increaseRoomCount();
-					roomName = "room"
-						+ this.gameService.getRoomCount().toString();
+					// can put length of room dynamically to reject connection if liimiit trigger
+					// roomNameArray.length < roomCount : reject busy server
+					roomName = "room "
+						+ roomNameArray [
+							this.gameService.getRoomCount()
+						];
+					this.logger.verbose("\tRoom name: " + roomName);
 					await client.join(roomName);
-					const newRoom = new GameServe(roomName);
+					const	newRoom = new GameServe(roomName);
+					newRoom.gameMode = "classical";
 					newRoom.ball.game = newRoom;
 					newRoom.board.game = newRoom;
 					newRoom.net.game = newRoom;
@@ -325,123 +596,335 @@ export class GameSocketEvents
 					newRoom.loop.callbackFunction = this.printPerformance;
 					newRoom.loop.update(performance.now());
 					this.gameService.pushGameServeToGameInstance(newRoom);
-					this.logger.verbose("User is created as player One");
+					this.logger.verbose("Game is created");
 				}
 				else
 				{
-					this.logger.verbose("We have a player one alone");
-					this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.socketId = client.id;
-					this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.profileId = profileId;
-					this.gameService.gameInstances[indexGamePlayerAlone].userConnected += 1;
-					this.logger.verbose("User is created as player Two");
-					roomName = this.gameService.gameInstances[indexGamePlayerAlone].roomName;
+					this.logger.verbose("Join a game, the user will be player two");
+					this.gameService.gameInstances[indexClassicalAlone].playerTwo.socketId = client.id;
+					this.gameService.gameInstances[indexClassicalAlone].playerTwo.profileId = profileId;
+					this.gameService.gameInstances[indexClassicalAlone].userConnected += 1;
+					roomName = this.gameService.gameInstances[indexClassicalAlone].roomName;
+					this.logger.verbose("\tRoom name: " + roomName);
 					await client.join(roomName);
+					this.logger.verbose("Joined the game");
 				}
 			}
-			else
-			{
-				this.logger.verbose("A game is already played by this user but socket different");
-				this.logger.verbose("Determine if user One Or user Two");
+		}
 
-				const	isplayerOne = this.gameService
-					.isProfileIdUserOne(indexGameInstance, profileId);
-				const	isplayerTwo = this.gameService
-					.isProfileIdUserTwo(indexGameInstance, profileId);
-				this.logger.verbose("The profile is player one : " + isplayerOne);
-				this.logger.verbose("The profile is player Two : " + isplayerTwo);
-				if (isplayerOne)
-				{
-					// check if user has many socket at same time
-					if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
-					{
-						this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
-						this.gameService.gameInstances[indexGameInstance].playerOne.profileId = profileId;
-						this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-					}
-					else
-					{
-						this.logger.warn("User try a  random game with same profileId, disconnected");
-						client.disconnect();
-						return ;
-					}
-				}
-				else if (isplayerTwo)
-				{
-					if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
-					{
-						this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
-						this.gameService.gameInstances[indexGameInstance].playerTwo.profileId = profileId;
-						this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-					}
-					else
-					{
-						this.logger.warn("User try a  random game with same profileId, disconnected");
-						client.disconnect();
-						return ;
-					}
-				}
-				else
-					this.logger.error("See this error: user already played");
-				roomName = this.gameService.gameInstances[indexGameInstance].roomName;
-				await client.join(roomName);
+		//	disconnected: user has pausing her game and other player is here
+		//	invited: must never be exist in this gameMode
+		//	revoked: user abandon the game
+		//		-- this one: the game must reject 2 players at setter and game deleted
+		//	/!\ undefined: the user never play the game
+		//		but this one nerver trigger here undefined is after search a game and setted at player Two
+		if (gameModeRequest === "upside-down")
+		{
+			this.logger.debug("Checking socket state for state of upsideDown games");
+			if (upsideDownArray.filtered.disconnected.length === 0)
+			{
+				this.logger.verbose("\tThe user has no pending games");
 			}
-			this.gameService.increaseUsers();
-			this.gameService.increaseTotalUsers();
-			const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
-			console.log("Room infos", roomInfo);
-			let	roomSize: number;
-			if (roomInfo)
-				roomSize = roomInfo.size;
+			if (upsideDownArray.filtered.invited.length === 0)
+			{
+				this.logger.verbose("\tThe user has no invite games");
+			}
+			if (upsideDownArray.filtered.revoked.length === 0)
+			{
+				this.logger.verbose("\tThe user has no revoked games");
+			}
+			if (upsideDownArray.filtered.undefined.length === 0)
+			{
+				this.logger.verbose("\tThe user as no undefined games");
+			}
+		}
+			// if (gameModeRequest === "friend")
+			// {
+			// 	if (activeUuidGameFriend.length === 0)
+			// 	{
+			// 	}
+			// }
+			// else
+			// {
+			// 	if (activeUuidGameClassical.length + activeUuidGameUpsideDown.length === 0)
+			// 	{
+			// 		this.logger.verbose("User dont have a game instance running in the selected game mode");
+			// 		client.disconnect();
+			// 		return ;
+			// 	}
+			// 	if (gameModeRequest === "classical")
+			// 	{
+			// 		if (activeUuidGameClassical.length === 0)
+			// 		{
+			// 			this.logger.verbose("User dont have a game instance running in the selected game mode");
+			// 			client.disconnect();
+			// 			return ;
+			// 		}
+			// 	}
+			// 	if (gameModeRequest === "upside-down")
+			// 	{
+			// 		if (activeUuidGameUpsideDown.length === 0)
+			// 		{
+			// 			this.logger.verbose("User dont have a game instance running in the selected game mode");
+			// 			client.disconnect();
+			// 			return ;
+			// 		}
+			// 	}
+			// }
+		// }
+		// else
+		// {
+		// 	this.logger.verbose("The user has no socket active");
+		// }
+		const	allMyGame = this.gameService.gameInstances.filter((instance) =>
+		{
+			const	playerOne = instance.playerOne.profileId;
+			const	playerTwo = instance.playerTwo.profileId;
+
+			return (
+				playerOne === profileId
+				|| playerTwo === profileId
+			);
+		});
+		this.logger.verbose("User have " + allMyGame.length + " games instances");
+		this.logger.verbose("The user request game mode " + gameModeRequest);
+
+		if (gameModeRequest === "friend")
+		{
+			// handShake.friendId
+
+			// we dont create here the friend request
+			// send notification if error on friendId
+		}
+		else
+		{
+			this.logger.verbose("The game mode is not gameModeRequest");
+			this.logger.verbose("Checking active connection");
+
+			const	indexSocketId = this.gameService
+				.findIndexSocketIdUserByProfileId(profileId);
+			if (indexSocketId === -1)
+			{
+				this.logger.verbose("The user is not connected to the service");
+				this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+			}
 			else
 			{
-				console.log("An error occured due to rooms");
-				return ;
+				this.doRenewSocketIfDisconnected(client, profileId, indexSocketId);
 			}
-			const	userMessage = {
-				type: "",
-				payload: {
-					roomName: roomName,
-					roomSize: roomSize
-				}
-			};
-			const	indexInstance = this.gameService.findIndexGameInstanceByRoomName(roomName);
-			if (this.gameService.isProfileIdUserOne(indexInstance, profileId))
-				userMessage.type = "player-one";
-			else
-				userMessage.type = "player-two";
-			client.emit("init-message", userMessage);
-			const	instance = this.gameService
-				.findGameInstanceWithClientId(client.id);
-			if (instance === undefined)
+			const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
 			{
-				this.logger.error("Must have a game instance");
-				return ;
-			}
-			let	playerOnePicture: string;
-			let	playerTwoPicture: string;
-			const	userOne = this.userService.getUserById(instance.playerOne.profileId);
-			if (userOne === undefined)
-				playerOnePicture = "undefined";
-			else
-				playerOnePicture = userOne.avatar;
-			const	userTwo = this.userService.getUserById(instance.playerTwo.profileId);
-			if (userTwo === undefined)
-				playerTwoPicture = "undefined";
-			else
-				playerTwoPicture = userTwo.avatar;
-			const	action = {
-				type: "connect",
-				payload: {
-					numberUsers: instance.userConnected,
-					userReadyCount: this.gameService.getUserReadyNumber(),
-					socketId: client.id,
-					playerOneProfileId: instance.playerOne.profileId,
-					playerTwoProfileId: instance.playerTwo.profileId,
-					playerOnePicture: playerOnePicture,
-					playerTwoPicture: playerTwoPicture
-				}
-			};
-			this.server.to(roomName).emit("player-info", action);
+				return (
+					instance.playerOne.profileId === profileId
+					|| instance.playerTwo.profileId === profileId
+				);
+			});
+		}
+
+
+		// // Can be only use to random party
+		// if (indexGameInstance === -1)
+		// {
+		// 	this.logger.verbose("User dont have a game instance running");
+		// }
+		// else
+		// {
+		// 	this.logger.verbose("User have a game instance running");
+		// 	this.logger.verbose("Game mode requested: " + gameModeRequest);
+		// 	// User have an instance
+		// 	// check game mode
+		// 	// 		if same game mode
+		// 	//			continue partie
+		// 	//		else
+		// 	// 			ask to continue same game mode || ask to remove the instance (by emit with sockets  waiting component in front)
+		// }
+		return ;
+			// const	indexSocketId = this.gameService.findIndexSocketIdUserByProfileId(profileId);
+			// if (indexSocketId === -1)
+			// 	this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
+			// else
+			// {
+			// 	this.logger.debug("User has already logged, will now if a game is active");
+			// 	if (indexGameInstance !== -1)
+			// 	{
+			// 		if (this.gameService.gameInstances[indexGameInstance].playerOne.profileId === profileId)
+			// 		{
+			// 			if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+			// 			{
+			// 				// accept the renew connection
+			// 				this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+			// 				this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
+			// 				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			// 			}
+			// 			else
+			// 			{
+			// 				// disconnect
+			// 				this.logger.error("No multiple connection allowed for a user");
+			// 				client.disconnect();
+			// 				return ;
+			// 			}
+			// 		}
+			// 		if (this.gameService.gameInstances[indexGameInstance].playerTwo.profileId === profileId)
+			// 		{
+			// 			if (this.gameService.gameInstances[indexGameInstance].playerTwo.socketId === "disconnected")
+			// 			{
+			// 				// accept the renew connection
+			// 				this.gameService.socketIdUsers[indexSocketId].socketId = client.id;
+			// 				this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
+			// 				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			// 			}
+			// 			else
+			// 			{
+			// 				this.logger.error("No multiple connection allowed for a user");
+			// 				client.disconnect();
+			// 				return ;
+			// 			}
+			// 		}
+			// 	}
+			// }
+			// if (indexGameInstance === -1)
+			// {
+			// 	this.logger.verbose("The User has no game started");
+			// 	this.logger.verbose("Selecting a game that have user alone");
+			// 	// this method check player two if undefined in one game.
+			// 	const	indexGamePlayerAlone = this.gameService.findIndexGameInstanceAlonePlayer();
+			// 	if (indexGamePlayerAlone === -1)
+			// 	{
+			// 		this.logger.verbose("There are  no player alone");
+			// 		this.gameService.increaseRoomCount();
+			// 		roomName = "room"
+			// 			+ this.gameService.getRoomCount().toString();
+			// 		await client.join(roomName);
+			// 		const newRoom = new GameServe(roomName);
+			// 		newRoom.ball.game = newRoom;
+			// 		newRoom.board.game = newRoom;
+			// 		newRoom.net.game = newRoom;
+			// 		newRoom.playerOne.socketId = client.id;
+			// 		newRoom.playerOne.profileId = profileId;
+			// 		newRoom.userConnected += 1;
+			// 		newRoom.board.init();
+			// 		newRoom.loop = new NodeAnimationFrame();
+			// 		newRoom.loop.game = newRoom;
+			// 		newRoom.loop.callbackFunction = this.printPerformance;
+			// 		newRoom.loop.update(performance.now());
+			// 		this.gameService.pushGameServeToGameInstance(newRoom);
+			// 		this.logger.verbose("User is created as player One");
+			// 	}
+			// 	else
+			// 	{
+			// 		this.logger.verbose("We have a player one alone");
+			// 		this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.socketId = client.id;
+			// 		this.gameService.gameInstances[indexGamePlayerAlone].playerTwo.profileId = profileId;
+			// 		this.gameService.gameInstances[indexGamePlayerAlone].userConnected += 1;
+			// 		this.logger.verbose("User is created as player Two");
+			// 		roomName = this.gameService.gameInstances[indexGamePlayerAlone].roomName;
+			// 		await client.join(roomName);
+			// 	}
+			// }
+			// else
+			// {
+			// 	this.logger.verbose("A game is already played by this user but socket different");
+			// 	this.logger.verbose("Determine if user One Or user Two");
+
+			// 	const	isplayerOne = this.gameService
+			// 		.isProfileIdUserOne(indexGameInstance, profileId);
+			// 	const	isplayerTwo = this.gameService
+			// 		.isProfileIdUserTwo(indexGameInstance, profileId);
+			// 	this.logger.verbose("The profile is player one : " + isplayerOne);
+			// 	this.logger.verbose("The profile is player Two : " + isplayerTwo);
+			// 	if (isplayerOne)
+			// 	{
+			// 		// check if user has many socket at same time
+			// 		if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+			// 		{
+			// 			this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
+			// 			this.gameService.gameInstances[indexGameInstance].playerOne.profileId = profileId;
+			// 			this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			// 		}
+			// 		else
+			// 		{
+			// 			this.logger.warn("User try a  random game with same profileId, disconnected");
+			// 			client.disconnect();
+			// 			return ;
+			// 		}
+			// 	}
+			// 	else if (isplayerTwo)
+			// 	{
+			// 		if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
+			// 		{
+			// 			this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
+			// 			this.gameService.gameInstances[indexGameInstance].playerTwo.profileId = profileId;
+			// 			this.gameService.gameInstances[indexGameInstance].userConnected += 1;
+			// 		}
+			// 		else
+			// 		{
+			// 			this.logger.warn("User try a  random game with same profileId, disconnected");
+			// 			client.disconnect();
+			// 			return ;
+			// 		}
+			// 	}
+			// 	else
+			// 		this.logger.error("See this error: user already played");
+			// 	roomName = this.gameService.gameInstances[indexGameInstance].roomName;
+			// 	await client.join(roomName);
+			// }
+			// this.gameService.increaseUsers();
+			// this.gameService.increaseTotalUsers();
+			// const roomInfo = this.server.sockets.adapter.rooms.get(roomName);
+			// console.log("Room infos", roomInfo);
+			// let	roomSize: number;
+			// if (roomInfo)
+			// 	roomSize = roomInfo.size;
+			// else
+			// {
+			// 	console.log("An error occured due to rooms");
+			// 	return ;
+			// }
+			// const	userMessage = {
+			// 	type: "",
+			// 	payload: {
+			// 		roomName: roomName,
+			// 		roomSize: roomSize
+			// 	}
+			// };
+			// const	indexInstance = this.gameService.findIndexGameInstanceByRoomName(roomName);
+			// if (this.gameService.isProfileIdUserOne(indexInstance, profileId))
+			// 	userMessage.type = "player-one";
+			// else
+			// 	userMessage.type = "player-two";
+			// client.emit("init-message", userMessage);
+			// const	instance = this.gameService
+			// 	.findGameInstanceWithClientId(client.id);
+			// if (instance === undefined)
+			// {
+			// 	this.logger.error("Must have a game instance");
+			// 	return ;
+			// }
+			// let	playerOnePicture: string;
+			// let	playerTwoPicture: string;
+			// const	userOne = this.userService.getUserById(instance.playerOne.profileId);
+			// if (userOne === undefined)
+			// 	playerOnePicture = "undefined";
+			// else
+			// 	playerOnePicture = userOne.avatar;
+			// const	userTwo = this.userService.getUserById(instance.playerTwo.profileId);
+			// if (userTwo === undefined)
+			// 	playerTwoPicture = "undefined";
+			// else
+			// 	playerTwoPicture = userTwo.avatar;
+			// const	action = {
+			// 	type: "connect",
+			// 	payload: {
+			// 		numberUsers: instance.userConnected,
+			// 		userReadyCount: this.gameService.getUserReadyNumber(),
+			// 		socketId: client.id,
+			// 		playerOneProfileId: instance.playerOne.profileId,
+			// 		playerTwoProfileId: instance.playerTwo.profileId,
+			// 		playerOnePicture: playerOnePicture,
+			// 		playerTwoPicture: playerTwoPicture
+			// 	}
+			// };
+			// this.server.to(roomName).emit("player-info", action);
 	}
 
 	handleDisconnect(client: Socket)
@@ -457,53 +940,55 @@ export class GameSocketEvents
 			this.gameService.gameInstances[indexInstance].playerOne.socketId = "disconnected";
 		if (this.gameService.isProfileIdUserTwo(indexInstance, profileId as string))
 			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
-		this.gameService.setGameActiveToFalse(indexInstance);
 
-		// remove the user from the list of users
+
+		// At the end PLZ
+		this.gameService.setGameActiveToFalse(indexInstance);
+		// // remove the user from the list of users
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
-		this.gameService.decreaseUsers();
+		// this.gameService.decreaseUsers();
 
-		// remove the user from the list of users ready
-		const	wasReadyIndex = this.gameService
-			.findIndexSocketIdReadyWithSocketId(client.id);
-		if (wasReadyIndex !== -1)
-		{
-			this.gameService.removeOneSocketIdReadyWithIndex(wasReadyIndex);
-			this.gameService.decreaseUserReadyNumber();
-		}
+		// // remove the user from the list of users ready
+		// const	wasReadyIndex = this.gameService
+		// 	.findIndexSocketIdReadyWithSocketId(client.id);
+		// if (wasReadyIndex !== -1)
+		// {
+		// 	this.gameService.removeOneSocketIdReadyWithIndex(wasReadyIndex);
+		// 	this.gameService.decreaseUserReadyNumber();
+		// }
 
-		// send the new number of users and users ready
-		const	action = {
-			type: "disconnect",
-			payload: {
-				numberUsers: this.gameService.getUsers(),
-				userReadyCount: this.gameService.getUserReadyNumber()
-			}
-		};
-		this.logger.error("User with id: " + client.id + " is quitting pprofile id is: " + profileId);
+		// // send the new number of users and users ready
+		// const	action = {
+		// 	type: "disconnect",
+		// 	payload: {
+		// 		numberUsers: this.gameService.getUsers(),
+		// 		userReadyCount: this.gameService.getUserReadyNumber()
+		// 	}
+		// };
+		// this.logger.error("User with id: " + client.id + " is quitting pprofile id is: " + profileId);
 
-		const indexGameInstance = this.gameService.findIndexGameInstanceWithProfileId(profileId as string);
-		if (indexGameInstance === -1)
-			this.logger.error("Index game instance failure ");
-		else
-		{
-			this.gameService.gameInstances[indexGameInstance].userConnected -= 1;
-			if (this.gameService.gameInstances[indexGameInstance].userConnected === 0)
-			{
-				this.gameService.removeGameInstance(indexGameInstance);
-				if (this.gameService.gameInstances.length === 0)
-				{
-					this.gameService.roomCount = 0;
-				}
-			}
-		}
-		const instance = this.gameService.findGameInstanceWithClientId(client.id);
-		if (instance)
-		{
-			this.logger.error("Test deeead code");
-			this.server.to(instance.roomName).emit("player-info", action);
-		}
+		// const indexGameInstance = this.gameService.findIndexGameInstanceWithProfileId(profileId as string);
+		// if (indexGameInstance === -1)
+		// 	this.logger.error("Index game instance failure ");
+		// else
+		// {
+		// 	this.gameService.gameInstances[indexGameInstance].userConnected -= 1;
+		// 	if (this.gameService.gameInstances[indexGameInstance].userConnected === 0)
+		// 	{
+		// 		this.gameService.removeGameInstance(indexGameInstance);
+		// 		if (this.gameService.gameInstances.length === 0)
+		// 		{
+		// 			this.gameService.roomCount = 0;
+		// 		}
+		// 	}
+		// }
+		// const instance = this.gameService.findGameInstanceWithClientId(client.id);
+		// if (instance)
+		// {
+		// 	this.logger.error("Test deeead code");
+		// 	this.server.to(instance.roomName).emit("player-info", action);
+		// }
 	}
 
 	@SubscribeMessage("info")
