@@ -478,6 +478,11 @@ const	ChatLayout = () =>
 		setJoiningChannelName
 	] = useState("");
 
+	const [
+		clickedChannel,
+		setClickedChannel
+	] = useState("");
+
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
@@ -1480,8 +1485,10 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
+													console.log("CHANNEL NAME: ", channel.name);
+													setClickedChannel(channel.name);
 													handleDialogOpen(false);
-													setButtonSelection(channel);
+													setButtonSelection(channel.name);
 												}}>
 													Options
 												</Button>
@@ -1518,7 +1525,7 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
-															console.log("CURRENT CHANNEL: " + channel.name);
+															console.log("CLICKED CHANNEL: " + clickedChannel);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1540,7 +1547,7 @@ const	ChatLayout = () =>
 																{
 																	console.log("target value " + e.target.value);
 																	setUserToInvite(e.target.value);
-																	setChannelToInvite(channel.name);
+																	setChannelToInvite(clickedChannel);
 																}}/>
 															</DialogContent>
 															<DialogActions>
@@ -1618,7 +1625,7 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					<Button onClick={() =>
+																					{/* <Button onClick={() =>
 																					{
 																						setInviteDialogOpen(true);
 																					}}>
@@ -1658,7 +1665,7 @@ const	ChatLayout = () =>
 																							Cancel
 																							</Button>
 																						</DialogActions>
-																					</Dialog>
+																					</Dialog> */}
 																				</>)}
 																			</li>);
 																	})
