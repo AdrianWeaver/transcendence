@@ -1655,7 +1655,7 @@ export const	getStats = (userProfileId: string)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		// const	token = prev.controller.user.bearerToken;
+		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	searchUser = prev.controller.user.chat.users.find((elem) =>
 		{
@@ -1663,16 +1663,28 @@ export const	getStats = (userProfileId: string)
 		});
 		if (searchUser === undefined)
 			return ;
-		const	data = await ServerService.getStats(userProfileId, searchUser.avatar, uri);
+		const	data = await ServerService.getStats(token, userProfileId, searchUser.avatar, uri);
 		if (data.success)
 		{
-			const	newStats = [...prev.controller.stats];
+			const	newStats = prev.controller.stats;
 			newStats.push(data.data);
-			const	response: ControllerModel = {
-				...prev.controller,
-				stats: newStats
+			console.log("here stats ?", data.data);
+			if (data.data.length)
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: data.data
+				}
+				dispatch(controllerActions.setStats(response));
 			}
-			dispatch(controllerActions.setStats(response));
+			else
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: []
+				}
+				dispatch(controllerActions.setStats(response));
+			}
 		}
 		else
 			dispatch(controllerActions.setStats(prev.controller));

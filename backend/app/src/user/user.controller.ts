@@ -151,8 +151,6 @@ export class UserController
 		@Res() res: Response)
 	{
 		this.logger.verbose("Next information is the previous user");
-		console.log(req.user);
-
 		const	unauthorized = (errCode: number, info: string) =>
 		{
 			res.status(errCode).json(
@@ -163,7 +161,6 @@ export class UserController
 				});
 		};
 		this.logger.verbose("Next information is the updated user");
-		// console.log(body);
 		if (body.password !== body.passwordConfirm)
 			return (unauthorized(401, "You are an hacker go off"), void(0));
 		this.logger.verbose("password okay and are the same");
@@ -173,7 +170,6 @@ export class UserController
 			return (unauthorized(401, "Username already taken"), void(0));
 		this.logger.verbose("username count okay");
 		const user = req.user;
-		console.log("STEP ONE", user, " ", body);
 		if (body.ft && (body.emailAddress !== user.email
 			|| body.firstName !== user.firstName
 			|| body.lastName !== user.lastName))
@@ -475,8 +471,6 @@ export class UserController
 	getAllUsers()
 		: BackUserModel[]
 	{
-		console.log("request back users model data");
-		console.log(this.userService.getBackUserModelArray());
 		return (this.userService.getBackUserModelArray());
 	}
 
@@ -550,8 +544,6 @@ export class UserController
 		@Req() req: any
 	)
 	{
-		// console.log("body ", body);
-		// console.log("req ", req.user);
 		console.log(this.env);
 		if (!this.env)
 			throw new InternalServerErrorException();
@@ -561,9 +553,6 @@ export class UserController
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
-		// const	number = this.userService.getPhoneNumber(req.user.id);
-		// if (number === undefined)
-		// 	throw new InternalServerErrorException();
 		if (body.numero === "undefined" || !body.numero)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
@@ -669,10 +658,7 @@ export class UserController
 			const	fileCfg = new FileConfig();
 			fileCfg.setTempFolder(this.userService.getConfig().tmpFolder);
 			fileCfg.setFilename(req.user.username);
-			console.log(req.user);
-
 			const bb = busboy(busboyConfig);
-
 			const	processBusboy = (): Promise<string> =>
 			{
 				this.logger.debug("start the busboy event listener");
@@ -870,20 +856,20 @@ export class UserController
 	getStats(@Body() body: any)
 	{
 		// return (["toto"]);
+		console.log("Body", body);
 		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
 			return (
-				record.playerOneProfileId === (body.UserProfileId)
-				|| record.playerTwoProfileId === (body.userProfileId)
+				record.playerOneProfileId?.toString() === body.userProfileId
+				|| record.playerTwoProfileId?.toString() === body.userProfileId
 			);
 		});
-		console.log(userStats);
+		console.log("here We go", userStats);
 		const	array: ResponseRow[] = [];
 
 		userStats.map((stat: MatchHistoryModel, index: number) =>
 		{
-			console.log(stat);
-			const	isPlayOne = stat.playerOneProfileId === body.userProfileId;
+			const	isPlayOne = stat.playerOneProfileId?.toString() === body.userProfileId;
 			const	frameCount = stat.frameCount as number;
 			const	frameRate = stat.frameRate as number;
 			let		adversaireProfileId: string;

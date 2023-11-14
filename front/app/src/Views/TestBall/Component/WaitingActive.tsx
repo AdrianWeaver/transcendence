@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 
 import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CardMedia from "@mui/material/CardMedia";
 import pong from "../assets/pong.jpeg";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";

@@ -268,13 +268,14 @@ const	ServerService = {
 				})
 		);
 	},
-	async	getStats(userProfileId: string, userAvatar: string, serverLocation: string)
+	async	getStats(token: string, userProfileId: string,
+		userAvatar: string, serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
 			headers:
 			{
 				"Content-Type": "application/x-www-form-urlencoded",
-				// "Authorization": token
+				"Authorization": token
 			}
 		};
 		const	data = {
@@ -290,6 +291,7 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
+					console.log("DATA", data.data);
 					return (
 						{
 							success: true,

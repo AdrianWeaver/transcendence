@@ -120,14 +120,12 @@ class User
 						{
 							this.client.join(chanName);
 							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
-							console.log("Hola");
 							const	index = this.channels.findIndex((elem) =>
 							{
 								return (elem === channel.id);
 							});
 							if (index === -1)
 								this.channels.push(channel.id);
-							console.log("Les channels du user", this.channels);
 						}
 					}
 				}
@@ -196,7 +194,6 @@ class User
 					{
 						if (taken.profile.pseudo === pseudo)
 						{
-							console.log("DEBUG Pseudo already taken");
 							found = true;
 						}
 					}

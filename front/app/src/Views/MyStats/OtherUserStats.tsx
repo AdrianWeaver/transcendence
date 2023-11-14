@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
-import { getMyStats } from "../../Redux/store/controllerAction";
+import { getStats } from "../../Redux/store/controllerAction";
 
 const	columns: GridColDef[] = [
 	{
@@ -79,14 +79,13 @@ const	columns: GridColDef[] = [
 
 ];
 
-const	fakeRows: any = [];
-
 const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
 	{
 		return (state.controller.stats);
 	});
+	console.log("rowStats", rowStats);
 	if (rowStats.length === 0)
 	{
 		return (
@@ -125,6 +124,10 @@ const	HistoryTable = () =>
 const	Header = () =>
 {
 	const	dispatch = useAppDispatch();
+	const	currentProfile = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfile);
+	});
 	return (
 		<>
 			<Box
@@ -164,7 +167,7 @@ const	Header = () =>
 							onClick={() =>
 							{
 								// dispatch(getMyActiveGame());
-								dispatch(getMyStats());
+								dispatch(getStats(currentProfile));
 							}}>
 							Rafraichir
 						</Button>
@@ -182,12 +185,18 @@ const	Stats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
-
+	const	currentProfile = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfile);
+	});
 	useEffect(() =>
 	{
-		dispatch(getMyStats());
-	}, [dispatch]);
-	savePrevPage("/profile/stats");
+		dispatch(getStats(currentProfile));
+	}, [
+		dispatch,
+		currentProfile
+	]);
+	savePrevPage("/stats");
 	return (
 		<>
 			<MenuBar />

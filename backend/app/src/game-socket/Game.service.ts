@@ -15,8 +15,8 @@ type	MapSocketIdProfileId = {
 
 export type	MatchHistoryModel = {
 	uuid				: string | undefined;
-	playerOneProfileId	: string | undefined;
-	playerTwoProfileId	: string | undefined;
+	playerOneProfileId	: string | undefined | number;
+	playerTwoProfileId	: string | undefined | number;
 	scorePlayerOne		: number;
 	scorePlayerTwo		: number;
 	frameCount			: number | undefined;
@@ -342,7 +342,7 @@ export class	GameService implements OnModuleInit
 			})
 		);
 	}
- 
+
 	// V2
 	public	findIndexGameInstanceAloneByGameMode(gameMode: string)
 	{
@@ -402,7 +402,7 @@ export class	GameService implements OnModuleInit
 					.playerTwo.profileId === myProfileId)
 				this.gameInstances[indexInstance].revoked = true;
 		}
-
+	}
 	public	recordMatchHistory(instance: GameServe)
 	{
 		const	date = new Date(Date.now());
