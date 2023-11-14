@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
@@ -186,6 +187,45 @@ const	ServerService = {
 		return (
 			Api(serverLocation)
 				.post("/user/my-stats", {}, config)
+				.then((res) =>
+				{
+					return (res.data);
+				})
+				.then((data) =>
+				{
+					return (
+						{
+							success: true,
+							data: data
+						}
+					);
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+					return ({
+						success: false,
+						data: undefined
+					});
+				})
+		);
+	},
+	async	getStats(userProfileId: string, userAvatar: string, serverLocation: string)
+	{
+		const	config:AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				// "Authorization": token
+			}
+		};
+		const	data = {
+			userProfileId: userProfileId,
+			userAvatar: userAvatar
+		};
+		return (
+			Api(serverLocation)
+				.post("/user/stats", data, config)
 				.then((res) =>
 				{
 					return (res.data);

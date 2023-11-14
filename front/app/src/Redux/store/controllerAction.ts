@@ -1603,27 +1603,28 @@ export const	updateChatUsers = (profileId: string, newPseudo: string)
 {
 	return (async (dispatch, getState) =>
 	{
-      const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
-      {
-        return (elem.profileId === profileId);
-      });
-      const	updatedUsers = [...prev.controller.user.chat.users];
-      if (index !== -1)
-        updatedUsers[index].name = newPseudo;
-      const	response: ControllerModel = {
-        ...prev.controller,
-        user:
-        {
-          ...prev.controller.user,
-          chat:
-          {
-            ...prev.controller.user.chat,
-            users: updatedUsers
-          }
-        }
-      }
-      dispatch(controllerActions.updateChatUsers(response));
-  });
+		const	prev = getState();
+		const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
+		{
+		return (elem.profileId === profileId);
+		});
+		const	updatedUsers = [...prev.controller.user.chat.users];
+		if (index !== -1)
+		updatedUsers[index].name = newPseudo;
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: updatedUsers
+				}
+			}
+		}
+		dispatch(controllerActions.updateChatUsers(response));
+	});
 }
 
 export const	getMyStats = ()
@@ -1645,5 +1646,35 @@ export const	getMyStats = ()
 		}
 		else
 			dispatch(controllerActions.setMyStats(prev.controller));
+	})
+}
+
+export const	getStats = (userProfileId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		// const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	searchUser = prev.controller.user.chat.users.find((elem) =>
+		{
+			return (elem.profileId === userProfileId);
+		});
+		if (searchUser === undefined)
+			return ;
+		const	data = await ServerService.getStats(userProfileId, searchUser.avatar, uri);
+		if (data.success)
+		{
+			const	newStats = [...prev.controller.stats];
+			newStats.push(data.data);
+			const	response: ControllerModel = {
+				...prev.controller,
+				stats: newStats
+			}
+			dispatch(controllerActions.setStats(response));
+		}
+		else
+			dispatch(controllerActions.setStats(prev.controller));
 	})
 }

@@ -187,7 +187,8 @@ export interface	ControllerModel
 	"user": UserModel,
 	"registration": RegistrationProcessModel,
 	"canvas": CanvasModel,
-	"myStats": any[]
+	"myStats": any[],
+	"stats": any[]
 }
 
 export interface	Dimension

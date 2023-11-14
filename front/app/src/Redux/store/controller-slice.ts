@@ -124,7 +124,8 @@ const	initialControllerState: ControllerModel = {
 		height: window.innerHeight,
 		width: window.innerWidth
 	},
-	myStats: []
+	myStats: [],
+	stats: []
 };
 
 const	controllerSlice = createSlice(
@@ -443,6 +444,10 @@ const	controllerSlice = createSlice(
 		setMyStats(state, action: PayloadAction<ControllerModel>)
 		{
 			state.myStats = action.payload.myStats;
+		},
+		setStats(state, action: PayloadAction<ControllerModel>)
+		{
+			state.stats = action.payload.stats;
 		}
 	}
 });

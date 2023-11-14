@@ -85,7 +85,7 @@ const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
 	{
-		return (state.controller.myStats);
+		return (state.controller.stats);
 	});
 	if (rowStats.length === 0)
 	{
@@ -178,7 +178,7 @@ const	Header = () =>
 	);
 };
 
-const	MyStats = () =>
+const	Stats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
@@ -187,7 +187,7 @@ const	MyStats = () =>
 	{
 		dispatch(getMyStats());
 	}, [dispatch]);
-	savePrevPage("/my-stats");
+	savePrevPage("/profile/stats");
 	return (
 		<>
 			<MenuBar />
@@ -198,4 +198,4 @@ const	MyStats = () =>
 	);
 };
 
-export default MyStats;
+export default Stats;
