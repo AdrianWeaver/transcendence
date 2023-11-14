@@ -33,7 +33,7 @@ class Player
 		this.game = undefined;
 		this.side = undefined;
 		this.uuid = undefined;
-		this.socketId = undefined;
+		this.socketId = "undefined";
 		this.name = undefined;
 		this.profileId = "undefined";
 		this.render = () =>

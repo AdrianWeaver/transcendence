@@ -24,6 +24,7 @@ import { Landing } from "../Views/Chat/Landing";
 import ChatLayout from "../Views/Chat/ChatLayout";
 import { useDispatch } from "react-redux";
 import ProfilePage from "../Views/MyProfile/ProfilePage";
+import MyActiveGame from "../Views/MyActiveGame/MyActiveGame";
 import MyStats from "../Views/MyStats/MyStats";
 import Stats from "../Views/MyStats/OtherUserStats";
 
@@ -111,6 +112,10 @@ const	LoggedRouter = () =>
 					element={<ChatLayout />}
 				/>
 				<Route
+					path="my-active-games"
+					element={<MyActiveGame />}
+          />
+         <Route
 					path="/my-stats"
 					element={<MyStats />}
 				/>

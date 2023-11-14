@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable max-statements */
 import {
 	Injectable,
@@ -328,6 +329,10 @@ export class	GameService implements OnModuleInit
 	}
 
 	// ONLY WITH PLAYER TWO
+	/**
+	 * @deprecated see aloneByGameMode just below
+	 * @returns 
+	 */
 	public	findIndexGameInstanceAlonePlayer()
 	{
 		return (
@@ -337,6 +342,66 @@ export class	GameService implements OnModuleInit
 			})
 		);
 	}
+ 
+	// V2
+	public	findIndexGameInstanceAloneByGameMode(gameMode: string)
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (
+					(instance.playerTwo.socketId === "undefined"
+					|| instance.playerTwo.socketId === "undefined")
+					&& (instance.gameMode === gameMode)
+				);
+			})
+		);
+	}
+
+	public	getAllInstancesByUserIdAndFilter(
+		myProfileId: string,
+		filter: string
+	)
+	{
+		const array: Array<any> = [];
+
+		for (const instance of this.gameInstances)
+		{
+			if (instance.gameMode === filter)
+			{
+				if (instance.playerOne.profileId === myProfileId
+					|| instance.playerTwo.profileId === myProfileId)
+					array.push({...instance.getSeralizable()});
+			}
+		}
+		return (array);
+	}
+
+	public	findIndexGameInstanceUserProfileAndGameUuid(
+		myProfileId: string,
+		gameUuid: string
+	)
+	{
+		return (
+			this.gameInstances.findIndex((instance) =>
+			{
+				return (instance.uuid === gameUuid
+					&& (instance.playerOne.profileId === myProfileId
+							|| instance.playerTwo.profileId === myProfileId));
+			})
+		);
+	}
+
+	public	setUserRevokedInstance(myProfileId: string, indexInstance: number)
+	{
+		if (indexInstance !== -1)
+		{
+			if (this.gameInstances[indexInstance]
+					.playerOne.profileId === myProfileId
+				|| this.gameInstances[indexInstance]
+					.playerTwo.profileId === myProfileId)
+				this.gameInstances[indexInstance].revoked = true;
+		}
 
 	public	recordMatchHistory(instance: GameServe)
 	{

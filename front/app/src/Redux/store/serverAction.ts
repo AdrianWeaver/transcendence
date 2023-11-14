@@ -30,7 +30,6 @@ export const	setIsFetching = (value : boolean)
 		dispatch(serverActions.setIsFetching(response));
 	});
 };
-
 export const	resetConnexionAttempt = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {

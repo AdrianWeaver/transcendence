@@ -34,7 +34,9 @@ class GameServe
 
 	public getSeralizable: () => any;
 
-	public	gameMode: string;
+	public gameMode: string;
+	public	revoked: boolean;
+  
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
@@ -54,6 +56,7 @@ class GameServe
 		this.loop = undefined;
 		this.userConnected = 0;
 		this.gameMode = "undefined";
+		this.revoked = false;
 		this.paddleCount = 0;
 
 		this.initPlayers = () =>
@@ -81,6 +84,7 @@ class GameServe
 		{
 			return ({
 				uuid: this.uuid,
+				gameMode: this.gameMode,
 				roomName: this.roomName,
 				frameRate: this.frameRate,
 				frameCount: this.frameCount,
@@ -94,7 +98,9 @@ class GameServe
 				startDisplayed: this.startDisplayed,
 				continueAnimating: this.continueAnimating,
 				loop: this.loop?.getSerializable(),
-				userConnected: this.userConnected
+				userConnected: this.userConnected,
+				revoked: this.revoked,
+        paddleCount: this.paddleCount,
 			});
 		};
 		this.isSocketIdExistGameInstance = (clientId: string) =>

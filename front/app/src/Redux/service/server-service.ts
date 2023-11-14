@@ -175,6 +175,64 @@ const	ServerService = {
 				})
 		);
 	},
+	async	getMyActiveGame(token: string, serverLocation: string)
+	{
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Authorization": token
+			}
+		};
+		return	(
+			Api(serverLocation)
+				.post("api/game/instance/myActiveGame", {}, config)
+				.then((res) =>
+				{
+					return ({
+						...res.data,
+						success: true
+					});
+				})
+				.catch((error: any) =>
+				{
+					return ({success: false});
+				})
+		);
+	},
+	async	revokeGameWithUuid(
+		token: string,
+		serverLocation: string,
+		uuid: string
+	)
+	{
+		const	config: AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+		const data = {
+			uuid: uuid
+		};
+		return (
+			Api(serverLocation)
+				.post("/api/game/instance/revokeGame", data, config)
+				.then((res) =>
+				{
+					return (
+						{
+							...res.data,
+							success: true
+						}
+					);
+				})
+				.catch((error) =>
+				{
+					return ({success: false});
+				})
+		);
+  },
 	async	getMyStats(token: string, serverLocation: string)
 	{
 		const	config:AxiosRequestConfig = {
