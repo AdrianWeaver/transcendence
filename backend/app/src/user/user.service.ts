@@ -54,6 +54,7 @@ import { RegisterStepOneDto } from "./user.controller";
 import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
+import Chat from "src/chat/Objects/Chat";
 
 
 @Injectable()
@@ -62,6 +63,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	user: Array<UserModel> = [];
 	private	matchHistory: Array<HistoryModel> = [];
 	private	secret: string;
+
 	// private	userDB: Array<UserDBModel> = [];
 	// private userDBString: Array<string> = [];
 
@@ -285,6 +287,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	async onModuleInit()
 	{
 		console.log("GET USER BACK FROM DB");
+		console.log("heer ", this.cdnConfig.uri);
 		this.loadTableToMemory();
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
@@ -612,16 +615,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					this.logger.log("Succesfully save micro file");
 					const newUserObj: UserModel = {
 						...userObj,
-						avatar: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+						avatar: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 						ftAvatar:
 						{
-							link: "http://localhost:3000/cdn/image/profile/" + userObj.username + ".jpeg",
+							link: this.cdnConfig.uri + ":3000/cdn/image/profile/" + userObj.username + ".jpeg",
 							version:
 							{
-								large: "http://localhost:3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
-								medium: "http://localhost:3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
-								mini: "http://localhost:3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
-								small: "http://localhost:3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
+								large: this.cdnConfig.uri + ":3000/cdn/image/profile/large/" + userObj.username + ".jpeg",
+								medium: this.cdnConfig.uri + ":3000/cdn/image/profile/medium/" + userObj.username + ".jpeg",
+								mini: this.cdnConfig.uri + ":3000/cdn/image/profile/micro/" + userObj.username + ".jpeg",
+								small: this.cdnConfig.uri + ":3000/cdn/image/profile/small/" + userObj.username + ".jpeg",
 							}
 						}
 					};
@@ -1220,21 +1223,21 @@ public	register(data: UserModel)
 
 	public	changeInfos(data: any, id: string)
 	{
-		const	searchUser = this.user.find((elem) =>
+		const	index = this.user.findIndex((elem) =>
 		{
 			return (elem.id === id);
 		});
-		if (searchUser !== undefined)
+		if (index !== -1)
 		{
 			if (data.info?.length)
-				if (data.field === "username" && data.info !== searchUser.username)
-					searchUser.username = data.info;
-				else if (data.field === "email" && data.info !== searchUser.email)
-					searchUser.email = data.info;
-				else if (data.field === "phoneNumber" && data.info !== searchUser.authService.doubleAuth.phoneNumber)
-					searchUser.authService.doubleAuth.phoneNumber = data.info;
+				if (data.field === "username" && data.info !== this.user[index].username)
+					this.user[index].username = data.info;
+				else if (data.field === "email" && data.info !== this.user[index].email)
+					this.user[index].email = data.info;
+				else if (data.field === "phoneNumber" && data.info !== this.user[index].authService.doubleAuth.phoneNumber)
+					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id, searchUser.email);
+					this.decodePassword(data.info, id, this.user[index].email);
 
 			// console.log(searchUser);
 			return ("okay");
@@ -1554,59 +1557,43 @@ public	register(data: UserModel)
 		return (true);
 	}
 
-	// public	resetUser()
-	// {
-	// 	console.log("------user before reset", this.user);
-	// 	// const	freshUser: UserModel =	{
-	// 	// 	registrationStarted: false,
-	// 	// 	registrationProcessEnded: false,
-	// 	// 	ftApi: {
-	// 	// 		accessToken: "undefined",
-	// 	// 		tokenType: "undefined",
-	// 	// 		expiresIn: "undefined",
-	// 	// 		refreshToken: "undefined",
-	// 	// 		scope: "public",
-	// 	// 		createdAt: "undefined",
-	// 	// 		secretValidUntil: "undefined"
-	// 	// 	},
-	// 	// 	retStatus: -1,
-	// 	// 	date: "undefined",
-	// 	// 	id: -1,
-	// 	// 	email: "undefined",
-	// 	// 	username: "undefined",
-	// 	// 	login: "undefined",
-	// 	// 	online: false,
-	// 	// 	status: "undefined",
-	// 	// 	firstName: "undefined",
-	// 	// 	lastName: "undefined",
-	// 	// 	url: "undefined",
-	// 	// 	avatar: "undefined",
-	// 	// 	ftAvatar: {
-	// 	// 		link: "undefined",
-	// 	// 		version: {
-	// 	// 		large: "undefined",
-	// 	// 		medium: "undefined",
-	// 	// 		mini: "undefined",
-	// 	// 		small: "undefined"
-	// 	// 		}
-	// 	// 	},
-	// 	// 	location: "undefined",
-	// 	// 	revokedConnectionRequest: false,
-	// 	// 	authService: {
-	// 	// 		token: "undefined",
-	// 	// 		expAt: -1,
-	// 	// 		doubleAuth: {
-	// 	// 		enable: false,
-	// 	// 		lastIpClient: "undefined",
-	// 	// 		phoneNumber: "undefined",
-	// 	// 		phoneRegistered: false,
-	// 	// 		validationCode: "undefined",
-	// 	// 		valid: false
-	// 	// 		}
-	// 	// 	},
-	// 	// 	password: "undefined",
-	// 	// 	friendsProfileId: []
-	// 	// };
-	// 	console.log("------user after reset");
-	// }
+	public	getMyStats()
+	{
+		const fakeRows = [
+			{
+				id: 1,
+				date: "Yesterday Night",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 2,
+				date: "Yesterday ",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 3,
+				date: "Toto",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+		];
+		return (fakeRows);
+	}
 }

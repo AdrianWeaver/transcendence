@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
@@ -7,7 +8,7 @@ import HighlightOffRoundedIcon
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
-import { setAbortRequestedValue } from "../../../Redux/store/controllerAction";
+import { setAbortRequestedValue, setFt } from "../../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 const	styleEscBox = {
@@ -40,6 +41,7 @@ const	EscButton = () =>
 		{
 			setAlreadyClicked(true);
 			dispatch(setAbortRequestedValue(true));
+			dispatch(setFt(true));
 			navigate("/cancel");
 		}
 	};

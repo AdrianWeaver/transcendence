@@ -12,6 +12,7 @@ import
 	ServerModel
 }	from "../models/redux-models";
 import ServerService from "../service/server-service";
+import Configuration from "../../Configuration";
 
 export const	serverActions = serverSlice.actions;
 
@@ -138,7 +139,7 @@ export	const	getServerConnection = ()
 		// const	user = prevState.controller.user;
 
 		const	data = await ServerService
-			.getConnection(prevState.server.serverLocation);
+			.getConnection(prevState.server.uri);
 		if (data.success === false)
 		{
 			// console.log("data tyes", data);
@@ -159,7 +160,6 @@ export	const	getServerConnection = ()
 			dispatch(
 				setServerConnectionSuccess(data.availableSince, data.links)
 			);
-			
 		}
 	});
 };
@@ -173,15 +173,17 @@ export	const	setErrorService = (server: ServerModel)
 	});
 };
 
-export const	setServerLocation = (locationServer: string)
+export const	setServerLocation = (protocole: string, locationServer: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
+
 		const	response: ServerModel = {
 			...prevState.server,
-			serverLocation: locationServer
+			serverLocation: locationServer,
+			uri: protocole + "//" + locationServer
 		};
 		dispatch(serverActions.setServerLocation(response));
 	});
@@ -195,7 +197,7 @@ export const	setAuthApiLinks = ()
 		const prev = getState();
 
 		const	data = await ServerService
-		.getAuthApiLinks(prev.server.serverLocation);
+		.getAuthApiLinks(prev.server.uri);
 		if (data.success === true)
 		{
 			console.log("Action reducer data set auth links: ", data);
@@ -213,5 +215,20 @@ export const	setAuthApiLinks = ()
 			console.log("Set auth links fails");
 			dispatch(serverActions.setAuthApiLinks({...prev.server}));
 		}
+	});
+};
+
+export const	setUri = (uri: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const prev = getState();
+			console.log("setUri: ", uri);
+			const	response: ServerModel = {
+				...prev.server,
+				uri: uri
+			};
+			dispatch(serverActions.setUri(response));
 	});
 };

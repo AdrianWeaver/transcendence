@@ -3,6 +3,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
+// import * as SocketIOClient from "socket.io-client";
 
 import {
 	Box,
@@ -29,8 +30,6 @@ import {
 import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
 import FriendItem from "./components/FriendItem";
-
-const URL = "http://localhost:3000/";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -258,6 +257,10 @@ const	ChatLayout = () =>
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	server	= useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -557,7 +560,7 @@ const	ChatLayout = () =>
 
 	useEffect(() =>
 	{
-		const socket = io(URL,
+		const socket = io(server.uri + ":3000",
 			{
 				path: "/socket-chat",
 				autoConnect: false,
@@ -776,7 +779,7 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload);
+				console.log("DISPLAY MEMBERS", data.payload, );
 				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
@@ -1923,7 +1926,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 0</h1>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1958,7 +1961,7 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}
+							> */}<h1>tabpanel 1</h1>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
@@ -1979,7 +1982,21 @@ const	ChatLayout = () =>
 								);
 							})}
 					</TabPanel>
-
+					<TabPanel
+						area={"true"}
+						value={value}
+						index={2}
+						dir={style.direction}
+						style={style}
+					>
+						{/* <List
+							sx={{
+								height: "70vh",
+								overflowY: "auto"
+							}}
+							> */}
+							<h1>tabpanel 2</h1>
+					</TabPanel>
 					<Divider />
 
 					<Grid

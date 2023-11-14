@@ -18,6 +18,7 @@ import UserServices from "../service/ft-api-service";
 import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
 import UserRegistration from "../../Object/UserRegistration";
 import { PersistPartial } from "redux-persist/es/persistReducer";
+import ServerService from "../service/server-service";
 type MessageModel =
 {
 	sender: string,
@@ -200,7 +201,7 @@ export const	reinitialiseUser = (logout: boolean)
 			return ;
 		if (logout)
 		{
-			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
 			dispatch(logOffUser());
 			dispatch(resetRegistration);
 		}
@@ -629,7 +630,7 @@ export const	verifyTokenAtRefresh = ()
 		const	data = await UserServices
 			.verifyToken(
 				user.bearerToken,
-				prevState.server.serverLocation
+				prevState.server.uri
 			);
 		if (data === "ERROR")
 		{
@@ -648,7 +649,9 @@ export const verifyToken = ()
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
-		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.serverLocation);
+		// const	protocole = window.location.protocol; protocole + "//" + prev.server.serverLocation
+		// localhost I DONT KNOW WHYYYY ITS NOT UPDATED THE URI
+		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -682,7 +685,7 @@ export const registerClientWithCode = (code : string)
 		dispatch(setRegistrationProcessStart())
 		// console.log("Code is equals to : ", code);
 		const	data: any = await UserServices.register(
-			code, prev.server.serverLocation);
+			code, prev.server.uri);
 		if (data === "ERROR")
 		{
 			// console.error("erreur");
@@ -775,7 +778,7 @@ export const registerNumberForDoubleAuth = (numero : string, token: string)
 			return ;
 		const	data: any = await
 			UserServices.getNumberForDoubleAuth(
-				numero, token, prev.server.serverLocation);
+				numero, token, prev.server.uri);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -812,7 +815,7 @@ export const receiveValidationCode = (numero : string, token: string)
 			return ;
 		const	data: any = await
 			UserServices.receiveValidationCodeFromTwilio(
-				numero, token, prev.server.serverLocation);
+				numero, token, prev.server.uri);
 		if (data === "ERROR")
 		{
 			dispatch(setRegistrationProcessError());
@@ -848,7 +851,7 @@ export const GetValidationCode = (otpCode : string, token: string)
 			|| prev.controller.user.registrationError !== "undefined")
 			return ;
 		const	data: any = await UserServices.getValidationCodeFromTwilio(
-			prev.controller.user.phoneNumber, otpCode, token, prev.server.serverLocation);
+			prev.controller.user.phoneNumber, otpCode, token, prev.server.uri);
 		if (data === "error")
 		{
 			console.log("TEST error");
@@ -953,7 +956,7 @@ export const	setRegistered = ()
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	data: any = UserServices.registrationValidation(prev.controller.user.bearerToken, prev.server.serverLocation);
+		const	data: any = UserServices.registrationValidation(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "error")
 		{
 			console.log("TEST error");
@@ -1161,7 +1164,7 @@ export const	setAllUsers = ()
 	{
 		const	prev = getState();
 
-		const	theUsers: any = await UserServices.getAllTheUsers(prev.server.serverLocation);
+		const	theUsers: any = await UserServices.getAllTheUsers(prev.server.uri);
 
 		if (theUsers === "error")
 		{
@@ -1217,10 +1220,10 @@ export const	registerInfosInBack = (info: string, field: string)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.serverLocation)
+		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.uri)
 		.then(() =>
 		{
-			console.log("okay");
+			console.log("okay registered in back");
 		})
 		.catch((error) =>
 		{
@@ -1284,7 +1287,7 @@ export const	decodePassword = (id: any, password: string, email: string)
 			const	data = await UserServices.decodePassword(
 				prev.controller.user.bearerToken,
 				password, id, email,
-				prev.server.serverLocation
+				prev.server.uri
 			);
 			console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
@@ -1326,7 +1329,7 @@ export const	addUserAsFriend = (myId: string, friendId: string)
 	{
 		const	prev = getState();
 		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.serverLocation, myId)
+			friendId, prev.server.uri, myId)
 		.then((data) =>
 		{
 			// console.log("okay", data);
@@ -1458,7 +1461,7 @@ export const	addChatUser = (user: ChatUserModel)
 				}
 			}
 		}
-		dispatch(controllerActions.addChatUser(response));
+		dispatch(controllerActions.updateChatUsers(response));
 	});
 }
 
@@ -1593,4 +1596,54 @@ export const	setCurrentProfileIsFriend = (isFriend: boolean)
 		}
 		dispatch(controllerActions.setCurrentProfileIsFriend(response));
 	});
+}
+
+export const	updateChatUsers = (profileId: string, newPseudo: string)
+  : ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+      const	index = prev.controller.user.chat.users.findIndex((elem: ChatUserModel) =>
+      {
+        return (elem.profileId === profileId);
+      });
+      const	updatedUsers = [...prev.controller.user.chat.users];
+      if (index !== -1)
+        updatedUsers[index].name = newPseudo;
+      const	response: ControllerModel = {
+        ...prev.controller,
+        user:
+        {
+          ...prev.controller.user,
+          chat:
+          {
+            ...prev.controller.user.chat,
+            users: updatedUsers
+          }
+        }
+      }
+      dispatch(controllerActions.updateChatUsers(response));
+  });
+}
+
+export const	getMyStats = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await ServerService.getMyStats(token, uri);
+		if (data.success)
+		{
+			const	response: ControllerModel = {
+				...prev.controller,
+				myStats: data.data
+			}
+			dispatch(controllerActions.setMyStats(response));
+		}
+		else
+			dispatch(controllerActions.setMyStats(prev.controller));
+	})
 }

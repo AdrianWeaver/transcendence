@@ -591,6 +591,24 @@ export	class ChatService implements OnModuleInit
 		return (this.chat.users);
 	}
 
+	public	changeInfos(data: any, id: string | number)
+	{
+		console.log("id change info ?", typeof id);
+		const	index = this.chat.users.findIndex((elem) =>
+		{
+			return (elem.profileId === id.toString());
+		});
+		if (index !== -1)
+		{
+			if (data.info?.length)
+				if (data.field === "username" && data.info !== this.chat.users[index].name)
+					this.chat.users[index].name = data.info;
+			// console.log(searchUser);
+			return ("okay");
+		}
+		return ("user doesnt exist");
+	}
+
 	public	sendMessageToUser(user: User)
 	{
 		this.searchUserIndex(user.id);

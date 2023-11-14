@@ -11,11 +11,16 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const	Copyright = () =>
+type	CopyrightProps =
+{
+	uri: string
+}
+
+const	Copyright = (props: CopyrightProps) =>
 {
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
-
+	const	url = props.uri + ":3001";
 	const
 	[
 		alreadyClicked,
@@ -46,7 +51,7 @@ const	Copyright = () =>
 			<Link
 				onClick={handleClick}
 				color="inherit"
-				href="http://localhost:3001"
+				href={url}
 			>
 				{"ft_transcendence "}
 			</Link>

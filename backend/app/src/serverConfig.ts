@@ -7,6 +7,7 @@ class	ServerConfig
 	public readonly		location: string | undefined;
 	public readonly		port: string | undefined;
 	public readonly		protocol: string | undefined;
+	public	readonly	uri: string | undefined;
 	private readonly	env: dotenv.DotenvConfigOutput;
 	public serialize: () => string;
 
@@ -16,6 +17,7 @@ class	ServerConfig
 		this.location = this.env.parsed?.HOST_LOCATION;
 		this.port = this.env.parsed?.HOST_PORT;
 		this.protocol = this.env.parsed?.HOST_PROTOCOL;
+		this.uri = this.protocol + "://" + this.location;
 		this.serialize = () =>
 		{
 			const res = {
