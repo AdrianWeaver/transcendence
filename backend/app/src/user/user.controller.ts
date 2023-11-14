@@ -125,7 +125,8 @@ export class UserController
 
 	constructor(
 		private readonly userService: UserService,
-		private readonly gameService: GameService
+		private readonly gameService: GameService,
+		private	readonly chatService: ChatService
 	)
 	{
 		this.logger = new Logger("user-controller");
@@ -858,6 +859,66 @@ export class UserController
 				elem.adversaireAvatar = userAdversaire.avatar;
 			}
 			elem.myAvatar = req.user.avatar;
+			array.push(elem);
+		});
+		return (array);
+	}
+
+	@Post("/stats")
+	@UseGuards(UserAuthorizationGuard)
+	getStats(@Body() body: any)
+	{
+		// return (["toto"]);
+		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
+		{
+			return (
+				record.playerOneProfileId === (body.UserProfileId)
+				|| record.playerTwoProfileId === (body.userProfileId)
+			);
+		});
+		console.log(userStats);
+		const	array: ResponseRow[] = [];
+
+		userStats.map((stat: MatchHistoryModel, index: number) =>
+		{
+			console.log(stat);
+			const	isPlayOne = stat.playerOneProfileId === body.userProfileId;
+			const	frameCount = stat.frameCount as number;
+			const	frameRate = stat.frameRate as number;
+			let		adversaireProfileId: string;
+
+			const	elem: ResponseRow = {
+				id: index,
+				date: stat.date,
+				gameMode: stat.gameMode,
+				adversaire: "unset",
+				advScore: "unset",
+				elapsedTime: (frameCount / frameRate) + " secondes",
+				myScore: "unset",
+				adversaireAvatar: "unset",
+				myAvatar: "unset"
+			};
+			if (isPlayOne)
+			{
+				adversaireProfileId = stat.playerTwoProfileId as string;
+				elem.advScore = stat.scorePlayerTwo.toString();
+				elem.myScore = stat.scorePlayerOne.toString();
+			}
+			else
+			{
+				adversaireProfileId = stat.playerOneProfileId as string;
+				elem.advScore = stat.scorePlayerOne.toString();
+				elem.myScore = stat.scorePlayerTwo.toString();
+			}
+			const userAdversaire = this.userService.getUserById(adversaireProfileId);
+			if (userAdversaire === undefined)
+				elem.adversaire = "Deleted user";
+			else
+			{
+				elem.adversaire = userAdversaire.username;
+				elem.adversaireAvatar = userAdversaire.avatar;
+			}
+			elem.myAvatar = body.userAvatar;
 			array.push(elem);
 		});
 		return (array);
