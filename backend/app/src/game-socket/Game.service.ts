@@ -402,6 +402,7 @@ export class	GameService implements OnModuleInit
 					.playerTwo.profileId === myProfileId)
 				this.gameInstances[indexInstance].revoked = true;
 		}
+	}
 
 	public	recordMatchHistory(instance: GameServe)
 	{
