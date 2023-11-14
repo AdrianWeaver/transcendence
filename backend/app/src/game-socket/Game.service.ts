@@ -334,8 +334,9 @@ export class	GameService implements OnModuleInit
 			this.gameInstances.findIndex((instance) =>
 			{
 				return (
-					instance.playerTwo.socketId === "undefined"
-					&& instance.gameMode === gameMode
+					(instance.playerTwo.socketId === "undefined"
+					|| instance.playerTwo.socketId === "undefined")
+					&& (instance.gameMode === gameMode)
 				);
 			})
 		);
