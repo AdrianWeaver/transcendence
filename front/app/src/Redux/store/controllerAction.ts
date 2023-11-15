@@ -1666,9 +1666,6 @@ export const	getStats = (userProfileId: string)
 		const	data = await ServerService.getStats(token, userProfileId, searchUser.avatar, uri);
 		if (data.success)
 		{
-			const	newStats = prev.controller.stats;
-			newStats.push(data.data);
-			console.log("here stats ?", data.data);
 			if (data.data.length)
 			{
 				const	response: ControllerModel = {
