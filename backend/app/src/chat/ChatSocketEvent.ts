@@ -505,7 +505,6 @@ export class ChatSocketEvents
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 // do the samed for private msg
 				let isAdmin: boolean;
-				console.log("DESTROY CHANNEL", data.payload.kind);
 				if (data.payload.kind === "privateMessage")
 				{
 					searchChannel = this.chatService.searchPrivateConvByName(data.payload.name);
@@ -513,18 +512,14 @@ export class ChatSocketEvents
 				}
 				else
 				{
-					console.log("I GOT HERE");
-					console.log("CHANNEL NAME: " + data.payload.name);
 					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
 					{
 						isAdmin = true;
-						console.log("I AM THE ADMIN");
 					}
 					else
 					{
 						isAdmin = false;
-						console.log("I AM NOT THE ADMIN");
 					}
 				}
 				let	msg;

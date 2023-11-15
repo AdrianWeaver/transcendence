@@ -697,7 +697,10 @@ const	ChatLayout = () =>
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
 				else if (data.payload.message === "")
+				{
 					setChannels(data.payload.chanMap);
+					setChanMessages([]);
+				}
 				else
 					alert(data.payload.message);
 			}
@@ -708,7 +711,7 @@ const	ChatLayout = () =>
 					alert(data.payload.message);
 				else
 				{
-					setChanMessages([]);
+					setChanMessages(data.payload.messages);
 					alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
@@ -784,8 +787,6 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload, );
-				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
@@ -801,7 +802,6 @@ const	ChatLayout = () =>
 				}
 				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
-				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};
 
@@ -832,7 +832,6 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					console.log("userInfo FRIENDS LIST", friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
 					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
@@ -1266,8 +1265,7 @@ const	ChatLayout = () =>
 
 	const	inviteUserToChannel = (data: string) =>
 	{
-		console.log("member: " + data);
-		console.log("channel : " + channelToInvite);
+		refreshListUser();
 		let	profileId: string;
 		// profileId = data.toString();
 		profileId = getProfileId(data);
@@ -1525,7 +1523,6 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
-															console.log("CLICKED CHANNEL: " + clickedChannel);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1545,7 +1542,6 @@ const	ChatLayout = () =>
 																value={userToInvite}
 																onChange={(e) =>
 																{
-																	console.log("target value " + e.target.value);
 																	setUserToInvite(e.target.value);
 																	setChannelToInvite(clickedChannel);
 																}}/>
@@ -1553,7 +1549,6 @@ const	ChatLayout = () =>
 															<DialogActions>
 																<Button onClick={() =>
 																	{
-																		console.log("USER TO INVITE: " + userToInvite);
 																		// setUserToInvite(getProfileId(userToInvite));
 																		inviteUserToChannel(userToInvite);
 																		setInviteDialogOpen(false);
