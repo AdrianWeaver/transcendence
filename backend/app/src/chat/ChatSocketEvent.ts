@@ -274,7 +274,7 @@ export class ChatSocketEvents
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
-				console.log("les users ?", copyUsers, " ", regularUsers);
+				// console.log("les users ?", copyUsers, " ", regularUsers);
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);
@@ -302,7 +302,7 @@ export class ChatSocketEvents
 						}
 					});
 				});
-				console.log("ICI", copyUsers);
+				// console.log("ICI", copyUsers);
 				const action = {
 					type: "sending-list-user",
 					payload:

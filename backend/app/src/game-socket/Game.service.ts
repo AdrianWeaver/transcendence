@@ -111,10 +111,18 @@ export class	GameService implements OnModuleInit
 	{
 		return (this.users);
 	}
+
+	/**
+	 * @deprecated
+	 */
 	public	increaseUsers()
 	{
 		this.users += 1;
 	}
+
+	/**
+	 * @deprecated
+	 */
 	public	decreaseUsers()
 	{
 		this.users -= 1;
