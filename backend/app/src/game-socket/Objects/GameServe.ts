@@ -37,6 +37,10 @@ class GameServe
 	public	gameMode: string;
 	public	revoked: boolean;
 	public	face: string;
+	public	faceRotation: number;
+	// public	mutexFaceRotation: boolean;
+	public	faceDirection: string;
+	public	triggeredPaddleCount: number;
   
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
@@ -60,6 +64,10 @@ class GameServe
 		this.revoked = false;
 		this.paddleCount = 0;
 		this.face = "up";
+		this.faceDirection = "up";
+		this.faceRotation = 0;
+		this.triggeredPaddleCount = 0;
+		// this.mutexFaceRotation = false;
 
 		this.initPlayers = () =>
 		{
@@ -103,7 +111,11 @@ class GameServe
 				userConnected: this.userConnected,
 				revoked: this.revoked,
         		paddleCount: this.paddleCount,
-				face: this.face
+				face: this.face,
+				faceRotation: this.faceRotation,
+				// mutexFaceRotation: this.mutexFaceRotation,
+				faceDirection: this.faceDirection,
+				triggeredPaddleCount: this.triggeredPaddleCount,
 			});
 		};
 		this.isSocketIdExistGameInstance = (clientId: string) =>

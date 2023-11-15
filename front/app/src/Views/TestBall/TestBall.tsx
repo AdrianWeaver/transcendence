@@ -88,6 +88,11 @@ const	TestBall = () =>
 		setGameActive
 	] = useState(false);
 
+	const [
+		rotation,
+		setRotation
+	] = useState<number>(0);
+
 	const	dispatch = useAppDispatch();
 
 	const	theServer = useAppSelector((state) =>
@@ -403,6 +408,8 @@ const	TestBall = () =>
 	// 	}
 	// }, [gameOver]);
 
+	const prevRotationRef = useRef<number>(0);
+
 	useEffect(() =>
 	{
 		let requestId: number;
@@ -428,6 +435,8 @@ const	TestBall = () =>
 		const	render = () =>
 		{
 			clear();
+			// prevRotationRef.current = gameMode?.mode === 'upside-down' ? theBoard.gameFace : 0;
+			// setRotation(prevRotationRef.current);
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -537,15 +546,32 @@ const	TestBall = () =>
 							{JSON.stringify(theBoard.playerOne.position)} <br />
 				position du player 2:
 							{JSON.stringify(theBoard.playerTwo.position)} <br />
+				value rotation mode spec : {theBoard.gameFace} <br/>
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
 
-			<div style={{ textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
+				<div
+					style={{
+					width: game.board.canvas?.width,
+					height: game.board.canvas?.height,
+					transform: `rotate(${theBoard.gameFace}deg)`,
+					// transition: 'transform 0.5s',
+					}}
+				>
+					<canvas
+					height={game.board.canvas?.height}
+					width={game.board.canvas?.width}
+					ref={canvasRef}
+					/>
+				</div>
+			</div>
+			{/* <div style={{ textAlign: "center" }}>
 				<motion.div
-					initial={{ rotate: 0 }}
+					// initial={{ rotate: 0 }}
 					animate={{
 						rotate: gameMode?.mode === "upside-down" ? theBoard.gameFace : 0,
 						transition: { duration: 0.5 }
@@ -561,7 +587,7 @@ const	TestBall = () =>
 					ref={game.board.canvasRef}
 					/>
 				</motion.div>
-			</div>
+			</div> */}
 		</>
 	);
 };
