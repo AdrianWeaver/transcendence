@@ -60,6 +60,7 @@ type WaitingActiveProps = {
 	connected: boolean,
 	numberOfUser: number,
 	disconnected: boolean
+	gameOver: boolean
 };
 
 const	WaitingActive = (props: WaitingActiveProps) =>
@@ -154,13 +155,20 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 				</IconButton>
 			</Box>
 		);
-		if (statusConnected === true)
+		if (props.gameOver)
 		{
-			title = "Partie Random";
+			title = "Game Over";
 		}
 		else
 		{
-			title = "Deconnecte";
+			if (statusConnected === true)
+			{
+				title = "Partie Random";
+			}
+			else
+			{
+				title = "Deconnecte";
+			}
 		}
 	}
 	else

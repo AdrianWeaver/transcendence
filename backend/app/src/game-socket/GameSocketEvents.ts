@@ -102,6 +102,27 @@ export class GameSocketEvents
 			{
 				console.log("User one has won score " + scorePlayerOne);
 				this.gameService.recordMatchHistory(instance);
+				const	playerOneSocket = instance.playerOne.socketId;
+				const	playerTwoSocket = instance.playerTwo.socketId;
+
+				const isPlayerOneActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerOneSocket);
+					});
+				if (isPlayerOneActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
+				const isPlayerTwoActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerTwoSocket);
+					});
+				if (isPlayerTwoActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
 			}
 			const action = {
 				type: "game-data",

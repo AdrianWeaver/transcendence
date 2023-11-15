@@ -34,6 +34,7 @@ import {
 } from "../../Redux/store/gameEngineAction";
 import { useLocation, useNavigate } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
+import WaitingActive from "./Component/WaitingActive";
 // import {
 // 	Backdrop,
 // 	Alert,
@@ -81,6 +82,12 @@ const	TestBall = () =>
 	[
 		gameActive,
 		setGameActive
+	] = useState(false);
+
+	const
+	[
+		gameOver,
+		setGameOver
 	] = useState(false);
 
 	const	dispatch = useAppDispatch();
@@ -285,16 +292,35 @@ const	TestBall = () =>
 
 		const	activateGame = (data: any) =>
 		{
+			setGameOver(false);
 			setGameActive(data.payload.gameActive);
 		};
 
 		const	matchmakingState = (data: any) =>
 		{
 			// please make me design
+			let	timeout: any;
+
+			timeout = undefined;
+			// setGameOver(false);
 			if (data.type === "already-connected")
 			{
 				window.alert("Vous etes deja connectes a un socket veuillez visiter /my-active-games");
 			}
+			if (data.type === "the-end")
+			{
+				console.log("here");
+				setGameOver(true);
+				timeout = setTimeout(() =>
+				{
+					navigate("/game-setup");
+				}, 4000);
+			}
+			return (() =>
+			{
+				if (timeout !== undefined)
+					clearTimeout(timeout);
+			});
 		};
 
 		socket.on("connect", connect);
@@ -320,14 +346,7 @@ const	TestBall = () =>
 			socket.off("game-active", activateGame);
 			socket.off("matchmaking-state", matchmakingState);
 		});
-	}, [
-		dispatch,
-		game,
-		gameMode.friendId,
-		gameMode.mode,
-		profileToken,
-		url
-	]);
+	}, []);
 
 	const	keyHookDown = (e: KeyboardEvent) =>
 	{
@@ -451,6 +470,7 @@ const	TestBall = () =>
 			if (game.playerOne.score === game.scoreLimit
 				|| game.playerTwo.score === game.scoreLimit)
 			{
+				setGameOver(true);
 				setGameActive(false);
 				game.displayEndMessage();
 			}
@@ -462,7 +482,7 @@ const	TestBall = () =>
 			cancelAnimationFrame(requestId);
 		});
 	},
-	[ theBoard.ball.position ]);
+	[theBoard.ball.position]);
 
 	const	displayStyle: React.CSSProperties = {
 		textAlign: "center",
@@ -473,68 +493,81 @@ const	TestBall = () =>
 		<>
 			< MenuBar />
 			{/* <WaitingActive
-				connected={connected}
-				numberOfUser={theServer.numberOfUser}
-				disconnected={socketRef.current?.active}
-			/> */}
-			<div style={displayStyle}>
-				FT_TRANSCENDANCE
-			</div>
+					connected={connected}
+					numberOfUser={theServer.numberOfUser}
+					disconnected={socketRef.current?.active}
+					gameOver={gameOver}
+				/> */}
+			{
+				// (gameOver === false)
+				// ?
+				<>
+					<div style={displayStyle}>
+						FT_TRANSCENDENCE
+					</div>
 
-			{/* This part show the connection to the websocket */}
-			<div style={displayStyle}>
-				<ConnectState connected={connected} />
-			</div>
+					{/* This part show the connection to the websocket */}
+					<div style={displayStyle}>
+						<ConnectState connected={connected} />
+					</div>
 
-			{/* This part show the number of client connected */}
-			<div style={displayStyle}>
-				number of client connected : {theServer.numberOfUser}<br/>
-				number of client ready : {theServer.readyPlayerCount}
-			</div>
+					{/* This part show the number of client connected */}
+					<div style={displayStyle}>
+						number of client connected : {theServer.numberOfUser}<br/>
+						number of client ready : {theServer.readyPlayerCount}
+					</div>
 
-			{/* This part show the frame number */}
-			<div style={displayStyle}>
-				frame number (time server): {theServer.frameNumber} <br/>
-			</div>
+					{/* This part show the frame number */}
+					<div style={displayStyle}>
+						frame number (time server): {theServer.frameNumber} <br/>
+					</div>
 
-			{/* /* This part show more information */ }
-			<div style={displayStyle}>
-				position ball x: {theBoard.ball.position.x} <br />
-				position ball y: {theBoard.ball.position.y} <br />
-				dimension width du server: {theServer.dimension.width} <br />
-				dimension height du server: {theServer.dimension.height} <br />
-				scale to server :
-					scale_width: {theServer.scaleServer.width},
-					scale_height:
-								{theServer.scaleServer.height} <br />
-				dimension width du client : {theBoard.dimension.width} <br />
-				dimension height du client: {theBoard.dimension.height} <br />
-				position du player 1:
-							{JSON.stringify(theBoard.playerOne.position)} <br />
-				position du player 2:
-							{JSON.stringify(theBoard.playerTwo.position)} <br />
-			</div>
-			<div style={displayStyle}>
-				<button onClick={setReadyAction}>I'm ready</button>
-			</div>
-			{/* This is the canvas part */}
+					{/* /* This part show more information */ }
+					<div style={displayStyle}>
+						position ball x: {theBoard.ball.position.x} <br />
+						position ball y: {theBoard.ball.position.y} <br />
+						dimension width du server: {theServer.dimension.width} <br />
+						dimension height du server: {theServer.dimension.height} <br />
+						scale to server :
+							scale_width: {theServer.scaleServer.width},
+							scale_height:
+										{theServer.scaleServer.height} <br />
+						dimension width du client : {theBoard.dimension.width} <br />
+						dimension height du client: {theBoard.dimension.height} <br />
+						position du player 1:
+									{JSON.stringify(theBoard.playerOne.position)} <br />
+						position du player 2:
+									{JSON.stringify(theBoard.playerTwo.position)} <br />
+					</div>
+					<div style={displayStyle}>
+						<button onClick={setReadyAction}>I'm ready</button>
+					</div>
+					{/* This is the canvas part */}
 
-			<div style={{ textAlign: "center" }}>
-				<motion.div
-					initial={{ rotate: 0 }}
-					animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
-					style={{
-					width: game.board.canvas?.width,
-					height: game.board.canvas?.height,
-					}}
-				>
-					<canvas
-					height={game.board.canvas?.height}
-					width={game.board.canvas?.width}
-					ref={game.board.canvasRef}
-					/>
-				</motion.div>
-			</div>
+					<div style={{ textAlign: "center" }}>
+						<motion.div
+							initial={{ rotate: 0 }}
+							animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
+							style={{
+							width: game.board.canvas?.width,
+							height: game.board.canvas?.height,
+							}}
+						>
+							<canvas
+							height={game.board.canvas?.height}
+							width={game.board.canvas?.width}
+							ref={game.board.canvasRef}
+							/>
+						</motion.div>
+					</div>
+				</>
+				// : <WaitingActive
+				// 	connected={connected}
+				// 	numberOfUser={theServer.numberOfUser}
+				// 	disconnected={socketRef.current?.active}
+				// 	gameOver={gameOver}
+				// />
+			}
 		</>
 	);
 };
