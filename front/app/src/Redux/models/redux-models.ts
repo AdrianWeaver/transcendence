@@ -243,5 +243,6 @@ export interface	GameEngineModel
 	{
 		random: any[],
 		friend: any[]
-	}
+	},
+	gameOver: boolean
 }

@@ -22,6 +22,7 @@ import CardMedia from "@mui/material/CardMedia";
 // import pong from "../assets/pong.jpeg";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // type DisplayUsersAvatarProps = {
 // 	avatarPlayerOne: JSX.Element,
@@ -77,8 +78,7 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 	// [
 	// 	render,
 	// 	setRender
-	// ] = useState(<></>);
-
+	// ] = useState(<></>);'
 	let title;
 
 	const
@@ -92,7 +92,6 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 	// 	userCount,
 	// 	setUserCount
 	// ] = useState(0);
-
 	const userOnePicture = useAppSelector((state) =>
 	{
 		return (state.gameEngine.server.playerOnePicture);

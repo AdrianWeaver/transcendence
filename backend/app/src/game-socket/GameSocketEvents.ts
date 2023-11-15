@@ -118,6 +118,27 @@ export class GameSocketEvents
 			if (scorePlayerOne === instance.scoreLimit || scorePlayerTwo === instance.scoreLimit)
 			{
 				this.gameService.recordMatchHistory(instance);
+				const	playerOneSocket = instance.playerOne.socketId;
+				const	playerTwoSocket = instance.playerTwo.socketId;
+
+				const isPlayerOneActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerOneSocket);
+					});
+				if (isPlayerOneActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
+				const isPlayerTwoActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerTwoSocket);
+					});
+				if (isPlayerTwoActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
 			}
 			// upside = 0, down = 180
 			const gameFace = instance.face === "up" ? 0 : 180;
