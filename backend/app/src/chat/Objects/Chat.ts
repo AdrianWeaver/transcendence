@@ -226,7 +226,6 @@ class Chat
 			rawChannels.forEach((raw: any) =>
 			{
 				const	newChannel = new Channel(raw.name);
-				// newChannel.setClient(null, raw.owner.profileId);
 				newChannel.setOwner({...raw.owner});
 				newChannel.setFromDatabaseAdmins([...raw.admins]);
 				newChannel.setKind(raw.kind);
@@ -234,8 +233,6 @@ class Chat
 				newChannel.setMode(raw.mode);
 				newChannel.id = raw.id;
 				newChannel.users = [...raw.users];
-				// console.log("--> raw channel", raw);
-				// console.log("new channel : ", newChannel);
 				this.channels.push(newChannel);
 			});
 			rawPrivateMessages.forEach((raw: any) =>
@@ -247,8 +244,6 @@ class Chat
 				newPrivateMessage.setPassword(raw.password);
 				newPrivateMessage.id = raw.id;
 				newPrivateMessage.setMode(raw.mode);
-				// console.log("--> raw private msg", raw);
-				// console.log("new private msg", newPrivateMessage);
 				this.privateMessage.push(newPrivateMessage);
 			});
 			rawUsers.forEach((raw: any) =>

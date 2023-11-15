@@ -12,9 +12,9 @@ import {
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
-import { getStats } from "../../Redux/store/controllerAction";
+import { getAllStats, getStats } from "../../Redux/store/controllerAction";
 
 const	columns: GridColDef[] = [
 	{
@@ -79,8 +79,6 @@ const	columns: GridColDef[] = [
 
 ];
 
-// const	fakeRows: any = [];
-
 const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
@@ -126,10 +124,6 @@ const	HistoryTable = () =>
 const	Header = () =>
 {
 	const	dispatch = useAppDispatch();
-	const	currentProfile = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.currentProfile);
-	});
 	return (
 		<>
 			<Box
@@ -168,7 +162,7 @@ const	Header = () =>
 							variant="contained"
 							onClick={() =>
 							{
-								dispatch(getStats(currentProfile));
+								dispatch(getAllStats());
 							}}>
 							Rafraichir
 						</Button>
@@ -179,22 +173,15 @@ const	Header = () =>
 	);
 };
 
-const	Stats = () =>
+const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
-	const	currentProfile = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.currentProfile);
-	});
 	useEffect(() =>
 	{
-		dispatch(getStats(currentProfile));
-	}, [
-		dispatch,
-		currentProfile
-	]);
-	savePrevPage("/stats");
+		dispatch(getAllStats());
+	}, [dispatch,]);
+	savePrevPage("/global-stats");
 	return (
 		<>
 			<MenuBar />
@@ -205,4 +192,4 @@ const	Stats = () =>
 	);
 };
 
-export default Stats;
+export default GlobalStats;

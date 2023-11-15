@@ -26,6 +26,7 @@ import ProfilePage from "../Views/MyProfile/ProfilePage";
 import MyActiveGame from "../Views/MyActiveGame/MyActiveGame";
 import MyStats from "../Views/MyStats/MyStats";
 import Stats from "../Views/MyStats/OtherUserStats";
+import GlobalStats from "../Views/MyStats/GlobalStats";
 
 
 /**
@@ -113,14 +114,18 @@ const	LoggedRouter = () =>
 				<Route
 					path="my-active-games"
 					element={<MyActiveGame />}
-          />
-         <Route
+				/>
+				<Route
 					path="/my-stats"
 					element={<MyStats />}
 				/>
 				<Route
 					path="/stats"
 					element={<Stats />}
+				/>
+				<Route
+					path="/global-stats"
+					element={<GlobalStats />}
 				/>
 				<Route
 					path="*"

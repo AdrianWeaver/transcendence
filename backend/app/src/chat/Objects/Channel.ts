@@ -93,7 +93,6 @@ class Channel
 				memberSocketId: "undefined",
 				profileId: profileId,
 			};
-			console.log("set client", profileId);
 			if (client !== null)
 				obj.memberSocketId = client.id;
 			if (this.members === 1)
@@ -124,12 +123,8 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
-		
-			// const	profId = this.chat?.getProfileIdFromSocketId(id);
 			for (const user of this.admins)
 			{
-				// if (id === user.memberSocketId)
-				// 	return (true);
 				if (id === user.profileId)
 					return (true);
 			}
