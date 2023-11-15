@@ -12,7 +12,7 @@ import {
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { getMyStats } from "../../Redux/store/controllerAction";
 
@@ -79,7 +79,7 @@ const	columns: GridColDef[] = [
 
 ];
 
-const	fakeRows: any = [];
+// const	fakeRows: any = [];
 
 const	HistoryTable = () =>
 {

@@ -7,9 +7,9 @@ import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import EditProfile from "./components/EditProfile";
-import { addUserAsFriend, setProfileEditView } from "../../Redux/store/controllerAction";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+// import EditProfile from "./components/EditProfile";
+// import { addUserAsFriend, setProfileEditView } from "../../Redux/store/controllerAction";
 
 const	ProfilePage = () =>
 {

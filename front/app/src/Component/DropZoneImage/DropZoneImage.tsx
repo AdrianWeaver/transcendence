@@ -14,7 +14,7 @@ import {
 	Slider,
 	Typography
 } from "@mui/material";
-import {DropzoneAreaBase, FileObject, readFile} from "mui-file-dropzone";
+import {DropzoneAreaBase, FileObject } from "mui-file-dropzone";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { UserModel } from "../../Redux/models/redux-models";
 import { useRef, useState } from "react";
@@ -30,22 +30,22 @@ type	MyAvatarCardProps = {
 
 const	MyAvatarCard = (props: MyAvatarCardProps) =>
 {
-	const	style = {
-		image: {
-			borderRadius: "50%"
-		}
-	};
+	// const	style = {
+	// 	image: {
+	// 		borderRadius: "50%"
+	// 	}
+	// };
 
 	const
 	[
 		isImageSquare,
 		setIsImageSquare
 	] = useState(false);
-	const
-	[
-		bestSize,
-		setBestSize
-	] = useState(80);
+	// const
+	// [
+	// 	bestSize,
+	// 	setBestSize
+	// ] = useState(80);
 
 	const	subHeader = props.userInfo.username + " - "
 		+ props.userInfo.firstName

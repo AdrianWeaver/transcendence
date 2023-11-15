@@ -4,7 +4,7 @@
 /* eslint-disable max-statements */
 import { AxiosRequestConfig } from "axios";
 import Api from "../store/Api";
-import { BackUserModel } from "../models/redux-models";
+// import { BackUserModel } from "../models/redux-models";
 
 const	UserServices = {
 	async	register(code: string, hostname: string)
@@ -79,7 +79,7 @@ const	UserServices = {
 			.post("/user/verify-token", {}, config)
 			.then((data) =>
 			{
-				// console.log(data);
+				console.log(data);
 				return ("OKay");
 			})
 			.catch(() =>
@@ -105,7 +105,7 @@ const	UserServices = {
 			.post("/user/revoke-token", {}, config)
 			.then((data) =>
 			{
-				// console.log(data);
+				console.log(data);
 				return ("OKay");
 			})
 			.catch((error) =>
@@ -245,7 +245,7 @@ const	UserServices = {
 			.post("/user/change-infos", data, config)
 			.then((data) =>
 			{
-				// console.log("ft-api-service register infos in backend ", data);
+				console.log("ft-api-service register infos in backend ", data);
 				return ("okay");
 			})
 			.catch((error) =>
@@ -332,7 +332,7 @@ const	UserServices = {
 			.post("user/add-friend", data, config)
 			.then((data) =>
 			{
-				// console.log(data);
+				console.log(data);
 				return ("OK");
 			})
 			.catch((error) =>

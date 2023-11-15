@@ -20,12 +20,13 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
-	hashPassword,
-	registerInfosInBack,
+	// hashPassword,
+	// registerInfosInBack,
 	setPassword,
-	setPseudo,
+	// setPseudo,
 	userRegistrationStepThree,
-	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
+	// userRegistrationStepTwo,
+} from "../../../Redux/store/controllerAction";
 import axios from "axios";
 
 type PasswordAlertProps ={

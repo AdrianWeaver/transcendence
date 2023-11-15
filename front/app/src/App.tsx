@@ -8,7 +8,7 @@ import MainRouter from "./Router/MainRouter";
 import ConnectionState from "./Component/ConnectionState";
 import { useAppDispatch } from "./Redux/hooks/redux-hooks";
 import { setServerLocation } from "./Redux/store/serverAction";
-import Configuration from "./Configuration";
+// import Configuration from "./Configuration";
 
 const	App = () =>
 {

@@ -12,20 +12,20 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { AnonymousUserModel, BackUserModel, CanvasModel, ChatUserModel, ControllerModel, GameEngineModel, ServerModel, UserModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
-import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
-import UserRegistration from "../../Object/UserRegistration";
-import { PersistPartial } from "redux-persist/es/persistReducer";
+// import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
+// import UserRegistration from "../../Object/UserRegistration";
+// import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
-type MessageModel =
-{
-	sender: string,
-	message: string,
-	mode: string,
-	username: string,
-}
+// type MessageModel =
+// {
+// 	sender: string,
+// 	message: string,
+// 	mode: string,
+// 	username: string,
+// }
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -562,11 +562,11 @@ export const setRegistrationProcessError = (message?: string)
 {
 	return ((dispatch, getState) =>
 	{
-		let errorMsg: string;
-		if (message)
-			errorMsg = message;
-		else
-			errorMsg = "error";
+		// let errorMsg: string;
+		// if (message)
+		// 	errorMsg = message;
+		// else
+		// 	errorMsg = "error";
 		const prev = getState();
 
 		const response: ControllerModel = {
@@ -1247,7 +1247,7 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((data) =>
+		.then((_data) =>
 		{
 			// console.log("okay", data);
 		})
@@ -1330,7 +1330,7 @@ export const	addUserAsFriend = (myId: string, friendId: string)
 		const	prev = getState();
 		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
 			friendId, prev.server.uri, myId)
-		.then((data) =>
+		.then((_data) =>
 		{
 			// console.log("okay", data);
 		})

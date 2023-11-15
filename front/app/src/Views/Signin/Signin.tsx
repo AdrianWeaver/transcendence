@@ -5,127 +5,127 @@
 import { useEffect, useState } from "react";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Alert, AlertTitle, Box, Button, Checkbox, FormControlLabel, Grid, List, ListItem, TextField } from "@mui/material";
+import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { decodePassword, setAllUsers, setProfileMyView, setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { decodePassword, setProfileMyView } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
-type PasswordAlertProps ={
-	password: string,
-	firstTrigger: boolean,
-	passwordConfirm?: string
-}
+// type PasswordAlertProps ={
+// 	password: string,
+// 	firstTrigger: boolean,
+// 	passwordConfirm?: string
+// }
 
-const	stringContainChar = (string: string, char: string) =>
-{
-	let	i;
+// const	stringContainChar = (string: string, char: string) =>
+// {
+// 	let	i;
 
-	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
-	while (i < string.length)
-	{
-		if (string.charAt(i) >= char.charAt(0)
-			&& string.charAt(i) <= char.charAt(char.length - 1))
-			return (true);
-		i++;
-	}
-	return (false);
-};
+// 	i = 0;
+// 	console.log("last Char = ", char.charAt(char.length - 1));
+// 	while (i < string.length)
+// 	{
+// 		if (string.charAt(i) >= char.charAt(0)
+// 			&& string.charAt(i) <= char.charAt(char.length - 1))
+// 			return (true);
+// 		i++;
+// 	}
+// 	return (false);
+// };
 
-const	stringContainCharOfString = (string: string, charset: string) =>
-{
-	let	i;
-	let	j;
+// const	stringContainCharOfString = (string: string, charset: string) =>
+// {
+// 	let	i;
+// 	let	j;
 
-	i = 0;
-	j = 0;
-	while (i < string.length)
-	{
-		while (j < charset.length)
-		{
-			if (string.charAt(i) === charset.charAt(j))
-				return (true);
-			j++;
-		}
-		j = 0;
-		i++;
-	}
-	return (false);
-};
+// 	i = 0;
+// 	j = 0;
+// 	while (i < string.length)
+// 	{
+// 		while (j < charset.length)
+// 		{
+// 			if (string.charAt(i) === charset.charAt(j))
+// 				return (true);
+// 			j++;
+// 		}
+// 		j = 0;
+// 		i++;
+// 	}
+// 	return (false);
+// };
 
-const	PasswordAlert = (props: PasswordAlertProps) =>
-{
-	const	message = [];
-	const	digit = "0-9";
-	const	uperCase = "A-Z";
-	const	lowerCase = "a-z";
-	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+// const	PasswordAlert = (props: PasswordAlertProps) =>
+// {
+// 	const	message = [];
+// 	const	digit = "0-9";
+// 	const	uperCase = "A-Z";
+// 	const	lowerCase = "a-z";
+// 	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-	if (props.password.length === 0 && props.firstTrigger === false)
-		return (<></>);
-	if (props.firstTrigger === false
-		&& props.passwordConfirm)
-		return (<></>);
-	if (props.passwordConfirm !== undefined )
-	{
-		console.log(props);
-		if (props.firstTrigger === false)
-			return (<></>);
-		if (props.password !== props.passwordConfirm)
-			return (
-				<Grid item xs={12}>
-					<Alert
-						severity="error"
-					>
-						Password mismatch
-					</Alert>
-				</Grid>
-			);
-		else
-			return (<></>);
-	}
-	if (props.password.length < 8)
-		message.push("minimum 8 character");
-	if (stringContainChar(props.password, digit) === false)
-		message.push("minimum 1 digit");
-	if (stringContainChar(props.password, uperCase) === false)
-		message.push("minimum 1 upercase");
-	if (stringContainChar(props.password, lowerCase) === false)
-		message.push("minimum 1 lowercase");
-	if (stringContainCharOfString(props.password, specialChar) === false)
-		message.push("minimum 1 special char : " + specialChar);
-	if (message.length === 0)
-		return (<></>);
-	return (
-		<Grid item xs={12}>
-			<Alert
-				severity="info"
-			>
-				<AlertTitle>You must have:</AlertTitle>
-				<List
-					sx={
-					{
-						m: 0,
-						fontSize: "0.7rem"
-					}}
-				>
-				{
-					message.map((msg) =>
-					{
-						return (
-							<ListItem key={msg}>
-								{msg}
-							</ListItem>
-						);
-					})
-				}
-				</List>
-			</Alert>
-		</Grid>
-	);
-};
+// 	if (props.password.length === 0 && props.firstTrigger === false)
+// 		return (<></>);
+// 	if (props.firstTrigger === false
+// 		&& props.passwordConfirm)
+// 		return (<></>);
+// 	if (props.passwordConfirm !== undefined )
+// 	{
+// 		console.log(props);
+// 		if (props.firstTrigger === false)
+// 			return (<></>);
+// 		if (props.password !== props.passwordConfirm)
+// 			return (
+// 				<Grid item xs={12}>
+// 					<Alert
+// 						severity="error"
+// 					>
+// 						Password mismatch
+// 					</Alert>
+// 				</Grid>
+// 			);
+// 		else
+// 			return (<></>);
+// 	}
+// 	if (props.password.length < 8)
+// 		message.push("minimum 8 character");
+// 	if (stringContainChar(props.password, digit) === false)
+// 		message.push("minimum 1 digit");
+// 	if (stringContainChar(props.password, uperCase) === false)
+// 		message.push("minimum 1 upercase");
+// 	if (stringContainChar(props.password, lowerCase) === false)
+// 		message.push("minimum 1 lowercase");
+// 	if (stringContainCharOfString(props.password, specialChar) === false)
+// 		message.push("minimum 1 special char : " + specialChar);
+// 	if (message.length === 0)
+// 		return (<></>);
+// 	return (
+// 		<Grid item xs={12}>
+// 			<Alert
+// 				severity="info"
+// 			>
+// 				<AlertTitle>You must have:</AlertTitle>
+// 				<List
+// 					sx={
+// 					{
+// 						m: 0,
+// 						fontSize: "0.7rem"
+// 					}}
+// 				>
+// 				{
+// 					message.map((msg) =>
+// 					{
+// 						return (
+// 							<ListItem key={msg}>
+// 								{msg}
+// 							</ListItem>
+// 						);
+// 					})
+// 				}
+// 				</List>
+// 			</Alert>
+// 		</Grid>
+// 	);
+// };
 
 
 const	Signin = () =>
@@ -138,10 +138,10 @@ const	Signin = () =>
 	{
 		return (state.controller.user);
 	});
-	const	users = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.users);
-	});
+	// const	users = useAppSelector((state) =>
+	// {
+	// 	return (state.controller.user.chat.users);
+	// });
 	const	allUsers = useAppSelector((state) =>
 	{
 		return (state.controller.allUsers);

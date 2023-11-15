@@ -2,14 +2,14 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
-import { Component, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import EditProfile from "./components/EditProfile";
 import UpdateMyProfilePicture from "../../Component/DropZoneImage/UpdateMyProfilePicture";
 

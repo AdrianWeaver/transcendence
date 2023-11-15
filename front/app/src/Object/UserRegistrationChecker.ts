@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import { Public } from "@mui/icons-material";
+// import { Public } from "@mui/icons-material";
 import UserRegistration from "./UserRegistration";
 /* eslint-disable max-statements */
 

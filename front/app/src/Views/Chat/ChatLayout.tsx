@@ -63,10 +63,10 @@ import {
 	setProfilePublicView,
 	setPreviousPage
 }	from "../../Redux/store/controllerAction";
-import { PropaneSharp } from "@mui/icons-material";
-import { ChatUserModel } from "../../Redux/models/redux-models";
-import MyProfile from "../MyProfile/MyProfile";
-import { render } from "react-dom";
+// import { PropaneSharp } from "@mui/icons-material";
+// import { ChatUserModel } from "../../Redux/models/redux-models";
+// import MyProfile from "../MyProfile/MyProfile";
+// import { render } from "react-dom";
 import { useNavigate } from "react-router-dom";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
@@ -265,10 +265,10 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.users);
 	});
-	const	numberOfChannels = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.numberOfChannels);
-	});
+	// const	numberOfChannels = useAppSelector((state) =>
+	// {
+	// 	return (state.controller.user.chat.numberOfChannels);
+	// });
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
@@ -584,7 +584,6 @@ const	ChatLayout = () =>
 				console.log("create chat user front ", data.payload);
 				if (data.payload.newChatUser === undefined)
 					return ;
-				console.log("ADD CHAT USER FRONT");
 				dispatch(addChatUser(data.payload.newChatUser));
 				dispatch(connectChatUser(data.payload.newChatUser, data.payload.online));
 				console.log("connecteed", user.chat.connectedUsers);
@@ -593,7 +592,6 @@ const	ChatLayout = () =>
 		};
 		const connect = () =>
 		{
-			console.log("CONNECT ?");
 			setConnected(true);
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
@@ -784,8 +782,6 @@ const	ChatLayout = () =>
 			}
 			if (data.type === "display-members")
 			{
-				console.log("DISPLAY MEMBERS", data.payload, );
-				console.log("HERE", data.payload.memberList);
 				setChannelMembers(data.payload.memberList);
 				setIsChannelAdmin(data.payload.isAdmin);
 				setUniqueId(data.payload.uniqueId);
@@ -832,7 +828,6 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					console.log("userInfo FRIENDS LIST", friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
 					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
@@ -959,10 +954,10 @@ const	ChatLayout = () =>
 		setValue(newValue);
 	};
 
-	const handleChangeIndex = (index: number) =>
-	{
-		setValue(index);
-	};
+	// const handleChangeIndex = (index: number) =>
+	// {
+	// 	setValue(index);
+	// };
 
 	const refreshListUser = () =>
 	{
@@ -987,11 +982,11 @@ const	ChatLayout = () =>
 		}
 	});
 
-	const customButtonStyle = {
-		// padding: "4px 8px",
-		fontSize: "12px",
-		margin: "0 8px",
-	};
+	// const customButtonStyle = {
+	// 	// padding: "4px 8px",
+	// 	fontSize: "12px",
+	// 	margin: "0 8px",
+	// };
 
 	const listItemStyle = {
 		display: "flex",
@@ -1141,7 +1136,7 @@ const	ChatLayout = () =>
 		handleDialogClose();
 	};
 
-	const handleLeaveButtonClick = (chanId: number, chanName: string) =>
+	const handleLeaveButtonClick = (_chanId: number, chanName: string) =>
 	{
 		leaveChannel(chanName);
 		handleDialogClose();
@@ -1149,7 +1144,6 @@ const	ChatLayout = () =>
 
 	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
 	{
-		console.log("HANDLE REMOVE BUTTON CLICK ", chanId, " ", chanName);
 		removeChannel(chanId, chanName);
 		handleDialogClose();
 	};
@@ -1164,7 +1158,6 @@ const	ChatLayout = () =>
 
 	const handleMembersClickOpen = (chanName: string) =>
 	{
-		console.log("HANDLE MEMBER CLICK OPEN");
 		console.log(chanName);
 		setMembersOpen(true);
 		const	action = {
@@ -1211,8 +1204,6 @@ const	ChatLayout = () =>
 
 	const	addUserToFriends = (userName: string) =>
 	{
-		console.log("I START ADDING A FRIEND", userName);
-
 		const	action = {
 			type: "add-friend",
 			payload: {
@@ -1291,7 +1282,6 @@ const	ChatLayout = () =>
 		// }
 		// else
 		// {
-		console.log("profileID Ok: ", profileId);
 		const	action = {
 			type: "invite-member",
 			payload: {
@@ -1299,7 +1289,6 @@ const	ChatLayout = () =>
 				userName: profileId,
 			}
 		};
-		console.log("Action : invite", action);
 		socketRef.current.emit("user-info", action);
 		// }
 	};

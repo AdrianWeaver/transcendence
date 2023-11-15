@@ -63,11 +63,11 @@ const	getText = (props: MyAvatarCardProps) =>
 
 const	MyAvatarCard = (props: MyAvatarCardProps) =>
 {
-	const	style = {
-		image: {
-			borderRadius: "50%"
-		}
-	};
+	// const	style = {
+	// 	image: {
+	// 		borderRadius: "50%"
+	// 	}
+	// };
 	const	data = getText(props);
 
 	return (
