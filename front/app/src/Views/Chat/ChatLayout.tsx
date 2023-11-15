@@ -1483,7 +1483,6 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
-													console.log("CHANNEL NAME: ", channel.name);
 													setClickedChannel(channel.name);
 													handleDialogOpen(false);
 													setButtonSelection(channel.name);
@@ -1497,13 +1496,13 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(buttonSelection.mode, buttonSelection.name);
+															return handleJoinButtonClick(buttonSelection.mode, clickedChannel);
 														}}>
 															Join
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleLeaveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleLeaveButtonClick(buttonSelection.id, clickedChannel);
 														}}>
 															Leave
 														</Button>
@@ -1515,7 +1514,7 @@ const	ChatLayout = () =>
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															return handleMembersClickOpen(clickedChannel);
 														}}>
 															Members
 														</Button>
