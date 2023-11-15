@@ -1687,3 +1687,36 @@ export const	getStats = (userProfileId: string)
 			dispatch(controllerActions.setStats(prev.controller));
 	})
 }
+
+export const	getAllStats = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await ServerService.getAllStats(token, uri);
+		if (data.success)
+		{
+			if (data.data.length)
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: data.data
+				}
+				dispatch(controllerActions.setStats(response));
+			}
+			else
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: []
+				}
+				dispatch(controllerActions.setStats(response));
+			}
+		}
+		else
+			dispatch(controllerActions.setStats(prev.controller));
+	})
+}

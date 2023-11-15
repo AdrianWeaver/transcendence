@@ -855,7 +855,6 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getStats(@Body() body: any)
 	{
-		// return (["toto"]);
 		console.log("Body", body);
 		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
@@ -864,7 +863,6 @@ export class UserController
 				|| record.playerTwoProfileId?.toString() === body.userProfileId
 			);
 		});
-		console.log("here We go", userStats);
 		const	array: ResponseRow[] = [];
 
 		userStats.map((stat: MatchHistoryModel, index: number) =>
@@ -907,6 +905,44 @@ export class UserController
 			}
 			elem.myAvatar = body.userAvatar;
 			array.push(elem);
+		});
+		return (array);
+	}
+
+	@Post("/global-stats")
+	@UseGuards(UserAuthorizationGuard)
+	getAllStats(@Body() body: any)
+	{
+		const	userStats = this.gameService.matchHistory;
+		const	array: ResponseRow[] = [];
+		const	users = this.userService.getAllUserRaw();
+		userStats.map((stat: MatchHistoryModel, index: number) =>
+		{
+			const	searchPlayerOne = users.find((elem) =>
+			{
+				return (elem.id.toString() === stat.playerOneProfileId?.toString());
+			});
+			const	searchPlayerTwo = users.find((elem) =>
+			{
+				return (elem.id.toString() === stat.playerTwoProfileId?.toString());
+			});
+			if (searchPlayerOne !== undefined && searchPlayerTwo !== undefined)
+			{
+				const	frameCount = stat.frameCount as number;
+				const	frameRate = stat.frameRate as number;
+				const	elem: ResponseRow = {
+					id: index,
+					date: stat.date,
+					gameMode: stat.gameMode,
+					adversaire: stat.playerTwoProfileId as string,
+					advScore: stat.scorePlayerTwo.toString(),
+					elapsedTime: (frameCount / frameRate) + " secondes",
+					myScore: stat.playerOneProfileId as string,
+					adversaireAvatar: searchPlayerTwo.avatar,
+					myAvatar: searchPlayerOne.avatar
+				};
+				array.push(elem);
+			}
 		});
 		return (array);
 	}

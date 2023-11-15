@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 import { AxiosRequestConfig } from "axios";
@@ -280,11 +281,47 @@ const	ServerService = {
 		};
 		const	data = {
 			userProfileId: userProfileId,
-			userAvatar: userAvatar
+			userAvatar: userAvatar,
 		};
 		return (
 			Api(serverLocation)
 				.post("/user/stats", data, config)
+				.then((res) =>
+				{
+					return (res.data);
+				})
+				.then((data) =>
+				{
+					console.log("DATA", data.data);
+					return (
+						{
+							success: true,
+							data: data
+						}
+					);
+				})
+				.catch((error) =>
+				{
+					console.log(error);
+					return ({
+						success: false,
+						data: undefined
+					});
+				})
+		);
+	},
+	async	getAllStats(token: string, serverLocation: string)
+	{
+		const	config:AxiosRequestConfig = {
+			headers:
+			{
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			}
+		};
+		return (
+			Api(serverLocation)
+				.post("/user/global-stats", {}, config)
 				.then((res) =>
 				{
 					return (res.data);
