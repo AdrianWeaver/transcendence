@@ -90,20 +90,37 @@ export class GameSocketEvents
 			{
 				const	actualFace = instance.face;
 				const	switchRate = 5;
-				if (instance.paddleCount % switchRate === 0)
+
+				if (instance.paddleCount === 0)
+					return ;
+				if (instance.paddleCount % switchRate === 0 && instance.triggeredPaddleCount !== instance.paddleCount)
 				{
-					switch(actualFace)
+					if (instance.face === "up" && instance.faceDirection === "up")
 					{
-						case "up":
-							instance.face = "down";
-							break ;
-						case "down":
-							instance.face = "up";
-							break; 
-						default: 
-							break; 
+						instance.faceDirection = "down";
+						instance.triggeredPaddleCount = instance.paddleCount;
+					}
+					if (instance.face === "down" && instance.faceDirection === "down")
+					{
+						instance.faceDirection = "up";
+						instance.triggeredPaddleCount = instance.paddleCount;
 					}
 				}
+				if (instance.face === "up" && instance.faceDirection === "down")
+				{
+					if (instance.faceRotation !== 180)
+						instance.faceRotation += 3;
+					else
+						instance.face = "down";
+				}
+				if(instance.face === "down" && instance.faceDirection === "up")
+				{
+					if (instance.faceRotation !== 0)
+						instance.faceRotation -= 3;
+					else
+						instance.face = "up";
+				}
+				
 			}
 		};
 
@@ -168,7 +185,7 @@ export class GameSocketEvents
 					},
 					plOneScore: instance.playerOne.score,
 					plTwoScore: instance.playerTwo.score,
-					whichFace: gameFace,
+					whichFace: instance.faceRotation,
 				}
 			};
 			this.server.to(instance.roomName).emit("game-event", action);
