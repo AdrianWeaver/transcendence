@@ -15,7 +15,7 @@ import	{ settings, settingsLinks } from "./config/SettingsItem";
 import strToPascalCase from "./extras/strToPascalCase";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import MyAvatar from "../../Views/MyProfile/components/MyAvatar";
+// import MyAvatar from "../../Views/MyProfile/components/MyAvatar";
 import { setCurrentProfile } from "../../Redux/store/controllerAction";
 
 

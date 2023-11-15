@@ -2,7 +2,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
 import { verifyTokenAtRefresh } from "../../Redux/store/controllerAction";
 import { Backdrop, Alert, Typography } from "@mui/material";
 

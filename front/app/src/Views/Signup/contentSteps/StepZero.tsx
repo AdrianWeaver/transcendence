@@ -20,9 +20,9 @@ import { useLocation } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setFt, setRegistrationProcessStart, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
-import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
-import { setAuthApiLinks } from "../../../Redux/store/serverAction";
+import { registerClientWithCode, setFt, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+// import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
+// import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
 
 const	getText = () =>
@@ -99,10 +99,10 @@ const	locationIsARedirectedPage = (pathname: string) =>
 const	StepZero = () =>
 {
 	const	query = useLocation();
-	const	urlFt = useAppSelector((state) =>
-	{
-		return (state.server.links.authApiUrl);
-	});
+	// const	urlFt = useAppSelector((state) =>
+	// {
+	// 	return (state.server.links.authApiUrl);
+	// });
 	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();

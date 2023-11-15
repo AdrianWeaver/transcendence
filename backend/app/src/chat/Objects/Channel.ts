@@ -126,13 +126,10 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
-			console.log("PROFILE ID: " + id);
-			console.log("NUM OF ADMINS: " + this.admins.length);
 			// let isAdmin: boolean;
 			// const	profId = this.chat?.getProfileIdFromSocketId(id);
 			const	index = this.admins.findIndex((elem) =>
 			{
-				console.log("ADM ID: " + elem.profileId);
 				return (elem.profileId === id);
 			});
 			if (index !== -1)

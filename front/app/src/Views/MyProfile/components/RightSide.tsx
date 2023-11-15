@@ -2,15 +2,15 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
-import { Info } from "@mui/icons-material";
+// import { Info } from "@mui/icons-material";
 import { Button, Grid, Typography } from "@mui/material";
-import { useState } from "react";
+// import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { setProfileEditView, setProfileFriendView, setProfilePublicView } from "../../../Redux/store/controllerAction";
-import EditProfile from "./EditProfile";
+import { setProfileEditView } from "../../../Redux/store/controllerAction";
+// import EditProfile from "./EditProfile";
 // import Stats from "./Stats";
 import { useNavigate } from "react-router-dom";
-import { blue } from "@mui/material/colors";
+// import { blue } from "@mui/material/colors";
 import { ChatUserModel } from "../../../Redux/models/redux-models";
 
 type	RightSideProps =

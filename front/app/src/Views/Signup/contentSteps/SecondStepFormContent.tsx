@@ -2,10 +2,10 @@
 /* eslint-disable curly */
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
-import { Box, Button, FormControlLabel, Grid, Link, Switch, TextField } from "@mui/material";
-import UserRegistration from "../../../Object/UserRegistration";
+import { Box, Button, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
+// import UserRegistration from "../../../Object/UserRegistration";
 import React, { useState } from "react";
-import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
+// import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch,
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
@@ -23,10 +23,10 @@ import {
 	setRegistered,
 	setStatus,
 	setUserLoggedIn } from "../../../Redux/store/controllerAction";
-import UserSecurity from "../../../Object/UserSecurity";
-import UserSecurityChecker from "../../../Object/UserSecurityChecker";
-import axios from "axios";
-import { PhoneInput } from "react-international-phone";
+// import UserSecurity from "../../../Object/UserSecurity";
+// import UserSecurityChecker from "../../../Object/UserSecurityChecker";
+// import axios from "axios";
+// import { PhoneInput } from "react-international-phone";
 
 import MuiPhone from "../component/MuiPhone";
 import { useNavigate } from "react-router-dom";
@@ -43,10 +43,10 @@ const	SecondStepFormContent = () =>
 		return (state.controller.user);
 	});
 	const	navigate = useNavigate();
-	const	[
-		errorValidation,
-		setErrorValidation
-	] = useState(new UserSecurityChecker());
+	// const	[
+	// 	errorValidation,
+	// 	setErrorValidation
+	// ] = useState(new UserSecurityChecker());
 
 	const	[
 		required,
@@ -59,11 +59,11 @@ const	SecondStepFormContent = () =>
 		setDisplayInput
 	] = useState(false);
 
-	const
-	[
-		codeValid,
-		setCodeValid
-	] = useState(false);
+	// const
+	// [
+	// 	codeValid,
+	// 	setCodeValid
+	// ] = useState(false);
 
 	const
 	[
@@ -83,11 +83,11 @@ const	SecondStepFormContent = () =>
 		setTwoAuthCode
 	] = useState("");
 
-	const
-	[
-		phoneInput,
-		setPhoneInput
-	] = useState("");
+	// const
+	// [
+	// 	phoneInput,
+	// 	setPhoneInput
+	// ] = useState("");
 
 	const
 	[
@@ -189,10 +189,10 @@ const	SecondStepFormContent = () =>
 
 		const handleSendCode = () =>
 		{
-			console.log("the value of phone " + user.phoneNumber);
+			// console.log("the value of phone " + user.phoneNumber);
 			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
-			console.log("code : ", twoAuthCode);
-			console.log("valid ", user.codeValidated);
+			// console.log("code : ", twoAuthCode);
+			// console.log("valid ", user.codeValidated);
 			if (twoAuthCode.length)
 			{
 				setSendCode(true);

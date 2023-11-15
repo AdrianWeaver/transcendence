@@ -3,9 +3,9 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable eqeqeq */
-import { Avatar, Typography } from "@mui/material";
+import { Avatar } from "@mui/material";
 import { useState } from "react";
-import { render } from "react-dom";
+// import { render } from "react-dom";
 
 
 type	MyAvatarProps =
@@ -43,9 +43,9 @@ const	MyAvatar = (props: MyAvatarProps) =>
 
 				setDefaultImage(false);
 		})
-    .catch((err) =>
+    .catch((_err) =>
 	{
-      setDefaultImage(true);
+    	setDefaultImage(true);
     });
   };
   renderImage();

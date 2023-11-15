@@ -22,9 +22,10 @@ import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks
 import {
 	setPassword,
 	userRegistrationStepThree,
-	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
+	// userRegistrationStepTwo,
+} from "../../../Redux/store/controllerAction";
 import axios from "axios";
-import { useWillChange } from "framer-motion";
+// import { useWillChange } from "framer-motion";
 
 // type PasswordAlertProps ={
 // 	password: string,
@@ -316,10 +317,10 @@ const	FirstStepFormContentNoData = () =>
 		setPasswordValue
 	] = useState("");
 
-	const	[
-		usernameValue,
-		setUsernameValue
-	] = useState("");
+	// const	[
+	// 	usernameValue,
+	// 	setUsernameValue
+	// ] = useState("");
 
 	const	[
 		uniquePassword,
@@ -352,13 +353,13 @@ const	FirstStepFormContentNoData = () =>
 		setPasswordFirstTrigger(true);
 	};
 
-	const	handleUsernameChangeValue = (
-		event: React.ChangeEvent<HTMLInputElement>
-	) =>
-	{
-		event.preventDefault();
-		setUsernameValue(event.target.value);
-	};
+	// const	handleUsernameChangeValue = (
+	// 	event: React.ChangeEvent<HTMLInputElement>
+	// ) =>
+	// {
+	// 	event.preventDefault();
+	// 	setUsernameValue(event.target.value);
+	// };
 
 	const	[
 		passwordConfirmValue,

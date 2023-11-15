@@ -34,20 +34,20 @@ import {
 } from "../../Redux/store/gameEngineAction";
 import { useLocation } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
-import {
-	Backdrop,
-	Alert,
-	Typography,
-	Card,
-	Box,
-	CardContent,
-	IconButton
-} from "@mui/material";
-import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import CardMedia from "@mui/material/CardMedia";
-import pong from "./assets/pong.jpeg";
-import WaitingActive from "./Component/WaitingActive";
+// import {
+// 	Backdrop,
+// 	Alert,
+// 	Typography,
+// 	Card,
+// 	Box,
+// 	CardContent,
+// 	IconButton
+// } from "@mui/material";
+// import { useTheme } from "@emotion/react";
+// import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+// import CardMedia from "@mui/material/CardMedia";
+// import pong from "./assets/pong.jpeg";
+// import WaitingActive from "./Component/WaitingActive";
 type	ActionSocket = {
 	type: string,
 	payload?: any

@@ -136,7 +136,6 @@ export class ChatSocketEvents
 						newUser.setId(client.id);
 						newUser.status = user.status;
 						newUser.online = user.online;
-						console.log(" handle connection add New user back: ", user);
 						this.chatService.pushUser(newUser, client.id);
 					}
 					else
@@ -187,7 +186,6 @@ export class ChatSocketEvents
 				{
 					friendsArr.push(friend.name);
 				});
-				console.log("FRIEND ARRAY INIT CHANNELS", friendsArr);
 				const	action = {
 					type: "init-channels",
 					payload: {
@@ -265,7 +263,6 @@ export class ChatSocketEvents
 		{
 			if (data.type === "get-user-list")
 			{
-				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				const copyUsers = this.chatService.getAllUsers();
 
 				const	me = this.chatService.getUserBySocketId(client.id);
@@ -274,7 +271,6 @@ export class ChatSocketEvents
 				const regularUsers = this.userService.getAllUserRaw();
 				if (regularUsers === undefined)
 					return ;
-				console.log("les users ?", copyUsers, " ", regularUsers);
 				const	searchUser = copyUsers.findIndex((elem) =>
 				{
 					return (client.id === elem.id);
@@ -287,12 +283,10 @@ export class ChatSocketEvents
 				{
 					friendsList.push(elem.name);
 				});
-				// console.log("friendsList here", friendsList);
 				copyUsers.forEach((elem) =>
 				{
 					newArray.map((element) =>
 					{
-						console.log(typeof elem.profileId, " ", typeof element.id, " ", elem.profileId === element.id.toString(), " ", elem.name, " ", element.username, " ", elem.name !== element.username)
 						if (elem.profileId === element.id && elem.name !== element.username)
 							elem.name = element.username;
 						if (elem.name === element.username)
@@ -302,7 +296,6 @@ export class ChatSocketEvents
 						}
 					});
 				});
-				console.log("ICI", copyUsers);
 				const action = {
 					type: "sending-list-user",
 					payload:
@@ -820,7 +813,6 @@ export class ChatSocketEvents
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
-								console.log("talking yser ???", talkingUser);
 								const	searchFriend = searchUser.friends.find((elem) =>
 								{
 									return (elem.name === userName);
@@ -866,12 +858,9 @@ export class ChatSocketEvents
 				this.logger.debug("add friend requested");
 				const	friendUser = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
 				const	userMe = this.chatService.getUserBySocketId(client.id);
-				console.log("Me ", userMe);
-				console.log("Friend", friendUser);
 
 				if (userMe === undefined || friendUser === undefined)
 					return ;
-				console.log("ADD FRIEND USERME AND FRIENDUSER OK");
 				let message: string;
 				message = "";
 				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
@@ -880,11 +869,9 @@ export class ChatSocketEvents
 				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
 				if (state === "ERROR")
 					return ;
-					console.log("ADD FRIEND Add to my friend OK");
 				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
 				if (state === "ERROR")
 					return ;
-				console.log("ADD FRIEND add me to friends OK");
 				if (state === "ALREADY_FRIENDS")
 					message = friendUser.name + " is already your friend";
 				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
@@ -933,14 +920,10 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				console.log("payload block user", data.payload);
 				const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
 				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
 				if (userToBlock === undefined)
 					return ;
-				// const profId = this.chatService.getProfileIdFromSocketId(data.payload.blockedName);
-				// if (profId === "undefined")
-				// 	return ;
 				const blockedToAdd: MemberSocketIdModel = {
 					memberSocketId: searchSocket === undefined ? userToBlock.id : data.payload.blockedName,
 					profileId: data.payload.friendProfileId,
@@ -1055,7 +1038,6 @@ export class ChatSocketEvents
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
 				}
-				console.log("invite-member OK", targetClient.id);
 				this.chatService.updateDatabase();
 			}
 

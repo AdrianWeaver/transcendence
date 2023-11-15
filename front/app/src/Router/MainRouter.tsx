@@ -4,9 +4,9 @@ import LoggedRouter from "./LoggedRouter";
 import RegistrationRouter from "./RegistrationRouter";
 import VisitorRouter from "./VisitorRouter";
 
-import { useAppDispatch, useAppSelector } from "../Redux/hooks/redux-hooks";
-import Configuration from "../Configuration";
-import { setUri } from "../Redux/store/serverAction";
+import { useAppSelector } from "../Redux/hooks/redux-hooks";
+// import Configuration from "../Configuration";
+// import { setUri } from "../Redux/store/serverAction";
 
 const	MainRouter: React.FC = () =>
 {
@@ -14,7 +14,7 @@ const	MainRouter: React.FC = () =>
 	{
 		return (state.controller);
 	});
-	const	dispatch = useAppDispatch();
+	// const	dispatch = useAppDispatch();
 	// const	config = new Configuration();
 
 	// dispatch(setUri(config.getURI()));

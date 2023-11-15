@@ -35,10 +35,6 @@ export	class UserAuthorizationGuard implements CanActivate
 			return ({validTokenSignature: false});
 		const	bearer = token.split("Bearer ");
 		let		response: UserAuthorizationGuardSignatureModel;
-		console.log("here ? popopo");
-		// Must be length === 2
-		// console.log("Bearer splitting length : ", bearer.length);
-		// Put Logger here
 		if (bearer.length !== 2)
 			return ({validTokenSignature: false});
 		try
@@ -53,7 +49,6 @@ export	class UserAuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			console.log("here 0?", response);
 			if (response.exp && response.exp * 1000 < Date.now())
 			{
 				this.service.revokeUserTokenExpById(response.id);
@@ -89,7 +84,6 @@ export	class UserAuthorizationGuard implements CanActivate
 		tok: UserAuthorizationGuardSignatureModel)
 		: boolean
 	{
-		console.log("tok", tok);
 		if (!tok.validTokenSignature
 			|| !tok.id
 			|| !tok.email
@@ -106,7 +100,6 @@ export	class UserAuthorizationGuard implements CanActivate
 	)
 		: boolean
 	{
-		console.log("tok ", tok.token, " ", user.authService.token, " === ", user.authService.token === tok.token);
 		if (user.authService.token !== tok.token)
 			return (false);
 		return (true);
@@ -131,7 +124,6 @@ export	class UserAuthorizationGuard implements CanActivate
 
 		const isValid = this.checkTokenPayloadAuthenticity(user, token);
 		request.user = user;
-		console.log("FLAG USER", user);
 		return (isValid);
 	}
 }
