@@ -22,15 +22,11 @@ const getGameMode = (pQuery: object) =>
 		return (gameMode);
 	buffer = buffer[1];
 	const	params = buffer.split("&");
-	console.log("gameMode: (buffer)", buffer);
-	console.log("gameMode: (params)", params);
 	for (const param of params)
 	{
 		const	splitParam = param.split("=");
 		const	key = splitParam[0];
 		const	value = splitParam[1];
-		console.log("gameMode: (key)", key);
-		console.log("gameMode: (Value)", value);
 		if (key === "mode")
 		{
 			switch (value)
@@ -47,7 +43,6 @@ const getGameMode = (pQuery: object) =>
 		}
 		else if (key === "friendId")
 		{
-			console.log("Flag: GameMode ", value);
 			if (value && value.length !== 0)
 				gameMode.friendId = value;
 			else
@@ -58,7 +53,6 @@ const getGameMode = (pQuery: object) =>
 		}
 		else
 		{
-			console.error("gameMode: (Key unwanted)", value);
 			gameMode.mode = "classical";
 			gameMode.friendId = undefined;
 		}
@@ -79,7 +73,6 @@ const getGameMode = (pQuery: object) =>
 	// else
 	// 	mode = "classical";
 	// return (mode);
-	console.log("gameMode: ", gameMode);
 	return (gameMode);
 };
 
