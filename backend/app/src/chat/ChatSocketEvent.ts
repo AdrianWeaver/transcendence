@@ -30,7 +30,7 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-import { instrument } from "@socket.io/admin-ui";
+// import { instrument } from "@socket.io/admin-ui";
 
 import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 
@@ -96,11 +96,11 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			instrument(this.server,
-				{
-					auth: false,
-					mode: "development"
-				});
+			// instrument(this.server,
+			// 	{
+			// 		auth: false,
+			// 		mode: "development"
+			// 	});
 		}
 
 		handleConnection(client: Socket)
@@ -318,6 +318,7 @@ export class ChatSocketEvents
 			if (data.type === "sent-message")
 			{
 				let	channel, kind;
+				let	friendProfileId;
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
@@ -327,6 +328,12 @@ export class ChatSocketEvents
 						return ;
 					else
 						kind = "privateMessage";
+					
+					channel.users.map((elem) =>
+					{
+						if (elem.profileId !== profileId)
+							friendProfileId = elem.profileId;
+					});
 				}
 				else
 					kind = "channel";
