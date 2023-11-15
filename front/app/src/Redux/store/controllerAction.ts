@@ -201,9 +201,9 @@ export const	reinitialiseUser = (logout: boolean)
 			return ;
 		if (logout)
 		{
-			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
+			await UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
 			dispatch(logOffUser());
-			dispatch(resetRegistration);
+			dispatch(resetRegistration());
 		}
 		dispatch(controllerActions.reinitialiseUser());
 	});

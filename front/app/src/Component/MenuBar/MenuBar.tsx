@@ -11,9 +11,6 @@ import	LargeMenu from "./LargeMenu";
 
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import LoginSignupButton from "./LoginSignupButton";
-// import { useDispatch } from "react-redux";
-// import { setCurrentProfile } from "../../Redux/store/controllerAction";
-
 
 const	MenuBar = () =>
 {
