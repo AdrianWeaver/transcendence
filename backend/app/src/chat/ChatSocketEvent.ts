@@ -514,6 +514,7 @@ export class ChatSocketEvents
 				else
 				{
 					console.log("I GOT HERE");
+					console.log("CHANNEL NAME: " + data.payload.name);
 					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
 					{
@@ -760,7 +761,6 @@ export class ChatSocketEvents
 
 			if (data.type === "member-list")
 			{
-				console.log("MEMBER-LIST");
 				let channel;
 				let	conv: boolean, isFriend;
 				let	talkingUser: string;
@@ -774,14 +774,11 @@ export class ChatSocketEvents
 				const	searchUser = this.chatService.getUserWithProfileId(profId);
 				if (searchUser === undefined)
 					return ;
-				console.log("searchUSER OK");
-				console.log("chanNAme", data.payload.chanName);
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
 					if (channel === undefined)
 						return ;
-					console.log("SEARCH CONV OK");
 					conv = true;
 				}
 				const	isAdmin = channel.isAdmin(profId);
@@ -792,18 +789,13 @@ export class ChatSocketEvents
 				{
 					for(const user of testChatUsers)
 					{
-						console.log("user conv priv", user);
-						console.log("user ", user.profileId);
-						console.log("profID ok", profId);
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
-							console.log("user not undefined", user.profileId);
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 							if (user.profileId !== profId && conv)
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
-								console.log("talking yser ???", talkingUser);
 								const	searchFriend = searchUser.friends.find((elem) =>
 								{
 									return (elem.name === userName);
@@ -826,11 +818,8 @@ export class ChatSocketEvents
 				{
 					for(const user of channel.users)
 					{
-						console.log("user ", user.profileId);
-						console.log("profID ok", profId);
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
-							console.log("user not undefined", user.profileId);
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 							if (user.profileId !== profId && conv)
 							{

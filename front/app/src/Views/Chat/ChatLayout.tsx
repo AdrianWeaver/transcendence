@@ -1149,7 +1149,7 @@ const	ChatLayout = () =>
 
 	const handleRemoveButtonClick = (chanId: number, chanName: string) =>
 	{
-		console.log("HANDLE REMOVE BUTTON CLICK ", chanId, " ", chanName);
+		console.log("CHANNAME: " + chanName);
 		removeChannel(chanId, chanName);
 		handleDialogClose();
 	};
@@ -1511,7 +1511,7 @@ const	ChatLayout = () =>
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleRemoveButtonClick(buttonSelection.id, clickedChannel);
 														}}>
 															Remove
 														</Button>

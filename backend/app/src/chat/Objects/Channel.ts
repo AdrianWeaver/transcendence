@@ -89,19 +89,21 @@ class Channel
 		};
 		this.setClient = (client: Socket | null, profileId: string) =>
 		{
+			let	memberSocketId: string;
+			if (client !== null)
+				memberSocketId = client.id;
+			else
+				memberSocketId = "undefined";
 			const obj: MemberSocketIdModel = {
-				memberSocketId: "undefined",
+				memberSocketId: memberSocketId,
 				profileId: profileId,
 			};
-			console.log("set client", profileId);
-			if (client !== null)
-				obj.memberSocketId = client.id;
 			if (this.members === 1)
 			{
-				this.admins.push(obj);
 				this.owner = obj;
 				this.setId();
 			}
+			this.admins.push(obj);
 			this.users.push(obj);
 			if (client !== null)
 			{
@@ -124,15 +126,25 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
-		
+			console.log("PROFILE ID: " + id);
+			console.log("NUM OF ADMINS: " + this.admins.length);
+			// let isAdmin: boolean;
 			// const	profId = this.chat?.getProfileIdFromSocketId(id);
-			for (const user of this.admins)
+			const	index = this.admins.findIndex((elem) =>
 			{
-				// if (id === user.memberSocketId)
-				// 	return (true);
-				if (id === user.profileId)
-					return (true);
-			}
+				console.log("ADM ID: " + elem.profileId);
+				return (elem.profileId === id);
+			});
+			if (index !== -1)
+				return (true);
+			// for (const user of this.admins)
+			// {
+			// 	// if (id === user.memberSocketId)
+			// 	// 	return (true);
+			// 	if (id === user.profileId)
+
+			// 		isAdmin = true;
+			// }
 			return (false);
 		};
 
