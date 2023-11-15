@@ -376,7 +376,7 @@ const	UserServices = {
 			},
 		};
 		const	data = {
-			changeIp: changeIp
+			changeIp: changeIp,
 		};
 		return (
 			Api(hostname)

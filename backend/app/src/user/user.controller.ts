@@ -31,6 +31,7 @@ import Configuration from "src/Configuration";
 import Chat from "src/chat/Objects/Chat";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+import { RealIP } from "nestjs-real-ip";
 
 type	ResponseRow = {
 	id: number;
@@ -184,9 +185,14 @@ export class UserController
 
 	@Post("register")
 	getUserRegister(
+		@RealIP() realIp: string,
+		@Req() req: Request,
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
+		const	ip = "real ip";
+		console.log(realIp);
+		console.log(req.headers);
 		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
@@ -950,12 +956,15 @@ export class UserController
 	@Post("/get-ip")
 	@UseGuards(UserAuthorizationGuard)
 	getUserIp(
-		@Req() req: any,
+		@Req() req: Request,
 		@Ip() ip: any,
-		@Body() body: any)
+		@Body() body: any) : { userAgent: string, ip: string }
 	{
 		console.log(ip);
-		const	res = this.userService.registerIpAddress(req.user.id, ip, body.changeIp);
+		console.log("req.ip", req.ip, "req.userAgent:", req.headers["user-agent"]);
+		// const	ip = req.ip;
+		const userAgent = req.headers["user-agent"];
+		const	res = this.userService.registerIpAddress(body.id, ip, body.changeIp);
 		console.log("res", res);
 		return (res);
 	}

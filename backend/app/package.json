@@ -41,6 +41,7 @@
     "http-terminator": "^3.2.0",
     "jsonwebtoken": "^9.0.1",
     "nestjs-graceful-shutdown": "^1.0.0",
+    "nestjs-real-ip": "^3.0.1",
     "react-international-phone": "^3.1.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",

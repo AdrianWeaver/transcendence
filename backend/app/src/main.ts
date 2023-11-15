@@ -9,6 +9,7 @@ import { setupGracefulShutdown } from "nestjs-graceful-shutdown";
 import { UserService } from "./user/user.service";
 import Configuration from "./Configuration";
 
+
 async function bootstrap()
 {
 	const	configTest = new Configuration();
