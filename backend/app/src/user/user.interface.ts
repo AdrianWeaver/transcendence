@@ -54,6 +54,7 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
+	ipAddress: string;
 }
 
 export interface UserDBModel

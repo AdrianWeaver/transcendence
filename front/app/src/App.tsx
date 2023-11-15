@@ -15,6 +15,7 @@ const	App = () =>
 	const	theme = Theme();
 	const	hostname = window.location.hostname;
 	const	protocole = window.location.protocol;
+
 	const	dispatch = useAppDispatch();
 
 	dispatch(setServerLocation(protocole, hostname));

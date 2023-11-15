@@ -109,7 +109,8 @@ const	initialControllerState: ControllerModel = {
 		password: "undefined",
 		location: "undefined",
 		ft: true,
-		alreadyExists: false
+		alreadyExists: false,
+		ipAddress: "undefined"
 	},
 	registration:
 	{
@@ -448,6 +449,10 @@ const	controllerSlice = createSlice(
 		setStats(state, action: PayloadAction<ControllerModel>)
 		{
 			state.stats = action.payload.stats;
+		},
+		setIpAddress(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.ipAddress = action.payload.user.ipAddress;
 		}
 	}
 });

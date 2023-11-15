@@ -1720,3 +1720,30 @@ export const	getAllStats = ()
 			dispatch(controllerActions.setStats(prev.controller));
 	})
 }
+
+export const	getIpAddress = (changeIp: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await UserServices.getIpAddress(token, uri, changeIp);
+		if (data)
+		{
+			console.log("change ip front", data);
+			if (data.changeIp || data.oldIp === "undefined")
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					user: {
+						...prev.controller.user,
+						ipAddress: data.ip
+					}
+				}
+				dispatch(controllerActions.setIpAddress(response));
+			}
+		}
+	})
+}

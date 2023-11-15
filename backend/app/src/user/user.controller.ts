@@ -9,7 +9,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException, Ip } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import e, { Request, Response } from "express";
@@ -945,5 +945,18 @@ export class UserController
 			}
 		});
 		return (array);
+	}
+
+	@Post("/get-ip")
+	@UseGuards(UserAuthorizationGuard)
+	getUserIp(
+		@Req() req: any,
+		@Ip() ip: any,
+		@Body() body: any)
+	{
+		console.log(ip);
+		const	res = this.userService.registerIpAddress(req.user.id, ip, body.changeIp);
+		console.log("res", res);
+		return (res);
 	}
 }
