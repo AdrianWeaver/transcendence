@@ -403,6 +403,7 @@ export class	GameService implements OnModuleInit
 				this.gameInstances[indexInstance].revoked = true;
 		}
 	}
+
 	public	recordMatchHistory(instance: GameServe)
 	{
 		const	date = new Date(Date.now());
