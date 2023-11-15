@@ -463,7 +463,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
-				ipAddress: elem.authService.doubleAuth.lastIpClient
+				ipAddress: elem.authService.doubleAuth.lastIpClient,
+				doubleAuth: elem.authService.doubleAuth.enable,
+				token: elem.authService.token
 			};
 			users.push(user);
 		});

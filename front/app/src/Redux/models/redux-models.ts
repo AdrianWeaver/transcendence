@@ -46,6 +46,9 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
+	ipAddress: string;
+	doubleAuth: boolean;
+	token: string;
 }
 
 export interface ChatModel

@@ -235,13 +235,17 @@ const	controllerSlice = createSlice(
 		},
 		setUserData(state, action: PayloadAction<ControllerModel>)
 		{
-			state.user = action.payload.user;
-			// state.user.id = action.payload.user.id;
-			// state.user.email = action.payload.user.email;
-			// state.user.bearerToken = action.payload.user.bearerToken;
-			// state.user.firstName = action.payload.user.firstName;
-			// state.user.lastName = action.payload.user.lastName;
-			// state.allUsers = action.payload.allUsers;
+			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.ipAddress = action.payload.user.ipAddress;
+			state.user.avatar = action.payload.user.avatar;
+			state.user.location = action.payload.user.location;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
+			state.allFrontUsers = action.payload.allFrontUsers;
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			state.allUsers = action.payload.allUsers;
 		},
 		registerClientWithCode(state, action: PayloadAction<ControllerModel>)
 		{
@@ -253,6 +257,7 @@ const	controllerSlice = createSlice(
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
 			state.user.avatar = action.payload.user.avatar;
+			state.user.location = action.payload.user.location;
 			state.allUsers = action.payload.allUsers;
 		},
 		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)

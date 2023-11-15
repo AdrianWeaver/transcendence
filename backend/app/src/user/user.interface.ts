@@ -55,6 +55,8 @@ export interface BackUserModel
 	avatar: string;
 	location: string;
 	ipAddress: string;
+	doubleAuth: boolean;
+	token: string;
 }
 
 export interface UserDBModel
