@@ -32,7 +32,7 @@ import {
 	setPlayerTwoPicture,
 	setConnectedStore
 } from "../../Redux/store/gameEngineAction";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
 // import {
 // 	Backdrop,
@@ -57,7 +57,7 @@ const	TestBall = () =>
 {
 	const	query = useLocation();
 	const	gameMode = getGameMode(query);
-
+	const	navigate = useNavigate();
 	const	profileToken = useAppSelector((state) =>
 	{
 		return (state.controller.user.bearerToken);
@@ -320,7 +320,14 @@ const	TestBall = () =>
 			socket.off("game-active", activateGame);
 			socket.off("matchmaking-state", matchmakingState);
 		});
-	}, []);
+	}, [
+		dispatch,
+		game,
+		gameMode.friendId,
+		gameMode.mode,
+		profileToken,
+		url
+	]);
 
 	const	keyHookDown = (e: KeyboardEvent) =>
 	{
