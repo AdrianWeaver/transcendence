@@ -695,7 +695,10 @@ const	ChatLayout = () =>
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessageMap);
 				else if (data.payload.message === "")
+				{
 					setChannels(data.payload.chanMap);
+					setChanMessages([]);
+				}
 				else
 					alert(data.payload.message);
 			}
@@ -706,7 +709,7 @@ const	ChatLayout = () =>
 					alert(data.payload.message);
 				else
 				{
-					setChanMessages([]);
+					setChanMessages(data.payload.messages);
 					alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
@@ -797,7 +800,6 @@ const	ChatLayout = () =>
 				}
 				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
-				console.log("DISPLAY-MEMBERS isFriend", isFriend, " with ", talkingUser);
 			}
 		};
 
@@ -1257,8 +1259,7 @@ const	ChatLayout = () =>
 
 	const	inviteUserToChannel = (data: string) =>
 	{
-		console.log("member: " + data);
-		console.log("channel : " + channelToInvite);
+		refreshListUser();
 		let	profileId: string;
 		// profileId = data.toString();
 		profileId = getProfileId(data);
@@ -1474,7 +1475,6 @@ const	ChatLayout = () =>
 												/>
 												<Button onClick={() =>
 												{
-													console.log("CHANNEL NAME: ", channel.name);
 													setClickedChannel(channel.name);
 													handleDialogOpen(false);
 													setButtonSelection(channel.name);
@@ -1488,25 +1488,25 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(buttonSelection.mode, buttonSelection.name);
+															return handleJoinButtonClick(buttonSelection.mode, clickedChannel);
 														}}>
 															Join
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleLeaveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleLeaveButtonClick(buttonSelection.id, clickedChannel);
 														}}>
 															Leave
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleRemoveButtonClick(buttonSelection.id, buttonSelection.name);
+															return handleRemoveButtonClick(buttonSelection.id, clickedChannel);
 														}}>
 															Remove
 														</Button>
 														<Button onClick={() =>
 														{
-															return handleMembersClickOpen(buttonSelection.name);
+															return handleMembersClickOpen(clickedChannel);
 														}}>
 															Members
 														</Button>
@@ -1514,7 +1514,6 @@ const	ChatLayout = () =>
 
 														<Button onClick={() =>
 														{
-															console.log("CLICKED CHANNEL: " + clickedChannel);
 															setInviteDialogOpen(true);
 															// inviteUserToChannel(member.name);
 														}}>
@@ -1534,7 +1533,6 @@ const	ChatLayout = () =>
 																value={userToInvite}
 																onChange={(e) =>
 																{
-																	console.log("target value " + e.target.value);
 																	setUserToInvite(e.target.value);
 																	setChannelToInvite(clickedChannel);
 																}}/>
@@ -1542,7 +1540,6 @@ const	ChatLayout = () =>
 															<DialogActions>
 																<Button onClick={() =>
 																	{
-																		console.log("USER TO INVITE: " + userToInvite);
 																		// setUserToInvite(getProfileId(userToInvite));
 																		inviteUserToChannel(userToInvite);
 																		setInviteDialogOpen(false);

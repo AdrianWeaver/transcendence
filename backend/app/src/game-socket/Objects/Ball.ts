@@ -99,7 +99,6 @@ class Ball
 					this.angle = this.degreesToRadians(0);
 					this.angle -= this.degreesToRadians(this.getBounceAngle());
 					this.game.paddleCount++;
-					console.log("PADDLE COUNT: ", this.game.paddleCount);
 				}
 				else if (rp === true)
 				{
@@ -107,7 +106,6 @@ class Ball
 					this.angle = Math.PI - this.angle;
 					this.angle += this.degreesToRadians(this.getBounceAngle());
 					this.game.paddleCount++;
-					console.log("PADDLE COUNT: ", this.game.paddleCount);
 				}
 				else
 				{

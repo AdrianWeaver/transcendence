@@ -79,8 +79,6 @@ export class GameSocketEvents
 		private readonly userService: UserService
 	)
 	{
-		this.logger.error("I am using service game with id: " + this.gameService.getInstanceId());
-		this.logger.error("I am using service user with id: " + this.userService.getUuidInstance());
 		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
@@ -88,6 +86,25 @@ export class GameSocketEvents
 			instance.playerTwo.updatePlayerPosition();
 
 			instance.ball.update();
+			if (instance.gameMode === "upside-down")
+			{
+				const	actualFace = instance.face;
+				const	switchRate = 5;
+				if (instance.paddleCount % switchRate === 0)
+				{
+					switch(actualFace)
+					{
+						case "up":
+							instance.face = "down";
+							break ;
+						case "down":
+							instance.face = "up";
+							break; 
+						default: 
+							break; 
+					}
+				}
+			}
 		};
 
 		this.printPerformance = (timestamp: number, frame: number, instance: GameServe) =>
@@ -100,7 +117,6 @@ export class GameSocketEvents
 			const	scorePlayerTwo = instance.playerTwo.score;
 			if (scorePlayerOne === instance.scoreLimit || scorePlayerTwo === instance.scoreLimit)
 			{
-				console.log("User one has won score " + scorePlayerOne);
 				this.gameService.recordMatchHistory(instance);
 				const	playerOneSocket = instance.playerOne.socketId;
 				const	playerTwoSocket = instance.playerTwo.socketId;
@@ -124,6 +140,9 @@ export class GameSocketEvents
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
 				}
 			}
+			// upside = 0, down = 180
+			const gameFace = instance.face === "up" ? 0 : 180;
+
 			const action = {
 				type: "game-data",
 				payload:
@@ -149,6 +168,7 @@ export class GameSocketEvents
 					},
 					plOneScore: instance.playerOne.score,
 					plTwoScore: instance.playerTwo.score,
+					whichFace: gameFace,
 				}
 			};
 			this.server.to(instance.roomName).emit("game-event", action);
@@ -201,16 +221,13 @@ export class GameSocketEvents
 			const	decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 			result.profileId = decodedToken.id;
 			result.isValid = true;
-			console.log(result.profileId);
 		}
 		catch (error)
 		{
 			result.isValid = false;
 			if (error instanceof jwt.JsonWebTokenError)
 			{
-				this.logger.warn("A client try to connect without authenticate");
 			}
-			this.logger.error(error);
 			return (result);
 		}
 		return (result);
@@ -253,8 +270,6 @@ export class GameSocketEvents
 	// please send a notification on disconnect 
 	public	doRenewSocketIfDisconnected(client: Socket, profileId: string, indexOldSocketId: number)
 	{
-		this.logger.debug("User has already logged, will check if a game is active");
-		this.logger.verbose("Check the renew connection algorithm");
 		// expected unique instance
 		const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
 		{
@@ -282,7 +297,6 @@ export class GameSocketEvents
 			else
 			{
 				// disconnect
-				this.logger.error("No multiple connection allowed for a user");
 				client.disconnect();
 				return ;
 			}
@@ -299,7 +313,6 @@ export class GameSocketEvents
 			else
 			{
 				// disconnect
-				this.logger.error("No multiple connection allowed for a user");
 				client.disconnect();
 				return ;
 			}
@@ -316,15 +329,12 @@ export class GameSocketEvents
 		const	handShake: HandShakeModel = this.isHandshakeValid(client);
 		if (handShake.isValid === false)
 		{
-			this.logger.warn("Client Failed handshake");
 			client.disconnect();
 			return ({error: true});
 		}
-		this.logger.verbose("Handshake is valid");
 		const token = this.isTokenValid(client.handshake.auth.token);
 		if (token.isValid === false)
 		{
-			this.logger.warn("Client try a wrong token");
 			console.log(token);
 			client.disconnect();
 			return ({error: true});
@@ -342,7 +352,6 @@ export class GameSocketEvents
 			.findIndexSocketIdUserByProfileId(profileId);
 		if (indexSocketId === -1)
 			return (false);
-		this.logger.verbose("The user is already connected to the service");
 		return (true);
 	}
 
@@ -543,7 +552,6 @@ export class GameSocketEvents
 		//		- undefined: must never
 		if (gameModeRequest === "friend")
 		{
-			this.logger.debug("Checking socket state for state of friend games");
 			if (friendArray.filtered.disconnected.length === 0)
 			{
 				this.logger.verbose("\tThe user has no pending games");
@@ -570,10 +578,8 @@ export class GameSocketEvents
 		//		but this one nerver trigger here undefined is after search a game and setted at player Two
 		else if (gameModeRequest === "classical")
 		{
-			this.logger.debug("Checking socket state for state of classical games");
 			if (classicalArray.filtered.disconnected.length === 0)
 			{
-				this.logger.verbose("\tThe user has no pending games");
 			}
 			else
 			{
@@ -589,7 +595,6 @@ export class GameSocketEvents
 					});
 				if (indexClassicalDisconnected === -1)
 				{
-					this.logger.error("The user must not be in this conditions !!");
 				}
 				else
 				{
@@ -604,12 +609,10 @@ export class GameSocketEvents
 							roomName = this.gameService.gameInstances[indexClassicalDisconnected]
 								.roomName;
 							await client.join(roomName);
-							this.logger.verbose("The user is reconnected as player one!");
 							return ;
 						}
 						else
 						{
-							this.logger.error("Must not be in this conditions");
 							client.disconnect();
 							return ;
 						}
@@ -625,12 +628,10 @@ export class GameSocketEvents
 							roomName = this.gameService.gameInstances[indexClassicalDisconnected]
 								.roomName;
 							await client.join(roomName);
-							this.logger.verbose("The user is reconnected as player Two!");
 							return ;
 						}
 						else
 						{
-							this.logger.error("Must not be in this conditions");
 							client.disconnect();
 							return ;
 						}
@@ -639,22 +640,16 @@ export class GameSocketEvents
 			}
 			if (classicalArray.filtered.invited.length === 0)
 			{
-				this.logger.error("\tThis mode does not accept invite");
 			}
 			if (classicalArray.filtered.revoked.length === 0)
 			{
-				this.logger.verbose("\tThe user revoked a connection");
 			}
 			if (classicalArray.filtered.undefined.length === 0)
 			{
-				this.logger.verbose("\tThe user as no undefined games");
-				this.logger.debug("Search a game ");
 				const	indexClassicalAlone = this.gameService
 					.findIndexGameInstanceAloneByGameMode("classical");
 				if (indexClassicalAlone === -1)
 				{
-					this.logger.debug("\tNo player Alone in this gameMode");
-					this.logger.verbose("Creating game, the user will be player one");
 					this.gameService.increaseRoomCount();
 					// can put length of room dynamically to reject connection if liimiit trigger
 					// roomNameArray.length < roomCount : reject busy server
@@ -662,7 +657,6 @@ export class GameSocketEvents
 						+ roomNameArray [
 							this.gameService.getRoomCount()
 						];
-					this.logger.verbose("\tRoom name: " + roomName);
 					await client.join(roomName);
 					const	newRoom = new GameServe(roomName);
 					newRoom.gameMode = "classical";
@@ -678,7 +672,6 @@ export class GameSocketEvents
 					newRoom.loop.callbackFunction = this.printPerformance;
 					newRoom.loop.update(performance.now());
 					this.gameService.pushGameServeToGameInstance(newRoom);
-					this.logger.verbose("Game is created");
 				}
 				else
 				{
@@ -686,19 +679,15 @@ export class GameSocketEvents
 					{
 						this.gameService.gameInstances[indexClassicalAlone].playerOne.socketId = client.id;
 						this.gameService.gameInstances[indexClassicalAlone].playerOne.profileId = profileId;
-						this.logger.verbose("Joining game, the user will be player One");
 					}
 					else
 					{
 						this.gameService.gameInstances[indexClassicalAlone].playerTwo.socketId = client.id;
 						this.gameService.gameInstances[indexClassicalAlone].playerTwo.profileId = profileId;
-						this.logger.verbose("Joining game, the user will be player Two");
 					}
 					this.gameService.gameInstances[indexClassicalAlone].userConnected += 1;
 					roomName = this.gameService.gameInstances[indexClassicalAlone].roomName;
-					this.logger.verbose("\tRoom name: " + roomName);
 					await client.join(roomName);
-					this.logger.verbose("Joined the game");
 				}
 			}
 		}
@@ -711,10 +700,8 @@ export class GameSocketEvents
 		//		but this one nerver trigger here undefined is after search a game and setted at player Two
 		if (gameModeRequest === "upside-down")
 		{
-			this.logger.debug("Checking socket state for state of upsideDown games");
 			if (upsideDownArray.filtered.disconnected.length === 0)
 			{
-				this.logger.verbose("\tThe user has no pending games");
 			}
 			else
 			{
@@ -730,7 +717,6 @@ export class GameSocketEvents
 					});
 				if (indexUpsideDownDisconnected === -1)
 				{
-					this.logger.error("The user must not be in this conditions !!");
 				}
 				else
 				{
@@ -745,12 +731,10 @@ export class GameSocketEvents
 							roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
 								.roomName;
 							await client.join(roomName);
-							this.logger.verbose("The user is reconnected as player one!");
 							return ;
 						}
 						else
 						{
-							this.logger.error("Must not be in this conditions");
 							client.disconnect();
 							return ;
 						}
@@ -766,12 +750,10 @@ export class GameSocketEvents
 							roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
 								.roomName;
 							await client.join(roomName);
-							this.logger.verbose("The user is reconnected as player Two!");
 							return ;
 						}
 						else
 						{
-							this.logger.error("Must not be in this conditions");
 							client.disconnect();
 							return ;
 						}
@@ -791,7 +773,7 @@ export class GameSocketEvents
 				this.logger.verbose("\tThe user as no undefined games");
 				this.logger.debug("Search a game with player two as undefined");
 				const	indexUpsideDownAlone = this.gameService
-					.findIndexGameInstanceAloneByGameMode("classical");
+					.findIndexGameInstanceAloneByGameMode("upside-down");
 				if (indexUpsideDownAlone === -1)
 				{
 					this.logger.debug("\tNo player Alone in this gameMode");

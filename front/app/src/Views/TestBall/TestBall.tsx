@@ -32,7 +32,8 @@ import {
 	setPlayerOnePicture,
 	setPlayerTwoPicture,
 	setConnectedStore,
-	setGameOver
+	setGameOver,
+	setGameFace
 } from "../../Redux/store/gameEngineAction";
 import { useLocation, useNavigate } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
@@ -149,9 +150,8 @@ const	TestBall = () =>
 			dispatch(setConnectedStore(false));
 		};
 
-		const	connectError = (error: Error) =>
-		{
-			console.error("ws_connect_error", error);
+		const	connectError = (_error: Error) =>
+		{	
 		};
 
 		const	updateGame = (data: any) =>
@@ -182,6 +182,9 @@ const	TestBall = () =>
 				);
 				dispatch(
 					setPlTwoScore(data.payload.plTwoScore)
+				);
+				dispatch(
+					setGameFace(data.payload.whichFace)
 				);
 			}
 		};
@@ -543,7 +546,10 @@ const	TestBall = () =>
 			<div style={{ textAlign: "center" }}>
 				<motion.div
 					initial={{ rotate: 0 }}
-					animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
+					animate={{
+						rotate: gameMode?.mode === "upside-down" ? theBoard.gameFace : 0,
+						transition: { duration: 0.5 }
+					}}
 					style={{
 					width: game.board.canvas?.width,
 					height: game.board.canvas?.height,
