@@ -5,55 +5,55 @@
 import { useEffect, useState } from "react";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Alert, AlertTitle, Box, Button, Grid, List, ListItem, TextField } from "@mui/material";
+import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { decodePassword, setProfileMyView } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
-type PasswordAlertProps ={
-	password: string,
-	firstTrigger: boolean,
-	passwordConfirm?: string
-}
+// type PasswordAlertProps ={
+// 	password: string,
+// 	firstTrigger: boolean,
+// 	passwordConfirm?: string
+// }
 
-const	stringContainChar = (string: string, char: string) =>
-{
-	let	i;
+// const	stringContainChar = (string: string, char: string) =>
+// {
+// 	let	i;
 
-	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
-	while (i < string.length)
-	{
-		if (string.charAt(i) >= char.charAt(0)
-			&& string.charAt(i) <= char.charAt(char.length - 1))
-			return (true);
-		i++;
-	}
-	return (false);
-};
+// 	i = 0;
+// 	console.log("last Char = ", char.charAt(char.length - 1));
+// 	while (i < string.length)
+// 	{
+// 		if (string.charAt(i) >= char.charAt(0)
+// 			&& string.charAt(i) <= char.charAt(char.length - 1))
+// 			return (true);
+// 		i++;
+// 	}
+// 	return (false);
+// };
 
-const	stringContainCharOfString = (string: string, charset: string) =>
-{
-	let	i;
-	let	j;
+// const	stringContainCharOfString = (string: string, charset: string) =>
+// {
+// 	let	i;
+// 	let	j;
 
-	i = 0;
-	j = 0;
-	while (i < string.length)
-	{
-		while (j < charset.length)
-		{
-			if (string.charAt(i) === charset.charAt(j))
-				return (true);
-			j++;
-		}
-		j = 0;
-		i++;
-	}
-	return (false);
-};
+// 	i = 0;
+// 	j = 0;
+// 	while (i < string.length)
+// 	{
+// 		while (j < charset.length)
+// 		{
+// 			if (string.charAt(i) === charset.charAt(j))
+// 				return (true);
+// 			j++;
+// 		}
+// 		j = 0;
+// 		i++;
+// 	}
+// 	return (false);
+// };
 
 // const	PasswordAlert = (props: PasswordAlertProps) =>
 // {
