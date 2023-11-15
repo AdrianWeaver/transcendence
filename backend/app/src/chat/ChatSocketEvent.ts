@@ -498,7 +498,6 @@ export class ChatSocketEvents
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 // do the samed for private msg
 				let isAdmin: boolean;
-				console.log("DESTROY CHANNEL", data.payload.kind);
 				if (data.payload.kind === "privateMessage")
 				{
 					searchChannel = this.chatService.searchPrivateConvByName(data.payload.name);
@@ -510,12 +509,10 @@ export class ChatSocketEvents
 					if (searchChannel?.isAdmin(profileId) === true)
 					{
 						isAdmin = true;
-						console.log("I AM THE ADMIN");
 					}
 					else
 					{
 						isAdmin = false;
-						console.log("I AM NOT THE ADMIN");
 					}
 				}
 				let	msg;
@@ -752,7 +749,6 @@ export class ChatSocketEvents
 
 			if (data.type === "member-list")
 			{
-				console.log("MEMBER-LIST");
 				let channel;
 				let	conv: boolean, isFriend;
 				let	talkingUser: string;
