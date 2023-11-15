@@ -63,7 +63,8 @@ export const	initialGameEngineState: Model = {
 		plOneScore: 0,
 		plTwoScore: 0,
 		plOneSocket: "undefined",
-		plTwoSocket: "undefined"
+		plTwoSocket: "undefined",
+		gameFace: 0,
 	},
 	meConnected: false,
 	myGameActive:
@@ -171,6 +172,10 @@ const	gameEngineSlice = createSlice(
 		{
 			state.myGameActive = action.payload.myGameActive;
 		},
+		setGameFace(state, action: PayloadAction<Model>)
+		{
+			state.board.gameFace = action.payload.board.gameFace;
+		}
 	}
 });
 

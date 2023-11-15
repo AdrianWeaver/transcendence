@@ -484,3 +484,23 @@ export const	revokeGameWithUuid = (gameUuid: string)
 		}
 	});
 };
+
+export const	setGameFace = (gameFace: number)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	prevState = getState();
+
+		const	res: Model = {
+			...prevState.gameEngine,
+			board:
+			{
+				...prevState.gameEngine.board,
+				gameFace: gameFace,
+			}
+		};
+		if (prevState.gameEngine.board.gameFace !== gameFace)
+			dispatch(action.setGameFace(res));
+	});
+};
