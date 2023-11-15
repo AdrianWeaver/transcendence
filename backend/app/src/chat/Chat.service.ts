@@ -158,16 +158,14 @@ export	class ChatService implements OnModuleInit
 				else
 				{
 					const rawobj = JSON.parse(data.contents);
-					// console.log("raw object chat from db", rawobj);
 					const	newChatInstance = new Chat();
 					newChatInstance.databaseToObject(rawobj);
 					this.chat = {...newChatInstance};
-					// console.log(rawobj);
 				}
 			})
-			.catch((error: any) =>
+			.catch(() =>
 			{
-				console.log(error);
+				console.log("error");
 			});
 	}
 
@@ -502,7 +500,6 @@ export	class ChatService implements OnModuleInit
 
 	public	pushUser(newUser: User, clientId: string)
 	{
-		console.log("PUSH USER PROFILE ID", newUser.profileId);
 		const	searchUser = this.getUserWithProfileId(newUser.profileId);
 		if (searchUser === undefined)
 		{
@@ -593,7 +590,6 @@ export	class ChatService implements OnModuleInit
 
 	public	changeInfos(data: any, id: string | number)
 	{
-		console.log("id change info ?", typeof id);
 		const	index = this.chat.users.findIndex((elem) =>
 		{
 			return (elem.profileId === id.toString());
@@ -603,7 +599,6 @@ export	class ChatService implements OnModuleInit
 			if (data.info?.length)
 				if (data.field === "username" && data.info !== this.chat.users[index].name)
 					this.chat.users[index].name = data.info;
-			// console.log(searchUser);
 			return ("okay");
 		}
 		return ("user doesnt exist");
@@ -805,14 +800,12 @@ export	class ChatService implements OnModuleInit
 
 	public	addNewChatUser(chatUser: ChatUserModel, client: Socket | null)
 	{
-		console.log("addd NEW USER BACK");
 		const	user: User = new User(chatUser.name, chatUser.profileId);
 		user.setClient(client);
 		user.setId(chatUser.id);
 		user.status = chatUser.status;
 		user.online = chatUser.online;
 		user.avatar = chatUser.avatar;
-		console.log("add New user back: ", user);
 		this.pushUser(user, chatUser.id);
 	}
 }
