@@ -22,6 +22,7 @@ import CardMedia from "@mui/material/CardMedia";
 // import pong from "../assets/pong.jpeg";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // type DisplayUsersAvatarProps = {
 // 	avatarPlayerOne: JSX.Element,
@@ -60,7 +61,6 @@ type WaitingActiveProps = {
 	connected: boolean,
 	numberOfUser: number,
 	disconnected: boolean
-	gameOver: boolean
 };
 
 const	WaitingActive = (props: WaitingActiveProps) =>
@@ -78,8 +78,7 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 	// [
 	// 	render,
 	// 	setRender
-	// ] = useState(<></>);
-
+	// ] = useState(<></>);'
 	let title;
 
 	const
@@ -93,7 +92,6 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 	// 	userCount,
 	// 	setUserCount
 	// ] = useState(0);
-
 	const userOnePicture = useAppSelector((state) =>
 	{
 		return (state.gameEngine.server.playerOnePicture);
@@ -155,20 +153,13 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 				</IconButton>
 			</Box>
 		);
-		if (props.gameOver)
+		if (statusConnected === true)
 		{
-			title = "Game Over";
+			title = "Partie Random";
 		}
 		else
 		{
-			if (statusConnected === true)
-			{
-				title = "Partie Random";
-			}
-			else
-			{
-				title = "Deconnecte";
-			}
+			title = "Deconnecte";
 		}
 	}
 	else

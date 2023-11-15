@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
@@ -10,7 +11,7 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import {
 	setBallPosition,
@@ -30,11 +31,13 @@ import {
 	setPlayerTwoProfileId,
 	setPlayerOnePicture,
 	setPlayerTwoPicture,
-	setConnectedStore
+	setConnectedStore,
+	setGameOver
 } from "../../Redux/store/gameEngineAction";
 import { useLocation, useNavigate } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
 import WaitingActive from "./Component/WaitingActive";
+import { Typography } from "@mui/material";
 // import {
 // 	Backdrop,
 // 	Alert,
@@ -84,12 +87,6 @@ const	TestBall = () =>
 		setGameActive
 	] = useState(false);
 
-	const
-	[
-		gameOver,
-		setGameOver
-	] = useState(false);
-
 	const	dispatch = useAppDispatch();
 
 	const	theServer = useAppSelector((state) =>
@@ -108,17 +105,7 @@ const	TestBall = () =>
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-
 	const	game = new Game("front");
-	// remove me after fix
-	// try
-	// {
-	// 	// throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
-	// }
-	// catch (error)
-	// {
-	// 	console.log(error);
-	// }
 	const	gameRef = useRef<Game>(game);
 	gameRef.current = game;
 	game.board.game = game;
@@ -292,34 +279,32 @@ const	TestBall = () =>
 
 		const	activateGame = (data: any) =>
 		{
-			setGameOver(false);
+			dispatch(setGameOver(false));
 			setGameActive(data.payload.gameActive);
 		};
 
 		const	matchmakingState = (data: any) =>
 		{
 			// please make me design
-			let	timeout: any;
+			let	time: any;
 
-			timeout = undefined;
-			// setGameOver(false);
+			time = undefined;
 			if (data.type === "already-connected")
 			{
 				window.alert("Vous etes deja connectes a un socket veuillez visiter /my-active-games");
 			}
 			if (data.type === "the-end")
 			{
-				console.log("here");
-				setGameOver(true);
-				timeout = setTimeout(() =>
+				dispatch(setGameOver(true));
+				time = setTimeout(() =>
 				{
 					navigate("/game-setup");
 				}, 4000);
 			}
 			return (() =>
 			{
-				if (timeout !== undefined)
-					clearTimeout(timeout);
+				if (time !== undefined)
+					clearTimeout(time);
 			});
 		};
 
@@ -399,6 +384,21 @@ const	TestBall = () =>
 		else
 			console.log("You are already ready !");
 	};
+	// useEffect(() =>
+	// {
+	// 	if (gameOver)
+	// 	{
+	// 		const	timeout = setTimeout(() =>
+	// 		{
+	// 			navigate("/game-setup");
+	// 		}, 9000);
+	// 		// return (() =>
+	// 		// {
+	// 		// 	if (timeout !== undefined)
+	// 		// 		clearTimeout(timeout);
+	// 		// });
+	// 	}
+	// }, [gameOver]);
 
 	useEffect(() =>
 	{
@@ -470,7 +470,7 @@ const	TestBall = () =>
 			if (game.playerOne.score === game.scoreLimit
 				|| game.playerTwo.score === game.scoreLimit)
 			{
-				setGameOver(true);
+				dispatch(setGameOver(true));
 				setGameActive(false);
 				game.displayEndMessage();
 			}
@@ -498,76 +498,64 @@ const	TestBall = () =>
 					disconnected={socketRef.current?.active}
 					gameOver={gameOver}
 				/> */}
-			{
-				// (gameOver === false)
-				// ?
-				<>
-					<div style={displayStyle}>
-						FT_TRANSCENDENCE
-					</div>
+			<div style={displayStyle}>
+				FT_TRANSCENDENCE
+			</div>
 
-					{/* This part show the connection to the websocket */}
-					<div style={displayStyle}>
-						<ConnectState connected={connected} />
-					</div>
+			{/* This part show the connection to the websocket */}
+			<div style={displayStyle}>
+				<ConnectState connected={connected} />
+			</div>
 
-					{/* This part show the number of client connected */}
-					<div style={displayStyle}>
-						number of client connected : {theServer.numberOfUser}<br/>
-						number of client ready : {theServer.readyPlayerCount}
-					</div>
+			{/* This part show the number of client connected */}
+			<div style={displayStyle}>
+				number of client connected : {theServer.numberOfUser}<br/>
+				number of client ready : {theServer.readyPlayerCount}
+			</div>
 
-					{/* This part show the frame number */}
-					<div style={displayStyle}>
-						frame number (time server): {theServer.frameNumber} <br/>
-					</div>
+			{/* This part show the frame number */}
+			<div style={displayStyle}>
+				frame number (time server): {theServer.frameNumber} <br/>
+			</div>
 
-					{/* /* This part show more information */ }
-					<div style={displayStyle}>
-						position ball x: {theBoard.ball.position.x} <br />
-						position ball y: {theBoard.ball.position.y} <br />
-						dimension width du server: {theServer.dimension.width} <br />
-						dimension height du server: {theServer.dimension.height} <br />
-						scale to server :
-							scale_width: {theServer.scaleServer.width},
-							scale_height:
-										{theServer.scaleServer.height} <br />
-						dimension width du client : {theBoard.dimension.width} <br />
-						dimension height du client: {theBoard.dimension.height} <br />
-						position du player 1:
-									{JSON.stringify(theBoard.playerOne.position)} <br />
-						position du player 2:
-									{JSON.stringify(theBoard.playerTwo.position)} <br />
-					</div>
-					<div style={displayStyle}>
-						<button onClick={setReadyAction}>I'm ready</button>
-					</div>
-					{/* This is the canvas part */}
+			{/* /* This part show more information */ }
+			<div style={displayStyle}>
+				position ball x: {theBoard.ball.position.x} <br />
+				position ball y: {theBoard.ball.position.y} <br />
+				dimension width du server: {theServer.dimension.width} <br />
+				dimension height du server: {theServer.dimension.height} <br />
+				scale to server :
+					scale_width: {theServer.scaleServer.width},
+					scale_height:
+								{theServer.scaleServer.height} <br />
+				dimension width du client : {theBoard.dimension.width} <br />
+				dimension height du client: {theBoard.dimension.height} <br />
+				position du player 1:
+							{JSON.stringify(theBoard.playerOne.position)} <br />
+				position du player 2:
+							{JSON.stringify(theBoard.playerTwo.position)} <br />
+			</div>
+			<div style={displayStyle}>
+				<button onClick={setReadyAction}>I'm ready</button>
+			</div>
+			{/* This is the canvas part */}
 
-					<div style={{ textAlign: "center" }}>
-						<motion.div
-							initial={{ rotate: 0 }}
-							animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
-							style={{
-							width: game.board.canvas?.width,
-							height: game.board.canvas?.height,
-							}}
-						>
-							<canvas
-							height={game.board.canvas?.height}
-							width={game.board.canvas?.width}
-							ref={game.board.canvasRef}
-							/>
-						</motion.div>
-					</div>
-				</>
-				// : <WaitingActive
-				// 	connected={connected}
-				// 	numberOfUser={theServer.numberOfUser}
-				// 	disconnected={socketRef.current?.active}
-				// 	gameOver={gameOver}
-				// />
-			}
+			<div style={{ textAlign: "center" }}>
+				<motion.div
+					initial={{ rotate: 0 }}
+					animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
+					style={{
+					width: game.board.canvas?.width,
+					height: game.board.canvas?.height,
+					}}
+				>
+					<canvas
+					height={game.board.canvas?.height}
+					width={game.board.canvas?.width}
+					ref={game.board.canvasRef}
+					/>
+				</motion.div>
+			</div>
 		</>
 	);
 };

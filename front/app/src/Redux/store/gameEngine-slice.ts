@@ -70,7 +70,8 @@ export const	initialGameEngineState: Model = {
 	{
 		random: [],
 		friend: [],
-	}
+	},
+	gameOver: false
 };
 
 const	gameEngineSlice = createSlice(
@@ -170,6 +171,10 @@ const	gameEngineSlice = createSlice(
 		revokeMyGame(state, action: PayloadAction<Model>)
 		{
 			state.myGameActive = action.payload.myGameActive;
+		},
+		setGameOver(state, action: PayloadAction<Model>)
+		{
+			state.gameOver = action.payload.gameOver;
 		},
 	}
 });

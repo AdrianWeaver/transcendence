@@ -484,3 +484,18 @@ export const	revokeGameWithUuid = (gameUuid: string)
 		}
 	});
 };
+
+export const	setGameOver = (gameOver: boolean)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	response = {
+			...prev.gameEngine,
+			gameOver: gameOver
+		};
+		dispatch(action.setGameOver(response));
+	});
+};
