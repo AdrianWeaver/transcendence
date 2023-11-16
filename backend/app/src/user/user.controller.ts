@@ -192,7 +192,7 @@ export class UserController
 	{
 		const	ip = "real ip";
 		console.log(realIp);
-		console.log(req.headers);
+		console.log(req.socket.remoteAddress);
 		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)

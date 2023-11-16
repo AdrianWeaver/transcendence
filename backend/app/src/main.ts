@@ -6,6 +6,7 @@ import { AppModule } from "./app.module";
 import * as bodyParser from "body-parser";
 import { ValidationPipe } from "@nestjs/common";
 import { setupGracefulShutdown } from "nestjs-graceful-shutdown";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import { UserService } from "./user/user.service";
 import Configuration from "./Configuration";
 
@@ -22,7 +23,7 @@ async function bootstrap()
 		return ;
 	}
 	console.log("The configuration of the project is okay program will start");
-	const	app = await NestFactory.create(AppModule);
+	const	app = await NestFactory.create<NestExpressApplication>(AppModule);
 	app.enableCors({
 		origin: "*",
 		methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
@@ -30,7 +31,7 @@ async function bootstrap()
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({extended: true}));
 	app.useGlobalPipes(new ValidationPipe());
-
+	app.set("trust proxy", true);
 	setupGracefulShutdown({app});
 
 	const serviceUser = app.get(UserService);
