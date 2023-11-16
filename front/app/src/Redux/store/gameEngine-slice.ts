@@ -6,7 +6,7 @@ import
 }	from "@reduxjs/toolkit";
 
 import { GameEngineModel as Model } from "../models/redux-models";
-import { setReadyPlayerCount } from "./gameEngineAction";
+// import { setReadyPlayerCount } from "./gameEngineAction";
 
 export const	initialGameEngineState: Model = {
 	server:
@@ -63,14 +63,16 @@ export const	initialGameEngineState: Model = {
 		plOneScore: 0,
 		plTwoScore: 0,
 		plOneSocket: "undefined",
-		plTwoSocket: "undefined"
+		plTwoSocket: "undefined",
+		gameFace: 0,
 	},
 	meConnected: false,
 	myGameActive:
 	{
 		random: [],
 		friend: [],
-	}
+	},
+	gameOver: false
 };
 
 const	gameEngineSlice = createSlice(
@@ -171,6 +173,14 @@ const	gameEngineSlice = createSlice(
 		{
 			state.myGameActive = action.payload.myGameActive;
 		},
+		setGameOver(state, action: PayloadAction<Model>)
+		{
+			state.gameOver = action.payload.gameOver;
+		},
+		setGameFace(state, action: PayloadAction<Model>)
+		{
+			state.board.gameFace = action.payload.board.gameFace;
+		}
 	}
 });
 

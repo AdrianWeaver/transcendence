@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import {
 	Box,
 	Typography} from "@mui/material";
+import { CSSProperties } from "react";
 
 interface TabPanelProps {
 	area?: boolean | string;

@@ -3,7 +3,7 @@
 /* eslint-disable max-lines-per-function */
 import { Container, Typography, Stack, Button, Box, Card, CardActions, CardContent, CardMedia, Grid } from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Profiler, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { getMyActiveGame, revokeGameWithUuid } from "../../Redux/store/gameEngineAction";
 
@@ -148,7 +148,7 @@ const	GamePreview = (props: GamePreviewProps) =>
 	);
 };
 
-const cards = [];
+// const cards = [];
 const cardsAlone = [];
 
 

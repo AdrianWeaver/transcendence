@@ -3,7 +3,7 @@ export const	pagesLinksLogged = [
 	"/",
 	"/game-setup",
 	"/starter-pack",
-	"/stats",
+	"/global-stats",
 	"/the-chat"
 
 ];

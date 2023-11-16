@@ -12,20 +12,20 @@ import controllerSlice from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { AnonymousUserModel, BackUserModel, CanvasModel, ChatUserModel, ControllerModel, GameEngineModel, ServerModel, UserModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
-import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
-import UserRegistration from "../../Object/UserRegistration";
-import { PersistPartial } from "redux-persist/es/persistReducer";
+// import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
+// import UserRegistration from "../../Object/UserRegistration";
+// import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
-type MessageModel =
-{
-	sender: string,
-	message: string,
-	mode: string,
-	username: string,
-}
+// type MessageModel =
+// {
+// 	sender: string,
+// 	message: string,
+// 	mode: string,
+// 	username: string,
+// }
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -562,11 +562,11 @@ export const setRegistrationProcessError = (message?: string)
 {
 	return ((dispatch, getState) =>
 	{
-		let errorMsg: string;
-		if (message)
-			errorMsg = message;
-		else
-			errorMsg = "error";
+		// let errorMsg: string;
+		// if (message)
+		// 	errorMsg = message;
+		// else
+		// 	errorMsg = "error";
 		const prev = getState();
 
 		const response: ControllerModel = {
@@ -1247,7 +1247,7 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((data) =>
+		.then((_data) =>
 		{
 			// console.log("okay", data);
 		})
@@ -1330,7 +1330,7 @@ export const	addUserAsFriend = (myId: string, friendId: string)
 		const	prev = getState();
 		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
 			friendId, prev.server.uri, myId)
-		.then((data) =>
+		.then((_data) =>
 		{
 			// console.log("okay", data);
 		})
@@ -1655,7 +1655,7 @@ export const	getStats = (userProfileId: string)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		// const	token = prev.controller.user.bearerToken;
+		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	searchUser = prev.controller.user.chat.users.find((elem) =>
 		{
@@ -1663,16 +1663,58 @@ export const	getStats = (userProfileId: string)
 		});
 		if (searchUser === undefined)
 			return ;
-		const	data = await ServerService.getStats(userProfileId, searchUser.avatar, uri);
+		const	data = await ServerService.getStats(token, userProfileId, searchUser.avatar, uri);
 		if (data.success)
 		{
-			const	newStats = [...prev.controller.stats];
-			newStats.push(data.data);
-			const	response: ControllerModel = {
-				...prev.controller,
-				stats: newStats
+			if (data.data.length)
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: data.data
+				}
+				dispatch(controllerActions.setStats(response));
 			}
-			dispatch(controllerActions.setStats(response));
+			else
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: []
+				}
+				dispatch(controllerActions.setStats(response));
+			}
+		}
+		else
+			dispatch(controllerActions.setStats(prev.controller));
+	})
+}
+
+export const	getAllStats = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		const	token = prev.controller.user.bearerToken;
+		const	uri = prev.server.uri;
+		const	data = await ServerService.getAllStats(token, uri);
+		if (data.success)
+		{
+			if (data.data.length)
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: data.data
+				}
+				dispatch(controllerActions.setStats(response));
+			}
+			else
+			{
+				const	response: ControllerModel = {
+					...prev.controller,
+					stats: []
+				}
+				dispatch(controllerActions.setStats(response));
+			}
 		}
 		else
 			dispatch(controllerActions.setStats(prev.controller));

@@ -78,8 +78,6 @@ export class GameSocketEvents
 		private readonly userService: UserService
 	)
 	{
-		this.logger.error("I am using service game with id: " + this.gameService.getInstanceId());
-		this.logger.error("I am using service user with id: " + this.userService.getUuidInstance());
 		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
@@ -87,6 +85,42 @@ export class GameSocketEvents
 			instance.playerTwo.updatePlayerPosition();
 
 			instance.ball.update();
+			if (instance.gameMode === "upside-down")
+			{
+				const	actualFace = instance.face;
+				const	switchRate = 5;
+
+				if (instance.paddleCount === 0)
+					return ;
+				if (instance.paddleCount % switchRate === 0 && instance.triggeredPaddleCount !== instance.paddleCount)
+				{
+					if (instance.face === "up" && instance.faceDirection === "up")
+					{
+						instance.faceDirection = "down";
+						instance.triggeredPaddleCount = instance.paddleCount;
+					}
+					if (instance.face === "down" && instance.faceDirection === "down")
+					{
+						instance.faceDirection = "up";
+						instance.triggeredPaddleCount = instance.paddleCount;
+					}
+				}
+				if (instance.face === "up" && instance.faceDirection === "down")
+				{
+					if (instance.faceRotation !== 180)
+						instance.faceRotation += 3;
+					else
+						instance.face = "down";
+				}
+				if(instance.face === "down" && instance.faceDirection === "up")
+				{
+					if (instance.faceRotation !== 0)
+						instance.faceRotation -= 3;
+					else
+						instance.face = "up";
+				}
+				
+			}
 		};
 
 		this.printPerformance = (timestamp: number, frame: number, instance: GameServe) =>
@@ -99,9 +133,32 @@ export class GameSocketEvents
 			const	scorePlayerTwo = instance.playerTwo.score;
 			if (scorePlayerOne === instance.scoreLimit || scorePlayerTwo === instance.scoreLimit)
 			{
-				console.log("User one has won score " + scorePlayerOne);
 				this.gameService.recordMatchHistory(instance);
+				const	playerOneSocket = instance.playerOne.socketId;
+				const	playerTwoSocket = instance.playerTwo.socketId;
+
+				const isPlayerOneActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerOneSocket);
+					});
+				if (isPlayerOneActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
+				const isPlayerTwoActiveSocket = this.gameService.socketIdUsers
+					.findIndex((elem) =>
+					{
+						return (elem.socketId === playerTwoSocket);
+					});
+				if (isPlayerTwoActiveSocket !== -1)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
+				}
 			}
+			// upside = 0, down = 180
+			const gameFace = instance.face === "up" ? 0 : 180;
+
 			const action = {
 				type: "game-data",
 				payload:
@@ -127,6 +184,7 @@ export class GameSocketEvents
 					},
 					plOneScore: instance.playerOne.score,
 					plTwoScore: instance.playerTwo.score,
+					whichFace: instance.faceRotation,
 				}
 			};
 			this.server.to(instance.roomName).emit("game-event", action);
@@ -179,16 +237,13 @@ export class GameSocketEvents
 			const	decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 			result.profileId = decodedToken.id;
 			result.isValid = true;
-			console.log(result.profileId);
 		}
 		catch (error)
 		{
 			result.isValid = false;
 			if (error instanceof jwt.JsonWebTokenError)
 			{
-				this.logger.warn("A client try to connect without authenticate");
 			}
-			this.logger.error(error);
 			return (result);
 		}
 		return (result);
@@ -231,8 +286,6 @@ export class GameSocketEvents
 	// please send a notification on disconnect 
 	public	doRenewSocketIfDisconnected(client: Socket, profileId: string, indexOldSocketId: number)
 	{
-		this.logger.debug("User has already logged, will check if a game is active");
-		this.logger.verbose("Check the renew connection algorithm");
 		// expected unique instance
 		const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
 		{
@@ -260,7 +313,6 @@ export class GameSocketEvents
 			else
 			{
 				// disconnect
-				this.logger.error("No multiple connection allowed for a user");
 				client.disconnect();
 				return ;
 			}
@@ -277,7 +329,6 @@ export class GameSocketEvents
 			else
 			{
 				// disconnect
-				this.logger.error("No multiple connection allowed for a user");
 				client.disconnect();
 				return ;
 			}
@@ -294,15 +345,12 @@ export class GameSocketEvents
 		const	handShake: HandShakeModel = this.isHandshakeValid(client);
 		if (handShake.isValid === false)
 		{
-			this.logger.warn("Client Failed handshake");
 			client.disconnect();
 			return ({error: true});
 		}
-		this.logger.verbose("Handshake is valid");
 		const token = this.isTokenValid(client.handshake.auth.token);
 		if (token.isValid === false)
 		{
-			this.logger.warn("Client try a wrong token");
 			console.log(token);
 			client.disconnect();
 			return ({error: true});
@@ -320,7 +368,6 @@ export class GameSocketEvents
 			.findIndexSocketIdUserByProfileId(profileId);
 		if (indexSocketId === -1)
 			return (false);
-		this.logger.verbose("The user is already connected to the service");
 		return (true);
 	}
 

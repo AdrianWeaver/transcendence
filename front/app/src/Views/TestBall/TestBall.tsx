@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable max-len */
 /* eslint-disable curly */
 /* eslint-disable max-lines-per-function */
@@ -10,7 +11,7 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 
 import { io } from "socket.io-client";
 import ConnectState from "./Component/ConnectState";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import {
 	setBallPosition,
@@ -30,24 +31,28 @@ import {
 	setPlayerTwoProfileId,
 	setPlayerOnePicture,
 	setPlayerTwoPicture,
-	setConnectedStore
+	setConnectedStore,
+	setGameOver,
+	setGameFace
 } from "../../Redux/store/gameEngineAction";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import getGameMode from "./extra/queryParamsMode";
-import {
-	Backdrop,
-	Alert,
-	Typography,
-	Card,
-	Box,
-	CardContent,
-	IconButton
-} from "@mui/material";
-import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import CardMedia from "@mui/material/CardMedia";
-import pong from "./assets/pong.jpeg";
 import WaitingActive from "./Component/WaitingActive";
+import { Typography } from "@mui/material";
+// import {
+// 	Backdrop,
+// 	Alert,
+// 	Typography,
+// 	Card,
+// 	Box,
+// 	CardContent,
+// 	IconButton
+// } from "@mui/material";
+// import { useTheme } from "@emotion/react";
+// import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+// import CardMedia from "@mui/material/CardMedia";
+// import pong from "./assets/pong.jpeg";
+// import WaitingActive from "./Component/WaitingActive";
 type	ActionSocket = {
 	type: string,
 	payload?: any
@@ -57,7 +62,7 @@ const	TestBall = () =>
 {
 	const	query = useLocation();
 	const	gameMode = getGameMode(query);
-
+	const	navigate = useNavigate();
 	const	profileToken = useAppSelector((state) =>
 	{
 		return (state.controller.user.bearerToken);
@@ -83,6 +88,11 @@ const	TestBall = () =>
 		setGameActive
 	] = useState(false);
 
+	const [
+		rotation,
+		setRotation
+	] = useState<number>(0);
+
 	const	dispatch = useAppDispatch();
 
 	const	theServer = useAppSelector((state) =>
@@ -101,17 +111,7 @@ const	TestBall = () =>
 	});
 
 	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
-
 	const	game = new Game("front");
-	// remove me after fix
-	// try
-	// {
-	// 	// throw new Error("TestBall.tsx: game is not correctly constructed at line 75 expected arguments got 0");
-	// }
-	// catch (error)
-	// {
-	// 	console.log(error);
-	// }
 	const	gameRef = useRef<Game>(game);
 	gameRef.current = game;
 	game.board.game = game;
@@ -155,9 +155,8 @@ const	TestBall = () =>
 			dispatch(setConnectedStore(false));
 		};
 
-		const	connectError = (error: Error) =>
-		{
-			console.error("ws_connect_error", error);
+		const	connectError = (_error: Error) =>
+		{	
 		};
 
 		const	updateGame = (data: any) =>
@@ -188,6 +187,9 @@ const	TestBall = () =>
 				);
 				dispatch(
 					setPlTwoScore(data.payload.plTwoScore)
+				);
+				dispatch(
+					setGameFace(data.payload.whichFace)
 				);
 			}
 		};
@@ -285,16 +287,33 @@ const	TestBall = () =>
 
 		const	activateGame = (data: any) =>
 		{
+			dispatch(setGameOver(false));
 			setGameActive(data.payload.gameActive);
 		};
 
 		const	matchmakingState = (data: any) =>
 		{
 			// please make me design
+			let	time: any;
+
+			time = undefined;
 			if (data.type === "already-connected")
 			{
 				window.alert("Vous etes deja connectes a un socket veuillez visiter /my-active-games");
 			}
+			if (data.type === "the-end")
+			{
+				dispatch(setGameOver(true));
+				time = setTimeout(() =>
+				{
+					navigate("/game-setup");
+				}, 4000);
+			}
+			return (() =>
+			{
+				if (time !== undefined)
+					clearTimeout(time);
+			});
 		};
 
 		socket.on("connect", connect);
@@ -374,6 +393,23 @@ const	TestBall = () =>
 		else
 			console.log("You are already ready !");
 	};
+	// useEffect(() =>
+	// {
+	// 	if (gameOver)
+	// 	{
+	// 		const	timeout = setTimeout(() =>
+	// 		{
+	// 			navigate("/game-setup");
+	// 		}, 9000);
+	// 		// return (() =>
+	// 		// {
+	// 		// 	if (timeout !== undefined)
+	// 		// 		clearTimeout(timeout);
+	// 		// });
+	// 	}
+	// }, [gameOver]);
+
+	const prevRotationRef = useRef<number>(0);
 
 	useEffect(() =>
 	{
@@ -400,6 +436,8 @@ const	TestBall = () =>
 		const	render = () =>
 		{
 			clear();
+			// prevRotationRef.current = gameMode?.mode === 'upside-down' ? theBoard.gameFace : 0;
+			// setRotation(prevRotationRef.current);
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{
@@ -445,6 +483,7 @@ const	TestBall = () =>
 			if (game.playerOne.score === game.scoreLimit
 				|| game.playerTwo.score === game.scoreLimit)
 			{
+				dispatch(setGameOver(true));
 				setGameActive(false);
 				game.displayEndMessage();
 			}
@@ -456,7 +495,7 @@ const	TestBall = () =>
 			cancelAnimationFrame(requestId);
 		});
 	},
-	[ theBoard.ball.position ]);
+	[theBoard.ball.position]);
 
 	const	displayStyle: React.CSSProperties = {
 		textAlign: "center",
@@ -466,13 +505,14 @@ const	TestBall = () =>
 	return (
 		<>
 			< MenuBar />
-			<WaitingActive
-				connected={connected}
-				numberOfUser={theServer.numberOfUser}
-				disconnected={socketRef.current?.active}
-			/>
+			{/* <WaitingActive
+					connected={connected}
+					numberOfUser={theServer.numberOfUser}
+					disconnected={socketRef.current?.active}
+					gameOver={gameOver}
+				/> */}
 			<div style={displayStyle}>
-				FT_TRANSCENDANCE
+				FT_TRANSCENDENCE
 			</div>
 
 			{/* This part show the connection to the websocket */}
@@ -507,16 +547,36 @@ const	TestBall = () =>
 							{JSON.stringify(theBoard.playerOne.position)} <br />
 				position du player 2:
 							{JSON.stringify(theBoard.playerTwo.position)} <br />
+				value rotation mode spec : {theBoard.gameFace} <br/>
 			</div>
 			<div style={displayStyle}>
 				<button onClick={setReadyAction}>I'm ready</button>
 			</div>
 			{/* This is the canvas part */}
 
-			<div style={{ textAlign: "center" }}>
+			<div style={{ textAlign: 'center' }}>
+				<div
+					style={{
+					width: game.board.canvas?.width,
+					height: game.board.canvas?.height,
+					transform: `rotate(${theBoard.gameFace}deg)`,
+					// transition: 'transform 0.5s',
+					}}
+				>
+					<canvas
+					height={game.board.canvas?.height}
+					width={game.board.canvas?.width}
+					ref={canvasRef}
+					/>
+				</div>
+			</div>
+			{/* <div style={{ textAlign: "center" }}>
 				<motion.div
-					initial={{ rotate: 0 }}
-					animate={{ rotate: gameMode?.mode === "upside-down" ? 180 : 0}}
+					// initial={{ rotate: 0 }}
+					animate={{
+						rotate: gameMode?.mode === "upside-down" ? theBoard.gameFace : 0,
+						transition: { duration: 0.5 }
+					}}
 					style={{
 					width: game.board.canvas?.width,
 					height: game.board.canvas?.height,
@@ -528,7 +588,7 @@ const	TestBall = () =>
 					ref={game.board.canvasRef}
 					/>
 				</motion.div>
-			</div>
+			</div> */}
 		</>
 	);
 };

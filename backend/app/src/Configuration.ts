@@ -158,7 +158,6 @@ class Configuration
 		if (!this.validConfiguration)
 			return ("");
 		this.generateFull();
-		console.log("VOICI", this.ftAuthUrl);
 		return (this.ftAuthUrl);
 	}
 

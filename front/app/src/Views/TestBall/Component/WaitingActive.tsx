@@ -5,28 +5,29 @@
 
 import {
 	Backdrop,
-	Alert,
+	// Alert,
 	Typography,
 	Card,
 	Box,
 	CardContent,
 	IconButton,
 	Grid,
-	Paper,
+	// Paper,
 	Avatar
 } from "@mui/material";
 
 import { useTheme } from "@emotion/react";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CardMedia from "@mui/material/CardMedia";
-import pong from "../assets/pong.jpeg";
+// import pong from "../assets/pong.jpeg";
 import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-type DisplayUsersAvatarProps = {
-	avatarPlayerOne: JSX.Element,
-	avatarPlayerTwo: JSX.Element
-};
+// type DisplayUsersAvatarProps = {
+// 	avatarPlayerOne: JSX.Element,
+// 	avatarPlayerTwo: JSX.Element
+// };
 
 const	DisplayUsersAvatar = (props: any) =>
 {
@@ -65,20 +66,19 @@ type WaitingActiveProps = {
 const	WaitingActive = (props: WaitingActiveProps) =>
 {
 	// use proper condition to set as false for start game
-	const	devTestValue = true;
+	// const	devTestValue = true;
 
 	const theme = useTheme();
-	const numberOfUser = useAppSelector((state) =>
-	{
-		return (state.gameEngine.server.numberOfUser);
-	});
+	// const numberOfUser = useAppSelector((state) =>
+	// {
+	// 	return (state.gameEngine.server.numberOfUser);
+	// });
 
-	const
-	[
-		render,
-		setRender
-	] = useState(<></>);
-
+	// const
+	// [
+	// 	render,
+	// 	setRender
+	// ] = useState(<></>);'
 	let title;
 
 	const
@@ -87,12 +87,11 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 		setDescription
 	] = useState("");
 
-	const
-	[
-		userCount,
-		setUserCount
-	] = useState(0);
-
+	// const
+	// [
+	// 	userCount,
+	// 	setUserCount
+	// ] = useState(0);
 	const userOnePicture = useAppSelector((state) =>
 	{
 		return (state.gameEngine.server.playerOnePicture);
@@ -252,7 +251,7 @@ const	WaitingActive = (props: WaitingActiveProps) =>
 					<CardMedia
 						component="img"
 						sx={{ width: 200 }}
-						image={pong}
+						// image={pong}
 						alt="Image de pong"
 					/>
 				</Card>

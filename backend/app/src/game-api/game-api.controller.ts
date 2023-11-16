@@ -4,7 +4,8 @@
 import {
 	Body,
 	Controller,
-	Get, Logger,
+	Get,
+	Logger,
 	Param,
 	Post,
 	Req,
@@ -79,8 +80,8 @@ export class GameApiController
 		@Req() req: any
 	)
 	{
-		const filter = "undefined";
 		// just for test
+		const filter = "undefined";
 		const arrayFriends = this.gameApiService
 			.getAllInstancesByUserIdAndFilter(req.user.id, filter);
 		this.logger.error("Array friends", arrayFriends);

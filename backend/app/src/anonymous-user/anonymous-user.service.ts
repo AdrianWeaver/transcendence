@@ -189,7 +189,6 @@ export class AnonymousUserService implements OnModuleInit
 			throw new ForbiddenException("Invalid credential");
 		else
 		{
-			console.log(this.secret);
 			searchUser.lastConnection = Date.now();
 			searchUser.revokeConnectionRequest = false;
 			searchUser.token = "Bearer " + jwt.sign(
@@ -202,7 +201,6 @@ export class AnonymousUserService implements OnModuleInit
 					expiresIn: "1d"
 				}
 			);
-			console.log(searchUser);
 			const	response: AnonymousUserLoginResponseModel = {
 				message: "You are successfully connected as anonymous user",
 				token: searchUser.token,

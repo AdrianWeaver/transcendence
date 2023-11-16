@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import { ChatUserModel } from "../Redux/models/redux-models";
+// import { ChatUserModel } from "../Redux/models/redux-models";
 import UserLogin from "./UserLogin";
 
 class UserLoginChecker

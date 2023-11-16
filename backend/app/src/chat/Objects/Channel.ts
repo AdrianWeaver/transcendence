@@ -89,19 +89,21 @@ class Channel
 		};
 		this.setClient = (client: Socket | null, profileId: string) =>
 		{
+			let	memberSocketId: string;
+			if (client !== null)
+				memberSocketId = client.id;
+			else
+				memberSocketId = "undefined";
 			const obj: MemberSocketIdModel = {
-				memberSocketId: "undefined",
+				memberSocketId: memberSocketId,
 				profileId: profileId,
 			};
-			console.log("set client", profileId);
-			if (client !== null)
-				obj.memberSocketId = client.id;
 			if (this.members === 1)
 			{
-				this.admins.push(obj);
 				this.owner = obj;
 				this.setId();
 			}
+			this.admins.push(obj);
 			this.users.push(obj);
 			if (client !== null)
 			{
@@ -124,15 +126,22 @@ class Channel
 
 		this.isAdmin = (id: string) =>
 		{
-		
+			// let isAdmin: boolean;
 			// const	profId = this.chat?.getProfileIdFromSocketId(id);
-			for (const user of this.admins)
+			const	index = this.admins.findIndex((elem) =>
 			{
-				// if (id === user.memberSocketId)
-				// 	return (true);
-				if (id === user.profileId)
-					return (true);
-			}
+				return (elem.profileId === id);
+			});
+			if (index !== -1)
+				return (true);
+			// for (const user of this.admins)
+			// {
+			// 	// if (id === user.memberSocketId)
+			// 	// 	return (true);
+			// 	if (id === user.profileId)
+
+			// 		isAdmin = true;
+			// }
 			return (false);
 		};
 
@@ -205,11 +214,26 @@ class Channel
 			this.users.splice(index, 1);
 		};
 
-		this.findClientById = (socketId: string) =>
+		this.findClientById = (socketOrProfileId: string) =>
 		{
+			let memberSocketIdMod;
+		
+			memberSocketIdMod = this.users.find((elem) =>
+			{
+				return (elem.profileId === socketOrProfileId);
+			})
+			if (memberSocketIdMod === undefined)
+			{
+				memberSocketIdMod = this.users.find((elem) =>
+				{
+					return (elem.memberSocketId === socketOrProfileId);
+				});
+				if (memberSocketIdMod === undefined)
+					return (undefined);
+			}
 			for (const client of this.sockets)
 			{
-				if (client.id === socketId)
+				if (client.id === memberSocketIdMod.memberSocketId)
 					return (client);
 			}
 			return (undefined);

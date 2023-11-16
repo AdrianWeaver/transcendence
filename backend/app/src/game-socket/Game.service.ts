@@ -15,8 +15,8 @@ type	MapSocketIdProfileId = {
 
 export type	MatchHistoryModel = {
 	uuid				: string | undefined;
-	playerOneProfileId	: string | undefined;
-	playerTwoProfileId	: string | undefined;
+	playerOneProfileId	: string | undefined | number;
+	playerTwoProfileId	: string | undefined | number;
 	scorePlayerOne		: number;
 	scorePlayerTwo		: number;
 	frameCount			: number | undefined;

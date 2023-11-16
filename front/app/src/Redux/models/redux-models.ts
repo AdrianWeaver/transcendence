@@ -235,12 +235,14 @@ export interface	GameEngineModel
 		plOneSocket: string,
 		plTwoSocket: string,
 		plOneScore: number,
-		plTwoScore:number
+		plTwoScore:number,
+		gameFace: number,
 	},
 	meConnected: boolean,
 	myGameActive:
 	{
 		random: any[],
 		friend: any[]
-	}
+	},
+	gameOver: boolean
 }

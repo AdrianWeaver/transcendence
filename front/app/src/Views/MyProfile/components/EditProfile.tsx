@@ -7,7 +7,7 @@ import {
 	AlertTitle,
 	FormControlLabel,
 	Grid,
-	Link,
+
 	List,
 	ListItem,
 	TextField,
@@ -17,25 +17,26 @@ import {
 	Switch,
 }	from "@mui/material";
 
-import	UserRegistration from "../../../Object/UserRegistration";
-import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
+// import	UserRegistration from "../../../Object/UserRegistration";
+// import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	hashPassword,
 	registerInfosInBack,
-	setChatUsers,
+	// setChatUsers,
 	setDoubleAuth,
-	setEmail,
+	// setEmail,
 	setPassword,
-	setPhoneNumber,
+	// setPhoneNumber,
 	setProfileMyView,
-	setPseudo,
+	// setPseudo,
 	updateChatUsers,
-	userRegistrationStepThree,
-	userRegistrationStepTwo } from "../../../Redux/store/controllerAction";
-import UserSecurityChecker from "../../../Object/UserSecurityChecker";
-import UserSecurity from "../../../Object/UserSecurity";
+	// userRegistrationStepThree,
+	// userRegistrationStepTwo,
+} from "../../../Redux/store/controllerAction";
+// import UserSecurityChecker from "../../../Object/UserSecurityChecker";
+// import UserSecurity from "../../../Object/UserSecurity";
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
@@ -177,7 +178,6 @@ type	EditProfileProps =
 
 const	EditProfile = (props: EditProfileProps) =>
 {
-	console.log("EDIT PROFILE");
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 

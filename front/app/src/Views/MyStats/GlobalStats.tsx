@@ -12,9 +12,9 @@ import {
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
-import { getMyStats } from "../../Redux/store/controllerAction";
+import { getAllStats, getStats } from "../../Redux/store/controllerAction";
 
 const	columns: GridColDef[] = [
 	{
@@ -79,14 +79,13 @@ const	columns: GridColDef[] = [
 
 ];
 
-// const	fakeRows: any = [];
-
 const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
 	{
-		return (state.controller.myStats);
+		return (state.controller.stats);
 	});
+	console.log("rowStats", rowStats);
 	if (rowStats.length === 0)
 	{
 		return (
@@ -163,14 +162,10 @@ const	Header = () =>
 							variant="contained"
 							onClick={() =>
 							{
-								// dispatch(getMyActiveGame());
-								dispatch(getMyStats());
+								dispatch(getAllStats());
 							}}>
 							Rafraichir
 						</Button>
-						{/* 
-							<Button variant="outlined">Secondary 
-							action</Button>  */}
 					</Stack>
 				</Container>
 			</Box>
@@ -178,16 +173,15 @@ const	Header = () =>
 	);
 };
 
-const	MyStats = () =>
+const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
-
 	useEffect(() =>
 	{
-		dispatch(getMyStats());
-	}, [dispatch]);
-	savePrevPage("/my-stats");
+		dispatch(getAllStats());
+	}, [dispatch,]);
+	savePrevPage("/global-stats");
 	return (
 		<>
 			<MenuBar />
@@ -198,4 +192,4 @@ const	MyStats = () =>
 	);
 };
 
-export default MyStats;
+export default GlobalStats;
