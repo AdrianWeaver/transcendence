@@ -338,6 +338,7 @@ const	TestBall = () =>
 			socket.off("init-message", sendInitMessageToPlayers);
 			socket.off("game-active", activateGame);
 			socket.off("matchmaking-state", matchmakingState);
+			socket.disconnect();
 		});
 	}, []);
 

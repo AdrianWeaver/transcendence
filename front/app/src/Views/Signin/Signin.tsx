@@ -189,8 +189,7 @@ const	Signin = () =>
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	userLogIn = new UserLogin(data);
-		
-		console.log("prev User ", user);
+		// console.log("prev User ", user);
 		userLogIn.check();
 		setErrorValidation(userLogIn.checker);
 		const	asArray = Object.entries(userLogIn.checker.getPlainObject());

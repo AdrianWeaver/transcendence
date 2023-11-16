@@ -45,7 +45,7 @@ const MessageItem = (props: MessageItemProps) =>
 			align = "center";
 			break;
 	}
-	if (props.message === "!play pong" && props.sender === "server")
+	if (props.message === "/playPong" && props.sender === "server")
 		return (
 			<ListItem key={props.ind}>
 				<Grid container>
