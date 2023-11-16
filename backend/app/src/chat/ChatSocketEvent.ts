@@ -125,7 +125,6 @@ export class ChatSocketEvents
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
-						this.logger.log("Chat User not found");
 						const userName = this.userService.getUsernameByProfileId(profileId) as string;
 						const user = this.userService.getUserById(profileId);
 						if (user === undefined)
@@ -140,7 +139,6 @@ export class ChatSocketEvents
 					}
 					else
 					{
-						this.logger.log("User found");
 						this.chatService.setSocketToUser(index, client);
 						this.chatService.updateUserSocketInChannels(client);
 
@@ -152,6 +150,20 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
+						
+						const	userToUpdate = this.chatService.getUserWithProfileId(profileId);
+						const	blockedArray: string[] = [];
+						userToUpdate?.blocked.forEach((blocked) =>
+						{
+							blockedArray.push(blocked.profileId);
+						})
+						const	action = {
+							type: "on-connection",
+							payload: {
+								blockedList: blockedArray,
+							}
+						};
+						this.server.emit("channel-info", action);
 					}
 					this.chatService.updateDatabase();
 				}
@@ -159,11 +171,9 @@ export class ChatSocketEvents
 				{
 					if (error instanceof jwt.JsonWebTokenError)
 					{
-						this.logger.warn("A client try to connect without authenticate");
 						client.disconnect();
 						return ;
 					}
-					this.logger.error(error);
 					return ;
 				}
 			}
@@ -680,19 +690,15 @@ export class ChatSocketEvents
 
 			if (data.type === "kick-member" || data.type === "ban-member")
 			{
-				console.log("WE GOT HERE");
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
-				console.log("CHANNEL OK");
 				const	targetClient = channel.findClientById(data.payload.userName);
 				if (targetClient === undefined)
 					return ;
-				console.log("TARGET CLIENT OK");
 				const	target = this.chatService.getUserBySocketId(targetClient.id);
 				if (target === undefined)
 					return ;
-				console.log("TARGEET USER OK");
 				channel.leaveChannel(targetClient);
 				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
@@ -924,25 +930,26 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
-				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
+				// const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
+				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.blockedName);
 				if (userToBlock === undefined)
 					return ;
 				const blockedToAdd: MemberSocketIdModel = {
-					memberSocketId: searchSocket === undefined ? userToBlock.id : data.payload.blockedName,
-					profileId: data.payload.friendProfileId,
+					memberSocketId: userToBlock.id,
+					profileId: userToBlock.profileId,
 				};
 				const arrayBlocked: string[] = [];
+				userMe.blocked.push(blockedToAdd);
 				userMe.blocked.forEach((blocked) =>
 				{
-					arrayBlocked.push(blocked.memberSocketId);
+					arrayBlocked.push(blocked.profileId);
 				});
-				userMe.blocked.push(blockedToAdd);
 				const	action = {
 					type: "block-user",
 					payload: {
 						blockedList: arrayBlocked,
-						newBlocked: data.payload.blockedName,
+						newBlocked: userToBlock.name,
+						blockedProfileId: userToBlock.profileId,
 					}
 				};
 				client.emit("user-info", action);
