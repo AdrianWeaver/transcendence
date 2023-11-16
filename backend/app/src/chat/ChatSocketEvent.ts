@@ -271,17 +271,20 @@ export class ChatSocketEvents
 				const	filteredGame = this.gameService.gameInstances.filter((instance) =>
 				{
 					return (
-						instance.playerOne.profileId === profileId
-						|| instance.playerTwo.profileId === profileId
+						(instance.playerOne.profileId === profileId
+						&& instance.playerTwo.profileId === friendProfileId)
+						|| (instance.playerTwo.profileId === profileId
+						&& instance.playerOne.profileId === friendProfileId)
 					);
 				});
 				const	filteredGameByGameMode = filteredGame.filter((instance) =>
 				{
 					return (instance.gameMode === "friend");
 				});
-				if (filteredGameByGameMode !== undefined)
+				if (filteredGameByGameMode.length)
 				{
 					console.log("already exists", filteredGameByGameMode);
+					return ;
 				}
 				const	newRoomName = roomName;
 				const	newGame = new GameServe(newRoomName);
@@ -308,7 +311,7 @@ export class ChatSocketEvents
 				newGame.initPlayers();
 				this.gameService.getRoomCount();
 				this.gameService.pushGameServeToGameInstance(newGame);
-				console.log("New game", newGame);
+				console.log("New game", newGame.getSeralizable());
 		}
 
 		/**
@@ -353,10 +356,10 @@ export class ChatSocketEvents
 			if (data.payload.message.trim().length === 0)
 				return ;
 			const	id = channel.messages.length;
-
+			console.log("PLayPOndijd", playPong);
 			const newMessage: MessageModel = {
 				// profileId instead of socketId ?
-				sender: profileId,
+				sender: playPong ? "server" : profileId,
 				message: data.payload.message,
 				id: id,
 				username: this.chatService.getUsernameWithSocketId(client.id) as string,
