@@ -214,11 +214,26 @@ class Channel
 			this.users.splice(index, 1);
 		};
 
-		this.findClientById = (socketId: string) =>
+		this.findClientById = (socketOrProfileId: string) =>
 		{
+			let memberSocketIdMod;
+		
+			memberSocketIdMod = this.users.find((elem) =>
+			{
+				return (elem.profileId === socketOrProfileId);
+			})
+			if (memberSocketIdMod === undefined)
+			{
+				memberSocketIdMod = this.users.find((elem) =>
+				{
+					return (elem.memberSocketId === socketOrProfileId);
+				});
+				if (memberSocketIdMod === undefined)
+					return (undefined);
+			}
 			for (const client of this.sockets)
 			{
-				if (client.id === socketId)
+				if (client.id === memberSocketIdMod.memberSocketId)
 					return (client);
 			}
 			return (undefined);

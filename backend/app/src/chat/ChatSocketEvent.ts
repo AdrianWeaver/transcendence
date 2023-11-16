@@ -680,15 +680,19 @@ export class ChatSocketEvents
 
 			if (data.type === "kick-member" || data.type === "ban-member")
 			{
+				console.log("WE GOT HERE");
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
+				console.log("CHANNEL OK");
 				const	targetClient = channel.findClientById(data.payload.userName);
 				if (targetClient === undefined)
 					return ;
+				console.log("TARGET CLIENT OK");
 				const	target = this.chatService.getUserBySocketId(targetClient.id);
 				if (target === undefined)
 					return ;
+				console.log("TARGEET USER OK");
 				channel.leaveChannel(targetClient);
 				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
@@ -720,7 +724,7 @@ export class ChatSocketEvents
 					// 	return ;
 					// searchUser.channels.splice(chanIndex, 1);
 					message = target.name + " has been banned.";
-					channel.addToBanned(data.payload.userName, target.profileId);
+					channel.addToBanned(target.id, target.profileId);
 				}
 				const newMessage: MessageModel = {
 					sender: "server",

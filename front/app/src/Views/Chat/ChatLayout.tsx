@@ -1185,7 +1185,7 @@ const	ChatLayout = () =>
 		const	action = {
 			type: "kick-member",
 			payload: {
-				userName: userName,
+				userName: userName as string,
 				chanName: chanName,
 			}
 		};
@@ -1572,27 +1572,30 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						alert(uniqueId);
-																						kickUserFromChannel(member.name, buttonSelection.name);
+																						// alert(uniqueId);
+																						kickUserFromChannel(member.name, clickedChannel);
 																						handleMembersClose();
 																					}}>
 																						Kick
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						banUserFromChannel(member.name, buttonSelection.name);
+																						banUserFromChannel(member.name, clickedChannel);
+																						handleMembersClose();
 																					}}>
 																						Ban
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						muteUserInChannel(member.name, buttonSelection.name);
+																						muteUserInChannel(member.name, clickedChannel);
+																						handleMembersClose();
 																					}}>
 																						Mute
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						makeAdmin(member.name, buttonSelection.name);
+																						makeAdmin(member.name, clickedChannel);
+																						handleMembersClose();
 																					}}>
 																						Make admin
 																					</Button>
