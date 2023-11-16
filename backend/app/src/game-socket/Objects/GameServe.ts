@@ -41,7 +41,6 @@ class GameServe
 	// public	mutexFaceRotation: boolean;
 	public	faceDirection: string;
 	public	triggeredPaddleCount: number;
-  
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
