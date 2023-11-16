@@ -768,6 +768,7 @@ const	ChatLayout = () =>
 				setKindOfConversation(data.payload.kind);
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
+				// let filteredMessages: MessageModel[] = [];
 				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
 				{
 					return (!blockedListRef.current.includes(message.sender));
@@ -775,7 +776,6 @@ const	ChatLayout = () =>
 				if (data.payload.kind === "channel")
 				{
 					setChanMessages(filteredMessages);
-					// chanMessageTest = filteredMessages;
 				}
 				else if (data.payload.kind === "privateMessage")
 					setPrivMessages(filteredMessages);
@@ -797,7 +797,12 @@ const	ChatLayout = () =>
 					dispatch(setCurrentChannel(data.payload.chanName));
 					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
 					{
-						setChanMessages(data.payload.chanMessages);
+						const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
+						{
+							return (!blockedListRef.current.includes(message.sender));
+						});
+						setChanMessages(filteredMessages);
+						goToChannel(data.payload.chanName, data.payload.kind);
 						// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
@@ -806,6 +811,7 @@ const	ChatLayout = () =>
 				else
 					alert(data.payload.isInside);
 			}
+
 			if (data.type === "display-members")
 			{
 				setChannelMembers(data.payload.memberList);
@@ -823,6 +829,11 @@ const	ChatLayout = () =>
 				}
 				setFriendProfileId(data.payload.friendId);
 				setIsFriend(data.payload.isFriend);
+			}
+
+			if (data.type === "on-connect")
+			{
+				setBlockedList(data.payload.blockedList)
 			}
 		};
 
@@ -862,8 +873,18 @@ const	ChatLayout = () =>
 
 			if (data.type === "block-user")
 			{
-				setBlockedList(data.payload.blockedList);
-				const	alertMessage = "You have blocked " + data.payload.newBlocked + ".";
+				let	alertMessage: string;
+				const	searchBlocked = blockedListRef.current.findIndex((person: string) =>
+				{
+					return (person === data.payload.blockedProfileId);
+				});
+				if (searchBlocked === -1)
+				{
+					setBlockedList(data.payload.blockedList);
+					alertMessage = "You have blocked " + data.payload.newBlocked + ".";
+				}
+				else
+					alertMessage = "You have already blocked " + data.payload.newBlocked + ".";
 				alert(alertMessage);
 			}
 
@@ -1228,6 +1249,7 @@ const	ChatLayout = () =>
 	const	addUserToBlocked = (userName: string) =>
 	{
 		console.log("userrname", userName);
+		console.log("FRIEND PROFILE ID ", friendProfileId);
 		const	action = {
 			type: "block-user",
 			payload: {
@@ -1804,7 +1826,7 @@ const	ChatLayout = () =>
 																					<Button onClick={() =>
 																					{
 																						setSeeProfile(false);
-																						addUserToBlocked(talkingUser);
+																						addUserToBlocked(friendProfileId);
 																					}}>
 																						Block
 																					</Button>
