@@ -12,6 +12,7 @@ import {
 import {
 	GetValidationCode,
 	addFrontUser,
+	getIpAddress,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setAllUsers,
@@ -131,11 +132,12 @@ const	SecondStepFormContent = () =>
 			dispatch(setRegistered());
 			dispatch(setUserLoggedIn());
 			dispatch(setProfileMyView());
-			dispatch(setAllUsers());
 			dispatch(addFrontUser(user));
 			dispatch(setOnline(true, user));
 			dispatch(setStatus("online", user));
 			dispatch(setAvatar(user.avatar));
+			dispatch(getIpAddress(true));
+			dispatch(setAllUsers());
 			navigate("/");
 		}
 	};
@@ -255,6 +257,7 @@ const	SecondStepFormContent = () =>
 				dispatch(setRegistered());
 				dispatch(setAllUsers());
 				dispatch(addFrontUser(user));
+				dispatch(getIpAddress(true));
 			}
 		};
 

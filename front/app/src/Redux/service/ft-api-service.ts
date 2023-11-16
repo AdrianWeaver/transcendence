@@ -123,7 +123,7 @@ const	UserServices = {
 			.get("/user/get-all-users", {})
 			.then((data) =>
 			{
-				// console.log("get all users route ", data.data);
+				console.log("get all users route ", data.data);
 				return (data.data);
 			})
 			.catch((error) =>
@@ -358,6 +358,32 @@ const	UserServices = {
 			{
 				console.log(data);
 				return ("OK");
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+	async	getIpAddress(token: string, hostname: string, changeIp: boolean)
+	{
+		console.log("Get Ip address");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		const	data = {
+			changeIp: changeIp,
+		};
+		return (
+			Api(hostname)
+			.post("user/get-ip", data, config)
+			.then((data) =>
+			{
+				return (data.data);
 			})
 			.catch((error) =>
 			{

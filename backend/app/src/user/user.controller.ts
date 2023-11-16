@@ -9,7 +9,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException, Ip } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
 import e, { Request, Response } from "express";
@@ -31,6 +31,7 @@ import Configuration from "src/Configuration";
 import Chat from "src/chat/Objects/Chat";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+import { RealIP } from "nestjs-real-ip";
 
 type	ResponseRow = {
 	id: number;
@@ -184,9 +185,14 @@ export class UserController
 
 	@Post("register")
 	getUserRegister(
+		@RealIP() realIp: string,
+		@Req() req: Request,
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
+		const	ip = "real ip";
+		console.log(realIp);
+		console.log(req.socket.remoteAddress);
 		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
@@ -945,5 +951,21 @@ export class UserController
 			}
 		});
 		return (array);
+	}
+
+	@Post("/get-ip")
+	@UseGuards(UserAuthorizationGuard)
+	getUserIp(
+		@Req() req: Request,
+		@Ip() ip: any,
+		@Body() body: any) : { userAgent: string, ip: string }
+	{
+		console.log(ip);
+		console.log("req.ip", req.ip, "req.userAgent:", req.headers["user-agent"]);
+		// const	ip = req.ip;
+		const userAgent = req.headers["user-agent"];
+		const	res = this.userService.registerIpAddress(body.id, ip, body.changeIp);
+		console.log("res", res);
+		return (res);
 	}
 }

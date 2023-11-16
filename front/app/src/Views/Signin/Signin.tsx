@@ -12,6 +12,8 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { decodePassword, setProfileMyView } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
+import os from "os";
+
 // type PasswordAlertProps ={
 // 	password: string,
 // 	firstTrigger: boolean,
@@ -189,7 +191,6 @@ const	Signin = () =>
 		event.preventDefault();
 		const	data = new FormData(event.currentTarget);
 		const	userLogIn = new UserLogin(data);
-		// console.log("prev User ", user);
 		userLogIn.check();
 		setErrorValidation(userLogIn.checker);
 		const	asArray = Object.entries(userLogIn.checker.getPlainObject());

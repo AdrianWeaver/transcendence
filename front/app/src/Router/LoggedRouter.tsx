@@ -11,17 +11,13 @@ import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
 import Logout from "../Views/Logout/Logout";
 import MyProfile from "../Views/MyProfile/MyProfile";
 import Settings from "../Views/Settings/Settings";
-// import PlayGame from "../Views/PlayGame/PlayGame";
-// import GameCanvas from "../Views/GameCanvas/GameCanvas";
+
 import TestBall from "../Views/TestBall/TestBall";
 
 import GameSetup from "../Views/GameSetup/GameSetup";
 
-// import Chat from "../Views/Chat/Chat";
-// import { useAppSelector } from "../Redux/hooks/redux-hooks";
-// import { Landing } from "../Views/Chat/Landing";
+
 import ChatLayout from "../Views/Chat/ChatLayout";
-// import { useDispatch } from "react-redux";
 import ProfilePage from "../Views/MyProfile/ProfilePage";
 import MyActiveGame from "../Views/MyActiveGame/MyActiveGame";
 import MyStats from "../Views/MyStats/MyStats";
@@ -34,11 +30,6 @@ import GlobalStats from "../Views/MyStats/GlobalStats";
  * */
 const	LoggedRouter = () =>
 {
-	// const	user = useAppSelector((state) =>
-	// {
-	// 	return (state.controller.user);
-	// });
-
 	return (
 		<BrowserRouter >
 			<Routes>
@@ -52,7 +43,6 @@ const	LoggedRouter = () =>
 					element={<ReduxTestView />}
 				/>
 
-				{/* no save route navigation */}
 				<Route
 					path="/logout"
 					element={<Logout />}

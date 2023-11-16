@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  reverse_proxy:
+    image: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./reverse_proxy/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./reverse_proxy/config/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+    container_name: reverse_proxy
+    command: [nginx-debug, '-g', 'daemon off;']
+    restart : always
+    networks:
+      - transcendence
+
   backend:
     container_name: backend
     image: backend
@@ -19,6 +32,15 @@ services:
       transcendence:
         ipv4_address: 172.19.0.40
     mem_limit: 4G
+
+  # frontProd:
+  #   container_name: frontProd
+  #   image: nginx
+  #   ports:
+  #     - "8080:80"
+  #   networks:
+  #     transcendence:
+  #       ipv4_address: 172.19.0.21
 
   front:
     container_name: front
@@ -76,6 +98,7 @@ networks:
       config:
         - subnet: 172.19.0.0/16
           gateway: 172.19.0.1
+    internal: false
 
 volumes:
   postgres:

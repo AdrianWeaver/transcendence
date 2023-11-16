@@ -463,6 +463,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
+				ipAddress: elem.authService.doubleAuth.lastIpClient,
+				doubleAuth: elem.authService.doubleAuth.enable,
+				token: elem.authService.token
 			};
 			users.push(user);
 		});
@@ -1605,5 +1608,34 @@ public	register(data: UserModel)
 			},
 		];
 		return (fakeRows);
+	}
+
+	public	registerIpAddress(profileId: string | number, ip: string, changeIp: boolean)
+		: any
+	{
+		const	searchUser = this.user.find((elem) =>
+		{
+			return (profileId.toString() === elem.id.toString());
+		});
+		if (searchUser === undefined)
+		{
+			console.log("user not found");
+			return ("error");
+		}
+		const	oldIp = searchUser.authService.doubleAuth.lastIpClient;
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (profileId.toString() === elem.id.toString());
+		});
+		if (index === -1)
+			return ("error");
+		if (changeIp || oldIp === "undefined")
+			this.user[index].authService.doubleAuth.lastIpClient = ip;
+		const	res = {
+			newIp: ip,
+			oldIp: oldIp,
+			ipChanged: changeIp
+		};
+		return (res);
 	}
 }

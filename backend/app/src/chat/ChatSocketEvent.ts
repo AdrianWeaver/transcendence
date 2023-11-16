@@ -104,11 +104,6 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			// instrument(this.server,
-			// 	{
-			// 		auth: false,
-			// 		mode: "development"
-			// 	});
 		}
 
 		handleConnection(client: Socket)

@@ -201,9 +201,9 @@ export const	reinitialiseUser = (logout: boolean)
 			return ;
 		if (logout)
 		{
-			await UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
+			UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
 			dispatch(logOffUser());
-			dispatch(resetRegistration());
+			dispatch(resetRegistration);
 		}
 		dispatch(controllerActions.reinitialiseUser());
 	});
@@ -589,22 +589,10 @@ export const	setUserData = (data: any)
 	{
 		const	prev = getState();
 
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
 		console.log("SET USER DATA", data);
-		array.forEach((elem) =>
-		{
-			if (elem.id === data.id)
-			{
-				elem.id = data.id;
-				elem.email = data.email;
-				elem.firstName = data.firstName;
-				elem.lastName = data.lastName;
-				elem.username = data.login;
-			}
-		});
 		const	response: ControllerModel = {
 			...prev.controller,
-			allUsers: [...array],
+			allUsers: data,
 			user:
 			{
 				...prev.controller.user,
@@ -613,6 +601,10 @@ export const	setUserData = (data: any)
 				bearerToken: data.token,
 				firstName: data.firstName,
 				lastName: data.lastName,
+				ipAddress: data.ipAddress,
+				doubleAuth: data.doubleAuth,
+				location: data.location,
+				avatar: data.avatar
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -706,6 +698,7 @@ export const registerClientWithCode = (code : string)
 					elem.lastName = data.lastName;
 					elem.username = data.username;
 					elem.avatar = data.avatar;
+					elem.location = data.location;
 				}
 			});
 
@@ -1178,6 +1171,7 @@ export const	setAllUsers = ()
 			...prev.controller,
 			allUsers: [...array]
 		}
+		dispatch(setUserData(theUsers));
 		dispatch(controllerActions.setAllUsers(response));
 	});
 }
@@ -1247,9 +1241,18 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((_data) =>
+		.then((data) =>
 		{
-			// console.log("okay", data);
+			console.log("hash", data);
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					password: data.hashed
+				}
+			}
+			dispatch(controllerActions.setPassword(response));
 		})
 		.catch((error) =>
 		{
@@ -1285,28 +1288,30 @@ export const	decodePassword = (id: any, password: string, email: string)
 		try
 		{
 			const	data = await UserServices.decodePassword(
-				prev.controller.user.bearerToken,
 				password, id, email,
 				prev.server.uri
 			);
 			console.log("data: ", data);
-			const	newUser = {...prev.controller.allFrontUsers[data.index]};
-
-			newUser.bearerToken = data.token;
-			newUser.isLoggedIn = true;
+			// const	newFrontUsers = prev.controller.allFrontUsers;
+			// newFrontUsers[data.index].bearerToken = data.token;
+			// newUser.isLoggedIn = true;
 
 			const	response: ControllerModel =	{
 				...prev.controller,
-				user: newUser
+				user:
+				{
+					...prev.controller.user,
+					bearerToken: data.token,
+				},
+				// allFrontUsers: newFrontUsers
 			}
-			console.log("newUser = ", newUser);
 			dispatch(controllerActions.setUserData(response));
 			// dispatch(controllerActions.setNewToken(response));
 		}
 		catch (error)
 		{
 			dispatch(controllerActions.setUserData({...prev.controller}))
-			console.log(error);
+			console.log("HERE ERR", error);
 			return ;
 		}
 		// .then((data) =>
@@ -1729,6 +1734,7 @@ export const	getIpAddress = (changeIp: boolean)
 		const	prev = getState();
 		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
+		console.log("getIp token", token);
 		const	data = await UserServices.getIpAddress(token, uri, changeIp);
 		if (data)
 		{
