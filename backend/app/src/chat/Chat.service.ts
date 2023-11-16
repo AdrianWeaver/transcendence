@@ -719,7 +719,7 @@ export	class ChatService implements OnModuleInit
 	{
 		const searchUser = this.chat.users.find((elem) =>
 		{
-			return (elem.profileId === profileId);
+			return (elem.profileId.toString() === profileId.toString());
 		});
 
 		return (searchUser);

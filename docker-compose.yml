@@ -61,7 +61,10 @@ services:
 
   postgres:
     container_name: postgres
-    image: postgres:15
+    image: database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
     restart: always
     # depends_on:
     #   - backend
@@ -75,9 +78,16 @@ services:
       - 6500:5432
     volumes: 
        - postgres:/var/lib/postgresql/data
+        # - ./postgres:/var/lib/postgresql/data # to see the data
     networks:
       transcendence:
         ipv4_address: 172.19.0.42
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "max_connections=200"
 
 networks:
   transcendence:
