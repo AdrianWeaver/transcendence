@@ -779,6 +779,7 @@ const	ChatLayout = () =>
 							return (!blockedListRef.current.includes(message.sender));
 						});
 						setChanMessages(filteredMessages);
+						goToChannel(data.payload.chanName, data.payload.kind);
 						// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
@@ -786,7 +787,6 @@ const	ChatLayout = () =>
 				}
 				else
 					alert(data.payload.isInside);
-				goToChannel(data.payload.chanName, data.payload.kind);
 			}
 
 			if (data.type === "display-members")
@@ -1240,6 +1240,7 @@ const	ChatLayout = () =>
 	const	addUserToBlocked = (userName: string) =>
 	{
 		console.log("userrname", userName);
+		console.log("FRIEND PROFILE ID ", friendProfileId);
 		const	action = {
 			type: "block-user",
 			payload: {
@@ -1828,7 +1829,7 @@ const	ChatLayout = () =>
 																					<Button onClick={() =>
 																					{
 																						setSeeProfile(false);
-																						addUserToBlocked(talkingUser);
+																						addUserToBlocked(friendProfileId);
 																					}}>
 																						Block
 																					</Button>
