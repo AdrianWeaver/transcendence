@@ -1269,7 +1269,6 @@ const	ChatLayout = () =>
 	const	inviteUserToChannel = (data: string) =>
 	{
 		refreshListUser();
-		let	profileId: string;
 		const	profileId = getProfileId(data);
 		const	action = {
 			type: "invite-member",
