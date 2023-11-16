@@ -1,7 +1,14 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
-import { Body, Controller, ForbiddenException, Get, Logger, Param, Post, Req, UseGuards } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get, Logger,
+	Param,
+	Post,
+	Req,
+	UseGuards } from "@nestjs/common";
 import { GameApiService } from "./game-api.service";
 import { UserService } from "src/user/user.service";
 import { UserAuthorizationGuard } from "../user/user.authorizationGuard";
@@ -72,7 +79,8 @@ export class GameApiController
 		@Req() req: any
 	)
 	{
-		const filter = "undefined"; // just for test
+		const filter = "undefined";
+		// just for test
 		const arrayFriends = this.gameApiService
 			.getAllInstancesByUserIdAndFilter(req.user.id, filter);
 		this.logger.error("Array friends", arrayFriends);

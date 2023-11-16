@@ -739,8 +739,27 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
+		const	goToChannel = (chanName: string, kind: string) =>
+		{
+			const	action = {
+				type: "did-I-join",
+				payload: {
+					chanName: chanName,
+					kind: kind,
+					userId: activeId
+				}
+			};
+			socketRef.current.emit("channel-info", action);
+		};
+
+		const	inviteToPlayPong = (roomName: string, pOneProfileId: string, pTwoProfileId: string) =>
+		{
+			// here ?
+		};
+
 		const	updateMessages = (data: any) =>
 		{
+			console.log("Update messages", data);
 			const	kind = data.payload.kind;
 			setKindOfConversation(kind);
 			if (data.payload.chanName === currentChannelRef.current)
@@ -761,6 +780,10 @@ const	ChatLayout = () =>
 					setPrivMessages(filteredMessages);
 			}
 			goToChannel(data.payload.chanName, data.payload.kind);
+			if (data.playPong === true)
+			{
+				inviteToPlayPong(data.payload.chanName, data.payload.MyProfileId, data.payload.friendProfileId);
+			}
 		};
 
 		const	channelInfo = (data: any) =>
@@ -1037,19 +1060,6 @@ const	ChatLayout = () =>
 		setText("");
 	};
 
-	const	goToChannel = (chanName: string, kind: string) =>
-	{
-		const	action = {
-			type: "did-I-join",
-			payload: {
-				chanName: chanName,
-				kind: kind,
-				userId: activeId
-			}
-		};
-		socketRef.current.emit("channel-info", action);
-	};
-
 	const	goToProfilePage = (username: string) =>
 	{
 		console.log("Go to ", username, "'s profile");
@@ -1089,7 +1099,6 @@ const	ChatLayout = () =>
 		// 		userId: undefined
 		// 	}
 		// };
-	
 		// socketRef.current.emit("channel-info", act);
 	};
 
@@ -1268,9 +1277,9 @@ const	ChatLayout = () =>
 	{
 		console.log("member: " + data);
 		console.log("channel : " + channelToInvite);
-		let	profileId: string;
+		// let	profileId: string;
 		// profileId = data.toString();
-		profileId = getProfileId(data);
+		const	profileId = getProfileId(data);
 		// console.log("isNaN(Number(data))", isNaN(Number(data)));
 		// if (data.length !== 5 || isNaN(Number(data)))
 		// if (isNaN(Number(data)) === true)
@@ -1305,7 +1314,18 @@ const	ChatLayout = () =>
 	};
 
 	// END OF INVITE
-
+	const	goToChannel = (chanName: string, kind: string) =>
+	{
+		const	action = {
+			type: "did-I-join",
+			payload: {
+				chanName: chanName,
+				kind: kind,
+				userId: activeId
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
 	const	makeAdmin = (userName: string, chanName: string) =>
 	{
 		const	action = {
@@ -1933,7 +1953,8 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}<h1>tabpanel 0</h1>
+							> */}
+							<h1>tabpanel 0</h1>
 							{chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";

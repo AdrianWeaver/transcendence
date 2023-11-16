@@ -10,6 +10,8 @@ import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 import { v4 as uuidv4 } from "uuid";
+import	* as roomNameArray from "../game-socket/assets/roomName.json";
+
 import
 {
 	ConnectedSocket,
@@ -33,6 +35,9 @@ import { UserModel } from "src/user/user.interface";
 // import { instrument } from "@socket.io/admin-ui";
 
 import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
+import GameServe from "src/game-socket/Objects/GameServe";
+import { GameService } from "src/game-socket/Game.service";
+import Player from "src/game-socket/Objects/Player";
 
 type	ActionSocket = {
 	type: string,
@@ -85,12 +90,15 @@ export class ChatSocketEvents
 
 		public	constructor(
 			private readonly chatService: ChatService,
-			private readonly userService: UserService)
+			private readonly userService: UserService,
+			private readonly gameService: GameService)
 		{
 			this.logger.debug("An instance is started with chat service id: "
 				+ this.chatService.getChatInstanceId());
 			this.logger.debug("User instance service is :"
 				+ this.userService.getUuidInstance());
+			this.logger.debug("GameSevice instance is loaded with id: "
+				+ this.gameService.getInstanceId());
 		}
 
 		afterInit(server: any)
@@ -107,6 +115,7 @@ export class ChatSocketEvents
 		{
 			this.chatService.setServer(this.server);
 			let profileId: string;
+			console.log(client.handshake);
 			if (client.handshake.auth)
 			{
 				const	secret = this.userService.getSecret();
@@ -257,6 +266,51 @@ export class ChatSocketEvents
 			}
 		}
 
+		public createNewGame(roomName: string, profileId: string, friendProfileId: string)
+		{
+				const	filteredGame = this.gameService.gameInstances.filter((instance) =>
+				{
+					return (
+						instance.playerOne.profileId === profileId
+						|| instance.playerTwo.profileId === profileId
+					);
+				});
+				const	filteredGameByGameMode = filteredGame.filter((instance) =>
+				{
+					return (instance.gameMode === "friend");
+				});
+				if (filteredGameByGameMode !== undefined)
+				{
+					console.log("already exists", filteredGameByGameMode);
+				}
+				const	newRoomName = roomName;
+				const	newGame = new GameServe(newRoomName);
+				const	searchPlayerOne = this.chatService.getUserWithProfileId(profileId.toString());
+				const	searchPlayerTwo = this.chatService.getUserWithProfileId(friendProfileId.toString());
+				if (searchPlayerOne === undefined || searchPlayerTwo === undefined)
+				{
+					// TEST
+					console.error("user not found");
+					return ;
+				}
+				const	playerOne = new Player();
+				const	playerTwo = new	Player();
+				this.gameService.increaseRoomCount();
+				playerOne.name = searchPlayerOne.name;
+				playerOne.profileId = searchPlayerOne.profileId;
+				playerOne.socketId = "invited";
+				playerTwo.name = searchPlayerTwo.name;
+				playerTwo.profileId = searchPlayerTwo.profileId;
+				playerTwo.socketId = "invited";
+				newGame.playerOne = playerOne;
+				newGame.playerTwo = playerTwo;
+				newGame.gameMode = "friend";
+				newGame.initPlayers();
+				this.gameService.getRoomCount();
+				this.gameService.pushGameServeToGameInstance(newGame);
+				console.log("New game", newGame);
+		}
+
 		/**
 		 * Subscibed message "info"
 		 * @param client 
@@ -267,7 +321,9 @@ export class ChatSocketEvents
 		{
 			let	channel;
 			let	kind;
+			let	playPong;
 			let	friendProfileId;
+			playPong = false;
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			channel = this.chatService.searchChannelByName(data.payload.chanName);
 			if (channel === undefined)
@@ -277,13 +333,20 @@ export class ChatSocketEvents
 					return ;
 				else
 					kind = "privateMessage";
-
 				channel.users.map((elem) =>
 				{
 					if (elem.profileId !== profileId)
 						friendProfileId = elem.profileId;
 				});
-				this.game
+				if (friendProfileId === undefined)
+					return ;
+				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
+				if (data.payload.message === "/playPong")
+				{
+					playPong = true;
+					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
+					this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+				}
 			}
 			else
 				kind = "channel";
@@ -305,6 +368,9 @@ export class ChatSocketEvents
 				payload: {
 					messages: channel.messages,
 					chanName: channel.name,
+					friendProfileId: friendProfileId,
+					myProfileId: profileId,
+					playPong: playPong,
 					kind: kind
 				}
 			};

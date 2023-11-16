@@ -350,7 +350,7 @@ export class	GameService implements OnModuleInit
 			})
 		);
 	}
- 
+
 	// V2
 	public	findIndexGameInstanceAloneByGameMode(gameMode: string)
 	{

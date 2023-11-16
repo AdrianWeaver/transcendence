@@ -36,7 +36,7 @@ class GameServe
 
 	public gameMode: string;
 	public	revoked: boolean;
-  
+
 	// public	isGameInstanceEmpty: () => boolean;
 	public constructor(roomName: string)
 	{
