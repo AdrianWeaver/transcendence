@@ -1050,7 +1050,10 @@ export class ChatSocketEvents
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
-				const	targetClient = this.chatService.searchUser(data.payload.userName)?.client;
+				const	tmpUser = this.chatService.getUserWithProfileId(data.payload.userName);
+				if (tmpUser === undefined)
+					return ;
+				const	targetClient = tmpUser.client;
 				if (targetClient === undefined || targetClient === null)
 					return ;
 				const	action = {
@@ -1060,6 +1063,11 @@ export class ChatSocketEvents
 					}
 				};
 
+				if (channel.isOwner(client.id) === false)
+				{
+					action.payload.message = "You are not the owner";
+					return ;
+				}
 				if (channel.isAdmin(targetClient.id) === true)
 				{
 					action.payload.message = targetClient.id + " is already an admin.";
@@ -1067,7 +1075,7 @@ export class ChatSocketEvents
 				}
 				else
 				{
-					action.payload.message = client.id + " has made you an admin of the channel " + channel.name;
+					action.payload.message = "You are now an admin of the channel " + channel.name;
 					targetClient.emit("user-info", action);
 					channel.addAdmin(targetClient.id);
 				}
@@ -1075,7 +1083,7 @@ export class ChatSocketEvents
 				const id = channel.messages.length + 1;
 					const newMessage: MessageModel = {
 						sender: "server",
-						message: targetClient.id + " is now an admin.",
+						message: this.chatService.getUsernameWithProfileId(targetClient.id) + " is now an admin.",
 						id: id,
 						username: "server",
 					};
