@@ -12,6 +12,8 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { decodePassword, setProfileMyView } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
+import os from "os";
+
 // type PasswordAlertProps ={
 // 	password: string,
 // 	firstTrigger: boolean,

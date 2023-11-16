@@ -30,7 +30,7 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-import { instrument } from "@socket.io/admin-ui";
+// import { instrument } from "@socket.io/admin-ui";
 
 import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 
@@ -96,17 +96,18 @@ export class ChatSocketEvents
 		afterInit(server: any)
 		{
 			this.chatService.setServer(this.server);
-			instrument(this.server,
+			/**instrument(this.server,
 				{
 					auth: false,
 					mode: "development"
-				});
+				});*/
 		}
 
 		handleConnection(client: Socket)
 		{
 			this.chatService.setServer(this.server);
 			let profileId: string;
+			console.log(client.handshake);
 			if (client.handshake.auth)
 			{
 				const	secret = this.userService.getSecret();
