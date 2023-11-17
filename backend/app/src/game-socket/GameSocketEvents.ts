@@ -40,12 +40,13 @@ type	HandShakeModel = {
 	friendId?: string,
 };
 
-type	FilteredArrayModel = {
+export type	FilteredArrayModel = {
 	filtered: {
 		undefined: GameServe[];
 		disconnected: GameServe[];
 		invited: GameServe[];
 		revoked: GameServe[];
+		connected: GameServe[];
 	}
 };
 
@@ -119,7 +120,6 @@ export class GameSocketEvents
 					else
 						instance.face = "up";
 				}
-				
 			}
 		};
 
@@ -157,7 +157,7 @@ export class GameSocketEvents
 				}
 			}
 			// upside = 0, down = 180
-			const gameFace = instance.face === "up" ? 0 : 180;
+			// const gameFace = instance.face === "up" ? 0 : 180;
 
 			const action = {
 				type: "game-data",
@@ -211,7 +211,6 @@ export class GameSocketEvents
 			case "upside-down":
 			case "friend":
 				return (true);
-				break ;
 			default:
 				return false;
 		}
@@ -243,6 +242,7 @@ export class GameSocketEvents
 			result.isValid = false;
 			if (error instanceof jwt.JsonWebTokenError)
 			{
+				console.error("Error: JsonWebTokenError", error);
 			}
 			return (result);
 		}
@@ -371,22 +371,6 @@ export class GameSocketEvents
 		return (true);
 	}
 
-	public	filterGameByProfileIdAndGameMode(profileId: string, gameMode: string)
-	{
-		const	filteredGame = this.gameService.gameInstances.filter((instance) =>
-		{
-			return (
-				instance.playerOne.profileId === profileId
-				|| instance.playerTwo.profileId === profileId
-			);
-		});
-		const	filteredGameByGameMode = filteredGame.filter((instance) =>
-		{
-			return (instance.gameMode === gameMode);
-		});
-		return (filteredGameByGameMode);
-	}
-
 	public	getUuidGameFromFilteredGame(game: GameServe[], profileId: string)
 	{
 		const	uuidGame: string[] = [];
@@ -444,92 +428,6 @@ export class GameSocketEvents
 		}
 	}
 
-	public	filterGameArrayBySocketState(profileId: string, arrayGameMode: GameServe[])
-		: FilteredArrayModel
-	{
-		// the socketState of a user disconnected
-		const	disconnectedArray = arrayGameMode.filter((instance) =>
-		{
-			const	socketPlayerOne = instance.playerOne.socketId;
-			const	socketPlayerTwo = instance.playerTwo.socketId;
-
-			const	profileIdPlayerOne = instance.playerOne.profileId;
-			const	profileIdPlayerTwo = instance.playerTwo.profileId;
-
-			if (profileIdPlayerOne === profileId)
-				if (socketPlayerOne === "disconnected")
-					return (true);
-			if (profileIdPlayerTwo === profileId)
-				if (socketPlayerTwo === "disconnected")
-					return (true);
-			return (false);
-		});
-
-		// the basic socketState of a random game (never connected)
-		const	undefinedArray = arrayGameMode.filter((instance) =>
-		{
-			const	socketPlayerOne = instance.playerOne.socketId;
-			const	socketPlayerTwo = instance.playerTwo.socketId;
-
-			const	profileIdPlayerOne = instance.playerOne.profileId;
-			const	profileIdPlayerTwo = instance.playerTwo.profileId;
-
-			if (profileIdPlayerOne === profileId)
-				if (socketPlayerOne === "undefined")
-					return (true);
-			if (profileIdPlayerTwo === profileId)
-				if (socketPlayerTwo === "undefined")
-					return (true);
-			return (false);
-		});
-
-		// the basic socketState of a friend games 
-		const	invitedArray = arrayGameMode.filter((instance) =>
-		{
-			const	socketPlayerOne = instance.playerOne.socketId;
-			const	socketPlayerTwo = instance.playerTwo.socketId;
-
-			const	profileIdPlayerOne = instance.playerOne.profileId;
-			const	profileIdPlayerTwo = instance.playerTwo.profileId;
-
-			if (profileIdPlayerOne === profileId)
-				if (socketPlayerOne === "invited")
-					return (true);
-			if (profileIdPlayerTwo === profileId)
-				if (socketPlayerTwo === "invited")
-					return (true);
-			return (false);
-		});
-
-		// the socket state of friend abandoned
-		const	revokedArray = arrayGameMode.filter((instance) =>
-		{
-			const	socketPlayerOne = instance.playerOne.socketId;
-			const	socketPlayerTwo = instance.playerTwo.socketId;
-
-			const	profileIdPlayerOne = instance.playerOne.profileId;
-			const	profileIdPlayerTwo = instance.playerTwo.profileId;
-
-			if (profileIdPlayerOne === profileId)
-				if (socketPlayerOne === "revoked")
-					return (true);
-			if (profileIdPlayerTwo === profileId)
-				if (socketPlayerTwo === "revoked")
-					return (true);
-			return (false);
-		});
-
-		return ({
-			filtered:
-			{
-				undefined: undefinedArray,
-				disconnected: disconnectedArray,
-				invited: invitedArray,
-				revoked: revokedArray
-			}
-		});
-	}
-
 	/**
 	 * 	A/ id friend not checked yet :
 	 * 			-- check:
@@ -545,8 +443,8 @@ export class GameSocketEvents
 	public async	dispatchMatchmakingFriend(profileId: string)
 
 	{
-		const	friendModeGame = this.filterGameByProfileIdAndGameMode(profileId, "friend");
-		const	friendArray = this.filterGameArrayBySocketState(profileId, friendModeGame);
+		const	friendModeGame = this.gameService.filterGameByProfileIdAndGameMode(profileId, "friend");
+		const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, friendModeGame);
 		let		roomName: string;
 
 		console.log("friend filtered", friendArray);
@@ -584,8 +482,8 @@ export class GameSocketEvents
 	public async	dispatchMatchmakingClassical(profileId: string, client: Socket)
 		: Promise<string>
 	{
-		const	classicalGameMode = this.filterGameByProfileIdAndGameMode(profileId, "classical");
-		const	classicalArray = this.filterGameArrayBySocketState(profileId, classicalGameMode);
+		const	classicalGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "classical");
+		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, classicalGameMode);
 		let		roomName: string;
 
 		console.log("classical filtered", classicalArray);
@@ -728,8 +626,8 @@ export class GameSocketEvents
 	public async	dispatchMatchmakingUpsideDown(profileId: string, client: Socket)
 		: Promise<string>
 	{
-		const	upsideDownGameMode = this.filterGameByProfileIdAndGameMode(profileId, "upside-down");
-		const	upsideDownArray = this.filterGameArrayBySocketState(profileId, upsideDownGameMode);
+		const	upsideDownGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "upside-down");
+		const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, upsideDownGameMode);
 		let		roomName: string;
 
 		console.log("upside-down filtered", upsideDownArray);

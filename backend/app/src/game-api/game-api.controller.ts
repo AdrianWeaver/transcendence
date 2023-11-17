@@ -80,15 +80,11 @@ export class GameApiController
 		@Req() req: any
 	)
 	{
-		// just for test
-		const filter = "undefined";
-		const arrayFriends = this.gameApiService
-			.getAllInstancesByUserIdAndFilter(req.user.id, filter);
-		this.logger.error("Array friends", arrayFriends);
+		const data = this.gameApiService
+			.getAllInstancesByUserId(req.user.id);
 		this.logger.verbose("User req id :" + req.user.id);
 		return ({
-			random: [0],
-			friend: arrayFriends
+			data: data
 		});
 	}
 

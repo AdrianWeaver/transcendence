@@ -3,9 +3,12 @@
 /* eslint-disable curly */
 /* eslint-disable max-len */
 import { Injectable, Logger } from "@nestjs/common";
-import { privateDecrypt } from "crypto";
 import { GameService } from "src/game-socket/Game.service";
 import { UserService } from "../user/user.service";
+import { FilteredArrayModel } from "src/game-socket/GameSocketEvents";
+import { profile } from "console";
+import { constrainedMemory } from "process";
+import GameServe from "src/game-socket/Objects/GameServe";
 
 @Injectable()
 export class GameApiService
@@ -35,35 +38,67 @@ export class GameApiService
 	{
 		// this.gameService.
 	}
-	public	getAllInstancesByUserIdAndFilter(myProfileId: string, filter: string)
+
+	public getCopyWithActiveSocketSetAsActive(array: GameServe[])
 	{
-		const serviceResult = this.gameService.getAllInstancesByUserIdAndFilter(myProfileId, filter);
-		for (const game of serviceResult)
+		const	copy = [...array];
+
+		for (const instance of array)
 		{
-			console.log("service results : ", game.playerOne);
-	
-			if (game.playerOne.profileId === undefined)
-				game.playerOne.profilePicture = "test"; // mettre une photo style
-			else
+			switch (instance.playerOne.socketId)
 			{
-				const user = this.userService.getUserById(game.playerOne.profileId);
-				if (user !== undefined)
-					game.playerOne.profilePicture = user.avatar;
-				else
-					game.playerOne.profilePicture = ""; // erreur  normalement, mais mettre autre chose
+				case "undefined":
+				case "disconnected":
+				case "invited":
+				case "revoked":
+					break ;
+				default:
+					instance.playerOne.socketId = "connected";
 			}
-			if (game.playerTwo.profileId === undefined)
-				game.playerTwo.profilePicture = "test"; // mettre une photo style
-			else
+			switch (instance.playerTwo.socketId)
 			{
-				const userTwo = this.userService.getUserById(game.playerTwo.profileId);
-				if (userTwo !== undefined)
-					game.playerTwo.profilePicture = userTwo.avatar;
-				else
-					game.playerTwo.profilePicture = ""; // erreur  normalement, mais mettre autre chose
+				case "undefined":
+				case "disconnected":
+				case "invited":
+				case "revoked":
+					break ;
+				default:
+					instance.playerTwo.socketId = "connected";
 			}
 		}
-		return (serviceResult);
+		return (copy);
+	}
+
+	public	getAllInstancesByUserId(profileId: string)
+	{
+		const	tempClassicalGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "classical");
+		const	deepCopyClassical = tempClassicalGameMode.map((instance) =>
+		{
+			return (instance.getSeralizable());
+		});
+		const	aliveClassicalGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyClassical);
+		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, aliveClassicalGameMode);
+
+		// const	friendModeGame = this.gameService.filterGameByProfileIdAndGameMode(profileId, "friend");
+		// console.log(copyClassicalGameMode);
+		// const	upsideDownGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "upside-down");
+
+
+		// console.log(classicalGameMode);
+		// const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, friendModeGame);
+
+		// const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, upsideDownGameMode);
+
+		// console.log("classical ", classicalArray);
+		// const	friendSerialzed = this.getFilteredSerialized(friendArray);
+		// const	classicalSerialzed = this.getFilteredSerialized(classicalArray);
+		// const	upsideDownSerialzed = this.getFilteredSerialized(upsideDownArray);
+
+		return (
+			{
+				classical: classicalArray.filtered,
+			}
+		);
 	}
 
 	public findIndexGameInstanceUserProfileAndGameUuid(myProfileId: string, gameUuid: string)
