@@ -154,7 +154,6 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
-						
 						const	userToUpdate = this.chatService.getUserWithProfileId(profileId);
 						const	blockedArray: string[] = [];
 						userToUpdate?.blocked.forEach((blocked) =>
@@ -287,7 +286,7 @@ export class ChatSocketEvents
 				if (filteredGameByGameMode.length)
 				{
 					console.log("already exists", filteredGameByGameMode);
-					return ;
+					return ("error");
 				}
 				const	newRoomName = roomName;
 				const	newGame = new GameServe(newRoomName);
@@ -297,7 +296,7 @@ export class ChatSocketEvents
 				{
 					// TEST
 					console.error("user not found");
-					return ;
+					return ("error");
 				}
 				const	playerOne = new Player();
 				const	playerTwo = new	Player();
@@ -315,7 +314,9 @@ export class ChatSocketEvents
 				this.gameService.getRoomCount();
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
+				return (newGame.uuid);
 		}
+
 		/**
 		 * Subscibed message "info"
 		 * @param client 
@@ -328,6 +329,9 @@ export class ChatSocketEvents
 			let	kind;
 			let	playPong;
 			let	friendProfileId;
+			let	message;
+
+			message = data.payload.message;
 			playPong = false;
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			channel = this.chatService.searchChannelByName(data.payload.chanName);
@@ -348,9 +352,14 @@ export class ChatSocketEvents
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
+					const	usernameOne = this.userService.getUsernameByProfileId(profileId);
+					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
 					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
-					this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					if (gameUuid === "error")
+						console.log("The game hasnt been created, something went wrong");
+					message = "/playPong&" + profileId + ":" + usernameOne + "!" + friendProfileId + ":" + usernameTwo + "!" + gameUuid;
 				}
 			}
 			else
@@ -362,7 +371,7 @@ export class ChatSocketEvents
 			const newMessage: MessageModel = {
 				// profileId instead of socketId ?
 				sender: playPong ? "server" : profileId,
-				message: data.payload.message,
+				message: message,
 				id: id,
 				username: this.chatService.getUsernameWithSocketId(client.id) as string,
 			};

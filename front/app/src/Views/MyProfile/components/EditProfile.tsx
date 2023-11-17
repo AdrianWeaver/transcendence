@@ -289,8 +289,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(setPassword(userChanges.password));
 				dispatch(hashPassword(userChanges.password));
 			}
-			if (user.email !== userChanges.emailAddress)
-				dispatch(registerInfosInBack(userChanges.emailAddress, "email"));
 			if (user.phoneNumber !== userChanges.phoneNumber)
 				dispatch(registerInfosInBack(userChanges.phoneNumber, "phoneNumber"));
 			if (props.setting)
@@ -351,23 +349,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						}
 					/>
 				</Grid>
-				<Grid item xs={12}>
-				<TextField
-						required
-						fullWidth
-						id="email"
-						label="Email Address"
-						name="email"
-						autoComplete="email"
-						error={errorValidation.email}
-						helperText={
-							errorValidation.email
-								? "Email is required"
-								: ""
-						}
-					/>
-				</Grid>
-				<Grid item xs={12} sm={12} >
+				{/* <Grid item xs={12} sm={12} > */}
 				<Grid item xs={12} sm={12} >
 					<FormControlLabel
 						value="doubleAuthentification"
@@ -381,7 +363,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						labelPlacement="start"
 					/>
 				</Grid>
-				</Grid>
+				{/* </Grid> */}
 
 				<Grid item xs={12} sm={12}>
 				{
