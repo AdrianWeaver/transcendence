@@ -316,6 +316,7 @@ export class ChatSocketEvents
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
 		}
+
 		/**
 		 * Subscibed message "info"
 		 * @param client 
@@ -889,18 +890,11 @@ export class ChatSocketEvents
 					{
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
-							const	myFriendsProfileIds = this.userService.getFriendsProfileId(profId);
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 							if (user.profileId !== profId)
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
-								// const	searchFriend = myFriendsProfileIds.find((elem: string) =>
-								// {
-								// 	return (elem === friendProfId);
-								// });
-								console.log("friends", searchUser.friends);
-								console.log("username", userName);
 								const	searchFriend = searchUser.friends.find((elem) =>
 								{
 									return (elem.name === userName);

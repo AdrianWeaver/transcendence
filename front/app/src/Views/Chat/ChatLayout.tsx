@@ -1811,18 +1811,12 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														<Button onClick={() =>
-														{
-															return handleRemoveButtonClick(buttonSelectionPriv.id, buttonSelectionPriv.name);
-														}}>
-															Remove
-														</Button>
-														<Button onClick={() =>
+														{/* <Button onClick={() =>
 														{
 															return handleMembersClickOpen(buttonSelectionPriv.name);
 														}}>
 															Other options
-														</Button>
+														</Button> */}
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogContent>
 																<ul>
@@ -1856,51 +1850,6 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					{/* <Button onClick={() =>
-																					{
-																						setSeeProfile(false);
-																						setInviteDialogOpen(true);
-																					}}>
-																						Invite
-																					</Button>
-																					<Dialog open={inviteDialogOpen} onClose={() =>
-																								{
-																									setInviteDialogOpen(false);
-																								}}
-																								maxWidth="sm" fullWidth>
-																						<DialogTitle>Invite User to Channel</DialogTitle>
-																						<DialogContent>
-																							<TextField
-																							label="Channel Name"
-																							variant="outlined"
-																							fullWidth
-																							value={channelToInvite}
-																							onChange={(e) =>
-																							{
-																								setSeeProfile(false);
-																								console.log("target value " + e.target.value);
-																								setChannelToInvite(e.target.value);
-																							}}/>
-																						</DialogContent>
-																						<DialogActions>
-																							<Button onClick={() =>
-																								{
-																									setSeeProfile(false);
-																									getProfileId(talkingUser);
-																									inviteUserToChannel(userToInvite);
-																									setInviteDialogOpen(false);
-																								}} color="primary">
-																								Invite
-																							</Button>
-																							<Button onClick={() =>
-																							{
-																								setSeeProfile(false);
-																								setInviteDialogOpen(false);
-																							}} color="primary">
-																							Cancel
-																							</Button>
-																						</DialogActions>
-																					</Dialog> */}
 																				</>
 																			</>
 																			: <></>
