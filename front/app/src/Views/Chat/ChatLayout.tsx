@@ -1977,7 +1977,8 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}<h1>tabpanel 1</h1>
+							> */}
+							<h1>tabpanel 1</h1>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";

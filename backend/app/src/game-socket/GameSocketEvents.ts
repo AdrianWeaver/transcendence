@@ -774,6 +774,7 @@ export class GameSocketEvents
 		const { handShake, token, error} = this.doHandShake(client);
 		if (error === true || token === undefined || handShake === undefined)
 			return ;
+		console.log(handShake);
 		const	profileId = token.profileId;
 		const	gameModeRequest = handShake.gameMode;
 
