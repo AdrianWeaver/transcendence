@@ -13,6 +13,7 @@ type FriendItemProps = {
 	status?: string;
 	key?: number;
 	ind?: number;
+	isFriend?: boolean;
 };
 
 const FriendItem = (props: FriendItemProps) =>
@@ -23,9 +24,7 @@ const FriendItem = (props: FriendItemProps) =>
 	if (props.status === "playing" && props.online)
 		status = "playing.. 🏓";
 	return (
-		<ListItem
-			// key={props.ind}
-		>
+		<ListItem >
 			<ListItemIcon>
 				<Avatar
 					alt={props.name}
@@ -35,11 +34,14 @@ const FriendItem = (props: FriendItemProps) =>
 			<ListItemText primary={props.name}>
 				{props.name}
 			</ListItemText>
-			<ListItemText
-				secondary={status}
-				sx={{ align: "right" }}
-			>
-			</ListItemText>
+			{
+				(props.isFriend)
+				? <ListItemText
+						secondary={status}
+						sx={{ align: "right" }}
+				></ListItemText>
+				: <></>
+			}
 		</ListItem>
 	);
 };

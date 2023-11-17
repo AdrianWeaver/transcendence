@@ -4,7 +4,7 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 // import * as SocketIOClient from "socket.io-client";
-
+// 🏓 🔴 🟢 🗨
 import {
 	Box,
 	Button,
@@ -157,6 +157,7 @@ const TabPanel = (props: TabPanelProps) =>
 type FriendsListProps = {
 	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
+	isFriend: boolean
 };
 
 const FriendsList = (props: FriendsListProps) =>
@@ -230,6 +231,7 @@ const FriendsList = (props: FriendsListProps) =>
 										status={elem.status}
 										key={index}
 										ind={index}
+										isFriend={props.isFriend}
 									/>
 								</div>
 							</>
@@ -562,6 +564,11 @@ const	ChatLayout = () =>
 		};
 		socketRef.current.emit("channel-info", action);
 	};
+	const
+	[
+		status,
+		setStatus
+	] = useState("🔴");
 
 	useEffect(() =>
 	{
@@ -593,6 +600,7 @@ const	ChatLayout = () =>
 		const connect = () =>
 		{
 			setConnected(true);
+			setStatus("🟢");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -620,6 +628,7 @@ const	ChatLayout = () =>
 		const disconnect = () =>
 		{
 			setConnected(false);
+			setStatus("🔴");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -833,7 +842,7 @@ const	ChatLayout = () =>
 
 			if (data.type === "on-connect")
 			{
-				setBlockedList(data.payload.blockedList)
+				setBlockedList(data.payload.blockedList);
 			}
 		};
 
@@ -1093,9 +1102,14 @@ const	ChatLayout = () =>
 		{
 			dispatch(setProfileFriendView());
 			dispatch(setCurrentProfileIsFriend(true));
+			setIsFriend(true);
 		}
 		else
+		{
+			setIsFriend(false);
+			dispatch(setCurrentProfileIsFriend(false));
 			dispatch(setProfilePublicView());
+		}
 		setTalkingUserProfileId(searchUser.profileId);
 		navigate("/profile/");
 	};
@@ -1751,7 +1765,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} />
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={isFriend}/>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
@@ -1921,6 +1935,10 @@ const	ChatLayout = () =>
 												style={listItemTextStyle}
 												primary={friend}
 											/>
+											<ListItemText
+												secondary={status}
+												sx={{ align: "right" }}
+										></ListItemText>
 										</ListItem>
 									);
 								})
@@ -1977,7 +1995,8 @@ const	ChatLayout = () =>
 								height: "70vh",
 								overflowY: "auto"
 							}}
-							> */}<h1>tabpanel 1</h1>
+							> */}
+							<h1>tabpanel 1</h1>
 						{privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
