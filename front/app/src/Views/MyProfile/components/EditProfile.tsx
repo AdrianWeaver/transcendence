@@ -17,26 +17,16 @@ import {
 	Switch,
 }	from "@mui/material";
 
-// import	UserRegistration from "../../../Object/UserRegistration";
-// import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	hashPassword,
 	registerInfosInBack,
-	// setChatUsers,
 	setDoubleAuth,
-	// setEmail,
 	setPassword,
-	// setPhoneNumber,
 	setProfileMyView,
-	// setPseudo,
 	updateChatUsers,
-	// userRegistrationStepThree,
-	// userRegistrationStepTwo,
 } from "../../../Redux/store/controllerAction";
-// import UserSecurityChecker from "../../../Object/UserSecurityChecker";
-// import UserSecurity from "../../../Object/UserSecurity";
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +42,6 @@ const	stringContainChar = (string: string, char: string) =>
 	let	i;
 
 	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
 	while (i < string.length)
 	{
 		if (string.charAt(i) >= char.charAt(0)
@@ -289,8 +278,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(setPassword(userChanges.password));
 				dispatch(hashPassword(userChanges.password));
 			}
-			if (user.email !== userChanges.emailAddress)
-				dispatch(registerInfosInBack(userChanges.emailAddress, "email"));
 			if (user.phoneNumber !== userChanges.phoneNumber)
 				dispatch(registerInfosInBack(userChanges.phoneNumber, "phoneNumber"));
 			if (props.setting)
@@ -351,23 +338,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						}
 					/>
 				</Grid>
-				<Grid item xs={12}>
-				<TextField
-						required
-						fullWidth
-						id="email"
-						label="Email Address"
-						name="email"
-						autoComplete="email"
-						error={errorValidation.email}
-						helperText={
-							errorValidation.email
-								? "Email is required"
-								: ""
-						}
-					/>
-				</Grid>
-				<Grid item xs={12} sm={12} >
+				{/* <Grid item xs={12} sm={12} > */}
 				<Grid item xs={12} sm={12} >
 					<FormControlLabel
 						value="doubleAuthentification"
@@ -381,7 +352,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						labelPlacement="start"
 					/>
 				</Grid>
-				</Grid>
+				{/* </Grid> */}
 
 				<Grid item xs={12} sm={12}>
 				{
