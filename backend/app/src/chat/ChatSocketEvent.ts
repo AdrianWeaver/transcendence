@@ -863,7 +863,9 @@ export class ChatSocketEvents
 				talkingUser = "";
 				conv = false;
 				isFriend = false;
-				let	friendProfId;
+				let	friendProfId: string;
+
+				friendProfId = "";
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				const	testChatUsers = this.chatService.getAllUsersArray();
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
@@ -887,12 +889,18 @@ export class ChatSocketEvents
 					{
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
-							console.log("Here ?????");
+							const	myFriendsProfileIds = this.userService.getFriendsProfileId(profId);
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
 							if (user.profileId !== profId)
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
+								// const	searchFriend = myFriendsProfileIds.find((elem: string) =>
+								// {
+								// 	return (elem === friendProfId);
+								// });
+								console.log("friends", searchUser.friends);
+								console.log("username", userName);
 								const	searchFriend = searchUser.friends.find((elem) =>
 								{
 									return (elem.name === userName);
@@ -941,7 +949,7 @@ export class ChatSocketEvents
 						}
 					}
 				}
-				console.log("display-member is friend", isFriend);
+				console.log("display-member is friend", isFriend, "friend profileId", friendProfId);
 				const	action = {
 					type: "display-members",
 					payload: {

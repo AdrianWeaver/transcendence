@@ -169,7 +169,6 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.currentProfileIsFriend);
 	});
-	console.log("IS FRIEND", currentProfileIsFriend);
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -885,6 +884,9 @@ const	ChatLayout = () =>
 					setFriendList(data.payload.friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
 					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
+					// TEST 
+					dispatch(setCurrentProfile(data.payload.friendProfileId));
+					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
 					alert(alertMessage);
 				}
