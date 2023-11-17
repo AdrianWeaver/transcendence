@@ -316,6 +316,7 @@ export class ChatSocketEvents
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
 		}
+
 		/**
 		 * Subscibed message "info"
 		 * @param client 

@@ -515,13 +515,31 @@ export class	GameService implements OnModuleInit
 			return (false);
 		});
 
+		const	activeArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "connected")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "connected")
+					return (true);
+			return (false);
+		});
+
 		return ({
 			filtered:
 			{
 				undefined: undefinedArray,
 				disconnected: disconnectedArray,
 				invited: invitedArray,
-				revoked: revokedArray
+				revoked: revokedArray,
+				connected: activeArray
 			}
 		});
 	}

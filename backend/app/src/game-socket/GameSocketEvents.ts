@@ -46,6 +46,7 @@ export type	FilteredArrayModel = {
 		disconnected: GameServe[];
 		invited: GameServe[];
 		revoked: GameServe[];
+		connected: GameServe[];
 	}
 };
 

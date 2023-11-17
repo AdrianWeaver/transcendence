@@ -88,10 +88,6 @@ const	TestBall = () =>
 		setGameActive
 	] = useState(false);
 
-	const [
-		rotation,
-		setRotation
-	] = useState<number>(0);
 
 	const	dispatch = useAppDispatch();
 
