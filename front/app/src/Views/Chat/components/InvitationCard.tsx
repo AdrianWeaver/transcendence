@@ -12,16 +12,27 @@ import
 	Typography,
 	IconButton,
 	CardMedia,
-	Box
+	Box,
 } from "@mui/material";
 
 // please use vector this one is just for testing card
 import pong from "../assets/pong.jpeg";
+
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-const	InvitationCard = () =>
+type	InvitationCardProps = {
+	message: string
+};
+
+const	InvitationCard = (props: InvitationCardProps) =>
 {
-	const theme = useTheme();
+	const	theme = useTheme();
+	const	message = props.message.split("#");
+	const	playerOne = message[0].split(":");
+	const	playerTwo = message[message.length - 1].split(":");
+
+	console.log("Player one: ", playerOne[0], "(", playerOne[1], ")");
+	console.log("Player two: ", playerTwo[0], "(", playerTwo[1], ")");
 	return (
 		<Card sx={{
 			display: "flex",

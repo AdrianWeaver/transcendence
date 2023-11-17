@@ -30,6 +30,9 @@ type MessageItemProps = {
 const MessageItem = (props: MessageItemProps) =>
 {
 	let align: "right" | "center" | "left";
+	const	messageToSplit = props.message.split("#");
+	const	playPong = messageToSplit[0];
+	const	message = messageToSplit[1];
 	switch (props.sender)
 	{
 		case "me":
@@ -45,7 +48,7 @@ const MessageItem = (props: MessageItemProps) =>
 			align = "center";
 			break;
 	}
-	if (props.message === "/playPong" && props.sender === "server")
+	if (playPong === "/playPong" && props.sender === "server")
 		return (
 			<ListItem key={props.ind}>
 				<Grid container>
@@ -54,7 +57,8 @@ const MessageItem = (props: MessageItemProps) =>
 							align={align}
 							color="primary"
 						>
-							<InvitationCard />
+							<InvitationCard
+								message={message} />
 						</ListItemText>
 					</Grid>
 					<Grid item xs={12}>

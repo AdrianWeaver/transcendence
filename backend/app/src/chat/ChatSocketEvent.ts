@@ -316,6 +316,7 @@ export class ChatSocketEvents
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
 		}
+
 		/**
 		 * Subscibed message "info"
 		 * @param client 
@@ -328,6 +329,9 @@ export class ChatSocketEvents
 			let	kind;
 			let	playPong;
 			let	friendProfileId;
+			let	message;
+
+			message = data.payload.message;
 			playPong = false;
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			channel = this.chatService.searchChannelByName(data.payload.chanName);
@@ -348,9 +352,13 @@ export class ChatSocketEvents
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
+					const	usernameOne = this.userService.getUsernameByProfileId(profileId);
+					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
 					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
 					this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					message = "/playPong#", profileId, ":", usernameOne, "#", friendProfileId, ":", usernameTwo;
+					console.log("IS MSG OK ", message);
 				}
 			}
 			else
@@ -362,7 +370,7 @@ export class ChatSocketEvents
 			const newMessage: MessageModel = {
 				// profileId instead of socketId ?
 				sender: playPong ? "server" : profileId,
-				message: data.payload.message,
+				message: message,
 				id: id,
 				username: this.chatService.getUsernameWithSocketId(client.id) as string,
 			};
