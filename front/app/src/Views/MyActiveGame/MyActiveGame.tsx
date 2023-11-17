@@ -1,11 +1,25 @@
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import { Container, Typography, Stack, Button, Box, Card, CardActions, CardContent, CardMedia, Grid } from "@mui/material";
+import {
+	Container,
+	Typography,
+	Stack,
+	Button,
+	Box,
+	Card,
+	CardActions,
+	CardContent,
+	CardMedia,
+	Grid
+} from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { getMyActiveGame, revokeGameWithUuid } from "../../Redux/store/gameEngineAction";
+import {
+	getMyActiveGame,
+	revokeGameWithUuid
+} from "../../Redux/store/gameEngineAction";
 
 const	Header = () =>
 {

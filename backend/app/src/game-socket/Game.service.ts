@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 import {
@@ -7,6 +8,7 @@ import {
 } from "@nestjs/common";
 import { v4 as uuidv4 } from "uuid";
 import GameServe from "./Objects/GameServe";
+import { FilteredArrayModel } from "./GameSocketEvents";
 
 type	MapSocketIdProfileId = {
 	socketId: string
@@ -366,6 +368,12 @@ export class	GameService implements OnModuleInit
 		);
 	}
 
+	/**
+	 * @deprecated
+	 * @param myProfileId 
+	 * @param filter 
+	 * @returns 
+	 */
 	public	getAllInstancesByUserIdAndFilter(
 		myProfileId: string,
 		filter: string
@@ -427,5 +435,113 @@ export class	GameService implements OnModuleInit
 			uuid: instance.uuid,
 		};
 		this.matchHistory.push(record);
+	}
+
+	public	filterGameArrayBySocketState(
+		profileId: string,
+		arrayGameMode: GameServe[]
+	)
+		: FilteredArrayModel
+	{
+		// the socketState of a user disconnected
+		const	disconnectedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "disconnected")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "disconnected")
+					return (true);
+			return (false);
+		});
+
+		// the basic socketState of a random game (never connected)
+		const	undefinedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "undefined")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "undefined")
+					return (true);
+			return (false);
+		});
+
+		// the basic socketState of a friend games 
+		const	invitedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "invited")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "invited")
+					return (true);
+			return (false);
+		});
+
+		// the socket state of friend abandoned
+		const	revokedArray = arrayGameMode.filter((instance) =>
+		{
+			const	socketPlayerOne = instance.playerOne.socketId;
+			const	socketPlayerTwo = instance.playerTwo.socketId;
+
+			const	profileIdPlayerOne = instance.playerOne.profileId;
+			const	profileIdPlayerTwo = instance.playerTwo.profileId;
+
+			if (profileIdPlayerOne === profileId)
+				if (socketPlayerOne === "revoked")
+					return (true);
+			if (profileIdPlayerTwo === profileId)
+				if (socketPlayerTwo === "revoked")
+					return (true);
+			return (false);
+		});
+
+		return ({
+			filtered:
+			{
+				undefined: undefinedArray,
+				disconnected: disconnectedArray,
+				invited: invitedArray,
+				revoked: revokedArray
+			}
+		});
+	}
+
+	public	filterGameByProfileIdAndGameMode(
+		profileId: string,
+		gameMode: string
+	)
+	{
+		const	filteredGame = this.gameInstances.filter((instance) =>
+		{
+			return (
+				instance.playerOne.profileId === profileId
+				|| instance.playerTwo.profileId === profileId
+			);
+		});
+		const	filteredGameByGameMode = filteredGame.filter((instance) =>
+		{
+			return (instance.gameMode === gameMode);
+		});
+		return (filteredGameByGameMode);
 	}
 }
