@@ -26,13 +26,11 @@ type	InvitationCardProps = {
 
 const	InvitationCard = (props: InvitationCardProps) =>
 {
+	console.log("message here", props.message);
 	const	theme = useTheme();
 	const	message = props.message.split("#");
 	const	playerOne = message[0].split(":");
-	const	playerTwo = message[message.length - 1].split(":");
-
-	console.log("Player one: ", playerOne[0], "(", playerOne[1], ")");
-	console.log("Player two: ", playerTwo[0], "(", playerTwo[1], ")");
+	const	playerTwo = message[1].split(":");
 	return (
 		<Card sx={{
 			display: "flex",
@@ -48,10 +46,10 @@ const	InvitationCard = (props: InvitationCardProps) =>
 			}>
 				<CardContent sx={{ flex: "1 0 auto" }}>
 					<Typography component="div" variant="h5">
-						Play Pong with me
+						Play Pong with you
 					</Typography>
 					<Typography variant="subtitle1" color="text.secondary" component="div">
-						A slot is reserved between John Wick and you
+						A slot is reserved between {playerOne[1]} and {playerTwo[1]}
 					</Typography>
 				</CardContent>
 				<Box sx={

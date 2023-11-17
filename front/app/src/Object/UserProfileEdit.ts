@@ -6,7 +6,6 @@ import UserProfileEditChecker from "./UserProfileEditChecker";
 class	UserProfileEdit
 {
 	private	data: FormData;
-	public	emailAddress: string;
 	public	password: string;
 	public	passwordConfirm: string;
 	public	uniquenessPassword: string;
@@ -23,12 +22,6 @@ class	UserProfileEdit
 		this.username = this.form("username");
 		if (this.username.length === 0)
 			this.username = user.username;
-		this.emailAddress = this.form("email");
-		if (this.emailAddress === undefined || this.emailAddress.length === 0)
-			if (user.email !== undefined)
-				this.emailAddress = user.email;
-			else
-				this.emailAddress = "undefined";
 		this.password = this.form("password");
 		if (this.password.length === 0)
 			this.pwModified = false;
@@ -72,7 +65,6 @@ class	UserProfileEdit
 		return (
 		{
 			username: this.username,
-			emailAddress: this.emailAddress,
 			password: this.password,
 			passwordConfirm: this.passwordConfirm,
 			uniquenessPassword: this.uniquenessPassword,

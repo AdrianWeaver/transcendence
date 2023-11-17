@@ -357,8 +357,7 @@ export class ChatSocketEvents
 					playPong = true;
 					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
 					this.createNewGame(data.payload.chanName, profileId, friendProfileId);
-					message = "/playPong#", profileId, ":", usernameOne, "#", friendProfileId, ":", usernameTwo;
-					console.log("IS MSG OK ", message);
+					message = "/playPong&"+profileId+":"+usernameOne+"#"+friendProfileId+":"+usernameTwo;
 				}
 			}
 			else

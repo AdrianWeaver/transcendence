@@ -7,7 +7,6 @@ import UserProfileEdit from "./UserProfileEdit";
 
 class	UserProfileEditChecker
 {
-	public	email: boolean;
 	public	password: boolean;
 	public	uniqueness: boolean;
 	public	username: boolean;
@@ -15,7 +14,6 @@ class	UserProfileEditChecker
 
 	constructor()
 	{
-		this.email = false;
 		this.password = false;
 		this.uniqueness = false;
 		this.username = false;
@@ -26,9 +24,6 @@ class	UserProfileEditChecker
 	{
 		this.resetError();
 		console.log("CHECK DATA");
-		if (data.emailAddress === undefined || data.emailAddress === "undefined"
-			|| data.emailAddress.length === 0)
-			this.email = true;
 		if (data.pwModified)
 		{
 			if (data.password === undefined || data.password === "undefined"
@@ -47,8 +42,6 @@ class	UserProfileEditChecker
 		const	validChar = /^[A-Za-z][A-Za-z0-9_]{3,8}$/;
 		this.username = !(validChar.test(data.username));
 		console.log("valid user ", validChar, " ", this.username);
-		const	emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-		this.email = !(emailRegex.test(data.emailAddress));
 		if (data.doubleAuth)
 		{
 			let	tmp;
@@ -70,7 +63,6 @@ class	UserProfileEditChecker
 
 	public	resetError = () =>
 	{
-		this.email = false;
 		this.password = false;
 		this.uniqueness = false;
 		this.username = false;
@@ -80,7 +72,6 @@ class	UserProfileEditChecker
 	public	getPlainObject = () =>
 	{
 		return ({
-			email: this.email,
 			password: this.password,
 			uniqueness: this.uniqueness,
 			username: this.username,

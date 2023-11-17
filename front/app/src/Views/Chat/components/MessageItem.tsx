@@ -30,7 +30,7 @@ type MessageItemProps = {
 const MessageItem = (props: MessageItemProps) =>
 {
 	let align: "right" | "center" | "left";
-	const	messageToSplit = props.message.split("#");
+	const	messageToSplit = props.message.split("&");
 	const	playPong = messageToSplit[0];
 	const	message = messageToSplit[1];
 	switch (props.sender)
