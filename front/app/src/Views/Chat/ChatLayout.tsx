@@ -68,6 +68,7 @@ import {
 // import MyProfile from "../MyProfile/MyProfile";
 // import { render } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import { stat } from "fs";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -163,6 +164,12 @@ type FriendsListProps = {
 const FriendsList = (props: FriendsListProps) =>
 {
 	const	dispatch = useAppDispatch();
+
+	const	currentProfileIsFriend = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfileIsFriend);
+	});
+	console.log("IS FRIEND", currentProfileIsFriend);
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -231,7 +238,7 @@ const FriendsList = (props: FriendsListProps) =>
 										status={elem.status}
 										key={index}
 										ind={index}
-										isFriend={props.isFriend}
+										isFriend={currentProfileIsFriend}
 									/>
 								</div>
 							</>
@@ -281,7 +288,10 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user);
 	});
-
+	const	currentProfileIsFriend = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfileIsFriend);
+	});
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
@@ -1765,7 +1775,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={isFriend}/>
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={currentProfileIsFriend}/>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{

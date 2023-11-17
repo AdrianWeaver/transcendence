@@ -887,8 +887,9 @@ export class ChatSocketEvents
 					{
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
+							console.log("Here ?????");
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
-							if (user.profileId !== profId && conv)
+							if (user.profileId !== profId)
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
@@ -898,6 +899,7 @@ export class ChatSocketEvents
 								});
 								if (searchFriend !== undefined)
 									isFriend = true
+								console.log("une friend", isFriend);
 							}
 							const newMember: MembersModel = {
 								id: memberList.length + 1,
@@ -939,6 +941,7 @@ export class ChatSocketEvents
 						}
 					}
 				}
+				console.log("display-member is friend", isFriend);
 				const	action = {
 					type: "display-members",
 					payload: {
