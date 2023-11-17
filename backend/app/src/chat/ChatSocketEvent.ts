@@ -872,7 +872,9 @@ export class ChatSocketEvents
 				talkingUser = "";
 				conv = false;
 				isFriend = false;
-				let	friendProfId;
+				let	friendProfId: string;
+
+				friendProfId = "";
 				channel = this.chatService.searchChannelByName(data.payload.chanName);
 				const	testChatUsers = this.chatService.getAllUsersArray();
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
@@ -897,7 +899,7 @@ export class ChatSocketEvents
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
-							if (user.profileId !== profId && conv)
+							if (user.profileId !== profId)
 							{
 								friendProfId = user.profileId;
 								talkingUser = userName;
@@ -907,6 +909,7 @@ export class ChatSocketEvents
 								});
 								if (searchFriend !== undefined)
 									isFriend = true
+								console.log("une friend", isFriend);
 							}
 							const newMember: MembersModel = {
 								id: memberList.length + 1,
@@ -948,6 +951,7 @@ export class ChatSocketEvents
 						}
 					}
 				}
+				console.log("display-member is friend", isFriend, "friend profileId", friendProfId);
 				const	action = {
 					type: "display-members",
 					payload: {

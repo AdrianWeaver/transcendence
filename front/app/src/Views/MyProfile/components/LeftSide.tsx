@@ -66,9 +66,11 @@ const	LeftSide = (props: LeftSideProps) =>
 										___________________
 									</Typography>
 								</>
-								: <>
-									{props.pseudo} is {props.status}
-								</>
+								: (props.isFriend)
+									? <>
+										{props.pseudo} is {props.status}
+									</>
+									: <></>
 							}
 						</Typography>
 					}

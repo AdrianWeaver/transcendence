@@ -1251,21 +1251,21 @@ public	register(data: UserModel)
 	{
 		const	searchFriend = this.user.find((elem) =>
 		{
-			return (elem.id === friendId);
+			return (elem.id.toString() === friendId.toString());
 		});
 		const	searchUserIndex = this.user.findIndex((elem) =>
 		{
-			return (elem.id === id);
+			return (elem.id.toString() === id.toString());
 		});
-		if (searchUserIndex !== -1)
+		if (searchUserIndex === -1)
 			return ("User doesnt exist");
 		if (searchFriend === undefined)
 			return ("This new friend doesnt exist");
 		const	searchFriendIndex = this.user.findIndex((elem) =>
 		{
-			return (elem.id === friendId);
+			return (elem.id.toString() === friendId.toString());
 		});
-		if (searchFriendIndex !== -1)
+		if (searchFriendIndex === -1)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
 		this.user[searchUserIndex].friendsProfileId.push(friendId);

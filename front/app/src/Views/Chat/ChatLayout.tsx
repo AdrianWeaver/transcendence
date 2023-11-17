@@ -4,7 +4,7 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 // import * as SocketIOClient from "socket.io-client";
-
+// 🏓 🔴 🟢 🗨
 import {
 	Box,
 	Button,
@@ -68,6 +68,7 @@ import {
 // import MyProfile from "../MyProfile/MyProfile";
 // import { render } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import { stat } from "fs";
 // import { MessageRoomModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
@@ -157,11 +158,17 @@ const TabPanel = (props: TabPanelProps) =>
 type FriendsListProps = {
 	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
+	isFriend: boolean
 };
 
 const FriendsList = (props: FriendsListProps) =>
 {
 	const	dispatch = useAppDispatch();
+
+	const	currentProfileIsFriend = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfileIsFriend);
+	});
 	const	users = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
@@ -230,6 +237,7 @@ const FriendsList = (props: FriendsListProps) =>
 										status={elem.status}
 										key={index}
 										ind={index}
+										isFriend={currentProfileIsFriend}
 									/>
 								</div>
 							</>
@@ -279,7 +287,10 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user);
 	});
-
+	const	currentProfileIsFriend = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfileIsFriend);
+	});
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
@@ -562,6 +573,11 @@ const	ChatLayout = () =>
 		};
 		socketRef.current.emit("channel-info", action);
 	};
+	const
+	[
+		status,
+		setStatus
+	] = useState("🔴");
 
 	useEffect(() =>
 	{
@@ -593,6 +609,7 @@ const	ChatLayout = () =>
 		const connect = () =>
 		{
 			setConnected(true);
+			setStatus("🟢");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -620,6 +637,7 @@ const	ChatLayout = () =>
 		const disconnect = () =>
 		{
 			setConnected(false);
+			setStatus("🔴");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -833,7 +851,7 @@ const	ChatLayout = () =>
 
 			if (data.type === "on-connect")
 			{
-				setBlockedList(data.payload.blockedList)
+				setBlockedList(data.payload.blockedList);
 			}
 		};
 
@@ -866,6 +884,9 @@ const	ChatLayout = () =>
 					setFriendList(data.payload.friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
 					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
+					// TEST 
+					dispatch(setCurrentProfile(data.payload.friendProfileId));
+					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
 					alert(alertMessage);
 				}
@@ -1093,9 +1114,14 @@ const	ChatLayout = () =>
 		{
 			dispatch(setProfileFriendView());
 			dispatch(setCurrentProfileIsFriend(true));
+			setIsFriend(true);
 		}
 		else
+		{
+			setIsFriend(false);
+			dispatch(setCurrentProfileIsFriend(false));
 			dispatch(setProfilePublicView());
+		}
 		setTalkingUserProfileId(searchUser.profileId);
 		navigate("/profile/");
 	};
@@ -1751,7 +1777,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} />
+							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={currentProfileIsFriend}/>
 							<List>
 								{privateMessage.map((channel: any) =>
 									{
@@ -1785,18 +1811,12 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														<Button onClick={() =>
-														{
-															return handleRemoveButtonClick(buttonSelectionPriv.id, buttonSelectionPriv.name);
-														}}>
-															Remove
-														</Button>
-														<Button onClick={() =>
+														{/* <Button onClick={() =>
 														{
 															return handleMembersClickOpen(buttonSelectionPriv.name);
 														}}>
 															Other options
-														</Button>
+														</Button> */}
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogContent>
 																<ul>
@@ -1830,51 +1850,6 @@ const	ChatLayout = () =>
 																					}}>
 																						Block
 																					</Button>
-																					{/* <Button onClick={() =>
-																					{
-																						setSeeProfile(false);
-																						setInviteDialogOpen(true);
-																					}}>
-																						Invite
-																					</Button>
-																					<Dialog open={inviteDialogOpen} onClose={() =>
-																								{
-																									setInviteDialogOpen(false);
-																								}}
-																								maxWidth="sm" fullWidth>
-																						<DialogTitle>Invite User to Channel</DialogTitle>
-																						<DialogContent>
-																							<TextField
-																							label="Channel Name"
-																							variant="outlined"
-																							fullWidth
-																							value={channelToInvite}
-																							onChange={(e) =>
-																							{
-																								setSeeProfile(false);
-																								console.log("target value " + e.target.value);
-																								setChannelToInvite(e.target.value);
-																							}}/>
-																						</DialogContent>
-																						<DialogActions>
-																							<Button onClick={() =>
-																								{
-																									setSeeProfile(false);
-																									getProfileId(talkingUser);
-																									inviteUserToChannel(userToInvite);
-																									setInviteDialogOpen(false);
-																								}} color="primary">
-																								Invite
-																							</Button>
-																							<Button onClick={() =>
-																							{
-																								setSeeProfile(false);
-																								setInviteDialogOpen(false);
-																							}} color="primary">
-																							Cancel
-																							</Button>
-																						</DialogActions>
-																					</Dialog> */}
 																				</>
 																			</>
 																			: <></>
@@ -1921,6 +1896,10 @@ const	ChatLayout = () =>
 												style={listItemTextStyle}
 												primary={friend}
 											/>
+											<ListItemText
+												secondary={status}
+												sx={{ align: "right" }}
+										></ListItemText>
 										</ListItem>
 									);
 								})

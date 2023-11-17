@@ -366,32 +366,32 @@ const	UserServices = {
 			})
 		);
 	},
-	async	getIpAddress(token: string, hostname: string, changeIp: boolean)
-	{
-		console.log("Get Ip address");
-		const	config: AxiosRequestConfig = {
-			headers: {
-				"content-type": "application/x-www-form-urlencoded",
-				"Authorization": token,
-			},
-		};
-		const	data = {
-			changeIp: changeIp,
-		};
-		return (
-			Api(hostname)
-			.post("user/get-ip", data, config)
-			.then((data) =>
-			{
-				return (data.data);
-			})
-			.catch((error) =>
-			{
-				console.error(error);
-				return ("ERROR");
-			})
-		);
-	},
+	// async	getIpAddress(token: string, hostname: string, changeIp: boolean)
+	// {
+	// 	console.log("Get Ip address");
+	// 	const	config: AxiosRequestConfig = {
+	// 		headers: {
+	// 			"content-type": "application/x-www-form-urlencoded",
+	// 			"Authorization": token,
+	// 		},
+	// 	};
+	// 	const	data = {
+	// 		changeIp: changeIp,
+	// 	};
+	// 	return (
+	// 		Api(hostname)
+	// 		.post("user/get-ip", data, config)
+	// 		.then((data) =>
+	// 		{
+	// 			return (data.data);
+	// 		})
+	// 		.catch((error) =>
+	// 		{
+	// 			console.error(error);
+	// 			return ("ERROR");
+	// 		})
+	// 	);
+	// },
 };
 
 export default UserServices;

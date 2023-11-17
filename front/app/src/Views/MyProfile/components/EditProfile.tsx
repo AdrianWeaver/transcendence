@@ -17,26 +17,16 @@ import {
 	Switch,
 }	from "@mui/material";
 
-// import	UserRegistration from "../../../Object/UserRegistration";
-// import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	hashPassword,
 	registerInfosInBack,
-	// setChatUsers,
 	setDoubleAuth,
-	// setEmail,
 	setPassword,
-	// setPhoneNumber,
 	setProfileMyView,
-	// setPseudo,
 	updateChatUsers,
-	// userRegistrationStepThree,
-	// userRegistrationStepTwo,
 } from "../../../Redux/store/controllerAction";
-// import UserSecurityChecker from "../../../Object/UserSecurityChecker";
-// import UserSecurity from "../../../Object/UserSecurity";
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +42,6 @@ const	stringContainChar = (string: string, char: string) =>
 	let	i;
 
 	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
 	while (i < string.length)
 	{
 		if (string.charAt(i) >= char.charAt(0)

@@ -952,20 +952,21 @@ export class UserController
 		});
 		return (array);
 	}
-
-	@Post("/get-ip")
-	@UseGuards(UserAuthorizationGuard)
-	getUserIp(
-		@Req() req: Request,
-		@Ip() ip: any,
-		@Body() body: any) : { userAgent: string, ip: string }
-	{
-		console.log(ip);
-		console.log("req.ip", req.ip, "req.userAgent:", req.headers["user-agent"]);
-		// const	ip = req.ip;
-		const userAgent = req.headers["user-agent"];
-		const	res = this.userService.registerIpAddress(body.id, ip, body.changeIp);
-		console.log("res", res);
-		return (res);
-	}
 }
+
+// 	@Post("/get-ip")
+// 	@UseGuards(UserAuthorizationGuard)
+// 	getUserIp(
+// 		@Req() req: Request,
+// 		@Ip() ip: any,
+// 		@Body() body: any) : { userAgent: string, ip: string }
+// 	{
+// 		console.log(ip);
+// 		console.log("req.ip", req.ip, "req.userAgent:", req.headers["user-agent"]);
+// 		// const	ip = req.ip;
+// 		const userAgent = req.headers["user-agent"];
+// 		const	res = this.userService.registerIpAddress(body.id, ip, body.changeIp);
+// 		console.log("res", res);
+// 		return (res);
+// 	}
+// }

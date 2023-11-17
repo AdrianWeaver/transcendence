@@ -23,7 +23,6 @@ class	UserProfileEditChecker
 	public checkData(data: UserProfileEdit)
 	{
 		this.resetError();
-		console.log("CHECK DATA");
 		if (data.pwModified)
 		{
 			if (data.password === undefined || data.password === "undefined"
