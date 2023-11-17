@@ -154,7 +154,6 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
-						
 						const	userToUpdate = this.chatService.getUserWithProfileId(profileId);
 						const	blockedArray: string[] = [];
 						userToUpdate?.blocked.forEach((blocked) =>
@@ -287,7 +286,7 @@ export class ChatSocketEvents
 				if (filteredGameByGameMode.length)
 				{
 					console.log("already exists", filteredGameByGameMode);
-					return ;
+					return ("error");
 				}
 				const	newRoomName = roomName;
 				const	newGame = new GameServe(newRoomName);
@@ -297,7 +296,7 @@ export class ChatSocketEvents
 				{
 					// TEST
 					console.error("user not found");
-					return ;
+					return ("error");
 				}
 				const	playerOne = new Player();
 				const	playerTwo = new	Player();
@@ -315,6 +314,7 @@ export class ChatSocketEvents
 				this.gameService.getRoomCount();
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
+				return (newGame.uuid);
 		}
 
 		/**
@@ -356,8 +356,10 @@ export class ChatSocketEvents
 					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
 					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
-					this.createNewGame(data.payload.chanName, profileId, friendProfileId);
-					message = "/playPong&"+profileId+":"+usernameOne+"#"+friendProfileId+":"+usernameTwo;
+					const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					if (gameUuid === "error")
+						console.log("The game hasnt been created, something went wrong");
+					message = "/playPong&" + profileId + ":" + usernameOne + "!" + friendProfileId + ":" + usernameTwo + "!" + gameUuid;
 				}
 			}
 			else

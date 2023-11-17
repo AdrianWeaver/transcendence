@@ -19,6 +19,7 @@ import
 import pong from "../assets/pong.jpeg";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { useNavigate } from "react-router-dom";
 
 type	InvitationCardProps = {
 	message: string
@@ -26,11 +27,32 @@ type	InvitationCardProps = {
 
 const	InvitationCard = (props: InvitationCardProps) =>
 {
+	const navigate = useNavigate();
 	console.log("message here", props.message);
 	const	theme = useTheme();
-	const	message = props.message.split("#");
-	const	playerOne = message[0].split(":");
-	const	playerTwo = message[1].split(":");
+	const	message = props.message.split("!");
+	if (message.length !== 3)
+		return (<></>);
+	const	playerOneId = message[0].split(":")[0];
+	const	playerOne = message[0].split(":")[1];
+	const	playerTwoId = message[1].split(":")[0];
+	const	playerTwo = message[1].split(":")[1];
+	const	gameUuid = message[2];
+	console.log("invite", playerOne);
+	console.log("INvite ", gameUuid);
+
+	const	isExistInAliveGame = false;
+
+	const	activeGame = <>
+		<CardContent sx={{ flex: "1 0 auto" }}>
+			<Typography component="div" variant="h5">
+				Play Pong with you
+			</Typography>
+			<Typography variant="subtitle1" color="text.secondary" component="div">
+				A slot is reserved between {playerOne} and {playerTwo}
+			</Typography>
+		</CardContent>
+	</>;
 	return (
 		<Card sx={{
 			display: "flex",
@@ -44,14 +66,7 @@ const	InvitationCard = (props: InvitationCardProps) =>
 					flexDirection: "column"
 				}
 			}>
-				<CardContent sx={{ flex: "1 0 auto" }}>
-					<Typography component="div" variant="h5">
-						Play Pong with you
-					</Typography>
-					<Typography variant="subtitle1" color="text.secondary" component="div">
-						A slot is reserved between {playerOne[1]} and {playerTwo[1]}
-					</Typography>
-				</CardContent>
+				{/* // ici  */}
 				<Box sx={
 					{
 						display: "flex",
@@ -59,7 +74,14 @@ const	InvitationCard = (props: InvitationCardProps) =>
 						pb: 1
 					}}
 				>
-					<IconButton aria-label="play/pause">
+					<IconButton
+						aria-label="play/pause"
+						onClick={() =>
+						{
+							navigate("/test-ball?mode=friend&uuid=" + gameUuid);
+							// diconnect socket chat in case of error
+						}}
+					>
 						<PlayArrowIcon sx={{
 							height: 38,
 							width: 38
