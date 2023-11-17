@@ -41,7 +41,7 @@ const	InvitationCard = (props: InvitationCardProps) =>
 	console.log("invite", playerOne);
 	console.log("INvite ", gameUuid);
 
-	const	isExistInAliveGame = false;
+	const	isExistInAliveGame = true;
 
 	const	activeGame = <>
 		<CardContent sx={{ flex: "1 0 auto" }}>
@@ -53,6 +53,25 @@ const	InvitationCard = (props: InvitationCardProps) =>
 			</Typography>
 		</CardContent>
 	</>;
+
+	const	endOfGame = <>
+		<CardContent sx={{ flex: "1 0 auto" }}>
+			<Typography component="div" variant="h5">
+				Game over
+			</Typography>
+			<Typography variant="subtitle1" color="text.secondary" component="div">
+				thank you for this fun moment
+			</Typography>
+		</CardContent>
+	</>;
+
+	const	handleClickCard = () =>
+	{
+		if (isExistInAliveGame)
+			navigate("/test-ball?mode=friend&uuid=" + gameUuid);
+	};
+
+
 	return (
 		<Card sx={{
 			display: "flex",
@@ -66,7 +85,11 @@ const	InvitationCard = (props: InvitationCardProps) =>
 					flexDirection: "column"
 				}
 			}>
-				{/* // ici  */}
+				{
+					(isExistInAliveGame)
+					? activeGame
+					: endOfGame
+				}
 				<Box sx={
 					{
 						display: "flex",
@@ -78,7 +101,7 @@ const	InvitationCard = (props: InvitationCardProps) =>
 						aria-label="play/pause"
 						onClick={() =>
 						{
-							navigate("/test-ball?mode=friend&uuid=" + gameUuid);
+							handleClickCard();
 							// diconnect socket chat in case of error
 						}}
 					>
