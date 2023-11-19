@@ -589,6 +589,36 @@ export class	GameService implements OnModuleInit
 		return (filteredGameByGameMode);
 	}
 
+	public getCopyWithActiveSocketSetAsActive(array: GameServe[])
+	{
+		const	copy = [...array];
+
+		for (const instance of array)
+		{
+			switch (instance.playerOne.socketId)
+			{
+				case "undefined":
+				case "disconnected":
+				case "invited":
+				case "revoked":
+					break ;
+				default:
+					instance.playerOne.socketId = "connected";
+			}
+			switch (instance.playerTwo.socketId)
+			{
+				case "undefined":
+				case "disconnected":
+				case "invited":
+				case "revoked":
+					break ;
+				default:
+					instance.playerTwo.socketId = "connected";
+			}
+		}
+		return (copy);
+	}
+
 	public	getStatusConnectedToGameFromProfileId(profileId: string)
 	{
 		const	deepCopy = this.gameInstances
@@ -596,8 +626,13 @@ export class	GameService implements OnModuleInit
 			{
 				return (instance.getSeralizable());
 			});
+		const	socketConvertedAsActive
+			= this.getCopyWithActiveSocketSetAsActive(deepCopy);
 		const	activeConnection
-			= this.filterGameArrayBySocketState(profileId, deepCopy)
+			= this.filterGameArrayBySocketState(
+					profileId,
+					socketConvertedAsActive
+				)
 				.filtered.connected;
 		return (activeConnection.length);
 	}
