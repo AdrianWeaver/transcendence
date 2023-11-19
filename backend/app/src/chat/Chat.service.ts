@@ -377,9 +377,9 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
-		this.log.verbose("Updating all Chat Object");
+		// this.log.verbose("Updating all Chat Object");
 		const dbString = this.parseForDatabase();
-		this.log.verbose(JSON.parse(dbString));
+		// this.log.verbose(JSON.parse(dbString));
 		this.prisma.chatJson
 		.update(
 			{

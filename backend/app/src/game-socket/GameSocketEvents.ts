@@ -37,7 +37,7 @@ type	ActionSocket = {
 type	HandShakeModel = {
 	isValid: boolean,
 	gameMode: string,
-	friendId?: string,
+	uuid?: string,
 };
 
 export type	FilteredArrayModel = {
@@ -255,7 +255,7 @@ export class GameSocketEvents
 		const	result: HandShakeModel= {
 			isValid: false,
 			gameMode: "classical",
-			friendId: undefined
+			uuid: undefined
 		};
 
 		if (client.handshake.auth)
@@ -264,9 +264,9 @@ export class GameSocketEvents
 			{
 				result.isValid = this.isGameModeValid(client.handshake.auth.mode);
 				result.gameMode = client.handshake.auth.mode;
-				if (result.gameMode === "friend" && client.handshake.auth.friendId)
-					result.friendId = client.handshake.auth.friendId;
-				else if (result.gameMode === "friend" && client.handshake.auth.friendId === undefined)
+				if (result.gameMode === "friend" && client.handshake.auth.uuid)
+					result.uuid = client.handshake.auth.uuid;
+				else if (result.gameMode === "friend" && client.handshake.auth.uuid === undefined)
 					result.isValid = false;
 			}
 			else
@@ -440,22 +440,66 @@ export class GameSocketEvents
 	 *			- revoked: refuse connection
 	 *			- undefined: must never
 	 **/
-	public async	dispatchMatchmakingFriend(profileId: string)
+	public async	dispatchMatchmakingFriend(profileId: string, client: Socket, uuid: string)
 
 	{
-		const	friendModeGame = this.gameService.filterGameByProfileIdAndGameMode(profileId, "friend");
+		const	friendModeGame = this.gameService.filterGameArrayByGameUUID(profileId, uuid);
 		const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, friendModeGame);
-		let		roomName: string;
+		let		instance: GameServe;
 
-		console.log("friend filtered", friendArray);
+		this.logger.verbose("client request game with uuid:" + uuid);
 		this.logger.debug("Checking socket state for state of friend games");
+
 		if (friendArray.filtered.disconnected.length === 0)
 		{
 			this.logger.verbose("\tThe user has no pending games");
 		}
+		else
+		{
+			instance = friendArray.filtered.disconnected[0];
+			if (instance.playerOne.profileId === profileId)
+			{
+				instance.playerOne.socketId = client.id;
+			}
+			if (instance.playerTwo.profileId === profileId)
+			{
+				instance.playerTwo.socketId = client.id;
+			}
+			instance.userConnected += 1;
+			await client.join(instance.roomName);
+			this.logger.verbose("\tThe user is connected to the game.");
+			return (instance.roomName);
+		}
 		if (friendArray.filtered.invited.length === 0)
 		{
 			this.logger.verbose("\tThe user has no invite games");
+		}
+		else
+		{
+			this.logger.verbose("\tThe user has invitation...");
+			this.logger.debug("\t\tSearchin the uuid of the game...");
+			instance = friendArray.filtered.invited[0];
+			if (instance.playerOne.socketId === "invited" && instance.playerTwo.socketId === "invited")
+			{
+				this.logger.debug("\t\tInstance loop");
+				if (instance.loop)
+				{
+					instance.loop.callbackFunction = this.printPerformance;
+					instance.loop.update(performance.now());
+				}
+			}
+			if (instance.playerOne.profileId === profileId)
+			{
+				instance.playerOne.socketId = client.id;
+			}
+			if (instance.playerTwo.profileId === profileId)
+			{
+				instance.playerTwo.socketId = client.id;
+			}
+			instance.userConnected += 1;
+			await client.join(instance.roomName);
+			this.logger.verbose("\tThe user is connected to the game.");
+			return (instance.roomName);
 		}
 		if (friendArray.filtered.revoked.length === 0)
 		{
@@ -465,7 +509,9 @@ export class GameSocketEvents
 		{
 			this.logger.verbose("\tThe user as no undefined games");
 		}
-		return ("unimplemented yet");
+		this.logger.error("not in condition to join the game");
+		client.disconnect();
+		return ("The void");
 	}
 
 	/**
@@ -593,8 +639,10 @@ export class GameSocketEvents
 				newRoom.board.init();
 				newRoom.loop = new NodeAnimationFrame();
 				newRoom.loop.game = newRoom;
+
 				newRoom.loop.callbackFunction = this.printPerformance;
 				newRoom.loop.update(performance.now());
+
 				this.gameService.pushGameServeToGameInstance(newRoom);
 				this.logger.verbose("Game is created");
 			}
@@ -774,9 +822,10 @@ export class GameSocketEvents
 		const { handShake, token, error} = this.doHandShake(client);
 		if (error === true || token === undefined || handShake === undefined)
 			return ;
-		console.log(handShake);
+		// console.log(handShake);
 		const	profileId = token.profileId;
 		const	gameModeRequest = handShake.gameMode;
+		const	uuid = handShake.uuid;
 
 		const	isActiveConnection = this.doesClientHaveActiveConnection(profileId);
 		if (isActiveConnection === true)
@@ -793,7 +842,7 @@ export class GameSocketEvents
 		switch (gameModeRequest)
 		{
 			case "friend":
-				roomName = await this.dispatchMatchmakingFriend(profileId);
+				roomName = await this.dispatchMatchmakingFriend(profileId, client, uuid as string);
 				break;
 			case "classical":
 				roomName = await this.dispatchMatchmakingClassical(profileId, client);

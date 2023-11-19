@@ -5,7 +5,7 @@
 
 type	GameModModel = {
 	mode: string;
-	friendId?: string;
+	uuid?: string;
 };
 
 const getGameMode = (pQuery: object) =>
@@ -13,7 +13,7 @@ const getGameMode = (pQuery: object) =>
 	let		buffer;
 	const	gameMode: GameModModel = {
 		mode: "classical",
-		friendId: undefined
+		uuid: undefined
 	};
 	const	query = pQuery as Location;
 	const	search = query.search;
@@ -41,38 +41,22 @@ const getGameMode = (pQuery: object) =>
 					break ;
 			}
 		}
-		else if (key === "friendId")
+		else if (key === "uuid")
 		{
 			if (value && value.length !== 0)
-				gameMode.friendId = value;
+				gameMode.uuid = value;
 			else
 			{
 				gameMode.mode = "classical";
-				gameMode.friendId = undefined;
+				gameMode.uuid = undefined;
 			}
 		}
 		else
 		{
 			gameMode.mode = "classical";
-			gameMode.friendId = undefined;
+			gameMode.uuid = undefined;
 		}
 	}
-	// if (params.split("=").length !== 2)
-	// if (buffer.length === 2)
-	// {
-	// 	const	param = buffer[1];
-	// 	const	splitParam = param.split("=");
-	// 	const	value = splitParam[1];
-	// 	if (value === "upside-down")
-	// 		mode = value;
-	// 	else if (value === "friend")
-	// 		mode = value;
-	// 	else
-	// 		mode = "classical";
-	// }
-	// else
-	// 	mode = "classical";
-	// return (mode);
 	return (gameMode);
 };
 
