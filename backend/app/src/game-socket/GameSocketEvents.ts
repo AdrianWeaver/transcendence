@@ -856,6 +856,30 @@ export class GameSocketEvents
 		}
 		if (roomName === "The void")
 			return ;
+		const	roomInfo = this.server.sockets.adapter.rooms.get(roomName);
+		console.log("room infos: ", roomInfo);
+		if (roomInfo)
+		{
+			const	userMessage: ActionSocket = {
+				type: "",
+				payload: {
+					roomName: roomName,
+					roomSize: roomInfo.size
+				}
+			};
+			const indexInstance = this.gameService.findIndexGameInstanceByRoomName(roomName);
+			if (this.gameService.isProfileIdUserOne(indexInstance, profileId))
+				userMessage.type = "player-one";
+			else
+				userMessage.type = "player-two";
+			client.emit("init-message", userMessage);
+		}
+		else
+		{
+			this.logger.error("An error occured due to room info");
+			// maybe disconnect
+			return ;
+		}
 		this.logger.verbose("The user request game mode " + gameModeRequest);
 	}
 
