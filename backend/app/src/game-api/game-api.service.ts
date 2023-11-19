@@ -34,6 +34,11 @@ export class GameApiService
 		return (this.gameService.getGameServiceCopy());
 	}
 
+	/**
+	 * @deprecated invited with chat
+	 * @param myProfileId 
+	 * @param friendProfileId 
+	 */
 	public	inviteFriends(myProfileId: string, friendProfileId: string): any
 	{
 		// this.gameService.
@@ -71,32 +76,37 @@ export class GameApiService
 
 	public	getAllInstancesByUserId(profileId: string)
 	{
-		const	tempClassicalGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "classical");
-		const	deepCopyClassical = tempClassicalGameMode.map((instance) =>
-		{
-			return (instance.getSeralizable());
-		});
+		const deepCopyClassical = this.gameService
+			.filterGameByProfileIdAndGameMode(profileId, "classical")
+			.map((instance) =>
+			{
+				return (instance.getSeralizable());
+			});
 		const	aliveClassicalGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyClassical);
 		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, aliveClassicalGameMode);
 
-		// const	friendModeGame = this.gameService.filterGameByProfileIdAndGameMode(profileId, "friend");
-		// console.log(copyClassicalGameMode);
-		// const	upsideDownGameMode = this.gameService.filterGameByProfileIdAndGameMode(profileId, "upside-down");
+		const deepCopyUpsideDown = this.gameService
+			.filterGameByProfileIdAndGameMode(profileId, "upside-down")
+			.map((instance) =>
+			{
+				return (instance.getSeralizable());
+			});
+		const	aliveUpsideDownGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyUpsideDown);
+		const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, aliveUpsideDownGameMode);
 
-
-		// console.log(classicalGameMode);
-		// const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, friendModeGame);
-
-		// const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, upsideDownGameMode);
-
-		// console.log("classical ", classicalArray);
-		// const	friendSerialzed = this.getFilteredSerialized(friendArray);
-		// const	classicalSerialzed = this.getFilteredSerialized(classicalArray);
-		// const	upsideDownSerialzed = this.getFilteredSerialized(upsideDownArray);
-
+		const deepCopyFriend = this.gameService
+			.filterGameByProfileIdAndGameMode(profileId, "friend")
+			.map((instance) =>
+			{
+				return (instance.getSeralizable());
+			});
+		const	aliveFriendGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyFriend);
+		const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, aliveFriendGameMode);
 		return (
 			{
 				classical: classicalArray.filtered,
+				upsideDown: upsideDownArray.filtered,
+				friendArray: friendArray.filtered
 			}
 		);
 	}

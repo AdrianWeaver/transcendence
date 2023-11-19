@@ -38,6 +38,7 @@ import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
 import Player from "src/game-socket/Objects/Player";
+import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
 
 type	ActionSocket = {
 	type: string,
@@ -268,8 +269,10 @@ export class ChatSocketEvents
 			}
 		}
 
-		public createNewGame(roomName: string, profileId: string, friendProfileId: string)
+		public createNewGame(profileId: string, friendProfileId: string)
 		{
+				// want to have a room name that fit to logic of game room name feature :)
+
 				const	filteredGame = this.gameService.gameInstances.filter((instance) =>
 				{
 					return (
@@ -288,8 +291,6 @@ export class ChatSocketEvents
 					console.log("already exists", filteredGameByGameMode);
 					return ("error");
 				}
-				const	newRoomName = roomName;
-				const	newGame = new GameServe(newRoomName);
 				const	searchPlayerOne = this.chatService.getUserWithProfileId(profileId.toString());
 				const	searchPlayerTwo = this.chatService.getUserWithProfileId(friendProfileId.toString());
 				if (searchPlayerOne === undefined || searchPlayerTwo === undefined)
@@ -298,20 +299,29 @@ export class ChatSocketEvents
 					console.error("user not found");
 					return ("error");
 				}
-				const	playerOne = new Player();
-				const	playerTwo = new	Player();
 				this.gameService.increaseRoomCount();
-				playerOne.name = searchPlayerOne.name;
-				playerOne.profileId = searchPlayerOne.profileId;
-				playerOne.socketId = "invited";
-				playerTwo.name = searchPlayerTwo.name;
-				playerTwo.profileId = searchPlayerTwo.profileId;
-				playerTwo.socketId = "invited";
-				newGame.playerOne = playerOne;
-				newGame.playerTwo = playerTwo;
+				// can put length of room dynamically to reject connection if liimiit trigger
+				// roomNameArray.length < roomCount : reject busy server
+				const	roomName = "room "
+					+ roomNameArray[
+						this.gameService.getRoomCount()
+					]
+				const	newGame = new GameServe(roomName);
 				newGame.gameMode = "friend";
-				newGame.initPlayers();
-				this.gameService.getRoomCount();
+				newGame.ball.game = newGame;
+				newGame.board.game = newGame;
+				newGame.net.game = newGame;
+				newGame.playerOne.socketId = "invited";
+				newGame.playerTwo.socketId = "invited";
+				newGame.playerOne.profileId = searchPlayerOne.profileId;
+				newGame.playerTwo.profileId = searchPlayerTwo.profileId;
+				newGame.playerOne.name = searchPlayerOne.name;
+				newGame.playerTwo.name = searchPlayerTwo.name;
+				newGame.board.init();
+				newGame.loop = new NodeAnimationFrame();
+				newGame.loop.game = newGame;
+
+				// this.gameService.getRoomCount();
 				this.gameService.pushGameServeToGameInstance(newGame);
 				console.log("New game", newGame.getSeralizable());
 				return (newGame.uuid);
@@ -356,7 +366,8 @@ export class ChatSocketEvents
 					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
 					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
-					const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					// const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
+					const	gameUuid = this.createNewGame(profileId, friendProfileId);
 					if (gameUuid === "error")
 						console.log("The game hasnt been created, something went wrong");
 					message = "/playPong&" + profileId + ":" + usernameOne + "!" + friendProfileId + ":" + usernameTwo + "!" + gameUuid;

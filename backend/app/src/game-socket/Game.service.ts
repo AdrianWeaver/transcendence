@@ -562,4 +562,30 @@ export class	GameService implements OnModuleInit
 		});
 		return (filteredGameByGameMode);
 	}
+
+	/**
+	 * 
+	 * @param profileId 
+	 * @param gameMode 
+	 * @param uuid this params is friendMode
+	 * @returns 
+	 */
+	public	filterGameArrayByGameUUID(
+		profileId: string,
+		uuid: string
+	)
+	{
+		const	filteredGame = this.gameInstances.filter((instance) =>
+		{
+			return (
+				instance.playerOne.profileId === profileId
+				|| instance.playerTwo.profileId === profileId
+			);
+		});
+		const	filteredGameByGameMode = filteredGame.filter((instance) =>
+		{
+			return (instance.uuid === uuid);
+		});
+		return (filteredGameByGameMode);
+	}
 }

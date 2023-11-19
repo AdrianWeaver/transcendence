@@ -127,7 +127,7 @@ const	TestBall = () =>
 			{
 				token: profileToken,
 				mode: gameMode.mode,
-				friendId: gameMode.friendId
+				uuid: gameMode.uuid
 			}
 		});
 
