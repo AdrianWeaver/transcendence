@@ -588,4 +588,17 @@ export class	GameService implements OnModuleInit
 		});
 		return (filteredGameByGameMode);
 	}
+
+	public	getStatusConnectedToGameFromProfileId(profileId: string)
+	{
+		const	deepCopy = this.gameInstances
+			.map((instance) =>
+			{
+				return (instance.getSeralizable());
+			});
+		const	activeConnection
+			= this.filterGameArrayBySocketState(profileId, deepCopy)
+				.filtered.connected;
+		return (activeConnection.length);
+	}
 }
