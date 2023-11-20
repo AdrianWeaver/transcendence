@@ -10,7 +10,7 @@ import
 
 import { RootState } from "./index";
 
-import { GameEngineModel as Model } from "../models/redux-models";
+import { GameServeStatus, GameEngineModel as Model } from "../models/redux-models";
 import ServerService from "../service/server-service";
 
 export const	action = gameEngineSlice.actions;
@@ -418,19 +418,90 @@ export const	getMyActiveGame = ()
 		const	token = prev.controller.user.bearerToken;
 
 		const data = await ServerService
-			.getMyActiveGame(token, prev.server.serverLocation);
-		console.log(data);
+			.getMyActiveGame(token, prev.server.uri);
+		console.log("data fetched", data);
 		if (data.success === true)
 		{
 			console.log("getMyGameActive success called", data);
+			console.log("values ", data.data);
+			console.log("classical", data.data.classical);
+			// const	newClassical: GameServeStatus = {
+			// 	connected: data.classical.connected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	disconnected: data.classical.disconnected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	invited: data.classical.invited.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	revoked: data.classical.revoked.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	undefined: data.classical.undefined.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	})
+			// };
+			// const	newFriend: GameServeStatus = {
+			// 	connected: data.friend.connected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	disconnected: data.friend.disconnected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	invited: data.friend.invited.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	revoked: data.friend.revoked.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	undefined: data.friend.undefined.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	})
+			// };
+			// const	newUpsideDown: GameServeStatus = {
+			// 	connected: data.upsideDown.connected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	disconnected: data.upsideDown.disconnected.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	invited: data.upsideDown.invited.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	revoked: data.upsideDown.revoked.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	}),
+			// 	undefined: data.upsideDown.undefined.map((el) =>
+			// 	{
+			// 		return (el);
+			// 	})
+			// };
 			const	response: Model = {
 				...prev.gameEngine,
 				myGameActive:
 				{
-					random: data.random,
-					friend: data.friend
+					classical: data.data.classical,
+					friend: data.data.friend,
+					upsideDown: data.data.upsideDown
 				}
 			};
+			console.error("before dispatch");
+			console.log("Response: ", response);
 			dispatch(action.getMyActiveGame(response));
 		}
 		else

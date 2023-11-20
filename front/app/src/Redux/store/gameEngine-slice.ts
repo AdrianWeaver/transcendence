@@ -69,8 +69,27 @@ export const	initialGameEngineState: Model = {
 	meConnected: false,
 	myGameActive:
 	{
-		random: [],
-		friend: [],
+		classical: {
+			connected: [],
+			disconnected: [],
+			invited: [],
+			revoked: [],
+			undefined: []
+		},
+		upsideDown: {
+			connected: [],
+			disconnected: [],
+			invited: [],
+			revoked: [],
+			undefined: []
+		},
+		friend: {
+			connected: [],
+			disconnected: [],
+			invited: [],
+			revoked: [],
+			undefined: []
+		}
 	},
 	gameOver: false
 };
@@ -167,7 +186,12 @@ const	gameEngineSlice = createSlice(
 		},
 		getMyActiveGame(state, action: PayloadAction<Model>)
 		{
-			state.myGameActive = action.payload.myGameActive;
+			state.myGameActive.classical
+				= action.payload.myGameActive.classical;
+			state.myGameActive.friend
+				= action.payload.myGameActive.friend;
+			state.myGameActive.upsideDown
+				= action.payload.myGameActive.upsideDown;
 		},
 		revokeMyGame(state, action: PayloadAction<Model>)
 		{
