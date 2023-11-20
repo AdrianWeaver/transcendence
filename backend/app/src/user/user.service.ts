@@ -985,29 +985,37 @@ public	register(data: UserModel)
 	});
 	}
 
-		public	login(id: any, email:string)
-			: UserLoginResponseModel
+	public async	login(username: string, password: string)
+		: Promise<UserLoginResponseModel>
+	{
+		const	searchUser = this.user.find((user) =>
 		{
-			const	searchUser = this.user.find((user) =>
+			return (username === user.username);
+		});
+		if (searchUser === undefined)
+			throw new ForbiddenException("Invalid credential");
+		else
+		{
+			this.logger.verbose("User found... checkin password");
+			console.log("user ", searchUser);
+			const	valid = await bcrypt.compare(password, searchUser.password);
+			console.log("Value of session validity: ", valid);
+			if (valid === false)
 			{
-				return (user.id.toString() === id.toString()
-					&& user.email === email);
-			});
-			if (searchUser === undefined)
 				throw new ForbiddenException("Invalid credential");
+			}
 			else
-
-				searchUser.authService.token = "Bearer " + jwt.sign(
-					{
-						id: searchUser.id,
-						email: searchUser.email
-					},
-					this.secret,
-					{
-						expiresIn: "1d"
-					}
-				);
-
+			{
+				// searchUser.authService.token = "Bearer " + jwt.sign(
+					// 	{
+					// 		id: searchUser.id,
+					// 		email: searchUser.email
+					// 	},
+					// 	this.secret,
+					// 	{
+					// 		expiresIn: "1d"
+					// 	}
+					// );
 				const	response: UserLoginResponseModel = {
 					message:
 						"You are successfully connected as " + searchUser.login,
@@ -1015,6 +1023,8 @@ public	register(data: UserModel)
 					expireAt: searchUser.authService.expAt
 				};
 				return (response);
+			}
+		}
 	}
 
 	public	userIdentifiedRequestEndOfSession(id: any)

@@ -12,8 +12,6 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { decodePassword, setAllUsers, setProfileMyView, setUserBackFromDB, setUserData, setUserLoggedIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
-import os from "os";
-
 // type PasswordAlertProps ={
 // 	password: string,
 // 	firstTrigger: boolean,
@@ -140,10 +138,7 @@ const	Signin = () =>
 	{
 		return (state.controller.user);
 	});
-	// const	users = useAppSelector((state) =>
-	// {
-	// 	return (state.controller.user.chat.users);
-	// });
+
 	const	allUsers = useAppSelector((state) =>
 	{
 		return (state.controller.allUsers);
@@ -209,19 +204,24 @@ const	Signin = () =>
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				dispatch(setUserBackFromDB(userLogIn.username));
-				if (user.id !== -1)
-				{
-					dispatch(decodePassword(userLogIn.username, userLogIn.password));
-					dispatch(setProfileMyView());
-					console.log("User is update ? ", user);
-					// dispatch(setUserLoggedIn());
-					if (user.isLoggedIn)
-						navigate("/");
-				}
-				else
-					console.log("user doesnt exist");
-				// throw a user not found exception
+				console.log("Data to send", {
+					username: userLogIn.username,
+					password: passwordValue
+				});
+				dispatch()
+				// dispatch(setUserBackFromDB(userLogIn.username));
+				// if (user.id !== -1)
+				// {
+				// 	dispatch(decodePassword(userLogIn.username, userLogIn.password));
+				// 	dispatch(setProfileMyView());
+				// 	console.log("User is update ? ", user);
+				// 	// dispatch(setUserLoggedIn());
+				// 	if (user.isLoggedIn)
+				// 		navigate("/");
+				// }
+				// else
+				// 	console.log("user doesnt exist");
+				// // throw a user not found exception
 			}
 	};
 

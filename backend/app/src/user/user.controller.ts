@@ -94,11 +94,11 @@ class	UserDoubleAuthDto
 class UserLoginDto
 {
 	@IsNotEmpty()
-	id: any;
+	username: string;
 	// getUserRegiste
-	@IsEmail()
+	// @IsEmail()
 	@IsNotEmpty()
-	email: string;
+	password: string;
 }
 
 
@@ -481,13 +481,11 @@ export class UserController
 	}
 
 	@Post("login")
-	userLogin(
+	async userLogin(
 		@Body() body: UserLoginDto)
-	: UserLoginResponseModel
+	: Promise<UserLoginResponseModel>
 	{
-		this.logger
-			.log("login route requested with id: ", body.id);
-		return (this.userService.login(body.id, body.email));
+		return (await this.userService.login(body.username, body.password));
 	}
 
 	@Post("validate-registration")
