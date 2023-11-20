@@ -19,6 +19,7 @@ import UserServices from "../service/ft-api-service";
 // import UserRegistration from "../../Object/UserRegistration";
 // import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
+import { useNavigate } from "react-router-dom";
 // type MessageModel =
 // {
 // 	sender: string,
@@ -857,6 +858,72 @@ export const GetValidationCode = (otpCode : string, token: string)
 			return ;
 		const	data: any = await UserServices.getValidationCodeFromTwilio(
 			prev.controller.user.phoneNumber, otpCode, token, prev.server.uri);
+		if (data === "error")
+		{
+			console.log("TEST error");
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		else
+		{
+			// console.log("TEST data validated cde", data.data);
+			response = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					otpCode: otpCode,
+					codeValidated: data.data
+				}
+			}
+			// console.log("controller action 791  ", data.data);
+		}
+		dispatch(controllerActions.getValidationCode(response));
+		console.log("code enregistre");
+	});
+};
+
+// when logging in
+export const receiveCode = (token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await
+			UserServices.receiveCode(
+				prev.controller.user.id.toString(), token, prev.server.uri);
+		if (data === "ERROR")
+		{
+			console.log("error receiving code");
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		console.log("phone number enregistre");
+	});
+};
+
+// when loggin in
+export const GetCode = (otpCode : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+		console.log("TEST ");
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await UserServices.getValidationCode(
+			prev.controller.user.id.toString(), otpCode, token, prev.server.uri);
 		if (data === "error")
 		{
 			console.log("TEST error");
@@ -1760,7 +1827,6 @@ export const	setUserBackFromDB = (token: string)
 	{
 		const	prev = getState();
 
-		console.log("TOKEN", token, " et ", prev.controller.user.bearerToken);
 		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
 		if (data === "ERROR")
 		{
@@ -1769,6 +1835,10 @@ export const	setUserBackFromDB = (token: string)
 			return ;
 		}
 		console.log("DATA HERE user back ", data);
+		let	loggin: boolean;
+		loggin = false;
+		if (data.doubleAuth === false)
+			loggin = true;
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1785,7 +1855,7 @@ export const	setUserBackFromDB = (token: string)
 				avatar: data.avatar,
 				doubleAuth: data.doubleAuth,
 				location: data.location,
-				isLoggedIn: true,
+				isLoggedIn: loggin,
 				ftAvatar: data.ftAvatar,
 				bearerToken: token,
 				registered: true

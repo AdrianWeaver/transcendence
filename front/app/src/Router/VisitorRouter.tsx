@@ -15,6 +15,7 @@ import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
 // import Chat from "../Views/Chat/Chat";
 // import ChatLayout from "../Views/Chat/ChatLayout";
 import MyStats from "../Views/MyStats/MyStats";
+import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
 
 /**
  * This is unauth router
@@ -37,6 +38,11 @@ const	VisitorRouter = () =>
 				<Route
 					path="/signin"
 					element={<Signin />}
+				/>
+
+				<Route
+					path="/signin-double-auth"
+					element={<SigninDoubleAuth />}
 				/>
 
 				<Route

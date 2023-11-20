@@ -194,6 +194,37 @@ const	UserServices = {
 		);
 	},
 
+	// when logging in
+	async	receiveCode
+		(profileId: string, token: string, hostname: string)
+	{
+		console.log("receive validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		const	data = {
+			profileId: profileId
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/login-receive-code", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service double auth TWILIO ", data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service double auth TWILIO error: ", error);
+				return ("error");
+			})
+		);
+	},
+
 	async	getValidationCodeFromTwilio
 	(numero: string, otpCode: string, token: string, hostname: string)
 	{
@@ -215,16 +246,50 @@ const	UserServices = {
 			.post("/user/get-code", data, config)
 			.then((data) =>
 			{
-				console.log("ft-api-service get code TWILIO ", data);
+				console.log("ft-api-service login get code TWILIO ", data);
 				return (data);
 			})
 			.catch((error) =>
 			{
-				console.log("ft-api-service get code error: ", error);
+				console.log("ft-api-service login get code error: ", error);
 				return ("error");
 			})
 		);
 	},
+
+	// when logging in
+	async	getValidationCode
+	(profileId: string, otpCode: string, token: string, hostname: string)
+	{
+		console.log("get validation code");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+
+		const	data = {
+			profileId: profileId,
+			otpCode: otpCode
+		};
+
+		return (
+			Api(hostname)
+			.post("/user/login-get-code", data, config)
+			.then((data) =>
+			{
+				console.log("ft-api-service login get code TWILIO ", data);
+				return (data);
+			})
+			.catch((error) =>
+			{
+				console.log("ft-api-service login get code error: ", error);
+				return ("error");
+			})
+		);
+	},
+
 	async	registerInfosInBack
 	(token: string, info: string, field: string, hostname: string)
 	{

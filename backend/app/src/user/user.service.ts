@@ -1147,7 +1147,7 @@ public	register(data: UserModel)
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
-			return (elem.id === id);
+			return (elem.id.toString() === id.toString());
 		});
 		if (searchUser !== undefined)
 			return (searchUser.authService.doubleAuth.phoneNumber);

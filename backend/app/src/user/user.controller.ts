@@ -635,6 +635,46 @@ export class UserController
 		});
 	}
 
+	@Post("login-receive-code")
+	@UseGuards(UserAuthorizationGuard)
+	loginSendSMS(
+		@Body() body: any,
+		@Req() req: any
+	)
+	{
+		console.log(this.env);
+		if (!this.env)
+			throw new Error("env problem");
+		if (!this.env.parsed)
+			throw new Error("env not parsed");
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new Error("env var not found or wrong");
+		const	number = this.userService.getPhoneNumber(body.profileId);
+		console.log("bYneror", number);
+		if (number === "undefined" || number === undefined)
+			throw new Error("Phone number not found");
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		client.verify.v2
+		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+		.verifications.create({
+			to: number,
+			channel: "sms" })
+		.then((verification) =>
+		{
+			console.log(verification.status);
+		})
+		.catch((error) =>
+		{
+			console.error("Boo", error);
+		})
+		.finally(() =>
+		{
+			console.log("sms sent");
+		});
+	}
+
 	@Post("get-code")
 	@UseGuards(UserAuthorizationGuard)
 	GetValidationCode(
@@ -657,6 +697,67 @@ export class UserController
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
 			throw new InternalServerErrorException();
 		const	number = body.to;
+		if (number === "undefined" || number === undefined)
+			throw new InternalServerErrorException();
+		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
+		// const readLine = readline.createInterface({
+				// input: process.stdin,
+				// output: process.stdout,
+			// });
+		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
+		if (verify === undefined)
+			throw new InternalServerErrorException();
+		// readLine.question("Please enter the OTP:", (otpCode: string) =>
+		// {
+		client.verify.v2
+			.services(verify)
+			.verificationChecks.create(
+				{
+					to: number,
+					code: body.otpCode
+				})
+			.then((verificationCheck) =>
+			{
+				console.log("status : ", verificationCheck.status);
+				console.log("VERIF : ", verificationCheck);
+				if (verificationCheck.status === "approved")
+				{
+					res.send(true);
+					return (this.userService.codeValidated(body.otpCode, req.user.id, true));
+				}
+				else
+					throw new UnauthorizedException();
+			})
+			.catch((err) =>
+			{
+				console.log("err");
+				throw new InternalServerErrorException();
+			});
+		// });
+	}
+
+	@Post("login-get-code")
+	@UseGuards(UserAuthorizationGuard)
+	loginGetCode(
+		@Body() body: any,
+		@Req() req: any,
+		@Res() res: Response
+	)
+	{
+		// console.log("body ", body);
+		// console.log("opt-code", body.otpCode);
+		if (body.otpCode === undefined)
+			throw new UnauthorizedException();
+		console.log(this.env);
+		if (!this.env)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed)
+			throw new InternalServerErrorException();
+		if (!this.env.parsed.TWILIO_ACCOUNT_SID
+			|| !this.env.parsed.TWILIO_AUTH_TOKEN
+			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
+			throw new InternalServerErrorException();
+		const	number = this.userService.getPhoneNumber(body.profileId);
 		if (number === "undefined" || number === undefined)
 			throw new InternalServerErrorException();
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);

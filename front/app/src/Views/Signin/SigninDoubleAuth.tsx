@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable curly */
 /* eslint-disable max-statements */
 /* eslint-disable max-len */
@@ -9,10 +11,10 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { userSignIn } from "../../Redux/store/controllerAction";
+import { GetCode, receiveCode, receiveValidationCode, setUserLoggedIn, userSignIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
-const	Signin = () =>
+const	SigninDoubleAuth = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
@@ -32,15 +34,6 @@ const	Signin = () =>
 	{
 		savePrevPage("/signin");
 	}, []);
-
-	useEffect(() =>
-	{
-		if (user.doubleAuth)
-		{
-			console.log("User wants to double auth log in");
-			navigate("/signin-double-auth");
-		}
-	}, [user.doubleAuth]);
 
 	useEffect(() =>
 	{
@@ -66,12 +59,37 @@ const	Signin = () =>
 		setPasswordValue
 	] = useState("");
 
+	const	[
+		twilioCode,
+		setTwilioCode
+	] = useState("");
+
+	const
+	[
+		sendSMS,
+		setSendSMS
+	] = useState(false);
+
+	const
+	[
+		sendCode,
+		setSendCode
+	] = useState(false);
+
 	const	handlePasswordChangeValue = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) =>
 	{
 		event.preventDefault();
 		setPasswordValue(event.target.value);
+	};
+
+	const	handleEnterCode = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) =>
+	{
+		event.preventDefault();
+		setTwilioCode(event.target.value);
 	};
 
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
@@ -102,9 +120,82 @@ const	Signin = () =>
 					password: passwordValue
 				});
 				dispatch(userSignIn(userLogIn.username, userLogIn.password));
-				console.log("USER UPDATED ?", user);
 			}
 	};
+
+	const handleSendCode = () =>
+	{
+		if (twilioCode.length)
+		{
+			setSendCode(true);
+			dispatch(GetCode(twilioCode, user.bearerToken));
+		}
+	};
+
+	const	handleReceiveCode = () =>
+	{
+		dispatch(receiveCode(user.bearerToken));
+		console.log("Handle receive mg");
+		setSendSMS(true);
+	};
+
+	const handleFinishToRegister = () =>
+	{
+		console.log("valid ", user.codeValidated);
+		if (user.codeValidated)
+		{
+			dispatch(setUserLoggedIn());
+			navigate("/");
+		}
+	};
+
+	const sendTheCode = (
+		<Button
+			type="submit"
+			fullWidth
+			variant="contained"
+			sx={
+			{
+				mt: 3,
+				mb: 2
+			}}
+			onClick={handleSendCode}
+		>
+			send the code
+		</Button>
+	);
+
+	const sendSmsButton = (
+		<Button
+			type="submit"
+			fullWidth
+			variant="contained"
+			sx={
+			{
+				mt: 3,
+				mb: 2
+			}}
+			onClick={handleReceiveCode}
+		>
+			Receive the code
+		</Button>
+	);
+
+	const finishButton = (
+		<Button
+				type="submit"
+				fullWidth
+				variant="contained"
+				sx={
+				{
+					mt: 3,
+					mb: 2
+				}}
+				onClick={handleFinishToRegister}
+			>
+				Log in
+			</Button>
+	);
 
 	return (
 		<>
@@ -145,22 +236,34 @@ const	Signin = () =>
 							}
 						/>
 					</Grid>
+					<Grid item xs={12}>
+						{
+							(!sendSMS)
+							? <></>
+							: <TextField
+								required
+								fullWidth
+								name="twilioCode"
+								label="Enter Code"
+								type="twilioCode"
+								id="twilioCode"
+								autoComplete="twilio-code"
+								value={twilioCode}
+								onChange={handleEnterCode}
+							/>
+						}
+						{
+							(!sendSMS)
+							? sendSmsButton
+							: (!sendCode)
+								? sendTheCode
+								: finishButton
+						}
+					</Grid>
 				</Grid>
-				<Button
-					type="submit"
-					fullWidth
-					variant="contained"
-					sx={
-					{
-						mt: 3,
-						mb: 2
-					}}
-				>
-					Log in
-				</Button>
 			</Box>
 		</>
 	);
 };
 
-export default Signin;
+export default SigninDoubleAuth;
