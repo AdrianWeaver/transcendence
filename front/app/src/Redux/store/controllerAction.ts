@@ -1753,17 +1753,18 @@ export const	getAllStats = ()
 // 	})
 // }
 
-export const	setUserBackFromDB = (username: string)
+export const	setUserBackFromDB = (token: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
 
-		const	data = await UserServices.getUserBackFromDB(username, prev.server.uri);
+		console.log("TOKEN", token, " et ", prev.controller.user.bearerToken);
+		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
 		// if (data === "ERROR")
 		// 	dispatch(controllerActions.setUserBackFromDB(prev));
-		console.log("DATA HERE ", data);
+		console.log("DATA HERE user back ", data);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1783,5 +1784,32 @@ export const	setUserBackFromDB = (username: string)
 			}
 		}
 		dispatch(controllerActions.setUserBackFromDB(response));
+	});
+}
+
+export const	userSignIn = (username: string, password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	data = await UserServices.UserSignin(username, password, prev.server.uri);
+		if (data === "ERROR")
+			return ;
+		else
+		{
+			console.log("DATA HERE ", data);
+			dispatch(setUserBackFromDB(data.token));
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					bearerToken: data.token,
+				}
+			}
+			dispatch(controllerActions.setNewToken(response));
+		}
 	});
 }

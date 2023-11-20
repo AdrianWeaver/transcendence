@@ -51,7 +51,7 @@ const	Copyright = (props: CopyrightProps) =>
 			<Link
 				onClick={handleClick}
 				color="inherit"
-				href={url}
+				// href={url}
 			>
 				{"ft_transcendence "}
 			</Link>

@@ -391,21 +391,46 @@ const	UserServices = {
 	// 		})
 	// 	);
 	// },
-	async	getUserBackFromDB(username: string, hostname: string)
+	async	getUserBackFromDB(token: string, hostname: string)
 	{
 		console.log("get user back from db");
 		const	config: AxiosRequestConfig = {
 			headers: {
 				"content-type": "application/x-www-form-urlencoded",
-				// "Authorization": token,
+				"Authorization": token,
+			},
+		};
+		return (
+			Api(hostname)
+			.post("/user/get-user-back", {}, config)
+			.then((data) =>
+			{
+				console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+
+	async	UserSignin(username: string, password:string, hostname: string)
+	{
+		console.log("get user back from db");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
 			},
 		};
 		const	data = {
 			username: username,
+			password: password
 		};
 		return (
 			Api(hostname)
-			.post("user/get-user-back", data, config)
+			.post("user/login", data, config)
 			.then((data) =>
 			{
 				console.log(data.data);

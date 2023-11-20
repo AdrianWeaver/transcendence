@@ -1006,16 +1006,25 @@ public	register(data: UserModel)
 			}
 			else
 			{
-				// searchUser.authService.token = "Bearer " + jwt.sign(
-					// 	{
-					// 		id: searchUser.id,
-					// 		email: searchUser.email
-					// 	},
-					// 	this.secret,
-					// 	{
-					// 		expiresIn: "1d"
-					// 	}
-					// );
+				searchUser.authService.token = "Bearer " + jwt.sign(
+					{
+						id: searchUser.id,
+						email: searchUser.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				);
+				const	index = this.user.findIndex((elem) =>
+				{
+					return (elem.id === searchUser.id);
+				});
+				if (index !== -1)
+				{
+					this.user[index].authService.token = searchUser.authService.token;
+					this.user[index].authService.expAt = searchUser.authService.expAt;
+				}
 				const	response: UserLoginResponseModel = {
 					message:
 						"You are successfully connected as " + searchUser.login,
@@ -1654,13 +1663,13 @@ public	register(data: UserModel)
 		return (res);
 	}
 
-	public	getUserBackFromDB(username: string)
+	public	getUserBackFromDB(profileId: string | number)
 	: string | UserDBFrontModel
 	{
-		console.log("get user back from db with username ", username);
+		console.log("get user back from db with profileId ", profileId);
 		const	index = this.user.findIndex((elem) =>
 		{
-			return (username === elem.username);
+			return (profileId.toString() === elem.id.toString());
 		});
 		if (index === -1)
 			return ("error");

@@ -9,8 +9,9 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { decodePassword, setAllUsers, setProfileMyView, setUserBackFromDB, setUserData, setUserLoggedIn } from "../../Redux/store/controllerAction";
+import { decodePassword, setAllUsers, setNewToken, setProfileMyView, setUserBackFromDB, setUserData, setUserLoggedIn, userSignIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // type PasswordAlertProps ={
 // 	password: string,
@@ -133,6 +134,10 @@ const	Signin = () =>
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	server = useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 
 	const	user = useAppSelector((state) =>
 	{
@@ -208,7 +213,25 @@ const	Signin = () =>
 					username: userLogIn.username,
 					password: passwordValue
 				});
-				dispatch()
+				dispatch(userSignIn(userLogIn.username, userLogIn.password));
+				// if (tokenOk)
+				// {
+				// 	axios
+				// 	.post(server.uri + ":3000/user/get-user-back", {}, {
+				// 		headers: {
+				// 			"Content-Type": "application/x-www-form-urlencoded",
+				// 			"token": user.bearerToken
+				// 		}
+				// 	})
+				// 	.then((data) =>
+				// 	{
+				// 		console.log("token ok ?", data);
+				// 	})
+				// 	.catch(() =>
+				// 	{
+				// 		console.error("ERROR TOKEN");
+				// 	});
+				// }
 				// dispatch(setUserBackFromDB(userLogIn.username));
 				// if (user.id !== -1)
 				// {
