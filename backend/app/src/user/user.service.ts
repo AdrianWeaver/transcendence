@@ -30,9 +30,7 @@ import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
-import { PrismaClient } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-
 
 import axios from "axios";
 import * as fs from "fs";
