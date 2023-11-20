@@ -8,6 +8,7 @@ type ButtonJoinPartyProps = {
 	playerOne: any;
 	playerTwo: any;
 };
+
 const	ButtonJoinParty = (props: ButtonJoinPartyProps) =>
 {
 	const	myProfileId = useAppSelector((state) =>
