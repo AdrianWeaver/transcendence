@@ -267,10 +267,7 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.users);
 	});
-	// const	numberOfChannels = useAppSelector((state) =>
-	// {
-	// 	return (state.controller.user.chat.numberOfChannels);
-	// });
+
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
@@ -295,7 +292,6 @@ const	ChatLayout = () =>
 		return (state.controller.user.bearerToken);
 	});
 
-	// USE STATES
 	const
 	[
 		isMyConv,
@@ -329,7 +325,6 @@ const	ChatLayout = () =>
 		setChanPassword
 	] = useState("");
 
-	// for when we try to access a protected channel
 	const [
 		userPassword,
 		setUserPassword
@@ -456,8 +451,6 @@ const	ChatLayout = () =>
 		userToInvite,
 		setUserToInvite
 	] = useState("");
-
-	// END OF USE STATEs
 
 	const handleClickOpen = () =>
 	{
@@ -681,12 +674,6 @@ const	ChatLayout = () =>
 				if (data.payload.friendsList !== undefined)
 					setFriendList(data.payload.friendsList);
 				console.log("sending list user", data.payload, " ", friendList);
-
-				// if (data.payload.privateMessage !== undefined)
-				// 	setPrivateMessage(data.payload.privateMessage);
-				// if (data.payload.friends !== undefined)
-				// 	setFriendList(data.payload.friends);
-				// console.log("friendList update channels", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -774,11 +761,6 @@ const	ChatLayout = () =>
 			socketRef.current.emit("channel-info", action);
 		};
 
-		const	inviteToPlayPong = (roomName: string, pOneProfileId: string, pTwoProfileId: string) =>
-		{
-			// here ?
-		};
-
 		const	updateMessages = (data: any) =>
 		{
 			console.log("Update messages", data);
@@ -845,7 +827,6 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
-			// NEED c'est ici qu'on va pouvoir regler le soucis d'affichage decaler je pense
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
@@ -1065,11 +1046,6 @@ const	ChatLayout = () =>
 		setValue(newValue);
 	};
 
-	// const handleChangeIndex = (index: number) =>
-	// {
-	// 	setValue(index);
-	// };
-
 	const refreshListUser = () =>
 	{
 		const action = {
@@ -1260,10 +1236,6 @@ const	ChatLayout = () =>
 		setMembersOpen(false);
 	};
 
-	// END OF MEMBERS
-
-	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
-
 	const	kickUserFromChannel = (userName: string, chanName: string) =>
 	{
 		const	action = {
@@ -1369,6 +1341,7 @@ const	ChatLayout = () =>
 		};
 		socketRef.current.emit("channel-info", action);
 	};
+
 	const	makeAdmin = (userName: string, chanName: string) =>
 	{
 		const	action = {
@@ -1601,23 +1574,24 @@ const	ChatLayout = () =>
 																					</Button>
 																				</>)}
 																				{
-																				member.name !== uniqueId &&
+																					(member.name !== uniqueId) &&
 																					(
-																					<>
-																						<Button onClick={() =>
-																						{
-																							addUserToFriends(member.name);
-																						}}>
-																							Add friend
-																						</Button>
-																						<Button onClick={() =>
-																						{
-																							addUserToBlocked(member.name);
-																						}}>
-																							Block
-																						</Button>
-																					</>
-																				)}
+																						<>
+																							<Button onClick={() =>
+																							{
+																								addUserToFriends(member.name);
+																							}}>
+																								Add friend
+																							</Button>
+																							<Button onClick={() =>
+																							{
+																								addUserToBlocked(member.name);
+																							}}>
+																								Block
+																							</Button>
+																						</>
+																					)
+																				}
 																			</li>);
 																	})
 																}
