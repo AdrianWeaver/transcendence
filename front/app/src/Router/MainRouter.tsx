@@ -18,7 +18,7 @@ const	MainRouter: React.FC = () =>
 	// const	config = new Configuration();
 
 	// dispatch(setUri(config.getURI()));
-	console.log("main router", controller);
+	// console.log("main router", controller);
 	if (controller.user.isLoggedIn)
 		return (<LoggedRouter />);
 	else

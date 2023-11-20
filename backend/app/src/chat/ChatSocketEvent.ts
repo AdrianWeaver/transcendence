@@ -145,6 +145,8 @@ export class ChatSocketEvents
 					else
 					{
 						this.chatService.setSocketToUser(index, client);
+						this.chatService.chat.users[index].status = "online";
+						this.chatService.chat.users[index].online = true;
 						this.chatService.updateUserSocketInChannels(client);
 
 						this.chatService.updateMemberSocketId(client.id, profileId);
@@ -235,10 +237,22 @@ export class ChatSocketEvents
 			this.chatService.updateChannelOwner("disconnected", profileId);
 			this.chatService.updateUserInChannels("disconnected", profileId);
 			this.chatService.updateUserInChat("disconnected", profileId);
-
 			this.chatService.updateBannedInChannel("disconnected", profileId);
-
 			this.chatService.updateDatabase();
+
+			const indexOfUsers = this.chatService.chat.users.findIndex((user) =>
+			{
+				return (user.profileId === profileId);
+			})
+			if (indexOfUsers === -1)
+			{
+				this.logger.error("must not be in this conditions ");
+				return ;
+			}
+			// can check if the user is playing with the function of gameService
+			this.chatService.chat.users[indexOfUsers].status = "offline";
+			this.chatService.chat.users[indexOfUsers].online = false;
+
 		}
 
 		@SubscribeMessage("sending-message")
@@ -378,7 +392,6 @@ export class ChatSocketEvents
 			if (data.payload.message.trim().length === 0)
 				return ;
 			const	id = channel.messages.length;
-			console.log("PLayPOndijd", playPong);
 			const newMessage: MessageModel = {
 				// profileId instead of socketId ?
 				sender: playPong ? "server" : profileId,
@@ -401,6 +414,7 @@ export class ChatSocketEvents
 			};
 			this.server.to(channel.name).emit("update-messages", action);
 		}
+
 		public handleInfoGetUserList(client: Socket, data: ActionSocket)
 		{
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
@@ -430,7 +444,6 @@ export class ChatSocketEvents
 			{
 				newArray.map((element) =>
 				{
-					// console.log(typeof elem.profileId, " ", typeof element.id, " ", elem.profileId === element.id.toString(), " ", elem.name, " ", element.username, " ", elem.name !== element.username)
 					if (elem.profileId === element.id && elem.name !== element.username)
 						elem.name = element.username;
 					if (elem.name === element.username)
@@ -566,7 +579,7 @@ export class ChatSocketEvents
 								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
 							};
 							newPrivateMsg?.users.push(obj);
-							newPrivateMsg?.addAdmin(tmp2?.profileId);
+							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();

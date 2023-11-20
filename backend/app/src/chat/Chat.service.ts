@@ -73,7 +73,7 @@ import { allowedNodeEnvironmentFlags } from "process";
 @Injectable()
 export	class ChatService implements OnModuleInit
 {
-	private	chat: Chat;
+	public	chat: Chat;
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
 	private readonly chatID = "id-chat-service-v-11";
