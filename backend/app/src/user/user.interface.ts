@@ -71,6 +71,7 @@ export interface UserDBFrontModel
 	avatar: string;
 	location: string;
 	doubleAuth: boolean;
+	bearerToken: string;
 	// friendsProfileId: Array<string>;
 }
 

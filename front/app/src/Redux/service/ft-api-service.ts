@@ -73,7 +73,7 @@ const	UserServices = {
 				"Authorization": token
 			}
 		};
-		console.log("VERIFYYYYY", hostname);
+		console.log("VERIFYYYYY", token);
 		return (
 			Api(hostname)
 			.post("/user/verify-token", {}, config)
@@ -400,9 +400,10 @@ const	UserServices = {
 				"Authorization": token,
 			},
 		};
+		console.error("LE TOKEN TO LOG IN", token);
 		return (
 			Api(hostname)
-			.post("/user/get-user-back", {}, config)
+			.get("/user/get-user-back", config)
 			.then((data) =>
 			{
 				console.log(data.data);

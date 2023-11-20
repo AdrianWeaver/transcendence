@@ -1024,6 +1024,7 @@ public	register(data: UserModel)
 				{
 					this.user[index].authService.token = searchUser.authService.token;
 					this.user[index].authService.expAt = searchUser.authService.expAt;
+					this.user[index].revokedConnectionRequest = false;
 				}
 				const	response: UserLoginResponseModel = {
 					message:
@@ -1666,15 +1667,13 @@ public	register(data: UserModel)
 	public	getUserBackFromDB(profileId: string | number)
 	: string | UserDBFrontModel
 	{
-		console.log("get user back from db with profileId ", profileId);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (profileId.toString() === elem.id.toString());
 		});
 		if (index === -1)
 			return ("error");
-		this.user[index].registrationProcessEnded = true;
-		console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
+		console.log("get user back from db with profileId ", profileId, " et token ", this.user[index].authService.token);
 		const	user: UserDBFrontModel = {
 			date: this.user[index].date,
 			id: this.user[index].id.toString(),
@@ -1686,6 +1685,7 @@ public	register(data: UserModel)
 			avatar: this.user[index].avatar,
 			location: this.user[index].location,
 			doubleAuth: this.user[index].authService.doubleAuth.enable,
+			bearerToken: this.user[index].authService.token,
 			// friendsProfileId: [...this.user[index].friendsProfileId]
 		};
 		return (user);

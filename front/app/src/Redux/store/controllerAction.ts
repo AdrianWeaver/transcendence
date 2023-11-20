@@ -1762,8 +1762,12 @@ export const	setUserBackFromDB = (token: string)
 
 		console.log("TOKEN", token, " et ", prev.controller.user.bearerToken);
 		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
-		// if (data === "ERROR")
-		// 	dispatch(controllerActions.setUserBackFromDB(prev));
+		if (data === "ERROR")
+		{
+			console.log("ERROR GET USER BACK");
+			dispatch(controllerActions.setUserBackFromDB(prev.controller));
+			return ;
+		}
 		console.log("DATA HERE user back ", data);
 		const	response: ControllerModel = {
 			...prev.controller,
@@ -1780,7 +1784,11 @@ export const	setUserBackFromDB = (token: string)
 				username: data.username,
 				avatar: data.avatar,
 				doubleAuth: data.doubleAuth,
-				location: data.location
+				location: data.location,
+				isLoggedIn: true,
+				ftAvatar: data.ftAvatar,
+				bearerToken: token,
+				registered: true
 			}
 		}
 		dispatch(controllerActions.setUserBackFromDB(response));
@@ -1799,7 +1807,7 @@ export const	userSignIn = (username: string, password: string)
 			return ;
 		else
 		{
-			console.log("DATA HERE ", data);
+			console.log("DATA HERE ", data.token);
 			dispatch(setUserBackFromDB(data.token));
 			const	response: ControllerModel = {
 				...prev.controller,

@@ -808,6 +808,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	RevokeToken(@Req() req: any)
 	{
+		console.log("'revoke-token' route requested");
 		this.userService.revokeTokenById(req.user.id);
 		return ("token revoked");
 	}
@@ -856,6 +857,7 @@ export class UserController
 	getMyStats(@Req() req: any)
 	{
 		// return (["toto"]);
+		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
 			return (
@@ -915,6 +917,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getStats(@Body() body: any)
 	{
+		console.log("'stats' route requested");
 		console.log("Body", body);
 		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
@@ -973,6 +976,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getAllStats(@Body() body: any)
 	{
+		console.log("'global-stats' route requested");
 		const	userStats = this.gameService.matchHistory;
 		const	array: ResponseRow[] = [];
 		const	users = this.userService.getAllUserRaw();
@@ -1007,7 +1011,7 @@ export class UserController
 		return (array);
 	}
 
-	@Post("/get-user-back")
+	@Get("/get-user-back")
 	@UseGuards(UserAuthorizationGuard)
 	getUserBackFromDB(
 		@Res() res: Response,
