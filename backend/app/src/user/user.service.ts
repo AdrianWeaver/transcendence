@@ -31,6 +31,8 @@ import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
 import { PrismaClient } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
+
 
 import axios from "axios";
 import * as fs from "fs";
@@ -67,7 +69,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// private	userDB: Array<UserDBModel> = [];
 	// private userDBString: Array<string> = [];
 
-	private	prisma: PrismaClient;
+	// private	prisma: PrismaClient;
 	private readonly secretId = "user-service-secret";
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
@@ -97,10 +99,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	];
 
 
-	public constructor()
+	public constructor(
+		private readonly prismaService: PrismaService,
+	)
 	{
 			// TEST
-		this.prisma = new PrismaClient();
+		// this.prisma = new PrismaClient();
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
 		this.loadSecretFromDB();
@@ -112,7 +116,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			"secret_id": this.secretId,
 			"value": randomBytes(64).toString("hex")
 		};
-		this.prisma.secretTable
+		this.prismaService.prisma.secretTable
 			.create(
 				{
 					data: toDB
@@ -129,7 +133,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private	loadSecretFromDB()
 	{
-		this.prisma
+		this.prismaService.prisma
 			.secretTable
 			.findUnique({
 				where:
@@ -171,7 +175,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		this.logger.debug("Create the user into the table User");
 		const	toDB = this.prepareUserForDB(user.id.toString());
 
-		const status = await this.prisma
+		const status = await this.prismaService.prisma
 			.userJson
 			.create(
 			{
@@ -199,7 +203,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-			this.prisma
+			this.prismaService.prisma
 				.userJson
 				.findUnique(
 					{
@@ -216,7 +220,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						const	content = JSON.parse(data.contents);
 						// console.log("content ", content);
 						const	update = this.prepareUserForDB(user.id);
-						this.prisma
+						this.prismaService.prisma
 							.userJson
 							.update(
 								{
@@ -233,7 +237,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					else
 					{
 						const	toDB = this.prepareUserForDB(user.id.toString());
-						this.prisma
+						this.prismaService
+							.prisma
 							.userJson
 							.create(
 							{
@@ -259,7 +264,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	loadTableToMemory()
 	{
 		// return ;
-		this.prisma
+		this.prismaService
+			.prisma
 			.userJson
 			.findMany({})
 			.then((data: any) =>
@@ -286,8 +292,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	async onModuleInit()
 	{
-		console.log("GET USER BACK FROM DB");
-		console.log("heer ", this.cdnConfig.uri);
 		this.loadTableToMemory();
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
@@ -346,12 +350,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private async isHavingPreviousPermalinks(actualServerCfg: ServerConfig): Promise<boolean>
 	{
-		const	prisma = new PrismaClient();
 		const	permalinkVersion = "prod-v2";
 		// console.log(prisma.permalinks);
 		try
 		{
-			const permalinks = await prisma.permalinks.findUnique(
+			const permalinks = await this.prismaService.prisma.permalinks.findUnique(
 				{
 					where:
 					{
@@ -363,7 +366,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			{
 				try
 				{
-					await prisma.permalinks.create(
+					await this.prismaService.prisma.permalinks.create(
 					{
 
 						data: {
@@ -648,24 +651,18 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			this.logger.error(error);
 		}
-		this.logger.error("Must not be here !");
 		return (userObj);
 	}
 
 	private	async convertPNGToJPEG(oldTmpFilePath: string, destTmpFilePath: string)
 	{
-		this.logger.debug("input file: " + oldTmpFilePath);
-		this.logger.debug("output file: " + destTmpFilePath);
-
 		try
 		{
 			const	imagePng = sharp(oldTmpFilePath);
 			const	metadata = await imagePng.metadata();
 			// console.log(metadata);
 			const	outputBuffer = await imagePng.jpeg().toBuffer();
-			this.logger.verbose("buffer ready to be writted");
 			fs.writeFileSync(destTmpFilePath, outputBuffer);
-			this.logger.log("Convertion okay");
 		}
 		catch (error)
 		{
@@ -678,7 +675,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		try
 		{
 			fs.unlinkSync(src);
-			this.logger.verbose("PNG file deleted");
 		}
 		catch (error)
 		{
@@ -701,7 +697,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				|| metadata.height === undefined)
 				return ;
 			const	requestedSize = Math.min(metadata.height, metadata.width);
-			console.log("requested size: ", requestedSize);
 			const	cropedImage = await image.extract(
 				{
 					width: requestedSize,
@@ -711,9 +706,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				}
 			)
 			.toBuffer();
-			this.logger.verbose("Sucessfull write to buffer the croped image");
 			fs.writeFileSync(filecfg.getPathTmpConverted(), cropedImage);
-			this.logger.log("Image cropped writed to disk");
 		}
 		catch (error)
 		{
@@ -723,7 +716,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private async	resizeAllUploadedPictures(fileCfg: FileConfig)
 	{
-		this.logger.verbose("Starting resize all pictures");
 		try
 		{
 			await	this.cropImageIfNeeded(fileCfg);
@@ -738,25 +730,21 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				fileCfg.getPathLarge(),
 				"large"
 			);
-			this.logger.log("resized to large");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathMedium(),
 				"medium"
 			);
-			this.logger.log("resized to medium");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathSmall(),
 				"small"
 			);
-			this.logger.log("resized to small");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathMicro(),
 				"micro"
 			);
-			this.logger.log("resized to micro");
 		}
 		catch (error)
 		{
@@ -767,19 +755,15 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	public	async	uploadPhoto(fileCfg: FileConfig, userObj: UserModel)
 	: Promise<UserModel>
 	{
-		this.logger.verbose("Starting resize Process");
-		this.logger.log("The tmpfilepath is : ", fileCfg.fullPath());
 		fileCfg.setPictureConfig(this.getConfig());
 		// console.log(this.getConfig());
 		if (fileCfg.needConvertToJPEG())
 		{
 			try
 			{
-				this.logger.log("Starting convertion of the file");
 				await this.convertPNGToJPEG(fileCfg.fullPath(), fileCfg.getPathTmpConverted());
 				await this.deletePicture(fileCfg.fullPath());
 				await this.resizeAllUploadedPictures(fileCfg);
-				this.logger.log("Ending convertion of the file");
 			}
 			catch (error)
 			{
@@ -803,7 +787,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: fileCfg.getCDNConfig().avatar,
 			ftAvatar: fileCfg.getCDNConfig().ftAvatar,
 		};
-		this.logger.verbose("End resize Process");
 		// const index = this.user.findIndex((user) =>
 		// {
 		// 	return (user.id === newUserObj.id);
@@ -1170,7 +1153,6 @@ public	register(data: UserModel)
 	async	hashPassword(password: string, id: number)
 	{
 		const	saltRounds = 10;
-		console.log("Hash password id ", id);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (id.toString() === elem.id.toString());
@@ -1180,7 +1162,6 @@ public	register(data: UserModel)
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
-		console.log("le test ", hashed);
 		return (hashed);
 	}
 
@@ -1276,8 +1257,6 @@ public	register(data: UserModel)
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
 		: number
 	{
-		this.logger.debug("username: " + username, " usernameUser ", user.username);
-
 		if (username !== user.username)
 		{
 			const	index = this.user.findIndex((elem) =>
@@ -1425,9 +1404,6 @@ public	register(data: UserModel)
 		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
 		// this.userDBString.push(toDB);
-		// console.log("create User ready for db ", user);
-		// console.log("create User to db ", objToDB);
-		// console.log("create USER STRINGIFIED", toDB);
 		return (objToDB);
 	}
 
@@ -1558,7 +1534,6 @@ public	register(data: UserModel)
 	public	validateRegistration(userId: string | number)
 	: boolean
 	{
-		console.log("VALIDATE REGISTRATION", userId);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (userId.toString() === elem.id.toString());
@@ -1566,7 +1541,6 @@ public	register(data: UserModel)
 		if (index === -1)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
-		console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
 		return (true);
 	}
 
@@ -1619,7 +1593,6 @@ public	register(data: UserModel)
 		});
 		if (searchUser === undefined)
 		{
-			console.log("user not found");
 			return ("error");
 		}
 		const	oldIp = searchUser.authService.doubleAuth.lastIpClient;

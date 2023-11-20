@@ -14,6 +14,7 @@ import { GameApiService } from "./game-api.service";
 import { UserService } from "src/user/user.service";
 import { UserAuthorizationGuard } from "../user/user.authorizationGuard";
 import { IsNotEmpty, IsNumberString, IsUUID} from "class-validator";
+import { PrismaService } from "src/prisma/prisma.service";
 
 class InviteDto
 {
@@ -35,7 +36,8 @@ export class GameApiController
 
 	public constructor(
 		private readonly gameApiService: GameApiService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly prismaService: PrismaService,
 	)
 	{
 		this.logger.error("instanciate controller for the Game api"
