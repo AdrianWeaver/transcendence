@@ -873,6 +873,32 @@ export class GameSocketEvents
 			else
 				userMessage.type = "player-two";
 			client.emit("init-message", userMessage);
+			const	instance = this.gameService.gameInstances[indexInstance];
+			let	playerOnePicture: string;
+				let	playerTwoPicture: string;
+			const	userOne = this.userService.getUserById(instance.playerOne.profileId);
+			if (userOne === undefined)
+				playerOnePicture = "undefined";
+			else
+				playerOnePicture = userOne.avatar;
+			const	userTwo = this.userService.getUserById(instance.playerTwo.profileId);
+			if (userTwo === undefined)
+				playerTwoPicture = "undefined";
+			else
+				playerTwoPicture = userTwo.avatar;
+			const	action = {
+				type: "connect",
+				payload: {
+					numberUsers: instance.userConnected,
+					userReadyCount: instance.userReady,
+					socketId: client.id,
+					playerOneProfileId: instance.playerOne.profileId,
+					playerTwoProfileId: instance.playerTwo.profileId,
+					playerOnePicture: playerOnePicture,
+					playerTwoPicture: playerTwoPicture
+				}
+			};
+			this.server.to(roomName).emit("player-info", action);
 		}
 		else
 		{
@@ -1021,40 +1047,46 @@ export class GameSocketEvents
 			if (search === undefined)
 			{
 				const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId as string;
-				this.gameService.pushClientIdIntoSocketIdReady(client.id, profileId);
-				this.gameService.increaseUserReadyNumber();
-
-				// check and add the user to the ready list
-
-				let	countReadyInRoom: number;
-				countReadyInRoom = 0;
-				for (const socketId of socketIdsInRoom)
+				const	indexInstance = this.gameService.gameInstances.findIndex((instance) =>
 				{
-					const	searchReady = this.gameService
-						.findSocketIdReadyWithSocketId(socketId);
-					if (searchReady !== undefined)
-						countReadyInRoom++;
+					return (instance.playerOne.socketId === client.id || instance.playerTwo.socketId === client.id);
+				});
+				if (indexInstance === -1)
+				{
+					this.logger.error("ready state error");
 				}
-
-				const	action = {
-					type: "ready-player",
-					payload: {
-						userReadyCount: this.gameService.getUserReadyNumber(),
-						gameActive: true
-					}
-				};
-
-				this.server.to(userRoom).emit("player-info", action);
-
-				if (countReadyInRoom === 2)
+				else
 				{
-					this.server.to(userRoom).emit("game-active", action);
-					for (const instance of this.gameService.getGameInstances())
+					const	instance = this.gameService.gameInstances[indexInstance];
+					if (instance.playerOne.profileId === profileId && instance.playerOne.isReady === false)
 					{
-						if (instance.loop && (instance.playerOne.socketId === client.id
-							|| instance.playerTwo.socketId === client.id))
+						instance.playerOne.isReady = true;
+						instance.userReady += 1;
+						this.gameService.pushClientIdIntoSocketIdReady(client.id, profileId);
+						this.gameService.increaseUserReadyNumber();
+					}
+					if (instance.playerTwo.profileId === profileId && instance.playerTwo.isReady === false)
+					{
+						instance.playerTwo.isReady = true;
+						instance.userReady += 1;
+						this.gameService.pushClientIdIntoSocketIdReady(client.id, profileId);
+						this.gameService.increaseUserReadyNumber();
+					}
+					const gameActive = (instance.userReady === 2) ? true : false;
+					if (gameActive)
+					{
+						if (instance.loop)
 							instance.loop.gameActive = true;
 					}
+					const	action = {
+						type: "ready-player",
+						payload: {
+							userReadyCount: instance.userReady,
+							gameActive: gameActive
+						}
+					};
+					this.server.to(userRoom).emit("player-info", action);
+					this.server.to(userRoom).emit("game-active", action);
 				}
 			}
 		}

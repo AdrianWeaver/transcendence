@@ -29,7 +29,7 @@ import
 }	from "./anonymous-user.interface";
 import { AuthorizationGuard } from "./anonymous-user.authorizationGuard";
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 
 class AnonymousRegisterDto
 {
@@ -51,20 +51,24 @@ class AnonymousUserLoginDto
 export class AnonymousUserController implements OnApplicationBootstrap
 {
 	private readonly logger;
-	constructor(private readonly anonymousUserService: AnonymousUserService)
+	constructor(
+		private readonly anonymousUserService: AnonymousUserService,
+		private	readonly prismaService: PrismaService
+	)
 	{
 		this.logger = new Logger("anonymous-user controller");
 		this.logger
 		.debug("I'm connected to anonymous-user-service instance id :"
 			+ this.anonymousUserService.getUuidInstance());
+		this.logger.debug("uuid prisma: " + this.prismaService.uuid);
 	}
 
 	onApplicationBootstrap()
 	{
 		this.logger
 			.log("Loading fron database before the connection is accepted");
-		const prisma = new PrismaClient();
-		prisma.anonymousUser
+		
+		this.prismaService.prisma.anonymousUser
 			.findMany()
 			.then((data: any) =>
 			{
@@ -94,8 +98,7 @@ export class AnonymousUserController implements OnApplicationBootstrap
 		const	obj = retValue.toDB;
 		this.logger.debug("User has registration finish");
 		this.logger.debug(obj);
-		const	prisma = new PrismaClient();
-		prisma.anonymousUser.create(
+		this.prismaService.prisma.anonymousUser.create(
 			{
 				data:
 				{
@@ -133,8 +136,7 @@ export class AnonymousUserController implements OnApplicationBootstrap
 		this.logger.debug("User has login finish");
 		const obj = ret.db;
 		this.logger.debug(obj);
-		const prisma = new PrismaClient();
-		prisma.anonymousUser.update({
+		this.prismaService.prisma.anonymousUser.update({
 			where: {
 				uuid: obj.uuid
 			},

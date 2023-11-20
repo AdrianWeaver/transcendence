@@ -24,7 +24,7 @@ import { join } from "path";
 import { GameApiModule } from "./game-api/game-api.module";
 import { GameApiController } from "./game-api/game-api.controller";
 import { GameApiService } from "./game-api/game-api.service";
-// import	dotenv from "dotenv";
+import { PrismaModule } from "./prisma/prisma.module";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 
@@ -37,6 +37,7 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 		GameSocketModule,
 		AnonymousUserModule,
 		UserModule,
+		PrismaModule,
 		ServeStaticModule
 			.forRoot({
 				serveRoot: "/cdn/image/profile",
@@ -82,6 +83,5 @@ export class AppModule implements OnApplicationBootstrap
 
 	onApplicationBootstrap()
 	{
-		this.logger.verbose("DIRECTORY: " + pictureFolder);
 	}
 }
