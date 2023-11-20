@@ -51,8 +51,6 @@ import {
 	setActiveConversationId,
 	setCurrentChannel,
 	setChatUsers,
-	// setMessageRoom,
-	// setKindOfConversation,
 	setNumberOfChannels,
 	connectChatUser,
 	addChatUser,
@@ -63,13 +61,9 @@ import {
 	setProfilePublicView,
 	setPreviousPage
 }	from "../../Redux/store/controllerAction";
-// import { PropaneSharp } from "@mui/icons-material";
-// import { ChatUserModel } from "../../Redux/models/redux-models";
-// import MyProfile from "../MyProfile/MyProfile";
-// import { render } from "react-dom";
+
 import { useNavigate } from "react-router-dom";
-import { stat } from "fs";
-// import { MessageRoomModel } from "../../Redux/models/redux-models";
+import AddNewChannelModal from "./components/AddNewChannelModal";
 
 type MessageModel =
 {
@@ -273,10 +267,7 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.chat.users);
 	});
-	// const	numberOfChannels = useAppSelector((state) =>
-	// {
-	// 	return (state.controller.user.chat.numberOfChannels);
-	// });
+
 	const	currentChannel = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentChannel);
@@ -301,7 +292,6 @@ const	ChatLayout = () =>
 		return (state.controller.user.bearerToken);
 	});
 
-	// USE STATES
 	const
 	[
 		isMyConv,
@@ -335,7 +325,6 @@ const	ChatLayout = () =>
 		setChanPassword
 	] = useState("");
 
-	// for when we try to access a protected channel
 	const [
 		userPassword,
 		setUserPassword
@@ -463,8 +452,6 @@ const	ChatLayout = () =>
 		setUserToInvite
 	] = useState("");
 
-	// END OF USE STATEs
-
 	const handleClickOpen = () =>
 	{
 		setOpen(true);
@@ -535,7 +522,7 @@ const	ChatLayout = () =>
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
-			alert("Channel name cannot be empty");
+			// alert("Channel name cannot be empty");
 			return;
 		}
 
@@ -545,13 +532,13 @@ const	ChatLayout = () =>
 			"private"
 			].includes(selectedMode))
 		{
-			alert("Please select a mode (Public, Protected, or Private)");
+			// alert("Please select a mode (Public, Protected, or Private)");
 			return;
 		}
 
 		if (selectedMode === "protected" && chanPassword.trim() === "")
 		{
-			alert("There must be a password for a protected channel");
+			// alert("There must be a password for a protected channel");
 			return;
 		}
 		setKindOfConversation("channel");
@@ -687,12 +674,6 @@ const	ChatLayout = () =>
 				if (data.payload.friendsList !== undefined)
 					setFriendList(data.payload.friendsList);
 				console.log("sending list user", data.payload, " ", friendList);
-
-				// if (data.payload.privateMessage !== undefined)
-				// 	setPrivateMessage(data.payload.privateMessage);
-				// if (data.payload.friends !== undefined)
-				// 	setFriendList(data.payload.friends);
-				// console.log("friendList update channels", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -718,17 +699,23 @@ const	ChatLayout = () =>
 					setChanMessages([]);
 				}
 				else
-					alert(data.payload.message);
+				{
+					// alert(data.payload.message);
+					console.log(data.payload.message);
+				}
 			}
 
 			if (data.type === "asked-join")
 			{
 				if (data.payload.message !== "")
-					alert(data.payload.message);
+				{
+					// alert(data.payload.message);
+					console.log(data.payload.message);
+				}
 				else
 				{
 					setChanMessages(data.payload.messages);
-					alert("Successfully joined channel " + data.payload.chanName + "!");
+					// alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
 
@@ -741,7 +728,10 @@ const	ChatLayout = () =>
 					setUserPassword("");
 				}
 				else
-					alert("Incorrect password, try again !");
+				{
+					// alert("Incorrect password, try again !");
+					console.log("Incorrect password, try again !");
+				}
 			}
 		};
 
@@ -754,7 +744,7 @@ const	ChatLayout = () =>
 		{
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
-			console.log("information from server: ", data);
+			// console.log("information from server: ", data);
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
@@ -771,16 +761,30 @@ const	ChatLayout = () =>
 			socketRef.current.emit("channel-info", action);
 		};
 
-		const	inviteToPlayPong = (roomName: string, pOneProfileId: string, pTwoProfileId: string) =>
-		{
-			// here ?
-		};
-
 		const	updateMessages = (data: any) =>
 		{
 			console.log("Update messages", data);
 			const	kind = data.payload.kind;
 			setKindOfConversation(kind);
+			if (data.payload.kind === "privateMessage")
+			{
+				for (const blocked of blockedListRef.current)
+				{
+					if (blocked === data.payload.friendProfileId)
+					{
+						const newMessage: MessageModel = {
+							sender: "server",
+							message: "The users are not receiving messages from each other",
+							id: 0,
+							username: uniqueId,
+						}
+						const	messagesArray: MessageModel[] = [];
+						messagesArray.push(newMessage);
+						setPrivMessages(messagesArray);
+						return ;
+					}
+				}
+			}
 			if (data.payload.chanName === currentChannelRef.current)
 			{
 				setKindOfConversation(data.payload.kind);
@@ -795,8 +799,24 @@ const	ChatLayout = () =>
 				{
 					setChanMessages(filteredMessages);
 				}
-				else if (data.payload.kind === "privateMessage")
-					setPrivMessages(filteredMessages);
+				else
+				{
+					for (const blocked of blockedListRef.current)
+					{
+						if (blocked === data.payload.friendProfileId)
+						{
+							const newMessage: MessageModel = {
+								sender: "server",
+								message: "The users are not receiving messages from each other",
+								id: 0,
+								username: uniqueId,
+							}
+							const	messagesArray: MessageModel[] = [];
+							messagesArray.push(newMessage);
+							setPrivMessages(messagesArray);
+						}
+					}
+				}
 			}
 			goToChannel(data.payload.chanName, data.payload.kind);
 			if (data.playPong === true)
@@ -807,7 +827,6 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
-			// NEED c'est ici qu'on va pouvoir regler le soucis d'affichage decaler je pense
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
@@ -827,7 +846,10 @@ const	ChatLayout = () =>
 						setPrivMessages(data.payload.chanMessages);
 				}
 				else
-					alert(data.payload.isInside);
+				{
+					// alert(data.payload.isInside);
+					console.log(data.payload.isInside);
+				}
 			}
 
 			if (data.type === "display-members")
@@ -869,7 +891,7 @@ const	ChatLayout = () =>
 						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
 				}
-				alert(data.payload.message);
+				// alert(data.payload.message);
 			}
 		};
 
@@ -878,17 +900,19 @@ const	ChatLayout = () =>
 			if (data.type === "add-friend")
 			{
 				if (data.payload.alreadyFriend !== "")
-					alert("ALERT" + data.payload.alreadyFriend);
+				{
+					// alert("ALERT" + data.payload.alreadyFriend);
+					console.log("ALERT" + data.payload.alreadyFriend);
+				}
 				else
 				{
 					setFriendList(data.payload.friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
 					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
-					// TEST 
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-					alert(alertMessage);
+					// alert(alertMessage);
 				}
 			}
 
@@ -906,24 +930,24 @@ const	ChatLayout = () =>
 				}
 				else
 					alertMessage = "You have already blocked " + data.payload.newBlocked + ".";
-				alert(alertMessage);
+				// alert(alertMessage);
 			}
 
 			if (data.type === "set-is-muted")
 			{
 				setIsMuted(true);
 				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
-				alert(message);
+				// alert(message);
 			}
 
 			if (data.type === "invite-member")
 			{
-				alert(data.payload.message);
+				// alert(data.payload.message);
 			}
 
 			if (data.type === "make-admin")
 			{
-				alert(data.payload.message);
+				// alert(data.payload.message);
 			}
 		};
 
@@ -981,6 +1005,7 @@ const	ChatLayout = () =>
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
 			socket.off("add-chat-user", createChatUser);
 			socket.off("is-my-conv", isMyConversation);
+			socket.disconnect();
         });
     }, []);
 
@@ -1021,19 +1046,15 @@ const	ChatLayout = () =>
 		setValue(newValue);
 	};
 
-	// const handleChangeIndex = (index: number) =>
-	// {
-	// 	setValue(index);
-	// };
-
 	const refreshListUser = () =>
 	{
 		const action = {
 			type: "get-user-list",
 		};
 		socketRef.current?.emit("info", action);
-		console.log("refresh the list of user");
 	};
+
+	refreshListUser();
 
 	useEffect(() =>
 	{
@@ -1048,12 +1069,6 @@ const	ChatLayout = () =>
 			});
 		}
 	});
-
-	// const customButtonStyle = {
-	// 	// padding: "4px 8px",
-	// 	fontSize: "12px",
-	// 	margin: "0 8px",
-	// };
 
 	const listItemStyle = {
 		display: "flex",
@@ -1081,7 +1096,10 @@ const	ChatLayout = () =>
 	const handleTextChange = (e: any) =>
 	{
 		if (isMuted === true)
-			alert("You are muted for the moment being.");
+		{
+			// alert("You are muted for the moment being.");
+			console.log("You are muted for the moment being.");
+		}
 		else
 			setText(e.target.value);
 	};
@@ -1135,18 +1153,7 @@ const	ChatLayout = () =>
 			}
 		};
 		socketRef.current.emit("channel-info", action);
-		// const act = {
-		// 	type: "did-I-join",
-		// 	payload: {
-		// 		chanName: chanName,
-		// 		kind: "channel",
-		// 		userId: undefined
-		// 	}
-		// };
-		// socketRef.current.emit("channel-info", act);
 	};
-
-	// FOR THE OPTIONS NEXT TO CHANNEL NAME:
 
 	const [
 		isDialogOpen,
@@ -1206,9 +1213,6 @@ const	ChatLayout = () =>
 		handleDialogClose();
 	};
 
-	// END OF OPTIONS NEXT TO CHANNEL NAME
-
-	// SHOW MEMBERS FUNCTIONS:
 	const [
 		membersOpen,
 		setMembersOpen
@@ -1231,10 +1235,6 @@ const	ChatLayout = () =>
 	{
 		setMembersOpen(false);
 	};
-
-	// END OF MEMBERS
-
-	// MEMBERS FUNCTION (BAN, KICK, ADD TO FRIENDS, BLOCK, MUTE)
 
 	const	kickUserFromChannel = (userName: string, chanName: string) =>
 	{
@@ -1341,6 +1341,7 @@ const	ChatLayout = () =>
 		};
 		socketRef.current.emit("channel-info", action);
 	};
+
 	const	makeAdmin = (userName: string, chanName: string) =>
 	{
 		const	action = {
@@ -1404,7 +1405,6 @@ const	ChatLayout = () =>
 							/>
 						</Tabs>
 					</Toolbar>
-					{/* right side of the screen  */}
 					<TabPanel
 						area={"false"}
 						value={value}
@@ -1412,97 +1412,24 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						{/* <ChannelsList /> */}
 						<div>
-							<Button onClick={handleClickOpen} variant="contained" color="success">
-								NEW
-							</Button>
-							<Dialog open={open} onClose={handleClose}>
-								<DialogTitle>Enter Information</DialogTitle>
-								<DialogContent>
-									<DialogContentText>
-										Please enter the following information:
-									</DialogContentText>
-									<input
-										type="text"
-										placeholder="User name"
-										value={channelName}
-										onChange={(e) =>
-										{
-											setKindOfConversation("channel");
-											const inputValue = e.target.value;
-											if (inputValue.length <= 8)
-												setChannelName(inputValue);
-											else
-												setChannelName(inputValue.slice(0, 8));
-										}}
-									/>
-									<br />
-									<div>
-										<input
-										type="radio"
-										id="option1"
-										name="answerOption"
-										value="public"
-										checked={selectedMode === "public"}
-										onChange={() =>
-										{
-											setSelectedMode("public");
-										}}
-										/>
-										<label htmlFor="option1">Public</label>
-									</div>
-									<div>
-										<input
-										type="radio"
-										id="option2"
-										name="answerOption"
-										value="protected"
-										checked={selectedMode === "protected"}
-										onChange={() =>
-										{
-											setSelectedMode("protected");
-										}}
-										/>
-										<label htmlFor="option2">Protected</label>
-									</div>
-									<div>
-										<input
-										type="radio"
-										id="option3"
-										name="answerOption"
-										value="private"
-										checked={selectedMode === "private"}
-										onChange={() =>
-										{
-											setSelectedMode("private");
-										}}
-										/>
-										<label htmlFor="option3">Private</label>
-									</div>
-									<input
-										type="text"
-										placeholder="Password (if protected)"
-										value={chanPassword}
-										onChange={(e) =>
-										{
-											setChanPassword(e.target.value);
-										}}
-									/>
-								</DialogContent>
-								<DialogActions>
-									<Button onClick={handleClose} color="primary">
-										Cancel
-									</Button>
-									<Button onClick={handleSave} color="primary">
-										Save
-									</Button>
-								</DialogActions>
-							</Dialog>
+							<AddNewChannelModal
+								handleClickOpen={handleClickOpen} 
+								handleClose={handleClose}
+								handleSave={handleSave}
+								open={open}
+								channelName={channelName}
+								selectedMode={selectedMode}
+								setChannelName={setChannelName}
+								setSelectedMode={setSelectedMode}
+								setChanPassword={setChanPassword}
+								chanPassword={chanPassword}
+							/>
 							<List>
 								{
 									channels.map((channel: any, index: number) =>
 									{
+										// console.log("channels", channel);
 										return (
 											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
@@ -1600,8 +1527,6 @@ const	ChatLayout = () =>
 																</Button>
 															</DialogActions>
 														</Dialog>
-
-														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogTitle>
 																Channel Members
@@ -1609,15 +1534,18 @@ const	ChatLayout = () =>
 															<DialogContent>
 																<ul>
 																{
-																	channelMembers.map((member) =>
+																	channelMembers.map((member, index: number) =>
 																	{
-																		return (<li key={member.id}>
+																		return (
+																			<li
+																				key={index}
+																			>
 																				{member.userName}
 																				{isChannelAdmin && member.name !== uniqueId && (
 																				<>
 																					<Button onClick={() =>
 																					{
-																						// alert(uniqueId);
+																						// // alert(uniqueId);
 																						kickUserFromChannel(member.name, clickedChannel);
 																						handleMembersClose();
 																					}}>
@@ -1645,62 +1573,25 @@ const	ChatLayout = () =>
 																						Make admin
 																					</Button>
 																				</>)}
-																				{member.name !== uniqueId && (
-																				<>
-																					<Button onClick={() =>
-																					{
-																						addUserToFriends(member.name);
-																					}}>
-																						Add friend
-																					</Button>
-																					<Button onClick={() =>
-																					{
-																						addUserToBlocked(member.name);
-																					}}>
-																						Block
-																					</Button>
-																					{/* <Button onClick={() =>
-																					{
-																						setInviteDialogOpen(true);
-																					}}>
-																						Invite
-																					</Button>
-																					<Dialog open={inviteDialogOpen} onClose={() =>
-																						{
-																							setInviteDialogOpen(false);
-																						}}
-																						maxWidth="sm" fullWidth>
-																						<DialogTitle>Invite User to Channel</DialogTitle>
-																						<DialogContent>
-																							<TextField
-																							label="Channel Name"
-																							variant="outlined"
-																							fullWidth
-																							value={channelToInvite}
-																							onChange={(e) =>
-																							{
-																								console.log("target value " + e.target.value);
-																								setChannelToInvite(e.target.value);
-																							}}/>
-																						</DialogContent>
-																						<DialogActions>
+																				{
+																					(member.name !== uniqueId) &&
+																					(
+																						<>
 																							<Button onClick={() =>
-																								{
-																									getProfileId(member.name);
-																									inviteUserToChannel(userToInvite);
-																									setInviteDialogOpen(false);
-																								}} color="primary">
-																								Invite
+																							{
+																								addUserToFriends(member.name);
+																							}}>
+																								Add friend
 																							</Button>
 																							<Button onClick={() =>
 																							{
-																								setInviteDialogOpen(false);
-																							}} color="primary">
-																							Cancel
+																								addUserToBlocked(member.name);
+																							}}>
+																								Block
 																							</Button>
-																						</DialogActions>
-																					</Dialog> */}
-																				</>)}
+																						</>
+																					)
+																				}
 																			</li>);
 																	})
 																}
@@ -1779,12 +1670,15 @@ const	ChatLayout = () =>
 					>
 							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={currentProfileIsFriend}/>
 							<List>
-								{privateMessage.map((channel: any) =>
+								{
+									privateMessage.map((channel: any, privId: number) =>
 									{
+										console.log("private message map", channel);
 										return (
 											<>
 											{
-												<><ListItem style={listItemStyle} key={channel.id}>
+												<>
+												<ListItem style={listItemStyle} key={privId}>
 													<ListItemText
 														style={
 															channel.name === currentChannel
@@ -1799,11 +1693,13 @@ const	ChatLayout = () =>
 														}}
 													/>
 												</ListItem>
-												<Button onClick={() =>
-												{
-													handleDialogOpen(true);
-													setButtonSelectionPriv(channel);
-												}}>
+												<Button
+													onClick={() =>
+													{
+														handleDialogOpen(true);
+														setButtonSelectionPriv(channel);
+													}}
+												>
 													Options
 												</Button>
 												<Dialog open={isPrivDialogOpen} onClose={handleDialogClose}>
@@ -1922,7 +1818,8 @@ const	ChatLayout = () =>
 							}}
 							> */}
 							<h1>tabpanel 0</h1>
-							{chanMessages.map((message: MessageModel, index: number) =>
+							{
+							chanMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
 
@@ -1951,14 +1848,9 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						{/* <List
-							sx={{
-								height: "70vh",
-								overflowY: "auto"
-							}}
-							> */}
-							<h1>tabpanel 1</h1>
-						{privMessages.map((message: MessageModel, index: number) =>
+						<h1>tabpanel 1</h1>
+						{
+							privMessages.map((message: MessageModel, index: number) =>
 							{
 								let	sender: "me" | "other" | "server";
 								if (uniqueId === message.sender)
@@ -1976,7 +1868,8 @@ const	ChatLayout = () =>
 										message={message.message}
 									/>
 								);
-							})}
+							})
+						}
 					</TabPanel>
 					<TabPanel
 						area={"true"}
@@ -1985,13 +1878,7 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						{/* <List
-							sx={{
-								height: "70vh",
-								overflowY: "auto"
-							}}
-						> */}
-							<h1>tabpanel 2</h1>
+						<h1>tabpanel 2</h1>
 					</TabPanel>
 					<Divider />
 
