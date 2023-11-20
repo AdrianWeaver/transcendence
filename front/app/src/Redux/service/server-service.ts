@@ -6,8 +6,10 @@ import Api from "../store/Api";
 import
 {
 	AnonymousUserLoginResponseModel,
-	AnonymousUserRegisterResponseModel
+	AnonymousUserRegisterResponseModel,
+	GameServeStatus
 }	from "../models/redux-models";
+import Game from "../../Views/TestBall/Objects/Game";
 
 const	ServerService = {
 	async getConnection(serverLocation: string)

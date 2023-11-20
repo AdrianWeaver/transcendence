@@ -208,6 +208,15 @@ export interface	Position
 	y: number
 }
 
+export interface GameServeStatus
+{
+	undefined: any[],
+	disconnected: any[],
+	invited: any[],
+	revoked: any[],
+	connected: any[],
+}
+
 export interface	GameEngineModel
 {
 	server:
@@ -246,8 +255,9 @@ export interface	GameEngineModel
 	meConnected: boolean,
 	myGameActive:
 	{
-		random: any[],
-		friend: any[]
+		classical: GameServeStatus,
+		upsideDown: GameServeStatus,
+		friend: GameServeStatus
 	},
 	gameOver: boolean
 }

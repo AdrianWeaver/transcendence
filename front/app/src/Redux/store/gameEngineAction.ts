@@ -418,19 +418,24 @@ export const	getMyActiveGame = ()
 		const	token = prev.controller.user.bearerToken;
 
 		const data = await ServerService
-			.getMyActiveGame(token, prev.server.serverLocation);
-		console.log(data);
+			.getMyActiveGame(token, prev.server.uri);
+		console.log("data fetched", data);
 		if (data.success === true)
 		{
 			console.log("getMyGameActive success called", data);
+			console.log("values ", data.data);
+			console.log("classical", data.data.classical);
 			const	response: Model = {
 				...prev.gameEngine,
 				myGameActive:
 				{
-					random: data.random,
-					friend: data.friend
+					classical: data.data.classical,
+					friend: data.data.friend,
+					upsideDown: data.data.upsideDown
 				}
 			};
+			console.error("before dispatch");
+			console.log("Response: ", response);
 			dispatch(action.getMyActiveGame(response));
 		}
 		else

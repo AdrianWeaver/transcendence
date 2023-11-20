@@ -7,20 +7,19 @@ import {
 	Stack,
 	Button,
 	Box,
-	Card,
-	CardActions,
-	CardContent,
-	CardMedia,
-	Grid
+	Tabs,
+	Tab,
 } from "@mui/material";
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
 import {
 	getMyActiveGame,
-	revokeGameWithUuid
 } from "../../Redux/store/gameEngineAction";
-import ButtonRemoveGame from "./ButtonRemoveGame";
-import GamePreview from "./GamePreview";
+import ClassicalParty from "./ClassicalParty";
+import { CSSProperties, SyntheticEvent, useState } from "react";
+import { motion } from "framer-motion";
+import UpsideDownParty from "./UpsideDownParty";
+import FriendParty from "./FriendParty";
 
 const	Header = () =>
 {
@@ -81,334 +80,110 @@ const	Header = () =>
 	);
 };
 
+interface TabPanelProps {
+	children?: React.ReactNode;
+	dir?: string;
+	index: number;
+	value: number;
+	style?: CSSProperties;
+}
 
-// const cards = [];
-const cardsAlone = [];
 
-
-type ButtonJoinPartyProps = {
-	playerOne: any;
-	playerTwo: any;
-};
-const	ButtonJoinParty = (props: ButtonJoinPartyProps) =>
+const TabPanel = (props: TabPanelProps) =>
 {
-	const	myProfileId = useAppSelector((state) =>
-	{
-		return (state.controller.user.id);
-	});
-	let	amIConnected;
-	let message;
-	amIConnected = false;
-	if (props.playerOne.profileId === myProfileId)
-	{
-		if (props.playerOne.socketId === "undefined")
-		{
-			message = "Commencer la partie";
-		}
-		else if (props.playerOne.socketId === "invited")
-		{
-			message = "Commencer la partie";
-		}
-		else if (props.playerOne.socketId === "disconnected")
-		{
-			message = "Votre adversaire vous attend";
-		}
-		else if (props.playerOne.socketId === "revoked")
-		{
-			message = "Fin de partie";
-		}
-		else
-		{
-			message = "Vous etes deja en partie";
-			amIConnected = true;
-		}
-	}
-	if (props.playerTwo.profileId === myProfileId)
-	{
-		if (props.playerTwo.socketId === "undefined") // must not be on friends
-		{
-			message = "Commencer la partie";
-		}
-		else if (props.playerTwo.socketId === "invited")
-		{
-			message = "Commencer la partie";
-		}
-		else if (props.playerTwo.socketId === "disconnected")
-		{
-			message = "Votre adversaire vous attend";
-		}
-		else if (props.playerTwo.socketId === "revoked")
-		{
-			message = "Fin de partie";
-		}
-		else
-		{
-			message = "Vous y jouez deja";
-			amIConnected = true;
-		}
-	}
-	let	render;
-	if (amIConnected === true)
-		render = <Button size="small" disabled={true}>{message}</Button>;
-	else
-		render = <Button size="small">Entrer en jeu</Button>;
-	return (render);
-};
+	const { children, value, index, ...other } = props;
 
-
-const	FriendsParty = () =>
-{
-	const	arrayGameFriends = useAppSelector((state) =>
-	{
-		return (state.gameEngine.myGameActive.friend);
-	});
+	const animationSettings = {
+			type: "spring",
+			duration: 0.3,
+			scale: 0.6,
+			stiffness: 0
+		};
 
 	return (
-		<Container sx={{ py: 8 }} maxWidth="md">
-			<Typography
-				component="h2"
-				variant="h3"
-				align="center"
-				color="text.primary"
-				gutterBottom
-			>
-				Parties entre amis
-			</Typography>
-			<Grid container spacing={4}>
-			{
-				arrayGameFriends.map((game: any, index: number) =>
+		<motion.div
+			initial={
 				{
-					const	userConnected = game.userConnected;
-					const	gameMode = game.gameMode;
-					const	uuid = game.uuid;
-					const	roomName = game.roomName;
-					const	playerOne = game.playerOne;
-					const	playerTwo = game.playerTwo;
-					const	board = game.board;
-					const 	loop = game.loop;
-					const	ball = game.ball;
-					const	revoked = game.revoked;
-
-					const	score = game.playerOne.score
-						+ ":" + game.playerTwo.score;
-					// check doublon dans les loop et GameServe
-					let elapsedTime;
-					if (loop.frameNumber === 0)
-						elapsedTime = "aucun";
-					else
-					{
-						elapsedTime
-							= loop.frameNumber / loop.frameRate + " sec.";
-					}
-					let userOneAvatar;
-					if (playerOne.profileId !== "undefined")
-						userOneAvatar = playerOne.profilePicture;
-					else
-						userOneAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
-					let userTwoAvatar;
-						if (playerTwo.profileId !== "undefined")
-							userTwoAvatar = playerTwo.profilePicture;
-						else
-							userTwoAvatar = 'http://localhost:3000/cdn/image/profile/default.png';
-					console.log("please use correct call to URL :) ",
-						userOneAvatar + " " + userTwoAvatar);
-					console.log(game);
-					return (
-						<Grid item key={index} xs={12} sm={6} md={4}>
-							<Card
-								sx={{
-									height: "100%",
-									display: "flex",
-									flexDirection: "column"
-								}}
-							>
-								<Grid
-									container
-									sx={{
-										flexDirection: "row",
-										border: "1px solid blue"
-									}}
-								>
-									{/* // player one  */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
-											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
-											}}
-											image={userOneAvatar}
-										/>
-									</ Grid>
-									{/* // player Two */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
-											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
-											}}
-											image={userTwoAvatar}
-										/>
-									</ Grid>
-								</ Grid>
-								<GamePreview
-									ball={ball}
-									board={board}
-									playerOne={playerOne}
-									playerTwo={playerTwo}
-								/>
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography
-										gutterBottom
-										variant="h5"
-										component="h2"
-									>
-										Instance: {roomName} <br />
-									</Typography>
-									<Typography>
-										Partie en mode: "{gameMode}"
-										<br />
-										Score : {score}
-										<br />
-										Temps passe en jeu : {elapsedTime}
-										<br />
-										Joueur dans le salon : {userConnected}
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<ButtonJoinParty
-										playerOne={playerOne}
-										playerTwo={playerTwo}
-									/>
-									<ButtonRemoveGame
-										uuid={uuid}
-										revoked={revoked}
-									/>
-								</CardActions>
-							</Card>
-						</Grid>
-					);
-				})
-			}
-			</Grid>
-		</Container>
-	);
-};
-
-const	PrivateParty = () =>
-{
-	return (
-		<Container sx={{ py: 8 }} maxWidth="md">
-			<Typography
-				component="h2"
-				variant="h3"
-				align="center"
-				color="text.primary"
-				gutterBottom
-			>
-				Partie random
-			</Typography>
-			<Grid container spacing={4}>
-			{
-				cardsAlone.map((card) =>
+					opacity: 0,
+					scale: animationSettings.scale
+				}}
+			animate={{
+				opacity: value === index ? 1 : 0,
+				scale: value === index ? 1 : animationSettings.scale
+			}}
+			transition={
 				{
-					return (
-						<Grid item key={card} xs={12} sm={6} md={4}>
-							<Card
-								sx={{
-									height: "100%",
-									display: "flex",
-									flexDirection: "column"
-								}}
-							>
-								<Grid
-									container
-									sx={{
-										flexDirection: "row",
-										border: "1px solid blue"
-									}}
-								>
-									{/* // player one  */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
-											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
-											}}
-											image="https://source.unsplash.com/random?wallpapers"
-										/>
-									</ Grid>
-									{/* // player Two */}
-									<Grid item xs={6}
-										sx={{
-											border: "1px solid blue"
-										}}
-									>
-										<CardMedia
-											component="div"
-											sx={{
-												// 16:9
-												// pt: "56.25%",
-												pt: "100%",
-											}}
-											image="https://source.unsplash.com/random?wallpapers"
-										/>
-									</ Grid>
-								</ Grid>
-								<GamePreview />
-								<CardContent sx={{ flexGrow: 1 }}>
-									<Typography
-										gutterBottom
-										variant="h5"
-										component="h2"
-									>
-										Heading
-									</Typography>
-									<Typography>
-										This is a media card.
-										You can use this section to describe the
-										content.
-									</Typography>
-								</CardContent>
-								<CardActions>
-									<Button size="small">Entrer en jeu</Button>
-									<Button size="small">Supprimer</Button>
-								</CardActions>
-							</Card>
-						</Grid>
-					);
-				})
-			}
-			</Grid>
-		</Container>
+					duration: animationSettings.duration,
+					type: animationSettings.type,
+					stiffness: 80,
+				}}
+			style={{ display: value === index ? "block" : "none" }}
+		>
+			<Typography
+				component="div"
+				role="tabpanel"
+				hidden={value !== index}
+				id={`action-tabpanel-${index}`}
+				aria-labelledby={`action-tab-${index}`}
+				{...other}
+			>
+				<Box sx={{ p: 3 }}>{children}</Box>
+			</Typography>
+		</motion.div>
 	);
 };
 
 const	MyActiveGame = () =>
 {
+	const
+	[
+		mainValue,
+		setMainValue
+	] = useState(0);
+
+	const	handleChange = (event: SyntheticEvent, newValue: number) =>
+	{
+		setMainValue(newValue);
+	};
+
 	return (
 		<>
 			<MenuBar />
 			<Header />
-			<FriendsParty />
-			<PrivateParty />
+			<Box
+				sx={{
+					width: "100%",
+					bgcolor: "background.paper"
+				}}
+			>
+				<Tabs
+					value={mainValue}
+					onChange={handleChange}
+					centered
+				>
+					<Tab label="Classique aleatoire" />
+					<Tab label="Upside Dolwn aleatoire" />
+					<Tab label="Parties entres amis" />
+				</Tabs>
+			</Box>
+			<TabPanel
+				index={0}
+				value={mainValue}
+			>
+				<ClassicalParty />
+			</TabPanel>
+			<TabPanel
+				index={1}
+				value={mainValue}
+			>
+				<UpsideDownParty />
+			</TabPanel>
+			<TabPanel
+				index={2}
+				value={mainValue}
+			>
+				<FriendParty />
+			</TabPanel>
 		</>
 	);
 };

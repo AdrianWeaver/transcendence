@@ -106,7 +106,7 @@ export class GameApiService
 			{
 				classical: classicalArray.filtered,
 				upsideDown: upsideDownArray.filtered,
-				friendArray: friendArray.filtered
+				friend: friendArray.filtered
 			}
 		);
 	}
