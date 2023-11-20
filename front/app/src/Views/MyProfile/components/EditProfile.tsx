@@ -311,7 +311,7 @@ const	EditProfile = (props: EditProfileProps) =>
 				error={errorValidation.phoneNumber}
 				helperText={
 					errorValidation.phoneNumber
-						? "phone number is required"
+						? "phone number is required (format +33612345632)"
 						: ""
 				}
 			/>
@@ -339,7 +339,6 @@ const	EditProfile = (props: EditProfileProps) =>
 						}
 					/>
 				</Grid>
-				{/* <Grid item xs={12} sm={12} > */}
 				<Grid item xs={12} sm={12} >
 					<FormControlLabel
 						value="doubleAuthentification"
@@ -353,7 +352,6 @@ const	EditProfile = (props: EditProfileProps) =>
 						labelPlacement="start"
 					/>
 				</Grid>
-				{/* </Grid> */}
 
 				<Grid item xs={12} sm={12}>
 				{

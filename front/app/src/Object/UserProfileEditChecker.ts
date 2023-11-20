@@ -49,6 +49,8 @@ class	UserProfileEditChecker
 			if (data.phoneNumber === undefined || data.phoneNumber === null
 					|| data.phoneNumber === "undefined")
 					this.phoneNumber = true;
+			if (data.phoneNumber[0] === "0" || data.phoneNumber[0] !== "+")
+				this.phoneNumber = true;
 			if (data.phoneNumber?.length < 10 || data.phoneNumber?.length > 15)
 				this.phoneNumber = true;
 			if (tmp[0] === "+")
