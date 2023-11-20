@@ -11,6 +11,7 @@ import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 import { PrismaClient } from "@prisma/client";
 import { Socket, Server, Namespace } from "socket.io";
+import { PrismaService } from "src/prisma/prisma.service";
 
 // export interface MessageModel
 // {
@@ -75,14 +76,14 @@ export	class ChatService implements OnModuleInit
 	private	chat: Chat;
 	private	log = new Logger("instance-chat-service itself");
 	private	uuid = uuidv4();
-	private prisma: PrismaClient;
 	private readonly chatID = "id-chat-service-v-11";
 
-	constructor()
+	constructor(
+		private	readonly prismaService: PrismaService,
+	)
 	{
 		this.log.verbose("Chat Service is constructed with id: " + this.uuid);
 		this.chat = new Chat();
-		this.prisma = new PrismaClient();
 		// this.initDB();
 		// this.updateDB();
 	}
@@ -91,7 +92,8 @@ export	class ChatService implements OnModuleInit
 	{
 		this.log.verbose("Creating a new version inside database");
 		const	dbString = this.parseForDatabase();
-		this.prisma
+		this.prismaService
+			.prisma
 			.chatJson
 			.create(
 			{
@@ -101,10 +103,9 @@ export	class ChatService implements OnModuleInit
 					contents: dbString
 				}
 			})
-			.catch((error: any) =>
+			.catch((_error: any) =>
 			{
-				this.log.error("On table Create error");
-				this.log.error(error);
+				// this.log.error(error);
 			});
 	}
 
@@ -138,7 +139,8 @@ export	class ChatService implements OnModuleInit
 
 	private	loadTableToMemory()
 	{
-		this.prisma
+		this.prismaService
+			.prisma
 			.chatJson
 			.findUnique(
 			{
@@ -171,7 +173,8 @@ export	class ChatService implements OnModuleInit
 
 	private	loadTableToMemoryOld()
 	{
-		this.prisma.chatJson
+		this.prismaService
+			.prisma.chatJson
 			.findUnique(
 			{
 				where:
@@ -380,7 +383,7 @@ export	class ChatService implements OnModuleInit
 		// this.log.verbose("Updating all Chat Object");
 		const dbString = this.parseForDatabase();
 		// this.log.verbose(JSON.parse(dbString));
-		this.prisma.chatJson
+		this.prismaService.prisma.chatJson
 		.update(
 			{
 				where:
