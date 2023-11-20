@@ -20,6 +20,7 @@ import
 	AdminResponseModel,
 	BackUserModel,
 	HistoryModel,
+	UserDBFrontModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -965,18 +966,27 @@ public	register(data: UserModel)
 	});
 	}
 
-		public	login(id: any, email:string)
-			: UserLoginResponseModel
+	public async	login(username: string, password: string)
+		: Promise<UserLoginResponseModel>
+	{
+		const	searchUser = this.user.find((user) =>
 		{
-			const	searchUser = this.user.find((user) =>
+			return (username === user.username);
+		});
+		if (searchUser === undefined)
+			throw new ForbiddenException("Invalid credential");
+		else
+		{
+			this.logger.verbose("User found... checkin password");
+			console.log("user ", searchUser);
+			const	valid = await bcrypt.compare(password, searchUser.password);
+			console.log("Value of session validity: ", valid);
+			if (valid === false)
 			{
-				return (user.id.toString() === id.toString()
-					&& user.email === email);
-			});
-			if (searchUser === undefined)
 				throw new ForbiddenException("Invalid credential");
+			}
 			else
-
+			{
 				searchUser.authService.token = "Bearer " + jwt.sign(
 					{
 						id: searchUser.id,
@@ -987,7 +997,16 @@ public	register(data: UserModel)
 						expiresIn: "1d"
 					}
 				);
-
+				const	index = this.user.findIndex((elem) =>
+				{
+					return (elem.id === searchUser.id);
+				});
+				if (index !== -1)
+				{
+					this.user[index].authService.token = searchUser.authService.token;
+					this.user[index].authService.expAt = searchUser.authService.expAt;
+					this.user[index].revokedConnectionRequest = false;
+				}
 				const	response: UserLoginResponseModel = {
 					message:
 						"You are successfully connected as " + searchUser.login,
@@ -995,6 +1014,8 @@ public	register(data: UserModel)
 					expireAt: searchUser.authService.expAt
 				};
 				return (response);
+			}
+		}
 	}
 
 	public	userIdentifiedRequestEndOfSession(id: any)
@@ -1163,11 +1184,12 @@ public	register(data: UserModel)
 		return (hashed);
 	}
 
-	async	decodePassword(password: string, id: any, email: any)
+	async	decodePassword(password: string, username: string)
 	{
+		console.log("usrname ???", username);
 		const	index = this.user.findIndex((elem) =>
 		{
-			return (elem.id.toString() === id.toString() && elem.email === email);
+			return (elem.username === username);
 		});
 		if (index === -1)
 			return ("ERROR");
@@ -1175,11 +1197,12 @@ public	register(data: UserModel)
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
 		{
+			console.log("email ? ", this.user[index].email);
 			const ret =	{
 				token: "Bearer " + jwt.sign(
 				{
-					id: id,
-					email: email
+					id: this.user[index].id,
+					email: this.user[index].email
 				},
 				this.getSecret(),
 				{
@@ -1190,12 +1213,14 @@ public	register(data: UserModel)
 			};
 			if (ret === undefined)
 				return ("ERROR");
+			console.log("Token ok");
 			this.user[index].authService.token = ret.token;
 			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
 		.catch((err) =>
 		{
+			console.log("ERROR HERE ?");
 			console.log(err);
 			return ("ERROR");
 		});
@@ -1219,7 +1244,7 @@ public	register(data: UserModel)
 				else if (data.field === "phoneNumber" && data.info !== this.user[index].authService.doubleAuth.phoneNumber)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id, this.user[index].email);
+					this.decodePassword(data.info, id);
 
 			// console.log(searchUser);
 			return ("okay");
@@ -1608,5 +1633,32 @@ public	register(data: UserModel)
 			ipChanged: changeIp
 		};
 		return (res);
+	}
+
+	public	getUserBackFromDB(profileId: string | number)
+	: string | UserDBFrontModel
+	{
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (profileId.toString() === elem.id.toString());
+		});
+		if (index === -1)
+			return ("error");
+		console.log("get user back from db with profileId ", profileId, " et token ", this.user[index].authService.token);
+		const	user: UserDBFrontModel = {
+			date: this.user[index].date,
+			id: this.user[index].id.toString(),
+			email: this.user[index].email,
+			username: this.user[index].username,
+			login: this.user[index].login,
+			firstName: this.user[index].firstName,
+			lastName: this.user[index].lastName,
+			avatar: this.user[index].avatar,
+			location: this.user[index].location,
+			doubleAuth: this.user[index].authService.doubleAuth.enable,
+			bearerToken: this.user[index].authService.token,
+			// friendsProfileId: [...this.user[index].friendsProfileId]
+		};
+		return (user);
 	}
 }

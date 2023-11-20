@@ -1811,12 +1811,12 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														{/* <Button onClick={() =>
+														<Button onClick={() =>
 														{
 															return handleMembersClickOpen(buttonSelectionPriv.name);
 														}}>
 															Other options
-														</Button> */}
+														</Button>
 														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
 															<DialogContent>
 																<ul>

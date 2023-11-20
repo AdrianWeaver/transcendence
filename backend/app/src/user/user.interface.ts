@@ -59,43 +59,20 @@ export interface BackUserModel
 	token: string;
 }
 
-export interface UserDBModel
+export interface UserDBFrontModel
 {
-	ftApi: ApplicationUserModel;
-	retStatus: number;
 	date: string;
-	id: any;
+	id: string;
 	email: string;
 	username: string;
 	login: string;
 	firstName: string;
 	lastName: string;
-	url: string;
 	avatar: string;
-	ftAvatar:
-	{
-		link: string,
-		version:
-			{
-				large: string,
-				medium: string,
-				small: string,
-				mini: string
-			}
-	}
 	location: string;
-	doubleAuth:
-	{
-		enable: boolean;
-		valid: boolean;
-		validationCode: string;
-		// model phone number +33621523456
-		phoneNumber: string;
-		phoneRegistered: boolean;
-		lastIpClient: string;
-	}
-	password: string,
-	friendsProfileId: Array<string>;
+	doubleAuth: boolean;
+	bearerToken: string;
+	// friendsProfileId: Array<string>;
 }
 
 export interface UserModel

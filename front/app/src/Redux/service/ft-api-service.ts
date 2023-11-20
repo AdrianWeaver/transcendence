@@ -73,7 +73,7 @@ const	UserServices = {
 				"Authorization": token
 			}
 		};
-		console.log("VERIFYYYYY", hostname);
+		console.log("VERIFYYYYY", token);
 		return (
 			Api(hostname)
 			.post("/user/verify-token", {}, config)
@@ -284,7 +284,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	decodePassword(token: string, password: string, id: any, email: string, hostname: string)
+	async	decodePassword(token: string, password: string, username: string, hostname: string)
 	{
 		console.log("Decode password");
 		const	config: AxiosRequestConfig = {
@@ -296,8 +296,7 @@ const	UserServices = {
 
 		const	data = {
 			password: password,
-			id: id,
-			email: email
+			username: username,
 		};
 		return (
 			await Api(hostname)
@@ -392,6 +391,59 @@ const	UserServices = {
 	// 		})
 	// 	);
 	// },
+	async	getUserBackFromDB(token: string, hostname: string)
+	{
+		console.log("get user back from db");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		console.error("LE TOKEN TO LOG IN", token);
+		return (
+			Api(hostname)
+			.get("/user/get-user-back", config)
+			.then((data) =>
+			{
+				console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
+
+	async	UserSignin(username: string, password:string, hostname: string)
+	{
+		console.log("get user back from db");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+			},
+		};
+		const	data = {
+			username: username,
+			password: password
+		};
+		return (
+			Api(hostname)
+			.post("user/login", data, config)
+			.then((data) =>
+			{
+				console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;

@@ -114,7 +114,8 @@ export interface	UserModel
 	"location": string,
 	"ft": boolean,
 	"alreadyExists": boolean,
-	"ipAddress": string
+	"ipAddress": string,
+	"date": string
 }
 
 export interface	AnonymousUserModel

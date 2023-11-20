@@ -599,7 +599,7 @@ export const	setUserData = (data: any)
 				elem.email = data.email;
 				elem.firstName = data.firstName;
 				elem.lastName = data.lastName;
-				elem.username = data.login;
+				elem.username = data.username;
 			}
 		});
 		const	response: ControllerModel = {
@@ -613,6 +613,11 @@ export const	setUserData = (data: any)
 				bearerToken: data.token,
 				firstName: data.firstName,
 				lastName: data.lastName,
+				username: data.username,
+				// avatar: data.avatar,
+				// ftAvatar: data.ftAvatar,
+				// doubleAuth: data.doubleAuth,
+				// location: data.location
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -1276,7 +1281,7 @@ export const	setNewToken = (newToken: string)
 	});
 }
 
-export const	decodePassword = (id: any, password: string, email: string)
+export const	decodePassword = (username: string, password: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
@@ -1286,14 +1291,14 @@ export const	decodePassword = (id: any, password: string, email: string)
 		{
 			const	data = await UserServices.decodePassword(
 				prev.controller.user.bearerToken,
-				password, id, email,
+				password, username,
 				prev.server.uri
 			);
 			console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
 			newUser.bearerToken = data.token;
-			newUser.isLoggedIn = true;
+			// newUser.isLoggedIn = true;
 
 			const	response: ControllerModel =	{
 				...prev.controller,
@@ -1747,3 +1752,72 @@ export const	getAllStats = ()
 // 		}
 // 	})
 // }
+
+export const	setUserBackFromDB = (token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		console.log("TOKEN", token, " et ", prev.controller.user.bearerToken);
+		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
+		if (data === "ERROR")
+		{
+			console.log("ERROR GET USER BACK");
+			dispatch(controllerActions.setUserBackFromDB(prev.controller));
+			return ;
+		}
+		console.log("DATA HERE user back ", data);
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				id: data.id,
+				email: data.email,
+				date: data.date,
+				login: data.login,
+				// friendsProfileId: [...data.friendsProfileId],
+				firstName: data.firstName,
+				lastName: data.lastName,
+				username: data.username,
+				avatar: data.avatar,
+				doubleAuth: data.doubleAuth,
+				location: data.location,
+				isLoggedIn: true,
+				ftAvatar: data.ftAvatar,
+				bearerToken: token,
+				registered: true
+			}
+		}
+		dispatch(controllerActions.setUserBackFromDB(response));
+	});
+}
+
+export const	userSignIn = (username: string, password: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	data = await UserServices.UserSignin(username, password, prev.server.uri);
+		if (data === "ERROR")
+			return ;
+		else
+		{
+			console.log("DATA HERE ", data.token);
+			dispatch(setUserBackFromDB(data.token));
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					bearerToken: data.token,
+				}
+			}
+			dispatch(controllerActions.setNewToken(response));
+		}
+	});
+}

@@ -94,11 +94,11 @@ class	UserDoubleAuthDto
 class UserLoginDto
 {
 	@IsNotEmpty()
-	id: any;
+	username: string;
 	// getUserRegiste
-	@IsEmail()
+	// @IsEmail()
 	@IsNotEmpty()
-	email: string;
+	password: string;
 }
 
 
@@ -251,7 +251,7 @@ export class UserController
 			{
 				if (newObject === "already exists")
 				{
-					res.status(400).json({error: "you are already register"});
+					res.status(201).json({error: "you are already register"});
 					return ;
 				}
 				const config = {
@@ -271,7 +271,63 @@ export class UserController
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
 						this.logger.error("User Already register ");
-						res.status(400).json({error: "you are already register"});
+						userObject = {
+							registrationProcessEnded: userTempCheck.registrationProcessEnded,
+							registrationStarted: userTempCheck.registrationStarted,
+							ftApi: {
+								accessToken: userTempCheck.ftApi.accessToken,
+								tokenType: userTempCheck.ftApi.tokenType,
+								expiresIn: userTempCheck.ftApi.expiresIn,
+								refreshToken: userTempCheck.ftApi.refreshToken,
+								scope: userTempCheck.ftApi.scope,
+								createdAt: userTempCheck.ftApi.createdAt,
+								secretValidUntil: userTempCheck.ftApi.secretValidUntil
+							},
+							retStatus: userTempCheck.retStatus,
+							date: userTempCheck.date,
+							id: userTempCheck.id,
+							email: userTempCheck.email,
+							username: userTempCheck.username,
+							online: userTempCheck.online,
+							status: userTempCheck.status,
+							login: userTempCheck.login,
+							firstName: userTempCheck.firstName,
+							lastName: userTempCheck.lastName,
+							url: userTempCheck.url,
+							avatar: userTempCheck.avatar,
+							ftAvatar: {
+								link: userTempCheck.ftAvatar.link,
+								version: {
+									large: userTempCheck.ftAvatar.version.large,
+									medium: userTempCheck.ftAvatar.version.medium,
+									mini: userTempCheck.ftAvatar.version.mini,
+									small: userTempCheck.ftAvatar.version.small
+								}
+							},
+							location: userTempCheck.location,
+							revokedConnectionRequest: userTempCheck.revokedConnectionRequest,
+							authService:
+							{
+								token: "",
+								expAt: 0,
+								doubleAuth:
+								{
+									enable: userTempCheck.authService.doubleAuth.enable,
+									lastIpClient: userTempCheck.authService.doubleAuth.lastIpClient,
+									phoneNumber: userTempCheck.authService.doubleAuth.phoneNumber,
+									phoneRegistered: false,
+									validationCode: "undefined",
+									valid: false,
+								}
+							},
+							password: userTempCheck.password,
+							friendsProfileId: [...userTempCheck.friendsProfileId]
+						};
+						this.logger.log("Starting processing image");
+						const newUserObj = await this.userService.downloadAvatar(userObject);
+						retValue = this.userService.login(newUserObj.username, newUserObj.password);
+						console.error("ALREADY EXISTS RETVALUE", retValue);
+						res.status(200).send(retValue);
 					}
 					else
 					{
@@ -481,13 +537,11 @@ export class UserController
 	}
 
 	@Post("login")
-	userLogin(
+	async userLogin(
 		@Body() body: UserLoginDto)
-	: UserLoginResponseModel
+	: Promise<UserLoginResponseModel>
 	{
-		this.logger
-			.log("login route requested with id: ", body.id);
-		return (this.userService.login(body.id, body.email));
+		return (await this.userService.login(body.username, body.password));
 	}
 
 	@Post("validate-registration")
@@ -754,6 +808,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	RevokeToken(@Req() req: any)
 	{
+		console.log("'revoke-token' route requested");
 		this.userService.revokeTokenById(req.user.id);
 		return ("token revoked");
 	}
@@ -771,19 +826,19 @@ export class UserController
 		return ("okay");
 	}
 
-	@Post("decode-password")
-	async DecodePassword(
-		@Body() body: any)
-	: Promise<any>
-	{
-		this.logger
-			.log("'decode-password' route requested");
-		const	ret = await this.userService.decodePassword(body.password, body.id, body.email);
-		console.log(ret);
-		if (!ret || ret === "ERROR")
-			return ("error");
-		return (ret);
-	}
+	// @Post("decode-password")
+	// async DecodePassword(
+	// 	@Body() body: any)
+	// : Promise<any>
+	// {
+	// 	this.logger
+	// 		.log("'decode-password' route requested");
+	// 	const	ret = await this.userService.decodePassword(body.password, body.username);
+	// 	console.log(ret);
+	// 	if (!ret || ret === "ERROR")
+	// 		return ("error");
+	// 	return (ret);
+	// }
 
 
 	@Post("add-friend")
@@ -802,6 +857,7 @@ export class UserController
 	getMyStats(@Req() req: any)
 	{
 		// return (["toto"]);
+		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
 			return (
@@ -861,6 +917,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getStats(@Body() body: any)
 	{
+		console.log("'stats' route requested");
 		console.log("Body", body);
 		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
@@ -919,6 +976,7 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getAllStats(@Body() body: any)
 	{
+		console.log("'global-stats' route requested");
 		const	userStats = this.gameService.matchHistory;
 		const	array: ResponseRow[] = [];
 		const	users = this.userService.getAllUserRaw();
@@ -951,6 +1009,20 @@ export class UserController
 			}
 		});
 		return (array);
+	}
+
+	@Get("/get-user-back")
+	@UseGuards(UserAuthorizationGuard)
+	getUserBackFromDB(
+		@Res() res: Response,
+		@Req() req: any)
+	{
+		console.log("'get-user-back' route requested");
+		const	data = this.userService.getUserBackFromDB(req.user.id);
+		if (data === "error")
+			res.status(400).send("User not found");
+		else
+			res.status(201).send(data);
 	}
 }
 

@@ -110,7 +110,8 @@ const	initialControllerState: ControllerModel = {
 		location: "undefined",
 		ft: true,
 		alreadyExists: false,
-		ipAddress: "undefined"
+		ipAddress: "undefined",
+		date: "undefined",
 	},
 	registration:
 	{
@@ -458,7 +459,23 @@ const	controllerSlice = createSlice(
 		setIpAddress(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.ipAddress = action.payload.user.ipAddress;
-		}
+		},
+		setUserBackFromDB(state, action: PayloadAction<ControllerModel>)
+		{
+			state.user.bearerToken = action.payload.user.bearerToken;
+			state.user.isLoggedIn = action.payload.user.isLoggedIn;
+			state.user.login = action.payload.user.login;
+			state.user.username = action.payload.user.username;
+			state.user.id = action.payload.user.id;
+			state.user.email = action.payload.user.email;
+			state.user.firstName = action.payload.user.firstName;
+			state.user.lastName = action.payload.user.lastName;
+			// state.user.phoneNumber = action.payload.user.phoneNumber;
+			state.user.registered = action.payload.user.registered;
+			state.user.avatar = action.payload.user.avatar;
+			state.user.ftAvatar = action.payload.user.ftAvatar;
+			// state.user.password = action.payload.user.password;
+		},
 	}
 });
 

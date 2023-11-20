@@ -15,7 +15,7 @@ import {
 	Typography,
 }	from "@mui/material";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
@@ -106,6 +106,7 @@ const	StepZero = () =>
 	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
+	const	navigate = useNavigate();
 	const	ftUrl = useAppSelector((state) =>
 	{
 		return (state.server.links.authApiUrl);
@@ -183,6 +184,10 @@ const	StepZero = () =>
 		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
+	}
+	else if (user.alreadyExists)
+	{
+		navigate("/signin");
 	}
 
 	useEffect(() =>
