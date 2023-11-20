@@ -68,7 +68,7 @@ export class AnonymousUserService implements OnModuleInit
 
 	private loadSecretFromDB()
 	{
-		const	prisma = new PrismaClient();
+		// const	prisma = new PrismaClient();
 		// prisma.secretTable
 		// 	.findUnique({
 		// 		where:
@@ -98,7 +98,6 @@ export class AnonymousUserService implements OnModuleInit
 
 	public	populateFromDBObject(data: any[])
 	{
-		this.logger.log("Into database");
 		// const	cast = data as AnonymousUserModel[];
 		// cast.forEach(el =>
 		// {

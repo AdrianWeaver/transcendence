@@ -20,6 +20,7 @@ import
 	AdminResponseModel,
 	BackUserModel,
 	HistoryModel,
+	UserDBFrontModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -30,7 +31,7 @@ import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 
 import axios from "axios";
 import * as fs from "fs";
@@ -67,7 +68,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// private	userDB: Array<UserDBModel> = [];
 	// private userDBString: Array<string> = [];
 
-	private	prisma: PrismaClient;
+	// private	prisma: PrismaClient;
 	private readonly secretId = "user-service-secret";
 	private readonly logger = new Logger("user-service itself");
 	private readonly uuidInstance = uuidv4();
@@ -97,10 +98,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	];
 
 
-	public constructor()
+	public constructor(
+		private readonly prismaService: PrismaService,
+	)
 	{
 			// TEST
-		this.prisma = new PrismaClient();
+		// this.prisma = new PrismaClient();
 		this.logger.log("Base instance loaded with the instance id: "
 			+ this.getUuidInstance());
 		this.loadSecretFromDB();
@@ -112,7 +115,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			"secret_id": this.secretId,
 			"value": randomBytes(64).toString("hex")
 		};
-		this.prisma.secretTable
+		this.prismaService.prisma.secretTable
 			.create(
 				{
 					data: toDB
@@ -129,7 +132,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private	loadSecretFromDB()
 	{
-		this.prisma
+		this.prismaService.prisma
 			.secretTable
 			.findUnique({
 				where:
@@ -171,7 +174,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		this.logger.debug("Create the user into the table User");
 		const	toDB = this.prepareUserForDB(user.id.toString());
 
-		const status = await this.prisma
+		const status = await this.prismaService.prisma
 			.userJson
 			.create(
 			{
@@ -199,7 +202,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-			this.prisma
+			this.prismaService.prisma
 				.userJson
 				.findUnique(
 					{
@@ -216,7 +219,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						const	content = JSON.parse(data.contents);
 						// console.log("content ", content);
 						const	update = this.prepareUserForDB(user.id);
-						this.prisma
+						this.prismaService.prisma
 							.userJson
 							.update(
 								{
@@ -233,7 +236,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 					else
 					{
 						const	toDB = this.prepareUserForDB(user.id.toString());
-						this.prisma
+						this.prismaService
+							.prisma
 							.userJson
 							.create(
 							{
@@ -259,7 +263,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	loadTableToMemory()
 	{
 		// return ;
-		this.prisma
+		this.prismaService
+			.prisma
 			.userJson
 			.findMany({})
 			.then((data: any) =>
@@ -286,8 +291,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	async onModuleInit()
 	{
-		console.log("GET USER BACK FROM DB");
-		console.log("heer ", this.cdnConfig.uri);
 		this.loadTableToMemory();
 		await this.checkPermalinks();
 		this.checkIOAccessPath(this.publicPath);
@@ -346,12 +349,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private async isHavingPreviousPermalinks(actualServerCfg: ServerConfig): Promise<boolean>
 	{
-		const	prisma = new PrismaClient();
 		const	permalinkVersion = "prod-v2";
 		// console.log(prisma.permalinks);
 		try
 		{
-			const permalinks = await prisma.permalinks.findUnique(
+			const permalinks = await this.prismaService.prisma.permalinks.findUnique(
 				{
 					where:
 					{
@@ -363,7 +365,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			{
 				try
 				{
-					await prisma.permalinks.create(
+					await this.prismaService.prisma.permalinks.create(
 					{
 
 						data: {
@@ -648,24 +650,18 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			this.logger.error(error);
 		}
-		this.logger.error("Must not be here !");
 		return (userObj);
 	}
 
 	private	async convertPNGToJPEG(oldTmpFilePath: string, destTmpFilePath: string)
 	{
-		this.logger.debug("input file: " + oldTmpFilePath);
-		this.logger.debug("output file: " + destTmpFilePath);
-
 		try
 		{
 			const	imagePng = sharp(oldTmpFilePath);
 			const	metadata = await imagePng.metadata();
 			// console.log(metadata);
 			const	outputBuffer = await imagePng.jpeg().toBuffer();
-			this.logger.verbose("buffer ready to be writted");
 			fs.writeFileSync(destTmpFilePath, outputBuffer);
-			this.logger.log("Convertion okay");
 		}
 		catch (error)
 		{
@@ -678,7 +674,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		try
 		{
 			fs.unlinkSync(src);
-			this.logger.verbose("PNG file deleted");
 		}
 		catch (error)
 		{
@@ -701,7 +696,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				|| metadata.height === undefined)
 				return ;
 			const	requestedSize = Math.min(metadata.height, metadata.width);
-			console.log("requested size: ", requestedSize);
 			const	cropedImage = await image.extract(
 				{
 					width: requestedSize,
@@ -711,9 +705,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				}
 			)
 			.toBuffer();
-			this.logger.verbose("Sucessfull write to buffer the croped image");
 			fs.writeFileSync(filecfg.getPathTmpConverted(), cropedImage);
-			this.logger.log("Image cropped writed to disk");
 		}
 		catch (error)
 		{
@@ -723,7 +715,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	private async	resizeAllUploadedPictures(fileCfg: FileConfig)
 	{
-		this.logger.verbose("Starting resize all pictures");
 		try
 		{
 			await	this.cropImageIfNeeded(fileCfg);
@@ -738,25 +729,21 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				fileCfg.getPathLarge(),
 				"large"
 			);
-			this.logger.log("resized to large");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathMedium(),
 				"medium"
 			);
-			this.logger.log("resized to medium");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathSmall(),
 				"small"
 			);
-			this.logger.log("resized to small");
 			await this.createResizeImage(
 				fileCfg.getPathTmpConverted(),
 				fileCfg.getPathMicro(),
 				"micro"
 			);
-			this.logger.log("resized to micro");
 		}
 		catch (error)
 		{
@@ -767,19 +754,15 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	public	async	uploadPhoto(fileCfg: FileConfig, userObj: UserModel)
 	: Promise<UserModel>
 	{
-		this.logger.verbose("Starting resize Process");
-		this.logger.log("The tmpfilepath is : ", fileCfg.fullPath());
 		fileCfg.setPictureConfig(this.getConfig());
 		// console.log(this.getConfig());
 		if (fileCfg.needConvertToJPEG())
 		{
 			try
 			{
-				this.logger.log("Starting convertion of the file");
 				await this.convertPNGToJPEG(fileCfg.fullPath(), fileCfg.getPathTmpConverted());
 				await this.deletePicture(fileCfg.fullPath());
 				await this.resizeAllUploadedPictures(fileCfg);
-				this.logger.log("Ending convertion of the file");
 			}
 			catch (error)
 			{
@@ -803,7 +786,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			avatar: fileCfg.getCDNConfig().avatar,
 			ftAvatar: fileCfg.getCDNConfig().ftAvatar,
 		};
-		this.logger.verbose("End resize Process");
 		// const index = this.user.findIndex((user) =>
 		// {
 		// 	return (user.id === newUserObj.id);
@@ -984,18 +966,27 @@ public	register(data: UserModel)
 	});
 	}
 
-		public	login(id: any, email:string)
-			: UserLoginResponseModel
+	public async	login(username: string, password: string)
+		: Promise<UserLoginResponseModel>
+	{
+		const	searchUser = this.user.find((user) =>
 		{
-			const	searchUser = this.user.find((user) =>
+			return (username === user.username);
+		});
+		if (searchUser === undefined)
+			throw new ForbiddenException("Invalid credential");
+		else
+		{
+			this.logger.verbose("User found... checkin password");
+			console.log("user ", searchUser);
+			const	valid = await bcrypt.compare(password, searchUser.password);
+			console.log("Value of session validity: ", valid);
+			if (valid === false)
 			{
-				return (user.id.toString() === id.toString()
-					&& user.email === email);
-			});
-			if (searchUser === undefined)
 				throw new ForbiddenException("Invalid credential");
+			}
 			else
-
+			{
 				searchUser.authService.token = "Bearer " + jwt.sign(
 					{
 						id: searchUser.id,
@@ -1006,7 +997,16 @@ public	register(data: UserModel)
 						expiresIn: "1d"
 					}
 				);
-
+				const	index = this.user.findIndex((elem) =>
+				{
+					return (elem.id === searchUser.id);
+				});
+				if (index !== -1)
+				{
+					this.user[index].authService.token = searchUser.authService.token;
+					this.user[index].authService.expAt = searchUser.authService.expAt;
+					this.user[index].revokedConnectionRequest = false;
+				}
 				const	response: UserLoginResponseModel = {
 					message:
 						"You are successfully connected as " + searchUser.login,
@@ -1014,6 +1014,8 @@ public	register(data: UserModel)
 					expireAt: searchUser.authService.expAt
 				};
 				return (response);
+			}
+		}
 	}
 
 	public	userIdentifiedRequestEndOfSession(id: any)
@@ -1170,7 +1172,6 @@ public	register(data: UserModel)
 	async	hashPassword(password: string, id: number)
 	{
 		const	saltRounds = 10;
-		console.log("Hash password id ", id);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (id.toString() === elem.id.toString());
@@ -1180,15 +1181,15 @@ public	register(data: UserModel)
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
-		console.log("le test ", hashed);
 		return (hashed);
 	}
 
-	async	decodePassword(password: string, id: any, email: any)
+	async	decodePassword(password: string, username: string)
 	{
+		console.log("usrname ???", username);
 		const	index = this.user.findIndex((elem) =>
 		{
-			return (elem.id.toString() === id.toString() && elem.email === email);
+			return (elem.username === username);
 		});
 		if (index === -1)
 			return ("ERROR");
@@ -1196,11 +1197,12 @@ public	register(data: UserModel)
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
 		{
+			console.log("email ? ", this.user[index].email);
 			const ret =	{
 				token: "Bearer " + jwt.sign(
 				{
-					id: id,
-					email: email
+					id: this.user[index].id,
+					email: this.user[index].email
 				},
 				this.getSecret(),
 				{
@@ -1211,12 +1213,14 @@ public	register(data: UserModel)
 			};
 			if (ret === undefined)
 				return ("ERROR");
+			console.log("Token ok");
 			this.user[index].authService.token = ret.token;
 			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
 		.catch((err) =>
 		{
+			console.log("ERROR HERE ?");
 			console.log(err);
 			return ("ERROR");
 		});
@@ -1240,7 +1244,7 @@ public	register(data: UserModel)
 				else if (data.field === "phoneNumber" && data.info !== this.user[index].authService.doubleAuth.phoneNumber)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id, this.user[index].email);
+					this.decodePassword(data.info, id);
 
 			// console.log(searchUser);
 			return ("okay");
@@ -1276,8 +1280,6 @@ public	register(data: UserModel)
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
 		: number
 	{
-		this.logger.debug("username: " + username, " usernameUser ", user.username);
-
 		if (username !== user.username)
 		{
 			const	index = this.user.findIndex((elem) =>
@@ -1425,9 +1427,6 @@ public	register(data: UserModel)
 		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
 		// this.userDBString.push(toDB);
-		// console.log("create User ready for db ", user);
-		// console.log("create User to db ", objToDB);
-		// console.log("create USER STRINGIFIED", toDB);
 		return (objToDB);
 	}
 
@@ -1558,7 +1557,6 @@ public	register(data: UserModel)
 	public	validateRegistration(userId: string | number)
 	: boolean
 	{
-		console.log("VALIDATE REGISTRATION", userId);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (userId.toString() === elem.id.toString());
@@ -1566,7 +1564,6 @@ public	register(data: UserModel)
 		if (index === -1)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
-		console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
 		return (true);
 	}
 
@@ -1619,7 +1616,6 @@ public	register(data: UserModel)
 		});
 		if (searchUser === undefined)
 		{
-			console.log("user not found");
 			return ("error");
 		}
 		const	oldIp = searchUser.authService.doubleAuth.lastIpClient;
@@ -1637,5 +1633,32 @@ public	register(data: UserModel)
 			ipChanged: changeIp
 		};
 		return (res);
+	}
+
+	public	getUserBackFromDB(profileId: string | number)
+	: string | UserDBFrontModel
+	{
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (profileId.toString() === elem.id.toString());
+		});
+		if (index === -1)
+			return ("error");
+		console.log("get user back from db with profileId ", profileId, " et token ", this.user[index].authService.token);
+		const	user: UserDBFrontModel = {
+			date: this.user[index].date,
+			id: this.user[index].id.toString(),
+			email: this.user[index].email,
+			username: this.user[index].username,
+			login: this.user[index].login,
+			firstName: this.user[index].firstName,
+			lastName: this.user[index].lastName,
+			avatar: this.user[index].avatar,
+			location: this.user[index].location,
+			doubleAuth: this.user[index].authService.doubleAuth.enable,
+			bearerToken: this.user[index].authService.token,
+			// friendsProfileId: [...this.user[index].friendsProfileId]
+		};
+		return (user);
 	}
 }
