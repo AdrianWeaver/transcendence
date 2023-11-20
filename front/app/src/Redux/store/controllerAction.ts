@@ -19,6 +19,7 @@ import UserServices from "../service/ft-api-service";
 // import UserRegistration from "../../Object/UserRegistration";
 // import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
+import { useNavigate } from "react-router-dom";
 // type MessageModel =
 // {
 // 	sender: string,
@@ -882,6 +883,75 @@ export const GetValidationCode = (otpCode : string, token: string)
 	});
 };
 
+// when logging in
+export const receiveCode = (token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+
+		response = prev.controller;
+		if (prev.controller.user.isLoggedIn
+			|| prev.controller.user.registrationError !== "undefined")
+			return ;
+		const	data: any = await
+			UserServices.receiveCode(
+				prev.controller.user.id.toString(), token, prev.server.uri);
+		if (data === "ERROR")
+		{
+			console.log("error receiving code");
+			dispatch(setRegistrationProcessError());
+			return ;
+		}
+		console.log("phone number enregistre");
+	});
+};
+
+// when loggin in
+export const GetCode = (otpCode : string, token: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const 	prev = getState();
+		let		response: ControllerModel;
+		response = prev.controller;
+		if (response.user.doubleAuth === true)
+		{
+			console.log("DOUBLE AUTH IS SET AS TRUE");
+			if (prev.controller.user.isLoggedIn
+				|| prev.controller.user.registrationError !== "undefined")
+				return ;
+			const	data: any = await UserServices.getValidationCode(
+				prev.controller.user.id.toString(), otpCode, token, prev.server.uri);
+			if (data === "error")
+			{
+				console.log("TEST error");
+				dispatch(setRegistrationProcessError());
+				return ;
+			}
+			else
+			{
+				// console.log("TEST data validated cde", data.data);
+				response = {
+					...prev.controller,
+					user:
+					{
+						...prev.controller.user,
+						otpCode: otpCode,
+						codeValidated: data.data
+					}
+				}
+				// console.log("controller action 791  ", data.data);
+			}
+		}
+		dispatch(controllerActions.getValidationCode(response));
+		console.log("code enregistre");
+	});
+};
+
 export const	setCodeValidated = (data: boolean)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -1219,13 +1289,13 @@ export const	setProfileId = (name: string, profileId: string)
 		dispatch(controllerActions.setProfileId(response));
 	});
 }
-export const	registerInfosInBack = (info: string, field: string)
+export const	registerInfosInBack = (info: string, doubleAuth: boolean, field: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.uri)
+		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, doubleAuth, prev.server.uri)
 		.then(() =>
 		{
 			console.log("okay registered in back");
@@ -1234,12 +1304,16 @@ export const	registerInfosInBack = (info: string, field: string)
 		{
 			console.error(error);
 		});
+		console.log("HEREEEE REGISTER INGOS", info);
 		if (field === "username")
-			dispatch(setPseudo(info));
+			dispatch(setPseudo(info as string));
 		else if (field === "email")
-			dispatch(setEmail(info));
-		else if (field === "phoneNumber")
-			dispatch(setPhoneNumber(info));
+			dispatch(setEmail(info as string));
+		else if (field === "phoneNumber" && info !== undefined)
+			dispatch(setPhoneNumber(info as string));
+		console.log("DOUBLE AUTH REGISTER IN BACK FRONT WAY", doubleAuth);
+		if (doubleAuth !== undefined)
+			dispatch(setDoubleAuth(doubleAuth));
 		dispatch(setAllUsers());
 	});
 }
@@ -1252,9 +1326,9 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((_data) =>
+		.then((data) =>
 		{
-			// console.log("okay", data);
+			console.log("okay", data);
 		})
 		.catch((error) =>
 		{
@@ -1760,7 +1834,6 @@ export const	setUserBackFromDB = (token: string)
 	{
 		const	prev = getState();
 
-		console.log("TOKEN", token, " et ", prev.controller.user.bearerToken);
 		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
 		if (data === "ERROR")
 		{
@@ -1769,6 +1842,14 @@ export const	setUserBackFromDB = (token: string)
 			return ;
 		}
 		console.log("DATA HERE user back ", data);
+		let	loggin: boolean, doubleAuth: boolean;
+		loggin = false;
+		doubleAuth = false;
+		if (data.doubleAuth === false || data.doubleAuth === "false")
+			loggin = true;
+		else
+			doubleAuth = true;
+		console.log("login", loggin, " et douable auth", doubleAuth);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1778,14 +1859,13 @@ export const	setUserBackFromDB = (token: string)
 				email: data.email,
 				date: data.date,
 				login: data.login,
-				// friendsProfileId: [...data.friendsProfileId],
 				firstName: data.firstName,
 				lastName: data.lastName,
 				username: data.username,
 				avatar: data.avatar,
-				doubleAuth: data.doubleAuth,
+				doubleAuth: doubleAuth as boolean,
 				location: data.location,
-				isLoggedIn: true,
+				isLoggedIn: loggin as boolean,
 				ftAvatar: data.ftAvatar,
 				bearerToken: token,
 				registered: true

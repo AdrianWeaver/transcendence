@@ -309,7 +309,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			.then((response) =>
 			{
 				console.log(response);
-				dispatch(setPassword(userSignup.password));
 				dispatch(userRegistrationStepThree());
 			})
 			.catch((error: any) =>

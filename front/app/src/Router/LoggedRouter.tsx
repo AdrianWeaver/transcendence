@@ -23,6 +23,9 @@ import MyActiveGame from "../Views/MyActiveGame/MyActiveGame";
 import MyStats from "../Views/MyStats/MyStats";
 import Stats from "../Views/MyStats/OtherUserStats";
 import GlobalStats from "../Views/MyStats/GlobalStats";
+import Signin from "../Views/Signin/Signin";
+import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
+import { NavigationTwoTone } from "@mui/icons-material";
 
 
 /**
@@ -76,6 +79,12 @@ const	LoggedRouter = () =>
 					path="/signin"
 					element={<Navigate to="/"/>}
 				/>
+
+				<Route
+					path="/signin-double-auth"
+					element={<NavigationTwoTone to ="/" />}
+				/>
+
 				<Route
 					path="/signup"
 					element={<Navigate to="/me/profile"/>}

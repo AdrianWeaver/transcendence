@@ -66,21 +66,6 @@ const	initialControllerState: ControllerModel = {
 				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
 				profileId: "undefined",
-				// matchHistory: [],
-				// Stats:
-				// {
-				// 	specialModePlayed: 0,
-				// 	victories: 0,
-				// 	defeats: 0,
-				// 	lastGreatVictory:
-				// 	{
-				// 		userScore: 0,
-				// 		opponentScore: 0,
-				// 		opponent: "",
-				// 		timestamp: "undefined",
-				// 		specialMode: false
-				// 	}
-				// }
 			}
 			],
 			activeConversationId: "undefined",
@@ -470,6 +455,7 @@ const	controllerSlice = createSlice(
 			state.user.email = action.payload.user.email;
 			state.user.firstName = action.payload.user.firstName;
 			state.user.lastName = action.payload.user.lastName;
+			state.user.doubleAuth = action.payload.user.doubleAuth;
 			// state.user.phoneNumber = action.payload.user.phoneNumber;
 			state.user.registered = action.payload.user.registered;
 			state.user.avatar = action.payload.user.avatar;

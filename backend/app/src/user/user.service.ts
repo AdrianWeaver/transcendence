@@ -1147,7 +1147,7 @@ public	register(data: UserModel)
 	{
 		const	searchUser = this.user.find((elem) =>
 		{
-			return (elem.id === id);
+			return (elem.id.toString() === id.toString());
 		});
 		if (searchUser !== undefined)
 			return (searchUser.authService.doubleAuth.phoneNumber);
@@ -1245,6 +1245,9 @@ public	register(data: UserModel)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
 					this.decodePassword(data.info, id);
+				console.log("DOUBLE AUTH CHANGE INFO", data.doubleAuth);
+				if (data.doubleAuth !== undefined)
+					this.user[index].authService.doubleAuth.enable = data.doubleAuth as boolean;
 
 			// console.log(searchUser);
 			return ("okay");

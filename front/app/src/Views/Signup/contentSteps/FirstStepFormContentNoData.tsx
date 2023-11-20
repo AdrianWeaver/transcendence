@@ -430,7 +430,6 @@ const	FirstStepFormContentNoData = () =>
 			.then((response) =>
 			{
 				console.log(response);
-				dispatch(setPassword(userSignup.password));
 				dispatch(userRegistrationStepThree());
 			})
 			.catch((error: any) =>

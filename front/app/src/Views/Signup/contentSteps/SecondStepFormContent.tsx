@@ -84,12 +84,6 @@ const	SecondStepFormContent = () =>
 		setTwoAuthCode
 	] = useState("");
 
-	// const
-	// [
-	// 	phoneInput,
-	// 	setPhoneInput
-	// ] = useState("");
-
 	const
 	[
 		muiPhone,
@@ -107,8 +101,9 @@ const	SecondStepFormContent = () =>
 	{
 		let	newNum;
 
-		newNum= num;
+		newNum = num;
 		newNum = newNum.replace(/\s/g, "");
+		console.log("Num", num, " new num:", newNum);
 		return (newNum);
 	};
 
@@ -136,7 +131,6 @@ const	SecondStepFormContent = () =>
 			dispatch(setOnline(true, user));
 			dispatch(setStatus("online", user));
 			dispatch(setAvatar(user.avatar));
-			// dispatch(getIpAddress(true));
 			dispatch(setAllUsers());
 			navigate("/");
 		}
@@ -191,20 +185,10 @@ const	SecondStepFormContent = () =>
 
 		const handleSendCode = () =>
 		{
-			// console.log("the value of phone " + user.phoneNumber);
-			// action poour une route /user/validateAuth BODY url encoded : phone number / Header token : verifie son id
-			// console.log("code : ", twoAuthCode);
-			// console.log("valid ", user.codeValidated);
 			if (twoAuthCode.length)
 			{
 				setSendCode(true);
 				dispatch(GetValidationCode(twoAuthCode, user.bearerToken));
-				// if (user.codeValidated)
-				// {
-				// 	dispatch(setUserLoggedIn());
-				// 	dispatch(setRegistered());
-				// 	dispatch(setAllUsers());
-				// }
 			}
 		};
 
@@ -257,7 +241,6 @@ const	SecondStepFormContent = () =>
 				dispatch(setRegistered());
 				dispatch(setAllUsers());
 				dispatch(addFrontUser(user));
-				// dispatch(getIpAddress(true));
 			}
 		};
 
@@ -304,7 +287,7 @@ const	SecondStepFormContent = () =>
 				}}
 				onClick={handleRegisterNumber}
 			>
-				register phone number
+				register phone number (format +33612345678)
 			</Button>
 		);
 		const finishButton = (
