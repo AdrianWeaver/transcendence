@@ -291,7 +291,7 @@ const	UserServices = {
 	},
 
 	async	registerInfosInBack
-	(token: string, info: string, field: string, hostname: string)
+	(token: string, info: string, field: string, doubleAuth: boolean, hostname: string)
 	{
 		console.log("register username in backend");
 		const	config: AxiosRequestConfig = {
@@ -303,7 +303,8 @@ const	UserServices = {
 
 		const	data = {
 			info: info,
-			field: field
+			field: field,
+			doubleAuth: doubleAuth
 		};
 		return (
 			Api(hostname)

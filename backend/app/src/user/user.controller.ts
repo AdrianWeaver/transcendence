@@ -601,20 +601,33 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	DoubleAuthSendSMS(
 		@Body() body: any,
-		@Req() req: any
+		@Req() req: any,
+		@Res() res: Response
 	)
 	{
 		console.log(this.env);
 		if (!this.env)
-			throw new InternalServerErrorException();
+		{
+			res.status(400).send("env not found");
+			return ;
+		}
 		if (!this.env.parsed)
-			throw new InternalServerErrorException();
+		{
+			res.status(400).send("env not parsed");
+			return ;
+		}
 		if (!this.env.parsed.TWILIO_ACCOUNT_SID
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
-			throw new InternalServerErrorException();
+		{
+			res.status(400).send("env var not ok");
+			return ;
+		}
 		if (body.numero === "undefined" || !body.numero)
-			throw new InternalServerErrorException();
+		{
+			res.status(400).send("number not found");
+			return ;
+		}
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		client.verify.v2
 		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
@@ -639,22 +652,35 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	loginSendSMS(
 		@Body() body: any,
-		@Req() req: any
+		@Req() req: any,
+		@Res() res: Response
 	)
 	{
 		console.log(this.env);
 		if (!this.env)
-			throw new Error("env problem");
+		{
+			res.status(400).send("env not found");
+			return ;
+		}
 		if (!this.env.parsed)
-			throw new Error("env not parsed");
+		{
+			res.status(400).send("env not parsed");
+			return ;
+		}
 		if (!this.env.parsed.TWILIO_ACCOUNT_SID
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
-			throw new Error("env var not found or wrong");
+		{
+			res.status(400).send("env var not ok");
+			return ;
+		}
 		const	number = this.userService.getPhoneNumber(body.profileId);
 		console.log("bYneror", number);
 		if (number === "undefined" || number === undefined)
-			throw new Error("Phone number not found");
+		{
+			res.status(400).send("number not found");
+			return ;
+		}
 		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		client.verify.v2
 		.services(this.env.parsed.TWILIO_VERIFY_SERVICE_SID)

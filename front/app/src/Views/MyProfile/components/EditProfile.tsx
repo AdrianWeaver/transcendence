@@ -169,7 +169,10 @@ const	EditProfile = (props: EditProfileProps) =>
 {
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
-
+	const	server = useAppSelector((state) =>
+	{
+		return (state.server);
+	});
 	const	user	= useAppSelector((state) =>
 	{
 		return (state.controller.user);
@@ -270,16 +273,14 @@ const	EditProfile = (props: EditProfileProps) =>
 			if (user.username !== userChanges.username)
 			{
 				dispatch(updateChatUsers(user.id.toString(), userChanges.username));
-				dispatch(registerInfosInBack(userChanges.username, "username"));
+				dispatch(registerInfosInBack(userChanges.username, required, "username"));
 			}
 			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
-			if (user.password !== userChanges.password)
-			{
-				dispatch(setPassword(userChanges.password));
+			console.log("CHANGES ", userChanges);
+			if (userChanges.password !== undefined && userChanges.password.length)
 				dispatch(hashPassword(userChanges.password));
-			}
-			if (user.phoneNumber !== userChanges.phoneNumber)
-				dispatch(registerInfosInBack(userChanges.phoneNumber, "phoneNumber"));
+			if (user.phoneNumber !== userChanges.phoneNumber || required !== user.doubleAuth)
+				dispatch(registerInfosInBack(userChanges.phoneNumber, required, "phoneNumber"));
 			if (props.setting)
 				navigate("/");
 			else

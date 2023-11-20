@@ -1286,13 +1286,13 @@ export const	setProfileId = (name: string, profileId: string)
 		dispatch(controllerActions.setProfileId(response));
 	});
 }
-export const	registerInfosInBack = (info: string, field: string)
+export const	registerInfosInBack = (info: string, doubleAuth: boolean, field: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, prev.server.uri)
+		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, doubleAuth, prev.server.uri)
 		.then(() =>
 		{
 			console.log("okay registered in back");
@@ -1301,12 +1301,16 @@ export const	registerInfosInBack = (info: string, field: string)
 		{
 			console.error(error);
 		});
+		console.log("HEREEEE REGISTER INGOS", info);
 		if (field === "username")
-			dispatch(setPseudo(info));
+			dispatch(setPseudo(info as string));
 		else if (field === "email")
-			dispatch(setEmail(info));
-		else if (field === "phoneNumber")
-			dispatch(setPhoneNumber(info));
+			dispatch(setEmail(info as string));
+		else if (field === "phoneNumber" && info !== undefined)
+			dispatch(setPhoneNumber(info as string));
+		console.log("DOUBLE AUTH REGISTER IN BACK FRONT WAY", doubleAuth);
+		if (doubleAuth !== undefined)
+			dispatch(setDoubleAuth(doubleAuth));
 		dispatch(setAllUsers());
 	});
 }
@@ -1319,9 +1323,9 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((_data) =>
+		.then((data) =>
 		{
-			// console.log("okay", data);
+			console.log("okay", data);
 		})
 		.catch((error) =>
 		{
