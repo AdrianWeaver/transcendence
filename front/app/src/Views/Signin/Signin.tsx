@@ -9,7 +9,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { decodePassword, setAllUsers, setProfileMyView, setUserBackFromDB, setUserData } from "../../Redux/store/controllerAction";
+import { decodePassword, setAllUsers, setProfileMyView, setUserBackFromDB, setUserData, setUserLoggedIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 import os from "os";
@@ -210,14 +210,14 @@ const	Signin = () =>
 			if (filtered.length === 0)
 			{
 				dispatch(setUserBackFromDB(userLogIn.username));
-				// dispatch(decodePassword(userLogIn.password));
-				if (user.username !== "undefined")
+				if (user.id !== -1)
 				{
+					dispatch(decodePassword(userLogIn.username, userLogIn.password));
 					dispatch(setProfileMyView());
 					console.log("User is update ? ", user);
 					// dispatch(setUserLoggedIn());
-					// if (user.isLoggedIn)
-					// 	navigate("/");
+					if (user.isLoggedIn)
+						navigate("/");
 				}
 				else
 					console.log("user doesnt exist");

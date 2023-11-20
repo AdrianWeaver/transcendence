@@ -1281,7 +1281,7 @@ export const	setNewToken = (newToken: string)
 	});
 }
 
-export const	decodePassword = (id: any, password: string, email: string)
+export const	decodePassword = (username: string, password: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
@@ -1291,14 +1291,14 @@ export const	decodePassword = (id: any, password: string, email: string)
 		{
 			const	data = await UserServices.decodePassword(
 				prev.controller.user.bearerToken,
-				password, id, email,
+				password, username,
 				prev.server.uri
 			);
 			console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
 			newUser.bearerToken = data.token;
-			newUser.isLoggedIn = true;
+			// newUser.isLoggedIn = true;
 
 			const	response: ControllerModel =	{
 				...prev.controller,

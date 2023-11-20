@@ -88,7 +88,7 @@ export interface	UserModel
 	"bearerToken": string,
 	"rememberMe": boolean,
 	"chat": ChatModel,
-	"id": string,
+	"id": number,
 	"email": string,
 	"firstName": string,
 	"lastName": string,

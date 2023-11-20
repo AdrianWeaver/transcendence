@@ -284,7 +284,7 @@ const	UserServices = {
 			})
 		);
 	},
-	async	decodePassword(token: string, password: string, id: any, email: string, hostname: string)
+	async	decodePassword(token: string, password: string, username: string, hostname: string)
 	{
 		console.log("Decode password");
 		const	config: AxiosRequestConfig = {
@@ -296,8 +296,7 @@ const	UserServices = {
 
 		const	data = {
 			password: password,
-			id: id,
-			email: email
+			username: username,
 		};
 		return (
 			await Api(hostname)

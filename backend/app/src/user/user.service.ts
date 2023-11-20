@@ -1185,11 +1185,12 @@ public	register(data: UserModel)
 		return (hashed);
 	}
 
-	async	decodePassword(password: string, id: any, email: any)
+	async	decodePassword(password: string, username: string)
 	{
+		console.log("usrname ???", username);
 		const	index = this.user.findIndex((elem) =>
 		{
-			return (elem.id.toString() === id.toString() && elem.email === email);
+			return (elem.username === username);
 		});
 		if (index === -1)
 			return ("ERROR");
@@ -1197,11 +1198,12 @@ public	register(data: UserModel)
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
 		{
+			console.log("email ? ", this.user[index].email);
 			const ret =	{
 				token: "Bearer " + jwt.sign(
 				{
-					id: id,
-					email: email
+					id: this.user[index].id,
+					email: this.user[index].email
 				},
 				this.getSecret(),
 				{
@@ -1212,12 +1214,14 @@ public	register(data: UserModel)
 			};
 			if (ret === undefined)
 				return ("ERROR");
+			console.log("Token ok");
 			this.user[index].authService.token = ret.token;
 			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
 		.catch((err) =>
 		{
+			console.log("ERROR HERE ?");
 			console.log(err);
 			return ("ERROR");
 		});
@@ -1241,7 +1245,7 @@ public	register(data: UserModel)
 				else if (data.field === "phoneNumber" && data.info !== this.user[index].authService.doubleAuth.phoneNumber)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
-					this.decodePassword(data.info, id, this.user[index].email);
+					this.decodePassword(data.info, id);
 
 			// console.log(searchUser);
 			return ("okay");
