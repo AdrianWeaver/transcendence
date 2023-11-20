@@ -24,6 +24,7 @@ class Player
 
 	public	getPlayerSocketId: () => string;
 	public	getSerializable: () => any;
+	public	isReady: boolean;
 
 	public constructor()
 	{
@@ -36,6 +37,7 @@ class Player
 		this.socketId = "undefined";
 		this.name = undefined;
 		this.profileId = "undefined";
+		this.isReady = false;
 		this.render = () =>
 		{
 			if (this.game && this.game.board.ctx)
@@ -146,7 +148,8 @@ class Player
 				uuid: this.uuid,
 				socketId: this.socketId,
 				profileId: this.profileId,
-				name: this.name
+				name: this.name,
+				isReady: this.isReady,
 			});
 		};
 		this.getPlayerSocketId = () =>
