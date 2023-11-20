@@ -66,21 +66,6 @@ const	initialControllerState: ControllerModel = {
 				avatar: "https://thispersondoesnotexist.com/",
 				password: "undefined",
 				profileId: "undefined",
-				// matchHistory: [],
-				// Stats:
-				// {
-				// 	specialModePlayed: 0,
-				// 	victories: 0,
-				// 	defeats: 0,
-				// 	lastGreatVictory:
-				// 	{
-				// 		userScore: 0,
-				// 		opponentScore: 0,
-				// 		opponent: "",
-				// 		timestamp: "undefined",
-				// 		specialMode: false
-				// 	}
-				// }
 			}
 			],
 			activeConversationId: "undefined",

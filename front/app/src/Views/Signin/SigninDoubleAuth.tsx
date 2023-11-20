@@ -37,6 +37,15 @@ const	SigninDoubleAuth = () =>
 
 	useEffect(() =>
 	{
+		if ((!user.doubleAuth) && !user.isLoggedIn)
+		{
+			console.log("User wants to simple log in");
+			navigate("/signin");
+		}
+	}, [user.doubleAuth]);
+
+	useEffect(() =>
+	{
 		if (user.isLoggedIn === true)
 		{
 			console.log("Navigate executed");

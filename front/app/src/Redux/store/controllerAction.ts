@@ -917,32 +917,35 @@ export const GetCode = (otpCode : string, token: string)
 	{
 		const 	prev = getState();
 		let		response: ControllerModel;
-		console.log("TEST ");
 		response = prev.controller;
-		if (prev.controller.user.isLoggedIn
-			|| prev.controller.user.registrationError !== "undefined")
-			return ;
-		const	data: any = await UserServices.getValidationCode(
-			prev.controller.user.id.toString(), otpCode, token, prev.server.uri);
-		if (data === "error")
+		if (response.user.doubleAuth === true)
 		{
-			console.log("TEST error");
-			dispatch(setRegistrationProcessError());
-			return ;
-		}
-		else
-		{
-			// console.log("TEST data validated cde", data.data);
-			response = {
-				...prev.controller,
-				user:
-				{
-					...prev.controller.user,
-					otpCode: otpCode,
-					codeValidated: data.data
-				}
+			console.log("DOUBLE AUTH IS SET AS TRUE");
+			if (prev.controller.user.isLoggedIn
+				|| prev.controller.user.registrationError !== "undefined")
+				return ;
+			const	data: any = await UserServices.getValidationCode(
+				prev.controller.user.id.toString(), otpCode, token, prev.server.uri);
+			if (data === "error")
+			{
+				console.log("TEST error");
+				dispatch(setRegistrationProcessError());
+				return ;
 			}
-			// console.log("controller action 791  ", data.data);
+			else
+			{
+				// console.log("TEST data validated cde", data.data);
+				response = {
+					...prev.controller,
+					user:
+					{
+						...prev.controller.user,
+						otpCode: otpCode,
+						codeValidated: data.data
+					}
+				}
+				// console.log("controller action 791  ", data.data);
+			}
 		}
 		dispatch(controllerActions.getValidationCode(response));
 		console.log("code enregistre");
@@ -1839,10 +1842,14 @@ export const	setUserBackFromDB = (token: string)
 			return ;
 		}
 		console.log("DATA HERE user back ", data);
-		let	loggin: boolean;
+		let	loggin: boolean, doubleAuth: boolean;
 		loggin = false;
-		if (data.doubleAuth === false)
+		doubleAuth = false;
+		if (data.doubleAuth === false || data.doubleAuth === "false")
 			loggin = true;
+		else
+			doubleAuth = true;
+		console.log("login", loggin, " et douable auth", doubleAuth);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1852,14 +1859,13 @@ export const	setUserBackFromDB = (token: string)
 				email: data.email,
 				date: data.date,
 				login: data.login,
-				// friendsProfileId: [...data.friendsProfileId],
 				firstName: data.firstName,
 				lastName: data.lastName,
 				username: data.username,
 				avatar: data.avatar,
-				doubleAuth: data.doubleAuth,
+				doubleAuth: doubleAuth as boolean,
 				location: data.location,
-				isLoggedIn: loggin,
+				isLoggedIn: loggin as boolean,
 				ftAvatar: data.ftAvatar,
 				bearerToken: token,
 				registered: true

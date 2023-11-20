@@ -35,7 +35,7 @@ const	Signin = () =>
 
 	useEffect(() =>
 	{
-		if (user.doubleAuth)
+		if (user.doubleAuth && !user.isLoggedIn)
 		{
 			console.log("User wants to double auth log in");
 			navigate("/signin-double-auth");
