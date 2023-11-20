@@ -599,7 +599,7 @@ export const	setUserData = (data: any)
 				elem.email = data.email;
 				elem.firstName = data.firstName;
 				elem.lastName = data.lastName;
-				elem.username = data.login;
+				elem.username = data.username;
 			}
 		});
 		const	response: ControllerModel = {
@@ -613,6 +613,11 @@ export const	setUserData = (data: any)
 				bearerToken: data.token,
 				firstName: data.firstName,
 				lastName: data.lastName,
+				username: data.username,
+				// avatar: data.avatar,
+				// ftAvatar: data.ftAvatar,
+				// doubleAuth: data.doubleAuth,
+				// location: data.location
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -1747,3 +1752,36 @@ export const	getAllStats = ()
 // 		}
 // 	})
 // }
+
+export const	setUserBackFromDB = (username: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+
+		const	data = await UserServices.getUserBackFromDB(username, prev.server.uri);
+		// if (data === "ERROR")
+		// 	dispatch(controllerActions.setUserBackFromDB(prev));
+		console.log("DATA HERE ", data);
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				id: data.id,
+				email: data.email,
+				date: data.date,
+				login: data.login,
+				// friendsProfileId: [...data.friendsProfileId],
+				firstName: data.firstName,
+				lastName: data.lastName,
+				username: data.username,
+				avatar: data.avatar,
+				doubleAuth: data.doubleAuth,
+				location: data.location
+			}
+		}
+		dispatch(controllerActions.setUserBackFromDB(response));
+	});
+}

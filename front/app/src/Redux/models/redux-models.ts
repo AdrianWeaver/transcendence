@@ -88,7 +88,7 @@ export interface	UserModel
 	"bearerToken": string,
 	"rememberMe": boolean,
 	"chat": ChatModel,
-	"id": number,
+	"id": string,
 	"email": string,
 	"firstName": string,
 	"lastName": string,
@@ -114,7 +114,8 @@ export interface	UserModel
 	"location": string,
 	"ft": boolean,
 	"alreadyExists": boolean,
-	"ipAddress": string
+	"ipAddress": string,
+	"date": string
 }
 
 export interface	AnonymousUserModel

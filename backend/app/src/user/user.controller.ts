@@ -952,6 +952,20 @@ export class UserController
 		});
 		return (array);
 	}
+
+	@Post("/get-user-back")
+	// @UseGuards(UserAuthorizationGuard)
+	getUserBackFromDB(
+		@Body() body: any,
+		@Res() res: Response)
+	{
+		console.log("'get-user-back' route requested");
+		const	data = this.userService.getUserBackFromDB(body.username);
+		if (data === "error")
+			res.status(400).send("User not found");
+		else
+			res.status(201).send(data);
+	}
 }
 
 // 	@Post("/get-ip")

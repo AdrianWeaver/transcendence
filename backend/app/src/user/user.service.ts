@@ -20,6 +20,7 @@ import
 	AdminResponseModel,
 	BackUserModel,
 	HistoryModel,
+	UserDBFrontModel,
 	UserLoginResponseModel,
 	UserModel,
 	UserPublicResponseModel,
@@ -1637,5 +1638,33 @@ public	register(data: UserModel)
 			ipChanged: changeIp
 		};
 		return (res);
+	}
+
+	public	getUserBackFromDB(username: string)
+	: string | UserDBFrontModel
+	{
+		console.log("get user back from db with username ", username);
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (username === elem.username);
+		});
+		if (index === -1)
+			return ("error");
+		this.user[index].registrationProcessEnded = true;
+		console.log("User registration ended ? ", this.user[index].registrationProcessEnded);
+		const	user: UserDBFrontModel = {
+			date: this.user[index].date,
+			id: this.user[index].id.toString(),
+			email: this.user[index].email,
+			username: this.user[index].username,
+			login: this.user[index].login,
+			firstName: this.user[index].firstName,
+			lastName: this.user[index].lastName,
+			avatar: this.user[index].avatar,
+			location: this.user[index].location,
+			doubleAuth: this.user[index].authService.doubleAuth.enable,
+			// friendsProfileId: [...this.user[index].friendsProfileId]
+		};
+		return (user);
 	}
 }

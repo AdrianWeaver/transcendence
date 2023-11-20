@@ -9,7 +9,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { decodePassword, setProfileMyView } from "../../Redux/store/controllerAction";
+import { decodePassword, setAllUsers, setProfileMyView, setUserBackFromDB, setUserData } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 import os from "os";
@@ -209,16 +209,10 @@ const	Signin = () =>
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				const	searchUser = allUsers.find((elem) =>
+				dispatch(setUserBackFromDB(userLogIn.username));
+				// dispatch(decodePassword(userLogIn.password));
+				if (user.username !== "undefined")
 				{
-					console.log("name ", elem.username === userLogIn.username);
-					// console.log("pass ", elem.password === userLogIn.password);
-					return (elem.username === userLogIn.username);
-						// && elem.password === userLogIn.password);
-				});
-				if (searchUser !== undefined)
-				{
-					dispatch(decodePassword(searchUser.id, userLogIn.password, searchUser.email));
 					dispatch(setProfileMyView());
 					console.log("User is update ? ", user);
 					// dispatch(setUserLoggedIn());

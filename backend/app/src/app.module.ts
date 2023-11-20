@@ -24,6 +24,7 @@ import { join } from "path";
 import { GameApiModule } from "./game-api/game-api.module";
 import { GameApiController } from "./game-api/game-api.controller";
 import { GameApiService } from "./game-api/game-api.service";
+// import	dotenv from "dotenv";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 

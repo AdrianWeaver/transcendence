@@ -392,6 +392,33 @@ const	UserServices = {
 	// 		})
 	// 	);
 	// },
+	async	getUserBackFromDB(username: string, hostname: string)
+	{
+		console.log("get user back from db");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				// "Authorization": token,
+			},
+		};
+		const	data = {
+			username: username,
+		};
+		return (
+			Api(hostname)
+			.post("user/get-user-back", data, config)
+			.then((data) =>
+			{
+				console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;
