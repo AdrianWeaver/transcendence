@@ -20,7 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, userRegistrationStepFour, userRegistrationStepThree, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 // import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
 // import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
@@ -105,14 +105,14 @@ const	StepZero = () =>
 		return (state.controller.registration.abortRequested);
 	});
 
-	if (abort === true)
-	{
-		savePrevPage("/signin");
-		navigate("/cancel");
-	}
 	useEffect(() =>
 	{
 		console.log("Abort value", abort);
+		if (abort === true)
+		{
+			savePrevPage("/signin");
+			navigate("/cancel");
+		}
 	}, [abort]);
 
 	const	ftUrl = useAppSelector((state) =>
@@ -168,12 +168,14 @@ const	StepZero = () =>
 			clearTimeout(timer);
 		});
 	});
-
+	let	start: boolean;
 	const	responseQuery = checkQueryParams(query);
 	const	alertInfo = AlertComponent(responseQuery);
-	if (responseQuery.code)
+	start = false;
+	if (responseQuery.code && (!start))
 	{
 		dispatch(registerClientWithCode(responseQuery.code));
+		start = true;
 	}
 	// eslint-disable-next-line eqeqeq
 	if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
@@ -182,9 +184,10 @@ const	StepZero = () =>
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}
-	else
+	else if (abort === true)
 	{
-		dispatch(setAbortRequestedValue(false));
+		// dispatch(setAbortRequestedValue(false));
+		// dispatch(userRegistrationStepFour());
 		console.log("ABORT TO FALSE ????d");
 	}
 

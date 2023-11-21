@@ -226,17 +226,6 @@ export class UserController
 			.then((res) =>
 			{
 				const	data = res.data;
-				// const	searchUser = users.find((elem) =>
-				// {
-				// 	return (elem.ftApi.accessToken === data.access_token);
-				// });
-				// if (searchUser)
-				// {
-				// 	this.logger.error("User Already register ");
-				// 	return ({msg: "exists",
-				// 		user: searchUser});
-				// }
-				// this.logger.debug(data);
 				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
 					tokenType: data.token_type,
@@ -250,13 +239,6 @@ export class UserController
 			})
 			.then((newObject : any) =>
 			{
-				let	accesTok;
-
-				// if (newObject.msg === "already exists")
-				// {
-				// 	// res.status(201).json({error: "you are already register"});
-				// 	// return ;
-				// }
 				const config = {
 					method: "get",
 					maxBodyLength: Infinity,
@@ -326,7 +308,7 @@ export class UserController
 							password: userTempCheck.password,
 							friendsProfileId: [...userTempCheck.friendsProfileId]
 						};
-						retValue = this.userService.login(userObject.username, userObject.password);
+						retValue = await this.userService.login(userObject.username, userObject.password);
 						console.error("ALREADY EXISTS RETVALUE", retValue);
 						res.status(200).send(retValue);
 					}
@@ -371,7 +353,7 @@ export class UserController
 						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
-						retValue = this.userService.register(newUserObj);
+						retValue = await this.userService.register(newUserObj);
 						await this.userService.createUserToDatabase(newUserObj)
 						.then((data) =>
 						{

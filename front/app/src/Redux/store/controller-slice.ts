@@ -154,6 +154,10 @@ const	controllerSlice = createSlice(
 		{
 			state.registration.step = action.payload.registration.step;
 		},
+		userRegistrationStepFour(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.step = action.payload.registration.step;
+		},
 		setCanvasSize(state, action: PayloadAction<ControllerModel>)
 		{
 			state.canvas = action.payload.canvas;
@@ -245,6 +249,7 @@ const	controllerSlice = createSlice(
 			state.user.avatar = action.payload.user.avatar;
 			state.user.location = action.payload.user.location;
 			state.allUsers = action.payload.allUsers;
+			state.registration.step = action.payload.registration.step;
 		},
 		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
 		{

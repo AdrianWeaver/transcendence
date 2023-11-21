@@ -165,6 +165,24 @@ export const	userRegistrationStepThree = ()
 	});
 };
 
+export const	userRegistrationStepFour = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				step: 3,
+			}
+		};
+		dispatch(controllerActions.userRegistrationStepFour(response));
+	});
+};
+
 export const	setCanvasSize = (size: CanvasModel)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -551,7 +569,8 @@ export const setRegistrationProcessSuccess = ()
 			user:
 			{
 				...prev.controller.user,
-				registrationProcess: false
+				registrationProcess: false,
+				registered: true,
 			}
 		};
 		dispatch(controllerActions.setRegistrationProcessSuccess(response));
@@ -688,24 +707,25 @@ export const registerClientWithCode = (code : string)
 			// dispatch(controllerActions.registerClientWithCode(prev.controller));
 			return ;
 		}
-		// dispatch(setRegistrationProcessStart())
-		// console.log("Code is equals to : ", code);
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
 		console.log("Patch: ", data);
 		if (data.error === "you are already register")
 		{
 			console.log("Patch: ca fait des chocapics");
+			dispatch(setRegistrationProcessSuccess());
 			return ;
 		}
 		else if (data === "ERROR")
 		{
+			console.log("UUUSEER", prev.controller.user);
 			response.registration.abortRequested = true;
 			dispatch(controllerActions.setAbortRequestedValue(response));
 			return ;
 		}
 		else
 		{
+			dispatch(setRegistrationProcessStart())
 			console.log("LA DATA WESH", data);
 			const	array: BackUserModel[] = [...prev.controller.allUsers];
 
@@ -750,6 +770,10 @@ export const registerClientWithCode = (code : string)
 				...prev.controller,
 				allUsers: [...array],
 				allFrontUsers: [...arrayFront],
+				registration: {
+					...prev.controller.registration,
+					step: 1
+				},
 				user:
 				{
 					...prev.controller.user,
