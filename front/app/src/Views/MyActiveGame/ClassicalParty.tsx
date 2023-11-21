@@ -13,7 +13,9 @@ import {
     Button
 } from "@mui/material";
 import GamePreview from "./GamePreview";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useNavigate } from "react-router-dom";
+import { revokeGameWithUuid } from "../../Redux/store/gameEngineAction";
 
 type	ItemCardModel =
 {
@@ -22,13 +24,27 @@ type	ItemCardModel =
 
 const	ItemCard = (props: ItemCardModel) =>
 {
-	return (<Grid container spacing={4}>
+	const	navigate = useNavigate();
+	const	dispatch = useAppDispatch();
+
+	return (
+		<Grid container spacing={4}>
 		{
-			props.array.map((card) =>
+			props.array.map((game, index: number) =>
 			{
-				console.log("card", card);
+				console.log("card", game);
+				const	score = game.playerOne.score
+					+ " - " + game.playerTwo.score;
+				let	elapsedTime;
+				if (game.loop.frameNumber === 0)
+					elapsedTime = "aucun";
+				else
+				{
+					elapsedTime
+					= game.loop.frameNumber / game.loop.frameRate + " sec.";
+				}
 				return (
-					<Grid item key={card} xs={12} sm={6} md={4}>
+					<Grid item key={index} xs={12} sm={6} md={4}>
 						<Card
 							sx={{
 								height: "100%",
@@ -56,7 +72,7 @@ const	ItemCard = (props: ItemCardModel) =>
 											// pt: "56.25%",
 											pt: "100%",
 										}}
-										image="https://source.unsplash.com/random?wallpapers"
+										image={game.playerOne.avatar}
 									/>
 								</ Grid>
 								{/* // player Two */}
@@ -72,15 +88,15 @@ const	ItemCard = (props: ItemCardModel) =>
 											// pt: "56.25%",
 											pt: "100%",
 										}}
-										image="https://source.unsplash.com/random?wallpapers"
+										image={game.playerTwo.avatar}
 									/>
 								</ Grid>
 							</ Grid>
 							<GamePreview
-								ball={card.ball}
-								board={card.board}
-								playerOne={card.playerOne}
-								playerTwo={card.playerTwo}
+								ball={game.ball}
+								board={game.board}
+								playerOne={game.playerOne}
+								playerTwo={game.playerTwo}
 							/>
 							<CardContent sx={{ flexGrow: 1 }}>
 								<Typography
@@ -88,17 +104,41 @@ const	ItemCard = (props: ItemCardModel) =>
 									variant="h5"
 									component="h2"
 								>
-									Heading
+									Instance: {game.roomName}
 								</Typography>
 								<Typography>
-									This is a media card.
-									You can use this section to describe the
-									content.
+									Partie en mode: "{game.gameMode}"
+									<br />
+									versus: 
+									 " {game.playerOne.username} - {game.playerTwo.username} "
+									<br />
+									Score : {score}
+									<br />
+									Temps passe en jeu : {elapsedTime}
+									<br />
+									Joueur dans la room : {game.userConnected}
 								</Typography>
 							</CardContent>
 							<CardActions>
-								<Button size="small">Entrer en jeu</Button>
-								<Button size="small">Supprimer</Button>
+								<Button
+									size="small"
+									onClick={() =>
+									{
+										navigate("/test-ball");
+									}}
+								>
+									Entrer en jeu
+								</Button>
+								<Button
+									size="small"
+									onClick={() =>
+									{
+										alert("note to dev : please fix my route")
+										dispatch(revokeGameWithUuid(game.uuid));
+									}}
+								>
+									Abandonner
+								</Button>
 							</CardActions>
 						</Card>
 					</Grid>
@@ -118,6 +158,7 @@ const	ClassicalParty = () =>
 	let	pausedParty;
 	let	playingParty;
 
+	console.log(classicalArray);
 	if (classicalArray.disconnected.length !== 0)
 	{
 		pausedParty = (

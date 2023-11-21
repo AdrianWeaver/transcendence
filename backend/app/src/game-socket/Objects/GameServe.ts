@@ -38,10 +38,8 @@ class GameServe
 	public	revoked: boolean;
 	public	face: string;
 	public	faceRotation: number;
-	// public	mutexFaceRotation: boolean;
 	public	faceDirection: string;
 	public	triggeredPaddleCount: number;
-	// public	isGameInstanceEmpty: () => boolean;
 	public	userReady: number;
 
 	public constructor(roomName: string)

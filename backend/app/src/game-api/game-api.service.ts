@@ -81,6 +81,32 @@ export class GameApiService
 			.map((instance) =>
 			{
 				return (instance.getSeralizable());
+			})
+			.map((instance) =>
+			{
+				if (instance.playerOne.profileId.toString() !== "undefined")
+				{
+					instance.playerOne.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerOne.username = this.userService.getUserById(instance.playerOne.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me player one");
+					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerOne.username = "wanted";
+				}
+				if (instance.playerTwo.profileId.toString() !== "undefined")
+				{
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me ");
+					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerTwo.username = "wanted";
+				}
+				return (instance);
 			});
 		const	aliveClassicalGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyClassical);
 		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, aliveClassicalGameMode);
@@ -90,6 +116,32 @@ export class GameApiService
 			.map((instance) =>
 			{
 				return (instance.getSeralizable());
+			})
+			.map((instance) =>
+			{
+				if (instance.playerOne.profileId.toString() !== "undefined")
+				{
+					instance.playerOne.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerOne.username = this.userService.getUserById(instance.playerOne.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me player one");
+					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerOne.username = "wanted";
+				}
+				if (instance.playerTwo.profileId.toString() !== "undefined")
+				{
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me ");
+					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerTwo.username = "wanted";
+				}
+				return (instance);
 			});
 		const	aliveUpsideDownGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyUpsideDown);
 		const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, aliveUpsideDownGameMode);
@@ -99,6 +151,32 @@ export class GameApiService
 			.map((instance) =>
 			{
 				return (instance.getSeralizable());
+			})
+			.map((instance) =>
+			{
+				if (instance.playerOne.profileId.toString() !== "undefined")
+				{
+					instance.playerOne.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerOne.username = this.userService.getUserById(instance.playerOne.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me player one");
+					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerOne.username = "wanted";
+				}
+				if (instance.playerTwo.profileId.toString() !== "undefined")
+				{
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
+				}
+				else
+				{
+					this.logger.error("please fill a good picture for me ");
+					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
+					instance.playerTwo.username = "wanted";
+				}
+				return (instance);
 			});
 		const	aliveFriendGameMode = this.getCopyWithActiveSocketSetAsActive(deepCopyFriend);
 		const	friendArray = this.gameService.filterGameArrayBySocketState(profileId, aliveFriendGameMode);

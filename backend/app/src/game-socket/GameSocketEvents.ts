@@ -156,8 +156,6 @@ export class GameSocketEvents
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "the-end"});
 				}
 			}
-			// upside = 0, down = 180
-			// const gameFace = instance.face === "up" ? 0 : 180;
 
 			const action = {
 				type: "game-data",
@@ -283,63 +281,6 @@ export class GameSocketEvents
 		return (result);
 	}
 
-	// please send a notification on disconnect 
-	public	doRenewSocketIfDisconnected(client: Socket, profileId: string, indexOldSocketId: number)
-	{
-		// expected unique instance
-		const	indexGameInstance = this.gameService.gameInstances.findIndex((instance) =>
-		{
-			return (
-				instance.playerOne.profileId === profileId
-				|| instance.playerTwo.profileId === profileId
-			);
-		});
-		if (indexGameInstance === -1)
-		{
-			// at this step we are shure socket id is present
-			// cf: this.gameService.pushClientIdIntoSocketIdUsers(client.id, profileId);
-			client.disconnect();
-			return ;
-		}
-		if (this.gameService.gameInstances[indexGameInstance].playerOne.profileId === profileId)
-		{
-			if (this.gameService.gameInstances[indexGameInstance].playerOne.socketId === "disconnected")
-			{
-				// accept the renew connection
-				this.gameService.socketIdUsers[indexOldSocketId].socketId = client.id;
-				this.gameService.gameInstances[indexGameInstance].playerOne.socketId = client.id;
-				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-			}
-			else
-			{
-				// disconnect
-				client.disconnect();
-				return ;
-			}
-		}
-		if (this.gameService.gameInstances[indexGameInstance].playerTwo.profileId === profileId)
-		{
-			if (this.gameService.gameInstances[indexGameInstance].playerTwo.socketId === "disconnected")
-			{
-				// accept the renew connection
-				this.gameService.socketIdUsers[indexOldSocketId].socketId = client.id;
-				this.gameService.gameInstances[indexGameInstance].playerTwo.socketId = client.id;
-				this.gameService.gameInstances[indexGameInstance].userConnected += 1;
-			}
-			else
-			{
-				// disconnect
-				client.disconnect();
-				return ;
-			}
-		}
-	}
-
-	public	createNewRoomIfNoGameInstance()
-	{
-		console.log("unimplemented");
-	}
-
 	public doHandShake(client: Socket)
 	{
 		const	handShake: HandShakeModel = this.isHandshakeValid(client);
@@ -369,63 +310,6 @@ export class GameSocketEvents
 		if (indexSocketId === -1)
 			return (false);
 		return (true);
-	}
-
-	public	getUuidGameFromFilteredGame(game: GameServe[], profileId: string)
-	{
-		const	uuidGame: string[] = [];
-
-		for (const instance of game)
-		{
-			if (instance.playerOne.profileId === profileId)
-			{
-				if (instance.playerOne.socketId !== "disconnected"
-					&& instance.playerOne.socketId !== "undefined"
-					&& instance.playerOne.socketId !== "invitation"
-					&& instance.playerOne.socketId !== "revoked")
-					uuidGame.push(instance.uuid as string);
-			}
-			else if (instance.playerTwo.profileId === profileId)
-			{
-				if (instance.playerTwo.socketId !== "disconnected"
-					&& instance.playerTwo.socketId !== "undefined"
-					&& instance.playerTwo.socketId !== "invitation"
-					&& instance.playerTwo.socketId !== "revoked")
-					uuidGame.push(instance.uuid as string);
-			}
-		}
-		return (uuidGame);
-	}
-
-	/**
-	 * @deprecated
-	 * @param client 
-	 * @param gameMode 
-	 * @param arrayGameFiltered 
-	 * @returns 
-	 */
-	public	randomGameRefreshed(client: Socket, gameMode: string, arrayGameFiltered: GameServe[])
-	{
-		const	keywordSelector = "disconnected";
-
-		if (gameMode === "friend")
-		{
-			this.logger.error("Error: This function does not handle friend game mode");
-			return ;
-		}
-		else
-		{
-			if (arrayGameFiltered.length === 0)
-			{
-				this.logger.verbose("Info: no game pause (" + gameMode + ")- no renewal");
-				return ;
-			}
-			if (arrayGameFiltered.length > 1)
-			{
-				this.logger.error("Error: more than one instance in this game mode: ", gameMode);
-				return ;
-			}
-		}
 	}
 
 	/**
@@ -857,7 +741,7 @@ export class GameSocketEvents
 		if (roomName === "The void")
 			return ;
 		const	roomInfo = this.server.sockets.adapter.rooms.get(roomName);
-		console.log("room infos: ", roomInfo);
+		// console.log("room infos: ", roomInfo);
 		if (roomInfo)
 		{
 			const	userMessage: ActionSocket = {
@@ -911,67 +795,75 @@ export class GameSocketEvents
 
 	handleDisconnect(client: Socket)
 	{
-		// set pause if client id is in a game
 		const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId;
 		if (profileId === undefined)
 			this.logger.error("Profile id not found");
+
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
 			this.logger.error("game instance not fouded for disconnect user");
+		const	instance = this.gameService.gameInstances[indexInstance];
+		if (instance.playerOne.socketId === client.id)
+		{
+			if (instance.playerOne.isReady === true)
+			{
+				instance.userReady -= 1;
+				instance.playerOne.isReady = false;
+			}
+		}
+		if (instance.playerTwo.socketId === client.id)
+		{
+			if (instance.playerTwo.isReady === true)
+			{
+				instance.userReady -= 1;
+				instance.playerTwo.isReady = false;
+			}
+		}
 		if (this.gameService.isProfileIdUserOne(indexInstance, profileId as string))
 			this.gameService.gameInstances[indexInstance].playerOne.socketId = "disconnected";
 		if (this.gameService.isProfileIdUserTwo(indexInstance, profileId as string))
 			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
 
-
-		// At the end PLZ
 		this.gameService.setGameActiveToFalse(indexInstance);
-		// // remove the user from the list of users
+		
+		instance.userConnected -= 1;
+		// send the new number of users and users ready
+		const	action = {
+			type: "disconnect",
+			payload: {
+				numberUsers: instance.userConnected,
+				userReadyCount: instance.userReady
+			}
+		};
+		const	gameMode = instance.gameMode;
+		if (gameMode === "classical" || gameMode === "upside-down")
+		{
+			const	playerOne = instance.playerOne;
+			const	playerTwo = instance.playerTwo;
+			if ((playerOne.socketId === "undefined" || playerOne.socketId === "disconnected")
+				&& (playerTwo.socketId === "undefined" || playerTwo.socketId === "disconnected"))
+			{
+				this.logger.verbose("The game will be destroyed");
+				const id = this.gameService.gameInstances.findIndex((game) =>
+				{
+					return (game.uuid === instance.uuid);
+				});
+				this.gameService.removeGameInstance(id);
+				if (this.gameService.gameInstances.length === 0)
+				{
+					this.gameService.roomCount = 0;
+				}
+			}
+		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 
-		// this.gameService.decreaseUsers();
-
-		// // remove the user from the list of users ready
-		// const	wasReadyIndex = this.gameService
-		// 	.findIndexSocketIdReadyWithSocketId(client.id);
-		// if (wasReadyIndex !== -1)
-		// {
-		// 	this.gameService.removeOneSocketIdReadyWithIndex(wasReadyIndex);
-		// 	this.gameService.decreaseUserReadyNumber();
-		// }
-
-		// // send the new number of users and users ready
-		// const	action = {
-		// 	type: "disconnect",
-		// 	payload: {
-		// 		numberUsers: this.gameService.getUsers(),
-		// 		userReadyCount: this.gameService.getUserReadyNumber()
-		// 	}
-		// };
-		// this.logger.error("User with id: " + client.id + " is quitting pprofile id is: " + profileId);
-
-		// const indexGameInstance = this.gameService.findIndexGameInstanceWithProfileId(profileId as string);
-		// if (indexGameInstance === -1)
-		// 	this.logger.error("Index game instance failure ");
-		// else
-		// {
-		// 	this.gameService.gameInstances[indexGameInstance].userConnected -= 1;
-		// 	if (this.gameService.gameInstances[indexGameInstance].userConnected === 0)
-		// 	{
-		// 		this.gameService.removeGameInstance(indexGameInstance);
-		// 		if (this.gameService.gameInstances.length === 0)
-		// 		{
-		// 			this.gameService.roomCount = 0;
-		// 		}
-		// 	}
-		// }
-		// const instance = this.gameService.findGameInstanceWithClientId(client.id);
-		// if (instance)
-		// {
-		// 	this.logger.error("Test deeead code");
-		// 	this.server.to(instance.roomName).emit("player-info", action);
-		// }
+		const game = this.gameService.findGameInstanceWithClientId(client.id);
+		if (game)
+		{
+			this.logger.error("Test deeead code");
+			this.server.to(game.roomName).emit("player-info", action);
+		}
 	}
 
 	@SubscribeMessage("info")

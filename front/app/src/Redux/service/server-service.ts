@@ -239,7 +239,8 @@ const	ServerService = {
 				{
 					return ({
 						success: false,
-						error: error});
+						error: error
+					});
 				})
 		);
   },

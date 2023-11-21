@@ -460,27 +460,7 @@ export const	revokeGameWithUuid = (gameUuid: string)
 		if (data.success === true)
 		{
 			console.log("revoke game success");
-			// const newData = await ServerService
-			// 	.getMyActiveGame(token, prev.server.serverLocation);
-			// console.log(newData);
-			// if (newData.success === true)
-			// {
-			// 	console.log("getMyGameActive success called", data);
-			// 	const	response: Model = {
-			// 		...prev.gameEngine,
-			// 		myGameActive:
-			// 		{
-			// 			random: newData.random,
-			// 			friend: data.friend
-			// 		}
-			// 	};
-			// 	dispatch(action.revokeMyGame(response));
-			// }
-			// else
-			// {
-			// 	console.log("getMyGameActive Failure");
-				dispatch(action.revokeMyGame({...prev.gameEngine}));
-			// }
+			dispatch(action.revokeMyGame({...prev.gameEngine}));
 		}
 		else
 		{
@@ -524,3 +504,14 @@ export const	setGameFace = (gameFace: number)
 			dispatch(action.setGameFace(res));
 	});
 };
+
+// export const	revokeGameByUUID = (uuidToRevoke: string)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return (async (dispatch, getState) =>
+// 	{
+// 		const	prev = getState();
+
+// 		const token = prev.controller.user.bearerToken;
+// 	});
+// };

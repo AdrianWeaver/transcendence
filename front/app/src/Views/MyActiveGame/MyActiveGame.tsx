@@ -16,7 +16,7 @@ import {
 	getMyActiveGame,
 } from "../../Redux/store/gameEngineAction";
 import ClassicalParty from "./ClassicalParty";
-import { CSSProperties, SyntheticEvent, useState } from "react";
+import { CSSProperties, SyntheticEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import UpsideDownParty from "./UpsideDownParty";
 import FriendParty from "./FriendParty";
@@ -24,6 +24,11 @@ import FriendParty from "./FriendParty";
 const	Header = () =>
 {
 	const dispatch = useAppDispatch();
+
+	useEffect(() =>
+	{
+		dispatch(getMyActiveGame());
+	}, []);
 
 	return (
 		<>
