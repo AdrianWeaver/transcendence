@@ -354,6 +354,7 @@ export class ChatSocketEvents
 		 */
 		public	handleInfoSentMessage(client: Socket, data: ActionSocket)
 		{
+			console.log("HANDLE INFO SENT MESSAGE");
 			let	channel;
 			let	kind;
 			let	playPong;
@@ -371,6 +372,7 @@ export class ChatSocketEvents
 					return ;
 				else
 					kind = "privateMessage";
+				console.log("PRIVATE CONV FOUND");
 				channel.users.map((elem) =>
 				{
 					if (elem.profileId !== profileId)
@@ -378,6 +380,7 @@ export class ChatSocketEvents
 				});
 				if (friendProfileId === undefined)
 					return ;
+				console.log("FRIEND FOUND");
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
@@ -393,7 +396,9 @@ export class ChatSocketEvents
 				}
 			}
 			else
+			{
 				kind = "channel";
+			}
 			if (data.payload.message.trim().length === 0)
 				return ;
 			const	id = channel.messages.length;
@@ -417,6 +422,7 @@ export class ChatSocketEvents
 					kind: kind
 				}
 			};
+			console.log("ACTION ", action.payload);
 			this.server.to(channel.name).emit("update-messages", action);
 		}
 

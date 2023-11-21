@@ -748,18 +748,20 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
-		const	goToChannel = (chanName: string, kind: string) =>
-		{
-			const	action = {
-				type: "did-I-join",
-				payload: {
-					chanName: chanName,
-					kind: kind,
-					userId: activeId
-				}
-			};
-			socketRef.current.emit("channel-info", action);
-		};
+		// const	goToChannel = (chanName: string, kind: string, okContinue: boolean) =>
+		// {
+		// 	if (okContinue === false)
+		// 		return ;
+		// 	const	action = {
+		// 		type: "did-I-join",
+		// 		payload: {
+		// 			chanName: chanName,
+		// 			kind: kind,
+		// 			userId: activeId
+		// 		}
+		// 	};
+		// 	socketRef.current.emit("channel-info", action);
+		// };
 
 		const	updateMessages = (data: any) =>
 		{
@@ -818,7 +820,8 @@ const	ChatLayout = () =>
 					}
 				}
 			}
-			goToChannel(data.payload.chanName, data.payload.kind);
+			console.log("CHANNEL KIND", data.payload.kind);
+			goToChannel(data.payload.chanName, data.payload.kind, true);
 			if (data.playPong === true)
 			{
 				inviteToPlayPong(data.payload.chanName, data.payload.MyProfileId, data.payload.friendProfileId);
@@ -827,25 +830,30 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
+			console.log("CONFIRM IS INSIDE CHANNEL");
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					if (data.payload.kind === "channel" || kindOfConversation !== "privateMessage")
+					console.log("PAYLOAD", data.payload);
+					if (data.payload.kind === "channel")
 					{
+						console.log("DID I GO HERE?");
 						const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
 						{
 							return (!blockedListRef.current.includes(message.sender));
 						});
 						setChanMessages(filteredMessages);
-						goToChannel(data.payload.chanName, data.payload.kind);
+						goToChannel(data.payload.chanName, "channel", false);
 						// chanMessageTest = data.payload.chanMessage;
 					}
-					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+					if (data.payload.kind === "privateMessage")
 					{
 						setCurrentChannel(data.payload.chanName);	
 						setPrivMessages(data.payload.chanMessages);
+						goToChannel(data.payload.chanName, "privateMessage", false);
+						// goToChannel(data.payload.chanName, data.payload.kind, true);
 					}
 				}
 				else
@@ -1332,8 +1340,10 @@ const	ChatLayout = () =>
 	};
 
 	// END OF INVITE
-	const	goToChannel = (chanName: string, kind: string) =>
+	const	goToChannel = (chanName: string, kind: string, okContinue: boolean) =>
 	{
+		if (okContinue === false)
+			return ;
 		const	action = {
 			type: "did-I-join",
 			payload: {
@@ -1468,7 +1478,7 @@ const	ChatLayout = () =>
 													onClick={() =>
 													{
 														setKindOfConversation("channel");
-														return (goToChannel(channel.name, "channel"));
+														return (goToChannel(channel.name, "channel", true));
 													}}
 												/>
 												<Button onClick={() =>
@@ -1719,7 +1729,7 @@ const	ChatLayout = () =>
 														onClick={() =>
 														{
 															setKindOfConversation("privateMessage");
-															return (goToChannel(channel.name, "privateMessage"));
+															goToChannel(channel.name, "privateMessage", true);
 														}}
 													/>
 												</ListItem>
