@@ -8,7 +8,7 @@
 /* eslint-disable max-lines-per-function */
 // eslint-disable-next-line max-len
 // https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
-import controllerSlice from "./controller-slice";
+import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
@@ -204,7 +204,7 @@ export const	reinitialiseUser = (logout: boolean)
 		{
 			await UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
 			dispatch(logOffUser());
-			dispatch(resetRegistration());
+			// dispatch(resetRegistration());
 		}
 		dispatch(controllerActions.reinitialiseUser());
 	});
@@ -1899,5 +1899,14 @@ export const	userSignIn = (username: string, password: string)
 			}
 			dispatch(controllerActions.setNewToken(response));
 		}
+	});
+}
+
+export const	resetController = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		dispatch(controllerActions.resetController(initialControllerState));
 	});
 }

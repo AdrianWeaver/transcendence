@@ -84,6 +84,10 @@ const	serverSlice = createSlice(
 		{
 			state.uri = action.payload.uri;
 		},
+		resetServer(state, action: PayloadAction<ServerModel>)
+		{
+			state = action.payload;
+		}
 	}
 });
 

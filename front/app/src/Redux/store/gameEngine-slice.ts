@@ -204,6 +204,10 @@ const	gameEngineSlice = createSlice(
 		setGameFace(state, action: PayloadAction<Model>)
 		{
 			state.board.gameFace = action.payload.board.gameFace;
+		},
+		resetGameEngine(state, action: PayloadAction<Model>)
+		{
+			state = action.payload;
 		}
 	}
 });

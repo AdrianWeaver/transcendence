@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { resetRegistration } from "../../Redux/store/controllerAction";
+import { resetController } from "../../Redux/store/controllerAction";
+import { resetServer, setAuthApiLinks } from "../../Redux/store/serverAction";
+import { resetGameEngine } from "../../Redux/store/gameEngineAction";
+import { resetAnonymousUser } from "../../Redux/store/anonymousUserAction";
 
 /**
  * 
@@ -17,7 +20,7 @@ const	CancelRegister = () =>
 	[
 		message,
 		setMessage
-	] = useState("You'll be redirected soon, please wait... (delayed)");
+	] = useState("You'll be redirected soon, please wait... ");
 
 	const	registration = useAppSelector((state) =>
 	{
@@ -36,10 +39,13 @@ const	CancelRegister = () =>
 		setTimeout(() =>
 		{
 			setMessage("Redirect now...");
-			if (registration.startedRegister === true
-				&& registration.abortRequested === true)
-				dispatch(resetRegistration());
-			navigate(prevPage);
+			// localStorage.clear();
+			dispatch(resetController());
+			dispatch(resetServer());
+			dispatch(resetGameEngine());
+			dispatch(resetAnonymousUser());
+			dispatch(setAuthApiLinks());
+			navigate("/");
 		}, 1500);
 	});
 	return (<p>{message}</p>);

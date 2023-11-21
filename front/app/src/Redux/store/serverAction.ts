@@ -2,7 +2,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 
-import	serverSlice from "./server-slice";
+import	serverSlice, { initialServerState } from "./server-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
@@ -229,5 +229,14 @@ export const	setUri = (uri: string)
 				uri: uri
 			};
 			dispatch(serverActions.setUri(response));
+	});
+};
+
+export const	resetServer = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		dispatch(serverActions.resetServer(initialServerState));
 	});
 };

@@ -267,3 +267,12 @@ export const	clearAllDataAnonymousUser = ()
 		dispatch(action.clearAllDataAnonymousUser(res));
 	});
 };
+
+export const	resetAnonymousUser = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch ) =>
+	{
+		dispatch(action.resetAnonymousUser(initialAnonymousUserState));
+	});
+};

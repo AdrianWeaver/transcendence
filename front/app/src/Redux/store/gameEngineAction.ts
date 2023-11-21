@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 
-import	gameEngineSlice from "./gameEngine-slice";
+import	gameEngineSlice, { initialGameEngineState } from "./gameEngine-slice";
 import
 {
 	AnyAction,
@@ -502,6 +502,15 @@ export const	setGameFace = (gameFace: number)
 		};
 		if (prevState.gameEngine.board.gameFace !== gameFace)
 			dispatch(action.setGameFace(res));
+	});
+};
+
+export const	resetGameEngine = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		dispatch(action.resetGameEngine(initialGameEngineState));
 	});
 };
 
