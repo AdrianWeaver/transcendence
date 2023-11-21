@@ -592,6 +592,7 @@ export class ChatSocketEvents
 							newPrivateMsg?.users.push(obj);
 							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
+							tmp2.client?.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
 						}

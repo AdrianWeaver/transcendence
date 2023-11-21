@@ -119,7 +119,7 @@ class Chat
 				return (this.memberSocketIds[index].profileId);
 		};
 
-		this.updateChannelsAdminSocketId = (newSocketId : string, profileId:string) =>
+		this.updateChannelsAdminSocketId = (newSocketId : string, profileId: string) =>
 		{
 			this.channels.forEach((channel) =>
 			{
@@ -143,6 +143,14 @@ class Chat
 		this.updateUserInChannels = (newSocketId: string, profileId: string) =>
 		{
 			this.channels.forEach((channel) =>
+			{
+				channel.users.forEach((user) =>
+				{
+					if (user.profileId === profileId)
+						user.memberSocketId = newSocketId;
+				});
+			});
+			this.privateMessage.forEach((channel) =>
 			{
 				channel.users.forEach((user) =>
 				{
