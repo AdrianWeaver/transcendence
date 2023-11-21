@@ -141,6 +141,11 @@ export class ChatSocketEvents
 						newUser.status = user.status;
 						newUser.online = user.online;
 						this.chatService.pushUser(newUser, client.id);
+						const	action = {
+							type: "on-connection",
+							payload: "",
+						};
+						this.server.emit("channel-info", action);
 					}
 					else
 					{
@@ -169,7 +174,7 @@ export class ChatSocketEvents
 								blockedList: blockedArray,
 							}
 						};
-						this.server.emit("channel-info", action);
+						client.emit("channel-info", action);
 					}
 					this.chatService.updateDatabase();
 				}
@@ -349,6 +354,7 @@ export class ChatSocketEvents
 		 */
 		public	handleInfoSentMessage(client: Socket, data: ActionSocket)
 		{
+			console.log("HANDLE INFO SENT MESSAGE");
 			let	channel;
 			let	kind;
 			let	playPong;
@@ -366,6 +372,7 @@ export class ChatSocketEvents
 					return ;
 				else
 					kind = "privateMessage";
+				console.log("PRIVATE CONV FOUND");
 				channel.users.map((elem) =>
 				{
 					if (elem.profileId !== profileId)
@@ -373,6 +380,7 @@ export class ChatSocketEvents
 				});
 				if (friendProfileId === undefined)
 					return ;
+				console.log("FRIEND FOUND");
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
@@ -388,7 +396,9 @@ export class ChatSocketEvents
 				}
 			}
 			else
+			{
 				kind = "channel";
+			}
 			if (data.payload.message.trim().length === 0)
 				return ;
 			const	id = channel.messages.length;
@@ -412,6 +422,7 @@ export class ChatSocketEvents
 					kind: kind
 				}
 			};
+			console.log("ACTION ", action.payload);
 			this.server.to(channel.name).emit("update-messages", action);
 		}
 
@@ -581,6 +592,7 @@ export class ChatSocketEvents
 							newPrivateMsg?.users.push(obj);
 							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
+							tmp2.client?.join(newPrivateMsg.name);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
 						}
