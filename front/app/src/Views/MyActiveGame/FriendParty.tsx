@@ -105,7 +105,8 @@ const	ItemCard = (props: ItemCardModel) =>
 				);
 			})
 		}
-		</Grid>);
+		</Grid>
+	);
 };
 
 const	FriendParty = () =>
