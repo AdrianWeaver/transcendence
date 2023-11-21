@@ -522,7 +522,7 @@ const	ChatLayout = () =>
 		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
-			// alert("Channel name cannot be empty");
+			alert("Channel name cannot be empty");
 			return;
 		}
 
@@ -532,13 +532,13 @@ const	ChatLayout = () =>
 			"private"
 			].includes(selectedMode))
 		{
-			// alert("Please select a mode (Public, Protected, or Private)");
+			alert("Please select a mode (Public, Protected, or Private)");
 			return;
 		}
 
 		if (selectedMode === "protected" && chanPassword.trim() === "")
 		{
-			// alert("There must be a password for a protected channel");
+			alert("There must be a password for a protected channel");
 			return;
 		}
 		setKindOfConversation("channel");
@@ -700,7 +700,7 @@ const	ChatLayout = () =>
 				}
 				else
 				{
-					// alert(data.payload.message);
+					alert(data.payload.message);
 					console.log(data.payload.message);
 				}
 			}
@@ -709,13 +709,13 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.message !== "")
 				{
-					// alert(data.payload.message);
+					alert(data.payload.message);
 					console.log(data.payload.message);
 				}
 				else
 				{
 					setChanMessages(data.payload.messages);
-					// alert("Successfully joined channel " + data.payload.chanName + "!");
+					alert("Successfully joined channel " + data.payload.chanName + "!");
 				}
 			}
 
@@ -729,7 +729,7 @@ const	ChatLayout = () =>
 				}
 				else
 				{
-					// alert("Incorrect password, try again !");
+					alert("Incorrect password, try again !");
 					console.log("Incorrect password, try again !");
 				}
 			}
@@ -843,11 +843,14 @@ const	ChatLayout = () =>
 						// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage" || kindOfConversation === "privateMessage")
+					{
+						setCurrentChannel(data.payload.chanName);	
 						setPrivMessages(data.payload.chanMessages);
+					}
 				}
 				else
 				{
-					// alert(data.payload.isInside);
+					alert(data.payload.isInside);
 					console.log(data.payload.isInside);
 				}
 			}
@@ -873,7 +876,9 @@ const	ChatLayout = () =>
 
 			if (data.type === "on-connect")
 			{
-				setBlockedList(data.payload.blockedList);
+				if (data.payload.blockedList !== "")
+					setBlockedList(data.payload.blockedList);
+				refreshListUser();
 			}
 		};
 
@@ -891,7 +896,7 @@ const	ChatLayout = () =>
 						setPrivMessages([]);
 					dispatch(setCurrentChannel("undefined"));
 				}
-				// alert(data.payload.message);
+				alert(data.payload.message);
 			}
 		};
 
@@ -901,7 +906,7 @@ const	ChatLayout = () =>
 			{
 				if (data.payload.alreadyFriend !== "")
 				{
-					// alert("ALERT" + data.payload.alreadyFriend);
+					alert("ALERT" + data.payload.alreadyFriend);
 					console.log("ALERT" + data.payload.alreadyFriend);
 				}
 				else
@@ -912,7 +917,7 @@ const	ChatLayout = () =>
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-					// alert(alertMessage);
+					alert(alertMessage);
 				}
 			}
 
@@ -930,24 +935,24 @@ const	ChatLayout = () =>
 				}
 				else
 					alertMessage = "You have already blocked " + data.payload.newBlocked + ".";
-				// alert(alertMessage);
+				alert(alertMessage);
 			}
 
 			if (data.type === "set-is-muted")
 			{
 				setIsMuted(true);
 				const	message = "You have been muted in the channel " + data.payload.chanName + " for 60 seconds.";
-				// alert(message);
+				alert(message);
 			}
 
 			if (data.type === "invite-member")
 			{
-				// alert(data.payload.message);
+				alert(data.payload.message);
 			}
 
 			if (data.type === "make-admin")
 			{
-				// alert(data.payload.message);
+				alert(data.payload.message);
 			}
 		};
 
@@ -1054,8 +1059,6 @@ const	ChatLayout = () =>
 		socketRef.current?.emit("info", action);
 	};
 
-	refreshListUser();
-
 	useEffect(() =>
 	{
 		{
@@ -1097,7 +1100,7 @@ const	ChatLayout = () =>
 	{
 		if (isMuted === true)
 		{
-			// alert("You are muted for the moment being.");
+			alert("You are muted for the moment being.");
 			console.log("You are muted for the moment being.");
 		}
 		else
@@ -1109,7 +1112,7 @@ const	ChatLayout = () =>
 		const action = {
 			type: "sent-message",
 			payload: {
-				chanName: currentChannel,
+				chanName: currentChannelRef.current,
 				message: text,
 			}
 		};
@@ -1354,6 +1357,14 @@ const	ChatLayout = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
+	const	changeTabOperations = () =>
+	{
+		refreshListUser();
+		setChanMessages([]);
+		setPrivMessages([]);
+		dispatch(setCurrentChannel(""));
+	}
+
 	return (
 		<div>
 			<MenuBar />
@@ -1392,11 +1403,26 @@ const	ChatLayout = () =>
 								label="Channels"
 								{...a11yProps(0)}
 								style={{fontSize: "15px"}}
+								onClick={() =>
+								{
+									changeTabOperations();
+									// refreshListUser();
+									// setPrivMessages([]);
+									// dispatch(setCurrentChannel(""));
+								}}
 							/>
 							<Tab
 								label="Users"
 								{...a11yProps(1)}
 								style={{fontSize: "15px"}}
+								onClick={() =>
+								{
+									changeTabOperations();
+									// refreshListUser();
+									// setChanMessages([]);
+									// setPrivMessages([]);
+									// dispatch(setCurrentChannel(""));
+								}}
 							/>
 							<Tab
 								label="Friends"
@@ -1429,7 +1455,7 @@ const	ChatLayout = () =>
 								{
 									channels.map((channel: any, index: number) =>
 									{
-										// console.log("channels", channel);
+										// console.log("channels map", channel);
 										return (
 											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
@@ -1450,6 +1476,7 @@ const	ChatLayout = () =>
 													setClickedChannel(channel.name);
 													handleDialogOpen(false);
 													setButtonSelection(channel.name);
+													refreshListUser();
 												}}>
 													Options
 												</Button>
@@ -1545,7 +1572,7 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						// // alert(uniqueId);
+																						// alert(uniqueId);
 																						kickUserFromChannel(member.name, clickedChannel);
 																						handleMembersClose();
 																					}}>
@@ -1668,12 +1695,15 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef} arrayListUsers={arrayListUser} isFriend={currentProfileIsFriend}/>
+							<FriendsList socketRef={socketRef}
+										arrayListUsers={arrayListUser}
+										isFriend={currentProfileIsFriend}
+							/>
 							<List>
 								{
 									privateMessage.map((channel: any, privId: number) =>
 									{
-										console.log("private message map", channel);
+										// console.log("private message map", channel);
 										return (
 											<>
 											{
@@ -1681,7 +1711,7 @@ const	ChatLayout = () =>
 												<ListItem style={listItemStyle} key={privId}>
 													<ListItemText
 														style={
-															channel.name === currentChannel
+															channel.name === currentChannelRef.current
 															? { color: "green" }
 															: listItemTextStyle
 														}
@@ -1750,27 +1780,27 @@ const	ChatLayout = () =>
 																			</>
 																			: <></>
 																		}
-																		</li>
-																	}
-																	</ul>
-																</DialogContent>
-																<DialogActions>
+																	</li>
+																}
+																</ul>
+															</DialogContent>
+															<DialogActions>
 																<Button onClick={handleMembersClose} color="primary">
 																	Close
 																</Button>
-																</DialogActions>
-															</Dialog>
-														</DialogContent>
+															</DialogActions>
+														</Dialog>
+													</DialogContent>
 														<DialogActions>
 															<Button onClick={handleDialogClose} color="primary">
 																Cancel
 															</Button>
 														</DialogActions>
-													</Dialog>
+												</Dialog>
 												</>}
 												</>
 											);
-										})
+									})
 								}
 								</List>
 

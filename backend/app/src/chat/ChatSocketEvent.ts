@@ -141,6 +141,11 @@ export class ChatSocketEvents
 						newUser.status = user.status;
 						newUser.online = user.online;
 						this.chatService.pushUser(newUser, client.id);
+						const	action = {
+							type: "on-connection",
+							payload: "",
+						};
+						this.server.emit("channel-info", action);
 					}
 					else
 					{
@@ -169,7 +174,7 @@ export class ChatSocketEvents
 								blockedList: blockedArray,
 							}
 						};
-						this.server.emit("channel-info", action);
+						client.emit("channel-info", action);
 					}
 					this.chatService.updateDatabase();
 				}
