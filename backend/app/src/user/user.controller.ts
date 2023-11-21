@@ -196,12 +196,12 @@ export class UserController
 		this.logger.log("A User want to register");
 		// need to throw 5xx exception
 		if (!this.env)
-			throw new InternalServerErrorException();
+			throw new Error(".env not found");
 		if (!this.env.parsed)
-			throw new InternalServerErrorException();
+			throw new Error(".env not parsed");
 		if (!this.env.parsed.FT_UID
 			|| !this.env.parsed.FT_SECRET)
-			throw new InternalServerErrorException();
+			throw new Error("ft env var not found");
 		let	retValue;
 		let	userObject: UserModel;
 		const file = new Configuration();
@@ -226,15 +226,16 @@ export class UserController
 			.then((res) =>
 			{
 				const	data = res.data;
-				const	searchUser = users.find((elem) =>
-				{
-					return (elem.ftApi.accessToken === data.access_token);
-				});
-				if (searchUser)
-				{
-					this.logger.error("User Already register ");
-					return ("already exists");
-				}
+				// const	searchUser = users.find((elem) =>
+				// {
+				// 	return (elem.ftApi.accessToken === data.access_token);
+				// });
+				// if (searchUser)
+				// {
+				// 	this.logger.error("User Already register ");
+				// 	return ({msg: "exists",
+				// 		user: searchUser});
+				// }
 				// this.logger.debug(data);
 				const	newObject: ApplicationUserModel = {
 					accessToken: data.access_token,
@@ -249,11 +250,13 @@ export class UserController
 			})
 			.then((newObject : any) =>
 			{
-				if (newObject === "already exists")
-				{
-					res.status(201).json({error: "you are already register"});
-					return ;
-				}
+				let	accesTok;
+
+				// if (newObject.msg === "already exists")
+				// {
+				// 	// res.status(201).json({error: "you are already register"});
+				// 	// return ;
+				// }
 				const config = {
 					method: "get",
 					maxBodyLength: Infinity,
@@ -323,14 +326,13 @@ export class UserController
 							password: userTempCheck.password,
 							friendsProfileId: [...userTempCheck.friendsProfileId]
 						};
-						this.logger.log("Starting processing image");
-						const newUserObj = await this.userService.downloadAvatar(userObject);
-						retValue = this.userService.login(newUserObj.username, newUserObj.password);
+						retValue = this.userService.login(userObject.username, userObject.password);
 						console.error("ALREADY EXISTS RETVALUE", retValue);
 						res.status(200).send(retValue);
 					}
 					else
 					{
+						console.log("ICI  655656?");
 						userObject = {
 							registrationProcessEnded: false,
 							registrationStarted: true,

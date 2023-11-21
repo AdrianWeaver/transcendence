@@ -693,20 +693,20 @@ export const registerClientWithCode = (code : string)
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
 		console.log("Patch: ", data);
-		if (data === "ERROR")
+		if (data.error === "you are already register")
+		{
+			console.log("Patch: ca fait des chocapics");
+			return ;
+		}
+		else if (data === "ERROR")
 		{
 			response.registration.abortRequested = true;
 			dispatch(controllerActions.setAbortRequestedValue(response));
-		}
-		if (data.error === "you are already register")
-		{
-			// console.error("erreur");
-			console.log("Patch: ca fait des chocapics");
-			// dispatch(setRegistrationProcessError("Already used account, please login"));
 			return ;
 		}
 		else
 		{
+			console.log("LA DATA WESH", data);
 			const	array: BackUserModel[] = [...prev.controller.allUsers];
 
 			array.forEach((elem) =>

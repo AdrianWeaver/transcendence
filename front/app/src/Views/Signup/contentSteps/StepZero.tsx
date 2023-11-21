@@ -181,10 +181,6 @@ const	StepZero = () =>
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}
-	else if (user.alreadyExists)
-	{
-		navigate("/signin");
-	}
 
 	useEffect(() =>
 	{
