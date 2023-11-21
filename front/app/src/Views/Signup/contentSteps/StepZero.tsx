@@ -148,19 +148,7 @@ const	StepZero = () =>
 		window.open(ftUrl, "_self");
 	};
 
-	// const	authUrl = useAppSelector((state) =>
-	// {
-	// 	return (state.server.links.authApiUrl);
-	// });
 
-	// console.log("Inside step zero link api 42", authUrl);
-
-	// useEffect(() =>
-	// {
-	// 	if (authUrl === undefined)
-	// 		dispatch(setAuthApiLinks());
-	// 	console.log(authUrl);
-	// });
 	useEffect(() =>
 	{
 		const timer = setTimeout(() =>
@@ -179,7 +167,8 @@ const	StepZero = () =>
 	{
 		dispatch(registerClientWithCode(responseQuery.code));
 	}
-	if (user.bearerToken !== "undefined" && !user.alreadyExists)
+	// eslint-disable-next-line eqeqeq
+	if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
 	{
 		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());

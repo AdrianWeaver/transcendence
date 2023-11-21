@@ -36,7 +36,7 @@ const	Copyright = (props: CopyrightProps) =>
 			dispatch(setAbortRequestedValue(true));
 			dispatch(setPreviousPage("/"));
 			dispatch(setRequestHomeLink(true));
-			navigate("/cancel");
+			navigate("/");
 		}
 	};
 
