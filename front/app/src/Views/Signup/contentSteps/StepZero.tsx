@@ -24,6 +24,7 @@ import { registerClientWithCode, setFt, setUserData, userRegistrationStepTwo, ve
 // import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
 // import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
+import { useSavePrevPage } from "../../../Router/Hooks/useSavePrevPage";
 
 const	getText = () =>
 {
@@ -91,22 +92,28 @@ const	locationIsARedirectedPage = (pathname: string) =>
 	return (true);
 };
 
-// const	getUrlFT = () =>
-// {
-// 	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Fmade-f0Br4s4.clusters.42paris.fr&response_type=code");
-// };
-
 const	StepZero = () =>
 {
 	const	query = useLocation();
-	// const	urlFt = useAppSelector((state) =>
-	// {
-	// 	return (state.server.links.authApiUrl);
-	// });
-	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	savePrevPage = useSavePrevPage();
+
+	const	abort = useAppSelector((state) =>
+	{
+		return (state.controller.registration.abortRequested);
+	});
+
+	if (abort === true)
+	{
+		savePrevPage("/signin");
+		navigate("/cancel");
+	}
+	useEffect(() =>
+	{
+		console.log("Abort value", abort);
+	}, [abort]);
 	const	ftUrl = useAppSelector((state) =>
 	{
 		return (state.server.links.authApiUrl);

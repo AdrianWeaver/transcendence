@@ -395,8 +395,8 @@ export class UserController
 				{
 					// this.logger.error("Get my information route", error);
 					// throw new InternalServerErrorException();
-					res.status(500).send({
-						message: "internal server Error ",
+					res.status(401).send({
+						message: "Wrong usage of the api by the client, rejected",
 						error: error
 					});
 				});

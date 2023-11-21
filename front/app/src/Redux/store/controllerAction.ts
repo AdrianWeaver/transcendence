@@ -688,14 +688,21 @@ export const registerClientWithCode = (code : string)
 			// dispatch(controllerActions.registerClientWithCode(prev.controller));
 			return ;
 		}
-		dispatch(setRegistrationProcessStart())
+		// dispatch(setRegistrationProcessStart())
 		// console.log("Code is equals to : ", code);
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
+		console.log("Patch: ", data);
 		if (data === "ERROR")
 		{
+			response.registration.abortRequested = true;
+			dispatch(controllerActions.setAbortRequestedValue(response));
+		}
+		if (data.error === "you are already register")
+		{
 			// console.error("erreur");
-			dispatch(setRegistrationProcessError("Already used account, please login"));
+			console.log("Patch: ca fait des chocapics");
+			// dispatch(setRegistrationProcessError("Already used account, please login"));
 			return ;
 		}
 		else
