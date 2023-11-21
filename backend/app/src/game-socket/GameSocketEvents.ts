@@ -802,16 +802,31 @@ export class GameSocketEvents
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
 			this.logger.error("game instance not fouded for disconnect user");
-
+		const	instance = this.gameService.gameInstances[indexInstance];
+		if (instance.playerOne.socketId === client.id)
+		{
+			if (instance.playerOne.isReady === true)
+			{
+				instance.userReady -= 1;
+				instance.playerOne.isReady = false;
+			}
+		}
+		if (instance.playerTwo.socketId === client.id)
+		{
+			if (instance.playerTwo.isReady === true)
+			{
+				instance.userReady -= 1;
+				instance.playerTwo.isReady = false;
+			}
+		}
 		if (this.gameService.isProfileIdUserOne(indexInstance, profileId as string))
 			this.gameService.gameInstances[indexInstance].playerOne.socketId = "disconnected";
 		if (this.gameService.isProfileIdUserTwo(indexInstance, profileId as string))
 			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
 
 		this.gameService.setGameActiveToFalse(indexInstance);
-		const	instance = this.gameService.gameInstances[indexInstance];
+		
 		instance.userConnected -= 1;
-		instance.userReady -= 1;
 		// send the new number of users and users ready
 		const	action = {
 			type: "disconnect",
@@ -834,6 +849,10 @@ export class GameSocketEvents
 					return (game.uuid === instance.uuid);
 				});
 				this.gameService.removeGameInstance(id);
+				if (this.gameService.gameInstances.length === 0)
+				{
+					this.gameService.roomCount = 0;
+				}
 			}
 		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
