@@ -20,7 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setFt, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 // import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
 // import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
@@ -114,6 +114,7 @@ const	StepZero = () =>
 	{
 		console.log("Abort value", abort);
 	}, [abort]);
+
 	const	ftUrl = useAppSelector((state) =>
 	{
 		return (state.server.links.authApiUrl);
@@ -180,6 +181,11 @@ const	StepZero = () =>
 		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
+	}
+	else
+	{
+		dispatch(setAbortRequestedValue(false));
+		console.log("ABORT TO FALSE ????d");
 	}
 
 	useEffect(() =>
