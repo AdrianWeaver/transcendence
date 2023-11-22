@@ -11,7 +11,9 @@ import { setProfileEditView } from "../../../Redux/store/controllerAction";
 // import Stats from "./Stats";
 import { useNavigate } from "react-router-dom";
 // import { blue } from "@mui/material/colors";
-import { ChatUserModel } from "../../../Redux/models/redux-models";
+import { BackUserModel, ChatUserModel } from "../../../Redux/models/redux-models";
+import axios from "axios";
+import { ElectricMopedOutlined } from "@mui/icons-material";
 
 type	RightSideProps =
 {
@@ -21,26 +23,40 @@ type	RightSideProps =
 
 const	RightSide = (props: RightSideProps) =>
 {
-	let		userSelected: ChatUserModel | undefined;
+	let		chatUserSelected: ChatUserModel | undefined;
+	let		userSelected: BackUserModel | undefined;
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
 	const	userMe = useAppSelector((state) =>
 	{
 		return (state.controller.user);
 	});
-	const	users = useAppSelector((state) =>
+	const	chatUsers = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.users);
 	});
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.allUsers);
+	});
 	if (!props.isMe)
 	{
-		userSelected = users.find((elem) =>
+		chatUserSelected = chatUsers.find((elem) =>
 		{
 			return (props.profileId === elem.profileId);
 		});
-		if (userSelected === undefined)
+		if (chatUserSelected === undefined)
 			throw new Error("User doesnt exist");
+
+		userSelected = users.find((elem) =>
+		{
+			return (props.profileId.toString() === elem.id.toString());
+		});
+		// if (userSelected === undefined)
+		// 	throw new Error("User doesnt exist");
 	}
+	console.log("Les users sont ils bien la ?", users);
+	
 
 	const	editRequest = () =>
 	{
@@ -99,7 +115,21 @@ const	RightSide = (props: RightSideProps) =>
 								___________________
 							</Typography>
 						</Grid>
-						: <></>
+						: (userSelected !== undefined)
+							? <>
+								{
+									(userSelected?.firstName !== "undefined" && userSelected.lastName !== "undefined")
+									? <> {userSelected?.firstName} {userSelected?.lastName}  </>
+									: <></>
+								}
+								♡ 
+								{
+									userSelected?.location
+									? <> {userSelected.location} </>
+									: <></>
+								}
+							</>
+							: <></>
 				}
 			</Grid>
 		</div>

@@ -35,7 +35,7 @@ const	ProfilePage = () =>
 	if (userSelected === undefined)
 		throw new Error("user profile doesnt exist");
 	console.log(userSelected.name, "'s profile !!!");
-	const	online = userSelected.online ? "🟢" : "🔴";
+	const	online = userSelected.online ? "online 🟢" : "offline 🔴";
 	const	status = userSelected.status === "playing" ? "playing... 🏓" : online;
 	return (
 		<>
