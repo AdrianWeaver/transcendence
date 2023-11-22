@@ -156,6 +156,7 @@ type FriendsListProps = {
 	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
 	friends: string[]
+	tabMode: "user" | "friend",
 };
 
 const FriendsList = (props: FriendsListProps) =>
@@ -225,7 +226,7 @@ const FriendsList = (props: FriendsListProps) =>
 					{
 						return (
 							<>
-								<div key={index} onClick={() =>
+								<div key={props.tabMode + index} onClick={() =>
 								{
 									dispatch(setActiveConversationId(elem.id));
 									createNewConv(elem.id);
@@ -921,7 +922,7 @@ const	ChatLayout = () =>
 				{
 					setFriendList(data.payload.friendList);
 					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
-					dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
+					// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
@@ -1724,6 +1725,7 @@ const	ChatLayout = () =>
 							<FriendsList socketRef={socketRef}
 										arrayListUsers={arrayListUser}
 										friends={friendList}
+										tabMode="user"
 							/>
 							<List>
 								{
