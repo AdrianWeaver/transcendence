@@ -18,7 +18,8 @@ import GamePreview from "./GamePreview";
 
 export type	ItemCardModel =
 {
-	array: any[]
+	array: any[];
+	gameMode: "classical" | "upside-down" | "friend";
 };
 
 const	ItemCard = (props: ItemCardModel) =>
@@ -42,6 +43,22 @@ const	ItemCard = (props: ItemCardModel) =>
 					elapsedTime
 					= game.loop.frameNumber / game.loop.frameRate + " sec.";
 				}
+
+				let	linkToPlayTheGame: string;
+				switch (props.gameMode)
+				{
+					case "upside-down":
+						linkToPlayTheGame = "/test-ball?mode=upside-down";
+						break ;
+					case "friend":
+						linkToPlayTheGame = "/test-ball?mode=friend&uuid="
+							+ game.uuid;
+						break;
+					case "classical":
+					default:
+						linkToPlayTheGame = "/test-ball?mode=classical";
+						break ;
+				}
 				return (
 					<Grid item key={index} xs={12} sm={6} md={4}>
 						<Card
@@ -55,13 +72,13 @@ const	ItemCard = (props: ItemCardModel) =>
 								container
 								sx={{
 									flexDirection: "row",
-									border: "1px solid blue"
+									// border: "1px solid blue"
 								}}
 							>
 								{/* // player one  */}
 								<Grid item xs={6}
 									sx={{
-										border: "1px solid blue"
+										// border: "1px solid blue"
 									}}
 								>
 									<CardMedia
@@ -77,7 +94,7 @@ const	ItemCard = (props: ItemCardModel) =>
 								{/* // player Two */}
 								<Grid item xs={6}
 									sx={{
-										border: "1px solid blue"
+										// border: "1px solid blue"
 									}}
 								>
 									<CardMedia
@@ -123,7 +140,7 @@ const	ItemCard = (props: ItemCardModel) =>
 									size="small"
 									onClick={() =>
 									{
-										navigate("/test-ball");
+										navigate(linkToPlayTheGame);
 									}}
 								>
 									Entrer en jeu

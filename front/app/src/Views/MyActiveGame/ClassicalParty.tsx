@@ -35,6 +35,7 @@ const	ClassicalParty = () =>
 				</Typography>
 				<ItemCard
 					array={classicalArray.disconnected}
+					gameMode="classical"
 				/>
 			</>
 		);
@@ -54,6 +55,7 @@ const	ClassicalParty = () =>
 				</Typography>
 				<ItemCard
 					array={classicalArray.disconnected}
+					gameMode="classical"
 				/>
 			</>
 		);
@@ -89,6 +91,7 @@ const	ClassicalParty = () =>
 				</Typography>
 				<ItemCard
 					array={classicalArray.connected}
+					gameMode="classical"
 				/>
 			</>
 		);

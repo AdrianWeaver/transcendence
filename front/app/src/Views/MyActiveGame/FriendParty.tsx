@@ -35,6 +35,7 @@ const	FriendParty = () =>
 				</Typography>
 				<ItemCard
 					array={friendArray.disconnected}
+					gameMode="friend"
 				/>
 			</>
 		);
@@ -86,6 +87,7 @@ const	FriendParty = () =>
 				</Typography>
 				<ItemCard
 					array={friendArray.connected}
+					gameMode="friend"
 				/>
 			</>
 		);
@@ -121,6 +123,7 @@ const	FriendParty = () =>
 				</Typography>
 				<ItemCard
 					array={friendArray.invited}
+					gameMode="friend"
 				/>
 			</>
 		);
