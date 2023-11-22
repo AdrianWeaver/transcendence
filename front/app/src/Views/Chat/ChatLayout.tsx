@@ -1852,7 +1852,6 @@ const	ChatLayout = () =>
 								overflowY: "auto"
 							}}
 							> */}
-							<h1>tabpanel 0</h1>
 							{
 							chanMessages.map((message: MessageModel, index: number) =>
 							{
@@ -1883,7 +1882,6 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<h1>tabpanel 1</h1>
 						{
 							privMessages.map((message: MessageModel, index: number) =>
 							{
@@ -1913,7 +1911,6 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<h1>tabpanel 2</h1>
 					</TabPanel>
 					<Divider />
 
