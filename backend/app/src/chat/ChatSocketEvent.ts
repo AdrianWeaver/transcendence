@@ -1062,14 +1062,7 @@ export class ChatSocketEvents
 					myFriendArray.push(toPush);
 					myFriendNameArray.push(this.userService.getFriendName(elem));
 				});
-				// friendArrayProfileId.forEach((elem, index) =>
-				// {
-				// 	const toPush = this.userService.getFriendModel(elem, index);
-				// 	if (toPush === undefined)
-				// 		throw new Error("Error");
-				// 	friendArray.push(toPush);
-				// 	friendNameArray.push(this.userService.getFriendName(elem));
-				// });
+
 				// NOTICE HERE FRIENDS WAS PUSHED
 
 				userMe.friends = [...myFriendArray];
