@@ -45,8 +45,8 @@ const	RightSide = (props: RightSideProps) =>
 		{
 			return (props.profileId === elem.profileId);
 		});
-		if (chatUserSelected === undefined)
-			throw new Error("User doesnt exist");
+		// if (chatUserSelected === undefined)
+		// 	throw new Error("User doesnt exist");
 
 		userSelected = users.find((elem) =>
 		{
