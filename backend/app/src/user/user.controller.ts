@@ -31,6 +31,7 @@ import Configuration from "src/Configuration";
 import Chat from "src/chat/Objects/Chat";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+import { ApiOAuth2 } from "@nestjs/swagger";
 // import { RealIP } from "nestjs-real-ip";
 
 type	ResponseRow = {
@@ -204,9 +205,9 @@ export class UserController
 			throw new Error("ft env var not found");
 		let	retValue;
 		let	userObject: UserModel;
-		const file = new Configuration();
+		const	file = new Configuration();
 		const	users = this.userService.getUserArray();
-		const dataAPI = new FormData();
+		const	dataAPI = new FormData();
 		dataAPI.append("grant_type", "authorization_code");
 		dataAPI.append("code", body.code);
 		dataAPI.append("client_id", this.env.parsed.FT_UID);
@@ -387,10 +388,17 @@ export class UserController
 			})
 			.catch((error) =>
 			{
-				// this.logger.error("redeem code for token", error);
+				this.logger.error("redeem code for token", error);
+				console.log("les users ici ?", users);
+				const	usernames: string[] = [];
+				users.map((elem) =>
+				{
+					usernames.push(elem.username);
+				});
 				res.status(401).send({
 					message: "wrong code provided",
-					error: error
+					error: error,
+					usersNames: usernames
 				});
 			});
 	}

@@ -111,7 +111,7 @@ const	StepZero = () =>
 		if (abort === true)
 		{
 			savePrevPage("/signin");
-			navigate("/cancel");
+			// navigate("/cancel");
 		}
 	}, [abort]);
 

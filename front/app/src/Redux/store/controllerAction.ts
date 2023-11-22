@@ -716,9 +716,13 @@ export const registerClientWithCode = (code : string)
 			dispatch(setRegistrationProcessSuccess());
 			return ;
 		}
-		else if (data === "ERROR")
+		else if (data.msg === "ERROR")
 		{
 			console.log("UUUSEER", prev.controller.user);
+			const	users = data.err.userNames;
+			// if (users.length)
+			// {
+			// }
 			response.registration.abortRequested = true;
 			dispatch(controllerActions.setAbortRequestedValue(response));
 			return ;
