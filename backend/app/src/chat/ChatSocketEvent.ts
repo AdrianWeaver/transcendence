@@ -1062,14 +1062,7 @@ export class ChatSocketEvents
 					myFriendArray.push(toPush);
 					myFriendNameArray.push(this.userService.getFriendName(elem));
 				});
-				friendArrayProfileId.forEach((elem, index) =>
-				{
-					const toPush = this.userService.getFriendModel(elem, index);
-					if (toPush === undefined)
-						throw new Error("Error");
-					friendArray.push(toPush);
-					friendNameArray.push(this.userService.getFriendName(elem));
-				});
+
 				// NOTICE HERE FRIENDS WAS PUSHED
 
 				userMe.friends = [...myFriendArray];
@@ -1130,9 +1123,17 @@ export class ChatSocketEvents
 					type: "set-is-muted",
 					payload: {
 						chanName: channel.name,
+						message: "",
 					}
 				};
-				targetClient.emit("user-info", action);
+				if (channel.isOwner(targetClient.id) === true)
+				{
+					action.type = "unsuccessful-kick";
+					action.payload.message = "Don't touch the owner of the channel!";
+					client.emit("user-info", action);
+				}
+				else
+					targetClient.emit("user-info", action);
 			}
 
 			if (data.type === "invite-member")
