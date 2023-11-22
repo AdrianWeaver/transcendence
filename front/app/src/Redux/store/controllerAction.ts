@@ -1238,7 +1238,6 @@ export const	setAllUsers = ()
 		const	prev = getState();
 
 		const	theUsers: any = await UserServices.getAllTheUsers(prev.server.uri);
-
 		if (theUsers === "error")
 		{
 			console.error("Error to get users");
