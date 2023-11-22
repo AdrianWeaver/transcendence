@@ -34,6 +34,7 @@ const	UpsideDownParty = () =>
 				</Typography>
 				<ItemCard
 					array={upsideDownArray.disconnected}
+					gameMode="upside-down"
 				/>
 			</>
 		);
@@ -53,6 +54,7 @@ const	UpsideDownParty = () =>
 				</Typography>
 				<ItemCard
 					array={upsideDownArray.disconnected}
+					gameMode="upside-down"
 				/>
 			</>
 		);
@@ -88,6 +90,7 @@ const	UpsideDownParty = () =>
 				</Typography>
 				<ItemCard
 					array={upsideDownArray.connected}
+					gameMode="upside-down"
 				/>
 			</>
 		);
