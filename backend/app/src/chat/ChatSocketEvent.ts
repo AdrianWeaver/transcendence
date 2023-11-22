@@ -127,6 +127,22 @@ export class ChatSocketEvents
 					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 					profileId = decodedToken.id;
 
+					const alreadyConnected = this.chatService.chat.memberSocketIds.find((user) =>
+					{
+		
+						return (user.profileId === profileId
+							&& (user.memberSocketId !== "disconnected" && user.memberSocketId !== "undefined"));
+					});
+
+					if (alreadyConnected !== undefined)
+					{
+						const action: ActionSocket = {
+							type: "already-connected"
+						};
+						client.emit("connect-state", action);
+						client.disconnect();
+						return ;
+					}
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{

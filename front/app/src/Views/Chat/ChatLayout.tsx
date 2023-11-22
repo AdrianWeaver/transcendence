@@ -969,6 +969,16 @@ const	ChatLayout = () =>
 			setIsMyConv(data.payload.isMyConv);
 		};
 
+		const	connectState = (data: any) =>
+		{
+			if (data.type === "already-connected")
+			{
+				alert("Vous etes deja connecte sur une autre page");
+			}
+			navigate("/");
+		}
+
+		socket.on("connect-state", connectState);
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -988,6 +998,7 @@ const	ChatLayout = () =>
 
 		return (() =>
 		{
+			socket.off("connect-state", connectState);
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
