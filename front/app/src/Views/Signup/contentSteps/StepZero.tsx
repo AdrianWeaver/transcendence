@@ -25,6 +25,7 @@ import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, use
 // import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
 import { useSavePrevPage } from "../../../Router/Hooks/useSavePrevPage";
+import { persistor } from "../../../Redux/store";
 
 const	getText = () =>
 {
@@ -111,6 +112,7 @@ const	StepZero = () =>
 		if (abort === true)
 		{
 			savePrevPage("/signin");
+			// persistor.purge();
 			navigate("/cancel");
 		}
 	}, [abort]);
@@ -183,12 +185,6 @@ const	StepZero = () =>
 		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
-	}
-	else if (abort === true)
-	{
-		// dispatch(setAbortRequestedValue(false));
-		// dispatch(userRegistrationStepFour());
-		console.log("ABORT TO FALSE ????d");
 	}
 
 	useEffect(() =>

@@ -26,14 +26,15 @@ const	UserServices = {
 			.then((data) =>
 			{
 				console.log("register front");
-				// console.log(data.data);
+				console.log(data.data);
 				return (data.data);
 			})
 			.catch((error) =>
 			{
 				console.error("error from api redux ");
-				console.error(error);
-				return ("ERROR");
+				console.error("LERROR ", error);
+				return ({msg: "ERROR",
+					err: error.response.data});
 			})
 		);
 	},

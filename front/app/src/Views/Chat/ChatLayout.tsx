@@ -770,35 +770,19 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUsers);
 		};
 
-		// const	goToChannel = (chanName: string, kind: string, okContinue: boolean) =>
-		// {
-		// 	if (okContinue === false)
-		// 		return ;
-		// 	const	action = {
-		// 		type: "did-I-join",
-		// 		payload: {
-		// 			chanName: chanName,
-		// 			kind: kind,
-		// 			userId: activeId
-		// 		}
-		// 	};
-		// 	socketRef.current.emit("channel-info", action);
-		// };
-
 		const	updateMessages = (data: any) =>
 		{
-			console.log("Update messages", data);
 			const	kind = data.payload.kind;
 			setKindOfConversation(kind);
 			if (data.payload.kind === "privateMessage")
 			{
 				for (const blocked of blockedListRef.current)
 				{
-					if (blocked === data.payload.friendProfileId)
+					if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
 					{
 						const newMessage: MessageModel = {
 							sender: "server",
-							message: "The users are not receiving messages from each other",
+							message: "You have blocked this user and will not see the messages",
 							id: 0,
 							username: uniqueId,
 						};
@@ -811,7 +795,6 @@ const	ChatLayout = () =>
 			}
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setKindOfConversation(data.payload.kind);
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
 				// let filteredMessages: MessageModel[] = [];
@@ -827,11 +810,11 @@ const	ChatLayout = () =>
 				{
 					for (const blocked of blockedListRef.current)
 					{
-						if (blocked === data.payload.friendProfileId)
+						if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
 						{
 							const newMessage: MessageModel = {
 								sender: "server",
-								message: "The users are not receiving messages from each other",
+								message: "You have blocked this user and will not see the messages",
 								id: 0,
 								username: uniqueId,
 							};
@@ -842,7 +825,6 @@ const	ChatLayout = () =>
 					}
 				}
 			}
-			console.log("CHANNEL KIND", data.payload.kind);
 			goToChannel(data.payload.chanName, data.payload.kind, true);
 			if (data.playPong === true)
 			{
@@ -852,16 +834,13 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
-			console.log("CONFIRM IS INSIDE CHANNEL");
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					console.log("PAYLOAD", data.payload);
 					if (data.payload.kind === "channel")
 					{
-						console.log("DID I GO HERE?");
 						const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
 						{
 							return (!blockedListRef.current.includes(message.sender));
@@ -984,6 +963,11 @@ const	ChatLayout = () =>
 			{
 				alert(data.payload.message);
 			}
+
+			if (data.type === "unsuccessful-kick")
+			{
+				alert(data.payload.message);
+			}
 		};
 
 		const	repopulateOnReconnection = (data: any) =>
@@ -1007,6 +991,16 @@ const	ChatLayout = () =>
 			setIsMyConv(data.payload.isMyConv);
 		};
 
+		const	connectState = (data: any) =>
+		{
+			if (data.type === "already-connected")
+			{
+				alert("Vous etes deja connecte sur une autre page");
+			}
+			navigate("/");
+		}
+
+		socket.on("connect-state", connectState);
 		socket.on("connect", connect);
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
@@ -1026,6 +1020,7 @@ const	ChatLayout = () =>
 
 		return (() =>
 		{
+			socket.off("connect-state", connectState);
 			socket.off("connect", connect);
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
@@ -1879,7 +1874,6 @@ const	ChatLayout = () =>
 								overflowY: "auto"
 							}}
 							> */}
-							<h1>tabpanel 0</h1>
 							{
 							chanMessages.map((message: MessageModel, index: number) =>
 							{
@@ -1910,7 +1904,6 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<h1>tabpanel 1</h1>
 						{
 							privMessages.map((message: MessageModel, index: number) =>
 							{
@@ -1940,7 +1933,6 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-						<h1>tabpanel 2</h1>
 					</TabPanel>
 					<Divider />
 
