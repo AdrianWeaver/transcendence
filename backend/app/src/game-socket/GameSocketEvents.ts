@@ -127,6 +127,7 @@ export class GameSocketEvents
 		{
 			if (instance.revoked === true)
 			{
+				this.gameService.recordMatchHistory(instance);
 				// this.logger.debug(frame);
 				if (frame === 0)
 				{
@@ -135,7 +136,6 @@ export class GameSocketEvents
 				else
 				{
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
-					this.gameService.recordMatchHistory(instance);
 				}
 				this.logger.error("error in revoked", instance);
 				console.log(instance);
@@ -875,16 +875,19 @@ export class GameSocketEvents
 			this.logger.verbose("The game will be destroyed");
 			// console.log(instance);
 			// before data is erased 
-			instance.revoked = false;
-			const	idToErase = this.gameService.gameInstances.findIndex((game) =>
+			if (instance.userConnected === 0)
 			{
-				return (game.uuid === instance.uuid);
-			});
-			if (idToErase !== -1)
-				this.gameService.gameInstances.splice(idToErase, 1);
-			if (this.gameService.gameInstances.length === 0)
-			{
-				this.gameService.roomCount = 0;
+				instance.revoked = false;
+				const	idToErase = this.gameService.gameInstances.findIndex((game) =>
+				{
+					return (game.uuid === instance.uuid);
+				});
+				if (idToErase !== -1)
+					this.gameService.gameInstances.splice(idToErase, 1);
+				if (this.gameService.gameInstances.length === 0)
+				{
+					this.gameService.roomCount = 0;
+				}
 			}
 			// console.log(instance);
 		}
