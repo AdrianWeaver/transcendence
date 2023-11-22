@@ -155,7 +155,7 @@ const TabPanel = (props: TabPanelProps) =>
 type FriendsListProps = {
 	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
-	isFriend: boolean
+	friends: string[]
 };
 
 const FriendsList = (props: FriendsListProps) =>
@@ -616,7 +616,7 @@ const	ChatLayout = () =>
 		const connect = () =>
 		{
 			setConnected(true);
-			setStatus("🟢");
+			setStatus("💚");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -1729,7 +1729,7 @@ const	ChatLayout = () =>
 					>
 							<FriendsList socketRef={socketRef}
 										arrayListUsers={arrayListUser}
-										isFriend={currentProfileIsFriend}
+										friends={friendList}
 							/>
 							<List>
 								{

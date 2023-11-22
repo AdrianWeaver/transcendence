@@ -444,18 +444,7 @@ export class ChatSocketEvents
 			const	friendsList: string[] = [];
 			me.friends.map((elem) =>
 			{
-				// newArray.map((element) =>
-				// {
-				// 	if (elem.name === element.username)
-				// 	{
-				// 		const friend = {
-				// 			name: element.username,
-				// 			status: element.status,
-				// 			online: element.online
-				// 		}
-					friendsList.push(elem.name);
-					// }
-				// });
+				friendsList.push(elem.name);
 			});
 			console.log("LA FRIEND LIST ????", friendsList);
 			// console.log("friendsList here", friendsList);
@@ -1038,23 +1027,14 @@ export class ChatSocketEvents
 					return ;
 				let message: string;
 				message = "";
-				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
-				// const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-				let state;
-				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
-				if (state === "ERROR")
-					return ;
-				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
+				const	state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
 				if (state === "ERROR")
 					return ;
 				if (state === "ALREADY_FRIENDS")
 					message = friendUser.name + " is already your friend";
 				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
-				const	friendArrayProfileId = this.userService.getFriendsProfileId(friendUser.profileId);
 				const	myFriendArray: Array<FriendsModel> = [];
 				const	myFriendNameArray: Array<string> = [];
-				const	friendArray: Array<FriendsModel> = [];
-				const	friendNameArray: Array<string> = [];
 
 				myArrayProfileId.forEach((elem, index) =>
 				{
@@ -1064,17 +1044,8 @@ export class ChatSocketEvents
 					myFriendArray.push(toPush);
 					myFriendNameArray.push(this.userService.getFriendName(elem));
 				});
-				friendArrayProfileId.forEach((elem, index) =>
-				{
-					const toPush = this.userService.getFriendModel(elem, index);
-					if (toPush === undefined)
-						throw new Error("The dev was lazy");
-					friendArray.push(toPush);
-					friendNameArray.push(this.userService.getFriendName(elem));
-				});
 				// NOTICE HERE FRIENDS WAS PUSHED
 				userMe.friends = [...myFriendArray];
-				friendUser.friends = [...friendArray];
 				const	action = {
 					type: "add-friend",
 					payload: {

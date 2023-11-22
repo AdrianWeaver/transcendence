@@ -5,6 +5,7 @@
 /* eslint-disable max-lines-per-function */
 
 import { Avatar, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { useAppSelector } from "../../../Redux/hooks/redux-hooks";
 
 type FriendItemProps = {
 	name: string;
@@ -22,7 +23,7 @@ const FriendItem = (props: FriendItemProps) =>
 	console.log(" FRIEND ITEM ", props);
 	status = props.online ? "💚" : "🔴";
 	if (props.status === "playing" && props.online)
-		status = "playing.. 🏓";
+		status = "🏓";
 	return (
 		<ListItem >
 			<ListItemIcon>
