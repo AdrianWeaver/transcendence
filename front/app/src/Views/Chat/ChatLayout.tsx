@@ -765,18 +765,17 @@ const	ChatLayout = () =>
 
 		const	updateMessages = (data: any) =>
 		{
-			console.log("Update messages", data);
 			const	kind = data.payload.kind;
 			setKindOfConversation(kind);
 			if (data.payload.kind === "privateMessage")
 			{
 				for (const blocked of blockedListRef.current)
 				{
-					if (blocked === data.payload.friendProfileId)
+					if (blocked === data.payload.myProfileId)
 					{
 						const newMessage: MessageModel = {
 							sender: "server",
-							message: "The users are not receiving messages from each other",
+							message: "You have blocked this user and will not see the messages",
 							id: 0,
 							username: uniqueId,
 						}
@@ -789,7 +788,6 @@ const	ChatLayout = () =>
 			}
 			if (data.payload.chanName === currentChannelRef.current)
 			{
-				setKindOfConversation(data.payload.kind);
 				// we will filter messages from blocked users if any
 				const	tmpMessages = data.payload.messages;
 				// let filteredMessages: MessageModel[] = [];
@@ -805,11 +803,11 @@ const	ChatLayout = () =>
 				{
 					for (const blocked of blockedListRef.current)
 					{
-						if (blocked === data.payload.friendProfileId)
+						if (blocked === data.payload.myProfileId)
 						{
 							const newMessage: MessageModel = {
 								sender: "server",
-								message: "The users are not receiving messages from each other",
+								message: "You have blocked this user and will not see the messages",
 								id: 0,
 								username: uniqueId,
 							}
@@ -820,7 +818,6 @@ const	ChatLayout = () =>
 					}
 				}
 			}
-			console.log("CHANNEL KIND", data.payload.kind);
 			goToChannel(data.payload.chanName, data.payload.kind, true);
 			if (data.playPong === true)
 			{
@@ -830,16 +827,13 @@ const	ChatLayout = () =>
 
 		const	channelInfo = (data: any) =>
 		{
-			console.log("CONFIRM IS INSIDE CHANNEL");
 			if (data.type === "confirm-is-inside-channel")
 			{
 				if (data.payload.isInside === "")
 				{
 					dispatch(setCurrentChannel(data.payload.chanName));
-					console.log("PAYLOAD", data.payload);
 					if (data.payload.kind === "channel")
 					{
-						console.log("DID I GO HERE?");
 						const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
 						{
 							return (!blockedListRef.current.includes(message.sender));
@@ -939,6 +933,7 @@ const	ChatLayout = () =>
 				if (searchBlocked === -1)
 				{
 					setBlockedList(data.payload.blockedList);
+					console.log("BLOCKED LIST 1 ", data.payload.blockedList);
 					alertMessage = "You have blocked " + data.payload.newBlocked + ".";
 				}
 				else

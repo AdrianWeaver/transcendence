@@ -129,6 +129,14 @@ class Chat
 						admin.memberSocketId = newSocketId;
 				});
 			});
+			this.privateMessage.forEach((channel) =>
+			{
+				channel.admins.forEach((admin) =>
+				{
+					if (admin.profileId === profileId)
+						admin.memberSocketId = newSocketId;
+				});
+			});
 		};
 
 		this.updateChannelOwner = (newSocketId: string, profileId: string) =>

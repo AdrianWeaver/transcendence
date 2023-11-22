@@ -162,7 +162,25 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
+
 						const	userToUpdate = this.chatService.getUserWithProfileId(profileId);
+						this.chatService.chat.channels.forEach((channel: Channel) =>
+						{
+							channel.users.forEach((user: MemberSocketIdModel) =>
+							{
+								if (user.profileId === profileId)
+									userToUpdate?.client?.join(channel.name);
+							});
+						});
+						this.chatService.chat.privateMessage.forEach((channel: Channel) =>
+						{
+							channel.users.forEach((user: MemberSocketIdModel) =>
+							{
+								if (user.profileId === profileId)
+									userToUpdate?.client?.join(channel.name);
+							});
+						});
+
 						const	blockedArray: string[] = [];
 						userToUpdate?.blocked.forEach((blocked) =>
 						{
@@ -175,6 +193,7 @@ export class ChatSocketEvents
 							}
 						};
 						client.emit("channel-info", action);
+						console.log("ROOMS: ", userToUpdate?.client?.rooms);
 					}
 					this.chatService.updateDatabase();
 				}
@@ -370,24 +389,20 @@ export class ChatSocketEvents
 				channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
-				else
-					kind = "privateMessage";
-				console.log("PRIVATE CONV FOUND");
-				channel.users.map((elem) =>
+				kind = "privateMessage";
+				channel.admins.map((elem) =>
 				{
 					if (elem.profileId !== profileId)
 						friendProfileId = elem.profileId;
 				});
 				if (friendProfileId === undefined)
 					return ;
-				console.log("FRIEND FOUND");
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
 					const	usernameOne = this.userService.getUsernameByProfileId(profileId);
 					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
-					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
 					// const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
 					const	gameUuid = this.createNewGame(profileId, friendProfileId);
 					if (gameUuid === "error")
@@ -590,9 +605,11 @@ export class ChatSocketEvents
 								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
 							};
 							newPrivateMsg?.users.push(obj);
+							newPrivateMsg.members++;
 							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
 							tmp2.client?.join(newPrivateMsg.name);
+							console.log(tmp2.client?.id + " now in rooms ", tmp2.client?.rooms);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
 						}
@@ -746,6 +763,7 @@ export class ChatSocketEvents
 							messages: searchChannel.messages,
 							chanName: searchChannel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
@@ -1078,6 +1096,7 @@ export class ChatSocketEvents
 				if (userMe === undefined)
 					return ;
 				// const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
+				
 				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.blockedName);
 				if (userToBlock === undefined)
 					return ;
@@ -1192,6 +1211,7 @@ export class ChatSocketEvents
 							messages: channel.messages,
 							chanName: channel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
@@ -1248,6 +1268,7 @@ export class ChatSocketEvents
 							messages: channel.messages,
 							chanName: channel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
