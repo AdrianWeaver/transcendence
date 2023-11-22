@@ -136,6 +136,5 @@ const	FriendParty = () =>
 		</Container>
 	);
 };
- 
 
 export default FriendParty;
