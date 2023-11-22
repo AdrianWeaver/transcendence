@@ -9,17 +9,8 @@ import {
 import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
-import { PrismaClient } from "@prisma/client";
-import { Socket, Server, Namespace } from "socket.io";
+import { Socket, Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
-
-// export interface MessageModel
-// {
-// 	sender: string,
-// 	message: string,
-// 	date: string
-// }
-
 
 export interface MessageRoomModel
 {
@@ -66,9 +57,6 @@ type MemberSocketIdModel ={
 };
 
 import { v4 as uuidv4 } from "uuid";
-import { profile } from "console";
-import { UserModel } from "src/user/user.interface";
-import { allowedNodeEnvironmentFlags } from "process";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -713,5 +701,21 @@ export	class ChatService implements OnModuleInit
 		user.online = chatUser.online;
 		user.avatar = chatUser.avatar;
 		this.pushUser(user, chatUser.id);
+	}
+
+	public	setStatus(profileId: string, playing: boolean)
+	{
+		const	index = this.chat.users.findIndex((elem) =>
+		{
+			return (elem.profileId === profileId);
+		});
+		if (index !== undefined)
+		{
+			if (playing)
+				this.chat.users[index].status = "playing";
+			else
+				this.chat.users[index].status
+					= this.chat.users[index].online ? "online" : "offline";
+		}
 	}
 }

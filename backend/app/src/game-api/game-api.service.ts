@@ -97,7 +97,7 @@ export class GameApiService
 				}
 				if (instance.playerTwo.profileId.toString() !== "undefined")
 				{
-					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerTwo.profileId)?.avatar;
 					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
 				}
 				else
@@ -132,7 +132,7 @@ export class GameApiService
 				}
 				if (instance.playerTwo.profileId.toString() !== "undefined")
 				{
-					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerTwo.profileId)?.avatar;
 					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
 				}
 				else
@@ -167,7 +167,7 @@ export class GameApiService
 				}
 				if (instance.playerTwo.profileId.toString() !== "undefined")
 				{
-					instance.playerTwo.avatar = this.userService.getUserById(instance.playerOne.profileId)?.avatar;
+					instance.playerTwo.avatar = this.userService.getUserById(instance.playerTwo.profileId)?.avatar;
 					instance.playerTwo.username = this.userService.getUserById(instance.playerTwo.profileId)?.username;
 				}
 				else

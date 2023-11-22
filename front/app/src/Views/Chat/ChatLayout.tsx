@@ -59,7 +59,8 @@ import {
 	setCurrentProfileIsFriend,
 	setProfileFriendView,
 	setProfilePublicView,
-	setPreviousPage
+	setPreviousPage,
+	getPlayingStatus
 }	from "../../Redux/store/controllerAction";
 
 import { useNavigate } from "react-router-dom";
@@ -79,6 +80,8 @@ type MembersModel =
 	name:string,
 	profileId: string,
 	userName: string,
+	status: string,
+	online: boolean
 }
 
 type ChanMapModel = {
@@ -152,7 +155,7 @@ const TabPanel = (props: TabPanelProps) =>
 type FriendsListProps = {
 	arrayListUsers: string[],
 	socketRef: React.MutableRefObject<SocketIOClient.Socket>
-	isFriend: boolean
+	friends: string[]
 };
 
 const FriendsList = (props: FriendsListProps) =>
@@ -172,6 +175,10 @@ const FriendsList = (props: FriendsListProps) =>
 		return (state.controller.user);
 	});
 
+	users.forEach((elem) =>
+	{
+		dispatch(getPlayingStatus(elem.profileId));
+	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
@@ -259,6 +266,7 @@ const	ChatLayout = () =>
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+
 	const	server	= useAppSelector((state) =>
 	{
 		return (state.server);
@@ -278,6 +286,7 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user);
 	});
+
 	const	currentProfileIsFriend = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfileIsFriend);
@@ -565,6 +574,16 @@ const	ChatLayout = () =>
 		setStatus
 	] = useState("🔴");
 
+	// useEffect(() =>
+	// {
+	// 	if (userStatus === "playing")
+	// 		setStatus("🏓");
+	// 	else if (userStatus === "online")
+	// 		setStatus("🟢");
+	// 	else if (userStatus === "offline")
+	// 		setStatus("🔴");
+	// }, [userStatus]);
+
 	useEffect(() =>
 	{
 		const socket = io(server.uri + ":3000",
@@ -592,10 +611,11 @@ const	ChatLayout = () =>
 				console.log("disconnected", user.chat.disconnectedUsers);
 			}
 		};
+
 		const connect = () =>
 		{
 			setConnected(true);
-			setStatus("🟢");
+			setStatus("💚");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -741,10 +761,12 @@ const	ChatLayout = () =>
 
 		const serverInfo = (data: any) =>
 		{
+			// 🏓 🔴 🟢
+			console.log("data Pyaload list users", data.payload);
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			// console.log("information from server: ", data);
-			setArrayListUser(data.payload.arrayListUser);
+			setArrayListUser(data.payload.arrayListUsers);
 		};
 
 		const	updateMessages = (data: any) =>
@@ -762,7 +784,7 @@ const	ChatLayout = () =>
 							message: "You have blocked this user and will not see the messages",
 							id: 0,
 							username: uniqueId,
-						}
+						};
 						const	messagesArray: MessageModel[] = [];
 						messagesArray.push(newMessage);
 						setPrivMessages(messagesArray);
@@ -794,7 +816,7 @@ const	ChatLayout = () =>
 								message: "You have blocked this user and will not see the messages",
 								id: 0,
 								username: uniqueId,
-							}
+							};
 							const	messagesArray: MessageModel[] = [];
 							messagesArray.push(newMessage);
 							setPrivMessages(messagesArray);
@@ -1701,7 +1723,7 @@ const	ChatLayout = () =>
 					>
 							<FriendsList socketRef={socketRef}
 										arrayListUsers={arrayListUser}
-										isFriend={currentProfileIsFriend}
+										friends={friendList}
 							/>
 							<List>
 								{

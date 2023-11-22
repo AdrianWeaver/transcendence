@@ -11,28 +11,20 @@
 
 import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException, Ip } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsString, } from "class-validator";
-import e, { Request, Response } from "express";
+import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
+import { Request, Response } from "express";
 import	Api from "../Api";
-import	ApiTwilio from "../Api-twilio";
-
 import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as busboy from "busboy";
 import * as fs from "fs";
-import * as sharp from "sharp";
 import internal from "stream";
-import { AccountPage } from "twilio/lib/rest/api/v2010/account";
 import FileConfig from "./Object/FileConfig";
-import * as readline from "readline";
 import * as twilio from "twilio";
 import Configuration from "src/Configuration";
-import Chat from "src/chat/Objects/Chat";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
-import { ApiOAuth2 } from "@nestjs/swagger";
-// import { RealIP } from "nestjs-real-ip";
 
 type	ResponseRow = {
 	id: number;
@@ -73,13 +65,6 @@ class	RegisterDto
 {
 	@IsNotEmpty()
 	code: string;
-
-	// @IsNotEmpty()
-	// id: any;
-
-	// @IsEmail()
-	// @IsNotEmpty()
-	// email: string;
 }
 
 class	UserDoubleAuthDto
@@ -87,17 +72,11 @@ class	UserDoubleAuthDto
 	// @IsNumberString()
 	@IsNotEmpty()
 	numero: string;
-
-	// id or token ?
-	// @IsNotEmpty()
-	// id: any;
 }
 class UserLoginDto
 {
 	@IsNotEmpty()
 	username: string;
-	// getUserRegiste
-	// @IsEmail()
 	@IsNotEmpty()
 	password: string;
 }
@@ -1081,6 +1060,21 @@ export class UserController
 			res.status(400).send("User not found");
 		else
 			res.status(201).send(data);
+	}
+
+	@Post("user-playing")
+	@UseGuards(UserAuthorizationGuard)
+	async GetPlayingStatus(@Body() body: any)
+	{
+		this.logger.log("'user-playing' route requested");
+		let	playing: boolean;
+		playing = false;
+		const	length = await this.gameService.getStatusConnectedToGameFromProfileId(body.profileId);
+		if (length)
+			playing = true;
+		this.chatService.setStatus(body.profileId, playing);
+		this.userService.setStatus(body.profileId, playing);
+		return (playing);
 	}
 }
 
