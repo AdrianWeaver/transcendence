@@ -1564,6 +1564,7 @@ public	register(data: UserModel)
 		if (index === -1)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
+		this.user[index].registrationStarted = false;
 		return (true);
 	}
 

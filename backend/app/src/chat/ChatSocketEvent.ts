@@ -127,6 +127,22 @@ export class ChatSocketEvents
 					const decodedToken = jwt.verify(token[1], secret) as jwt.JwtPayload;
 					profileId = decodedToken.id;
 
+					const alreadyConnected = this.chatService.chat.memberSocketIds.find((user) =>
+					{
+		
+						return (user.profileId === profileId
+							&& (user.memberSocketId !== "disconnected" && user.memberSocketId !== "undefined"));
+					});
+
+					if (alreadyConnected !== undefined)
+					{
+						const action: ActionSocket = {
+							type: "already-connected"
+						};
+						client.emit("connect-state", action);
+						client.disconnect();
+						return ;
+					}
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
@@ -162,7 +178,25 @@ export class ChatSocketEvents
 						this.chatService.updateUserInChat(client.id, profileId);
 
 						this.chatService.updateBannedInChannel(client.id, profileId);
+
 						const	userToUpdate = this.chatService.getUserWithProfileId(profileId);
+						this.chatService.chat.channels.forEach((channel: Channel) =>
+						{
+							channel.users.forEach((user: MemberSocketIdModel) =>
+							{
+								if (user.profileId === profileId)
+									userToUpdate?.client?.join(channel.name);
+							});
+						});
+						this.chatService.chat.privateMessage.forEach((channel: Channel) =>
+						{
+							channel.users.forEach((user: MemberSocketIdModel) =>
+							{
+								if (user.profileId === profileId)
+									userToUpdate?.client?.join(channel.name);
+							});
+						});
+
 						const	blockedArray: string[] = [];
 						userToUpdate?.blocked.forEach((blocked) =>
 						{
@@ -175,6 +209,7 @@ export class ChatSocketEvents
 							}
 						};
 						client.emit("channel-info", action);
+						console.log("ROOMS: ", userToUpdate?.client?.rooms);
 					}
 					this.chatService.updateDatabase();
 				}
@@ -354,7 +389,6 @@ export class ChatSocketEvents
 		 */
 		public	handleInfoSentMessage(client: Socket, data: ActionSocket)
 		{
-			console.log("HANDLE INFO SENT MESSAGE");
 			let	channel;
 			let	kind;
 			let	playPong;
@@ -370,24 +404,20 @@ export class ChatSocketEvents
 				channel = this.chatService.searchPrivateConvByName(data.payload.chanName);
 				if (channel === undefined)
 					return ;
-				else
-					kind = "privateMessage";
-				console.log("PRIVATE CONV FOUND");
-				channel.users.map((elem) =>
+				kind = "privateMessage";
+				channel.admins.map((elem) =>
 				{
 					if (elem.profileId !== profileId)
 						friendProfileId = elem.profileId;
 				});
 				if (friendProfileId === undefined)
 					return ;
-				console.log("FRIEND FOUND");
 				// TEST DO WE NEED TO HANDLE THAT ERROR ? OR IT IS OK LIKE THIS
 				if (data.payload.message === "/playPong")
 				{
 					const	usernameOne = this.userService.getUsernameByProfileId(profileId);
 					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
-					console.log("create new game already ?", data.payload.chanName, profileId, friendProfileId);
 					// const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
 					const	gameUuid = this.createNewGame(profileId, friendProfileId);
 					if (gameUuid === "error")
@@ -590,9 +620,11 @@ export class ChatSocketEvents
 								profileId: this.chatService.getProfileIdFromSocketId(data.payload.activeId),
 							};
 							newPrivateMsg?.users.push(obj);
+							newPrivateMsg.members++;
 							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
 							tmp2.client?.join(newPrivateMsg.name);
+							console.log(tmp2.client?.id + " now in rooms ", tmp2.client?.rooms);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
 						}
@@ -746,6 +778,7 @@ export class ChatSocketEvents
 							messages: searchChannel.messages,
 							chanName: searchChannel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(searchChannel.name).emit("update-messages", messageAction);
@@ -842,61 +875,63 @@ export class ChatSocketEvents
 				const	target = this.chatService.getUserBySocketId(targetClient.id);
 				if (target === undefined)
 					return ;
-				channel.leaveChannel(targetClient);
-				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
-				// const profId = this.chatService.getProfileIdFromSocketId(client.id);
-				// if (profId === undefined || profId === "undefined")
-				// 	return ;
-				// const	searchUser = this.chatService.getUserWithProfileId(profId);
-				// if (searchUser === undefined)
-				// 	throw new Error("User not found - kick/ban-member ChtSocketEvent");
+	
 				let message: string;
-				if (data.type === "kick-member")
-				{
-					// const	chanIndex = searchUser.channels.findIndex((elem) =>
-					// {
-					// 	return (elem === channel.id);
-					// });
-					// if (chanIndex === -1)
-					// 	return ;
-					// searchUser.channels.splice(chanIndex, 1);
-					message = target.name + " has been kicked.";
-				}
-				else
-				{
-					// const	chanIndex = searchUser.channels.findIndex((elem) =>
-					// {
-					// 	return (elem === channel.id);
-					// });
-					// if (chanIndex === -1)
-					// 	return ;
-					// searchUser.channels.splice(chanIndex, 1);
-					message = target.name + " has been banned.";
-					channel.addToBanned(target.id, target.profileId);
-				}
 				const newMessage: MessageModel = {
 					sender: "server",
-					message: message,
+					message: "",
 					id: id,
 					username: "server",
 				};
-				channel.addNewMessage(newMessage);
+				if (channel.isOwner(targetClient.id) === false)
+				{
+					channel.leaveChannel(targetClient);
+					targetClient.leave(channel.name);
+					if (data.type === "kick-member")
+					{
+						newMessage.message = target.name + " has been kicked.";
+					}
+					else
+					{
+						newMessage.message = target.name + " has been banned.";
+						channel.addToBanned(target.id, target.profileId);
+					}
+					channel.addNewMessage(newMessage);
+				}
+				else
+					newMessage.message = "Don't touch the owner of the channel !";
+
 				const	action = {
 					type: "left-channel",
 					payload: {
-						message: message,
+						message: newMessage.message,
 						messages: channel.messages,
 						chanName: channel.name,
 						kind: "channel",
 					}
 				};
-				this.server.to(channel.name).emit("update-messages", action);
-				if (data.type === "kick-member")
-					action.payload.message = "You have been kicked from " + channel.name;
+				
+				if (channel.isOwner(targetClient.id) === false)
+				{
+					this.server.to(channel.name).emit("update-messages", action);
+					if (data.type === "kick-member")
+						action.payload.message = "You have been kicked from " + channel.name;
+					else
+						action.payload.message = "You have been banned from " + channel.name;
+				
+					const indexToRemove = channel.admins.findIndex((admin) =>
+					{
+						return (admin.profileId === target.profileId);
+					})
+					channel.admins.splice(indexToRemove, 1);
+					targetClient.emit("left-message", action);
+				}
 				else
-					action.payload.message = "You have been banned from " + channel.name;
-				targetClient.emit("left-message", action);
+				{
+					action.type = "unsuccessful-kick";
+					client.emit("user-info", action);
+				}
 				this.chatService.updateDatabase();
 			}
 
@@ -1078,6 +1113,7 @@ export class ChatSocketEvents
 				if (userMe === undefined)
 					return ;
 				// const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
+				
 				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.blockedName);
 				if (userToBlock === undefined)
 					return ;
@@ -1192,6 +1228,7 @@ export class ChatSocketEvents
 							messages: channel.messages,
 							chanName: channel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);
@@ -1237,7 +1274,7 @@ export class ChatSocketEvents
 				const id = channel.messages.length + 1;
 					const newMessage: MessageModel = {
 						sender: "server",
-						message: this.chatService.getUsernameWithProfileId(targetClient.id) + " is now an admin.",
+						message: this.chatService.getUsernameWithProfileId(tmpUser.profileId) + " is now an admin.",
 						id: id,
 						username: "server",
 					};
@@ -1248,6 +1285,7 @@ export class ChatSocketEvents
 							messages: channel.messages,
 							chanName: channel.name,
 							socketId: client.id,
+							kind: "channel",
 						}
 					};
 					this.server.to(channel.name).emit("update-messages", messageAction);

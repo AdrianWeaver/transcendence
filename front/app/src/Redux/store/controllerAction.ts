@@ -707,69 +707,35 @@ export const registerClientWithCode = (code : string)
 			// dispatch(controllerActions.registerClientWithCode(prev.controller));
 			return ;
 		}
+		dispatch(setRegistrationProcessStart())
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
 		console.log("Patch: ", data);
-		if (data.error === "you are already register")
+		if (data === "already registered")
 		{
 			console.log("Patch: ca fait des chocapics");
-			dispatch(setRegistrationProcessSuccess());
-			return ;
+			const	alreadyResponse: ControllerModel = {
+				...prev.controller,
+				registration:
+				{
+					...prev.controller.registration,
+					abortRequested: true,
+				}
+			}
+			dispatch(controllerActions.setAbortRequestedValue(alreadyResponse));
+			console.log("ABORT ?");
+			// return ;
 		}
-		else if (data === "ERROR")
+		else if (data.msg === "ERROR" || data === "ERROR")
 		{
-			console.log("UUUSEER", prev.controller.user);
-			response.registration.abortRequested = true;
-			dispatch(controllerActions.setAbortRequestedValue(response));
+			// dispatch(setRegistrationProcessError(""));
 			return ;
 		}
 		else
 		{
-			dispatch(setRegistrationProcessStart())
-			console.log("LA DATA WESH", data);
-			const	array: BackUserModel[] = [...prev.controller.allUsers];
-
-			array.forEach((elem) =>
-			{
-				if (elem.id === data.id)
-				{
-					// elem.id = data.id;
-					elem.email = data.email;
-					elem.firstName = data.firstName;
-					elem.lastName = data.lastName;
-					elem.username = data.username;
-					elem.avatar = data.avatar;
-				}
-			});
-
-			const	arrayFront: UserModel[] = [...prev.controller.allFrontUsers];
-
-			arrayFront.forEach((elem) =>
-			{
-				if (elem.id === data.id)
-				{
-					elem.id= data.id,
-					elem.email= data.email,
-					// our token
-					elem.bearerToken = data.token,
-					elem.username = data.username,
-					elem.firstName = data.firstName,
-					elem.lastName = data.lastName,
-					elem.avatar = data.avatar,
-					elem.profile = {
-						editView: false,
-						friendView: false,
-						publicView: false,
-						myView: true
-					}
-				}
-			});
-
-
+			// console.log("LA DATA WESH", data);
 			response = {
 				...prev.controller,
-				allUsers: [...array],
-				allFrontUsers: [...arrayFront],
 				registration: {
 					...prev.controller.registration,
 					step: 1
@@ -794,10 +760,10 @@ export const registerClientWithCode = (code : string)
 					}
 				}
 			}
+			dispatch(controllerActions.registerClientWithCode(response));
+			// dispatch(controllerActions.verifyToken());
+			console.log("end of registration");
 		}
-		dispatch(controllerActions.registerClientWithCode(response));
-		// dispatch(controllerActions.verifyToken());
-		console.log("end of registration");
 	});
 };
 
@@ -1075,6 +1041,7 @@ export const	setRegistered = ()
 			{
 				...prev.controller.user,
 				registered: true,
+				alreadyExists: true
 			}
 		}
 		dispatch(controllerActions.setRegistered(response));
