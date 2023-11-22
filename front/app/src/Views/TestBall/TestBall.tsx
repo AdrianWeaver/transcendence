@@ -146,7 +146,6 @@ const	TestBall = () =>
 
 		const disconnect = () =>
 		{
-			// console.log("ws disconnected");
 			setConnected(false);
 			dispatch(setConnectedStore(false));
 		};
@@ -381,29 +380,10 @@ const	TestBall = () =>
 			const	action = {
 				type: "ready"
 			};
-			console.log("ready action", action);
 			socketRef.current?.emit("game-event", action);
 			setReadyPlayer(true);
 		}
-		// just for understanding the code 
-		else
-			console.log("You are already ready !");
 	};
-	// useEffect(() =>
-	// {
-	// 	if (gameOver)
-	// 	{
-	// 		const	timeout = setTimeout(() =>
-	// 		{
-	// 			navigate("/game-setup");
-	// 		}, 9000);
-	// 		// return (() =>
-	// 		// {
-	// 		// 	if (timeout !== undefined)
-	// 		// 		clearTimeout(timeout);
-	// 		// });
-	// 	}
-	// }, [gameOver]);
 
 	const prevRotationRef = useRef<number>(0);
 
@@ -432,8 +412,6 @@ const	TestBall = () =>
 		const	render = () =>
 		{
 			clear();
-			// prevRotationRef.current = gameMode?.mode === 'upside-down' ? theBoard.gameFace : 0;
-			// setRotation(prevRotationRef.current);
 			game.board.ctx?.beginPath();
 			if (game.board.ctx)
 			{

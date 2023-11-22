@@ -49,7 +49,6 @@ export	class UserAuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			console.log("KODKODKOAKOK", token, " ", decode);
 			if (response.exp && response.exp * 1000 < Date.now())
 			{
 				this.service.revokeUserTokenExpById(response.id);
@@ -72,10 +71,8 @@ export	class UserAuthorizationGuard implements CanActivate
 		{
 			if (error instanceof jwt.JsonWebTokenError)
 			{
-				console.log("User has tried to use a wrong token signature");
 				throw new UnauthorizedException();
 			}
-			console.log("Error on isValidTokenSignature : ", error);
 			return ({validTokenSignature: false});
 		}
 	}

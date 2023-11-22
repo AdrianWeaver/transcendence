@@ -32,7 +32,6 @@ import { error, profile } from "console";
 import { elementAt } from "rxjs";
 import { constants } from "buffer";
 import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
 
 import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
@@ -111,7 +110,6 @@ export class ChatSocketEvents
 		{
 			this.chatService.setServer(this.server);
 			let profileId: string;
-			console.log(client.handshake);
 			if (client.handshake.auth)
 			{
 				const	secret = this.userService.getSecret();
@@ -209,7 +207,6 @@ export class ChatSocketEvents
 							}
 						};
 						client.emit("channel-info", action);
-						console.log("ROOMS: ", userToUpdate?.client?.rooms);
 					}
 					this.chatService.updateDatabase();
 				}
@@ -342,7 +339,6 @@ export class ChatSocketEvents
 				});
 				if (filteredGameByGameMode.length)
 				{
-					console.log("already exists", filteredGameByGameMode);
 					return ("error");
 				}
 				const	searchPlayerOne = this.chatService.getUserWithProfileId(profileId.toString());
@@ -377,7 +373,6 @@ export class ChatSocketEvents
 
 				// this.gameService.getRoomCount();
 				this.gameService.pushGameServeToGameInstance(newGame);
-				console.log("New game", newGame.getSeralizable());
 				return (newGame.uuid);
 		}
 
@@ -418,10 +413,7 @@ export class ChatSocketEvents
 					const	usernameOne = this.userService.getUsernameByProfileId(profileId);
 					const	usernameTwo = this.userService.getUsernameByProfileId(friendProfileId);
 					playPong = true;
-					// const	gameUuid = this.createNewGame(data.payload.chanName, profileId, friendProfileId);
 					const	gameUuid = this.createNewGame(profileId, friendProfileId);
-					if (gameUuid === "error")
-						console.log("The game hasnt been created, something went wrong");
 					message = "/playPong&" + profileId + ":" + usernameOne + "!" + friendProfileId + ":" + usernameTwo + "!" + gameUuid;
 				}
 			}
@@ -452,7 +444,6 @@ export class ChatSocketEvents
 					kind: kind
 				}
 			};
-			console.log("ACTION ", action.payload);
 			this.server.to(channel.name).emit("update-messages", action);
 		}
 
@@ -467,7 +458,6 @@ export class ChatSocketEvents
 			const regularUsers = this.userService.getAllUserRaw();
 			if (regularUsers === undefined)
 				return ;
-			// console.log("les users ?", copyUsers, " ", regularUsers);
 			const	searchUser = copyUsers.findIndex((elem) =>
 			{
 				return (client.id === elem.id);
@@ -480,7 +470,6 @@ export class ChatSocketEvents
 			{
 				friendsList.push(elem.name);
 			});
-			// console.log("friendsList here", friendsList);
 			copyUsers.forEach((elem) =>
 			{
 				newArray.map((element) =>
@@ -494,7 +483,6 @@ export class ChatSocketEvents
 					}
 				});
 			});
-			// console.log("ICI", copyUsers);
 			const action = {
 				type: "sending-list-user",
 				payload:
@@ -509,13 +497,11 @@ export class ChatSocketEvents
 
 		public	handleInfoCreateChatUser(client: Socket, data: ActionSocket )
 		{
-			console.log("CREATE CHAT USER");
 			const	searchChatUser = this.chatService.getUserBySocketId(client.id);
 
 			let newChatUser: ChatUserModel;
 			if (searchChatUser === undefined)
 			{
-				console.log("back does not exist");
 				newChatUser = {
 					name: data.payload.user.username,
 					avatar: data.payload.user.avatar,
@@ -528,7 +514,6 @@ export class ChatSocketEvents
 			}
 			else
 			{
-				console.log("back does exist");
 				newChatUser = {
 					name: searchChatUser.name,
 					avatar: searchChatUser.avatar,
@@ -624,7 +609,6 @@ export class ChatSocketEvents
 							newPrivateMsg?.addAdmin(tmp2?.id);
 							client.join(newPrivateMsg.name);
 							tmp2.client?.join(newPrivateMsg.name);
-							console.log(tmp2.client?.id + " now in rooms ", tmp2.client?.rooms);
 							this.chatService.addNewChannel(newPrivateMsg, data.payload.pmIndex, kind);
 							this.chatService.updateDatabase();
 						}
@@ -681,7 +665,6 @@ export class ChatSocketEvents
 				let	searchChannel: Channel | undefined;
 
 				const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-// do the samed for private msg
 				let isAdmin: boolean;
 				if (data.payload.kind === "privateMessage")
 				{
@@ -692,13 +675,9 @@ export class ChatSocketEvents
 				{
 					searchChannel = this.chatService.searchChannelByName(data.payload.name);
 					if (searchChannel?.isAdmin(profileId) === true)
-					{
 						isAdmin = true;
-					}
 					else
-					{
 						isAdmin = false;
-					}
 				}
 				let	msg;
 				msg = "";
@@ -980,7 +959,6 @@ export class ChatSocketEvents
 								});
 								if (searchFriend !== undefined)
 									isFriend = true
-								console.log("une friend", isFriend);
 							}
 							const newMember: MembersModel = {
 								id: memberList.length + 1,
@@ -1022,7 +1000,6 @@ export class ChatSocketEvents
 						}
 					}
 				}
-				console.log("display-member is friend", isFriend, "friend profileId", friendProfId);
 				const	action = {
 					type: "display-members",
 					payload: {
@@ -1077,7 +1054,7 @@ export class ChatSocketEvents
 				{
 					const toPush = this.userService.getFriendModel(elem, index);
 					if (toPush === undefined)
-						throw new Error("The dev was lazy");
+						throw new Error("Error");
 					myFriendArray.push(toPush);
 					myFriendNameArray.push(this.userService.getFriendName(elem));
 				});
@@ -1085,11 +1062,10 @@ export class ChatSocketEvents
 				{
 					const toPush = this.userService.getFriendModel(elem, index);
 					if (toPush === undefined)
-						throw new Error("The dev was lazy");
+						throw new Error("Error");
 					friendArray.push(toPush);
 					friendNameArray.push(this.userService.getFriendName(elem));
 				});
-				// NOTICE HERE FRIENDS WAS PUSHED
 				userMe.friends = [...myFriendArray];
 				friendUser.friends = [...friendArray];
 				const	action = {
@@ -1103,8 +1079,6 @@ export class ChatSocketEvents
 				};
 				client.emit("user-info", action);
 				this.chatService.updateDatabase();
-					// update user service database
-				// }
 			}
 
 			if (data.type === "block-user")

@@ -79,7 +79,6 @@ export class	GameService implements OnModuleInit
 		{
 			return (elem.getSeralizable());
 		});
-		// console.log("Serialized data : ", gameInstanceSerialized);
 		return ({
 			roomCount: this.roomCount,
 			instanceId: this.instanceId,

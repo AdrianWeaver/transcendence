@@ -103,34 +103,6 @@ class User
 		{
 			this.online = online;
 		};
-		this.joinChannel = (chanName: string) =>
-		{
-			if (this.client === null)
-				return ;
-			if (this.chat && this.chat.server)
-			{
-				// TEST it was this.channels, was it a mistake ?
-				for (const channel of this.chat.channels)
-				{
-					if (channel.name === chanName)
-					{
-						if (channel.mode === "private")
-							console.log("This channel is private");
-						else
-						{
-							this.client.join(chanName);
-							this.chat.server.to(chanName).emit("Say hello to " + this.name + " !");
-							const	index = this.channels.findIndex((elem) =>
-							{
-								return (elem === channel.id);
-							});
-							if (index === -1)
-								this.channels.push(channel.id);
-						}
-					}
-				}
-			}
-		};
 		this.leaveChannel = (chanName: string) =>
 		{
 			if (this.client === null)

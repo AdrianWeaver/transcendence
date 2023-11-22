@@ -280,8 +280,6 @@ class Chat
 				newUser.status = raw.status;
 				newUser.online = raw.online;
 				newUser.stats = {...raw.stats};
-				// console.log("raw user", raw);
-				// console.log("new user", newUser);
 				this.users.push(newUser);
 			});
 			this.chanMap = [...rawObj.chanMap];
