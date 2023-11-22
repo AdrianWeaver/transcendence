@@ -24,16 +24,9 @@ import {
 	setRegistered,
 	setStatus,
 	setUserLoggedIn } from "../../../Redux/store/controllerAction";
-// import UserSecurity from "../../../Object/UserSecurity";
-// import UserSecurityChecker from "../../../Object/UserSecurityChecker";
-// import axios from "axios";
-// import { PhoneInput } from "react-international-phone";
 
 import MuiPhone from "../component/MuiPhone";
 import { useNavigate } from "react-router-dom";
-
-
-// import "react-international-phone/style.css";
 
 /* eslint-disable max-lines-per-function */
 const	SecondStepFormContent = () =>
@@ -44,10 +37,6 @@ const	SecondStepFormContent = () =>
 		return (state.controller.user);
 	});
 	const	navigate = useNavigate();
-	// const	[
-	// 	errorValidation,
-	// 	setErrorValidation
-	// ] = useState(new UserSecurityChecker());
 
 	const	[
 		required,
@@ -59,12 +48,6 @@ const	SecondStepFormContent = () =>
 		displayInput,
 		setDisplayInput
 	] = useState(false);
-
-	// const
-	// [
-	// 	codeValid,
-	// 	setCodeValid
-	// ] = useState(false);
 
 	const
 	[
@@ -103,7 +86,6 @@ const	SecondStepFormContent = () =>
 
 		newNum = num;
 		newNum = newNum.replace(/\s/g, "");
-		console.log("Num", num, " new num:", newNum);
 		return (newNum);
 	};
 

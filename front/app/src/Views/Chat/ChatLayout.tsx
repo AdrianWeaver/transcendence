@@ -557,7 +557,6 @@ const	ChatLayout = () =>
 
 	const	joinChannel = (chanName: string) =>
 	{
-		console.log(" Join channel", chanName);
 		const	action = {
 			type: "asked-join",
 			payload: {
