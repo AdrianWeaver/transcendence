@@ -59,7 +59,8 @@ import {
 	setCurrentProfileIsFriend,
 	setProfileFriendView,
 	setProfilePublicView,
-	setPreviousPage
+	setPreviousPage,
+	getPlayingStatus
 }	from "../../Redux/store/controllerAction";
 
 import { useNavigate } from "react-router-dom";
@@ -79,6 +80,8 @@ type MembersModel =
 	name:string,
 	profileId: string,
 	userName: string,
+	status: string,
+	online: boolean
 }
 
 type ChanMapModel = {
@@ -172,6 +175,10 @@ const FriendsList = (props: FriendsListProps) =>
 		return (state.controller.user);
 	});
 
+	users.forEach((elem) =>
+	{
+		dispatch(getPlayingStatus(elem.profileId));
+	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
@@ -259,6 +266,7 @@ const	ChatLayout = () =>
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+
 	const	server	= useAppSelector((state) =>
 	{
 		return (state.server);
@@ -278,6 +286,7 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user);
 	});
+
 	const	currentProfileIsFriend = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfileIsFriend);
@@ -566,6 +575,16 @@ const	ChatLayout = () =>
 		setStatus
 	] = useState("🔴");
 
+	// useEffect(() =>
+	// {
+	// 	if (userStatus === "playing")
+	// 		setStatus("🏓");
+	// 	else if (userStatus === "online")
+	// 		setStatus("🟢");
+	// 	else if (userStatus === "offline")
+	// 		setStatus("🔴");
+	// }, [userStatus]);
+
 	useEffect(() =>
 	{
 		const socket = io(server.uri + ":3000",
@@ -593,6 +612,7 @@ const	ChatLayout = () =>
 				console.log("disconnected", user.chat.disconnectedUsers);
 			}
 		};
+
 		const connect = () =>
 		{
 			setConnected(true);
@@ -742,10 +762,12 @@ const	ChatLayout = () =>
 
 		const serverInfo = (data: any) =>
 		{
+			// 🏓 🔴 🟢
+			console.log("data Pyaload list users", data.payload);
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			// console.log("information from server: ", data);
-			setArrayListUser(data.payload.arrayListUser);
+			setArrayListUser(data.payload.arrayListUsers);
 		};
 
 		// const	goToChannel = (chanName: string, kind: string, okContinue: boolean) =>
@@ -779,7 +801,7 @@ const	ChatLayout = () =>
 							message: "The users are not receiving messages from each other",
 							id: 0,
 							username: uniqueId,
-						}
+						};
 						const	messagesArray: MessageModel[] = [];
 						messagesArray.push(newMessage);
 						setPrivMessages(messagesArray);
@@ -812,7 +834,7 @@ const	ChatLayout = () =>
 								message: "The users are not receiving messages from each other",
 								id: 0,
 								username: uniqueId,
-							}
+							};
 							const	messagesArray: MessageModel[] = [];
 							messagesArray.push(newMessage);
 							setPrivMessages(messagesArray);

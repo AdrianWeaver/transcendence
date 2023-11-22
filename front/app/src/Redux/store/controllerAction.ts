@@ -1517,7 +1517,6 @@ export const	setStatus = (status: string, user: UserModel)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-
 		const	array = [...prev.controller.user.chat.users];
 		const	index = array.findIndex((elem) =>
 		{
@@ -1525,9 +1524,11 @@ export const	setStatus = (status: string, user: UserModel)
 		});
 		if (index === -1)
 			return ;
-			// throw new Error("controllerAction setOnline, user doesnt exist");
+			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
 		else
+		{
 			array[index].status = status;
+		}
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1930,6 +1931,53 @@ export const	userSignIn = (username: string, password: string)
 			}
 			dispatch(controllerActions.setNewToken(response));
 		}
+	});
+}
+
+export const	getPlayingStatus = (profileId: string)
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return (async (dispatch, getState) =>
+	{
+		const	prev = getState();
+		let		status: string;
+		status = "";
+		const	array = [...prev.controller.user.chat.users];
+		const	index = array.findIndex((elem) =>
+		{
+			return (elem.id.toString() === profileId);
+		});
+		if (index === -1)
+			return ;
+			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
+		else
+		{
+			if (!prev.controller.user.chat.users[index].online)
+				status = "offline";
+			else
+			{
+				const	data = await UserServices.getPlayingStatus(profileId, prev.controller.user.bearerToken, prev.server.uri);
+				if (data === true)
+					status = "playing";
+				else if (data === false)
+					status = "online";
+			}
+			if (status.length)
+				array[index].status = status;
+		}
+		const	response: ControllerModel = {
+			...prev.controller,
+			user:
+			{
+				...prev.controller.user,
+				chat:
+				{
+					...prev.controller.user.chat,
+					users: array
+				}
+			}
+		}
+		dispatch(controllerActions.setStatus(response));
 	});
 }
 

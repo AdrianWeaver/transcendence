@@ -6,10 +6,8 @@
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 import { Server, Socket } from "socket.io";
-import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
-import { v4 as uuidv4 } from "uuid";
 import	* as roomNameArray from "../game-socket/assets/roomName.json";
 
 import
@@ -24,26 +22,23 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService, ChatUserModel } from "./Chat.service";
-import { Body, Logger, Post, Req, UseGuards } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { Logger } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
-import { error, profile } from "console";
-import { elementAt } from "rxjs";
-import { constants } from "buffer";
-import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
-
-import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
-import Player from "src/game-socket/Objects/Player";
 import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
 };
+
+type FriendListModel = {
+	name: string,
+	status: string,
+	online: boolean
+}
 
 type MessageModel =
 {
@@ -59,6 +54,8 @@ type	MembersModel =
 	name: string,
 	profileId: string,
 	userName: string,
+	status: string,
+	online: boolean
 }
 
 export type	FriendsModel =
@@ -257,7 +254,6 @@ export class ChatSocketEvents
 			// can check if the user is playing with the function of gameService
 			this.chatService.chat.users[indexOfUsers].status = "offline";
 			this.chatService.chat.users[indexOfUsers].online = false;
-
 		}
 
 		@SubscribeMessage("sending-message")
@@ -448,8 +444,20 @@ export class ChatSocketEvents
 			const	friendsList: string[] = [];
 			me.friends.map((elem) =>
 			{
-				friendsList.push(elem.name);
+				// newArray.map((element) =>
+				// {
+				// 	if (elem.name === element.username)
+				// 	{
+				// 		const friend = {
+				// 			name: element.username,
+				// 			status: element.status,
+				// 			online: element.online
+				// 		}
+					friendsList.push(elem.name);
+					// }
+				// });
 			});
+			console.log("LA FRIEND LIST ????", friendsList);
 			// console.log("friendsList here", friendsList);
 			copyUsers.forEach((elem) =>
 			{
@@ -953,6 +961,8 @@ export class ChatSocketEvents
 								name: user.profileId,
 								profileId: user.profileId,
 								userName: userName,
+								status: user.status,
+								online: user.online
 							};
 							memberList.push(newMember);
 						}
@@ -965,6 +975,12 @@ export class ChatSocketEvents
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+							const	searchU = this.chatService.getUserWithProfileId(user.profileId);
+							if (searchU === undefined)
+							{
+								console.log("ERROR USER NOT FOUND");
+								return ;
+							}
 							if (user.profileId !== profId && conv)
 							{
 								friendProfId = user.profileId;
@@ -982,6 +998,8 @@ export class ChatSocketEvents
 								name: user.profileId,
 								profileId: user.profileId,
 								userName: userName,
+								status: searchU.status,
+								online: searchU.online,
 							};
 							memberList.push(newMember);
 						}

@@ -510,6 +510,34 @@ const	UserServices = {
 			})
 		);
 	},
+
+	async	getPlayingStatus(profileId: string | number, token :string, hostname: string)
+	{
+		console.log("get user back from db");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token
+			},
+		};
+		const	data = {
+			profileId: profileId,
+		};
+		return (
+			Api(hostname)
+			.post("user/user-playing", data, config)
+			.then((data) =>
+			{
+				console.log(data.data);
+				return (data.data);
+			})
+			.catch((error) =>
+			{
+				console.error(error);
+				return ("ERROR");
+			})
+		);
+	},
 };
 
 export default UserServices;
