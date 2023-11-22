@@ -69,11 +69,11 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	// private userDBString: Array<string> = [];
 
 	// private	prisma: PrismaClient;
-	private readonly secretId = "user-service-secret";
-	private readonly logger = new Logger("user-service itself");
-	private readonly uuidInstance = uuidv4();
+	private readonly	secretId = "user-service-secret";
+	private readonly	logger = new Logger("user-service itself");
+	private readonly	uuidInstance = uuidv4();
 	private	readonly	cdnConfig = new ServerConfig();
-	private			shutdown$ = new Subject<string>();
+	private				shutdown$ = new Subject<string>();
 	// image cdn Large is eq to publicPath 700 X 700
 	private	readonly	publicPath = "/app/public/profilePictures";
 	private readonly	publicPathLarge = "/app/public/profilePictures/large";
@@ -96,7 +96,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		175,
 		25
 	];
-
 
 	public constructor(
 		private readonly prismaService: PrismaService,
@@ -1273,7 +1272,6 @@ public	register(data: UserModel)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
 		this.user[searchUserIndex].friendsProfileId.push(friendId);
-		this.user[searchFriendIndex].friendsProfileId.push(id);
 		return (searchFriend.username + " added as friend");
 	}
 
@@ -1317,6 +1315,7 @@ public	register(data: UserModel)
 	public	addFriends(myProfileId: any, targetProfileId: any)
 		: string
 	{
+		console.log("ADD FRIEND ", myProfileId);
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
 			return (user.id.toString() === myProfileId.toString());
@@ -1338,7 +1337,7 @@ public	register(data: UserModel)
 			if (findProfileIndex === -1)
 			{
 				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
-				// console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
+				console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
 			}
 			else
 			{
@@ -1661,5 +1660,21 @@ public	register(data: UserModel)
 			// friendsProfileId: [...this.user[index].friendsProfileId]
 		};
 		return (user);
+	}
+
+	public	setStatus(profileId: string, playing: boolean)
+	{
+		const	index = this.user.findIndex((elem) =>
+		{
+			return (elem.id.toString() === profileId);
+		});
+		if (index !== undefined)
+		{
+			if (playing)
+				this.user[index].status = "playing";
+			else
+				this.user[index].status
+					= this.user[index].online ? "online" : "offline";
+		}
 	}
 }

@@ -6,10 +6,8 @@
 /* eslint-disable max-len */
 /* eslint-disable max-statements */
 import { Server, Socket } from "socket.io";
-import Chat from "./Objects/Chat";
 import User from "./Objects/User";
 import Channel from "./Objects/Channel";
-import { v4 as uuidv4 } from "uuid";
 import	* as roomNameArray from "../game-socket/assets/roomName.json";
 
 import
@@ -24,26 +22,23 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService, ChatUserModel } from "./Chat.service";
-import { Body, Logger, Post, Req, UseGuards } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { Logger } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
-import { error, profile } from "console";
-import { elementAt } from "rxjs";
-import { constants } from "buffer";
-import { UserModel } from "src/user/user.interface";
-// import { instrument } from "@socket.io/admin-ui";
-
-import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
-import Player from "src/game-socket/Objects/Player";
 import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
 
 type	ActionSocket = {
 	type: string,
 	payload?: any
 };
+
+type FriendListModel = {
+	name: string,
+	status: string,
+	online: boolean
+}
 
 type MessageModel =
 {
@@ -59,6 +54,8 @@ type	MembersModel =
 	name: string,
 	profileId: string,
 	userName: string,
+	status: string,
+	online: boolean
 }
 
 export type	FriendsModel =
@@ -292,7 +289,6 @@ export class ChatSocketEvents
 			// can check if the user is playing with the function of gameService
 			this.chatService.chat.users[indexOfUsers].status = "offline";
 			this.chatService.chat.users[indexOfUsers].online = false;
-
 		}
 
 		@SubscribeMessage("sending-message")
@@ -480,6 +476,7 @@ export class ChatSocketEvents
 			{
 				friendsList.push(elem.name);
 			});
+			console.log("LA FRIEND LIST ????", friendsList);
 			// console.log("friendsList here", friendsList);
 			copyUsers.forEach((elem) =>
 			{
@@ -988,6 +985,8 @@ export class ChatSocketEvents
 								name: user.profileId,
 								profileId: user.profileId,
 								userName: userName,
+								status: user.status,
+								online: user.online
 							};
 							memberList.push(newMember);
 						}
@@ -1000,6 +999,12 @@ export class ChatSocketEvents
 						if (user !== undefined && user?.profileId !== "undefined" && user.profileId !== undefined)
 						{
 							userName = this.chatService.getUsernameWithProfileId(user.profileId) as string;
+							const	searchU = this.chatService.getUserWithProfileId(user.profileId);
+							if (searchU === undefined)
+							{
+								console.log("ERROR USER NOT FOUND");
+								return ;
+							}
 							if (user.profileId !== profId && conv)
 							{
 								friendProfId = user.profileId;
@@ -1017,6 +1022,8 @@ export class ChatSocketEvents
 								name: user.profileId,
 								profileId: user.profileId,
 								userName: userName,
+								status: searchU.status,
+								online: searchU.online,
 							};
 							memberList.push(newMember);
 						}
@@ -1055,23 +1062,14 @@ export class ChatSocketEvents
 					return ;
 				let message: string;
 				message = "";
-				// const	newFriend = this.chatService.getUsernameWithSocketId(data.payload.friendName) as string;
-				// const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-				let state;
-				state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
-				if (state === "ERROR")
-					return ;
-				state = this.userService.addFriends(friendUser.profileId, userMe.profileId);
+				const	state = this.userService.addFriends(userMe.profileId, friendUser.profileId);
 				if (state === "ERROR")
 					return ;
 				if (state === "ALREADY_FRIENDS")
 					message = friendUser.name + " is already your friend";
 				const	myArrayProfileId = this.userService.getFriendsProfileId(userMe.profileId);
-				const	friendArrayProfileId = this.userService.getFriendsProfileId(friendUser.profileId);
 				const	myFriendArray: Array<FriendsModel> = [];
 				const	myFriendNameArray: Array<string> = [];
-				const	friendArray: Array<FriendsModel> = [];
-				const	friendNameArray: Array<string> = [];
 
 				myArrayProfileId.forEach((elem, index) =>
 				{
@@ -1081,17 +1079,8 @@ export class ChatSocketEvents
 					myFriendArray.push(toPush);
 					myFriendNameArray.push(this.userService.getFriendName(elem));
 				});
-				friendArrayProfileId.forEach((elem, index) =>
-				{
-					const toPush = this.userService.getFriendModel(elem, index);
-					if (toPush === undefined)
-						throw new Error("The dev was lazy");
-					friendArray.push(toPush);
-					friendNameArray.push(this.userService.getFriendName(elem));
-				});
 				// NOTICE HERE FRIENDS WAS PUSHED
 				userMe.friends = [...myFriendArray];
-				friendUser.friends = [...friendArray];
 				const	action = {
 					type: "add-friend",
 					payload: {
