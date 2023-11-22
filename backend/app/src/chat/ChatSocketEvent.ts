@@ -874,22 +874,22 @@ export class ChatSocketEvents
 					targetClient.leave(channel.name);
 					if (data.type === "kick-member")
 					{
-						message = target.name + " has been kicked.";
+						newMessage.message = target.name + " has been kicked.";
 					}
 					else
 					{
-						message = target.name + " has been banned.";
+						newMessage.message = target.name + " has been banned.";
 						channel.addToBanned(target.id, target.profileId);
 					}
+					channel.addNewMessage(newMessage);
 				}
 				else
-					message = "Don't touch the owner of the channel !";
+					newMessage.message = "Don't touch the owner of the channel !";
 
-				channel.addNewMessage(newMessage);
 				const	action = {
 					type: "left-channel",
 					payload: {
-						message: message,
+						message: newMessage.message,
 						messages: channel.messages,
 						chanName: channel.name,
 						kind: "channel",
@@ -904,6 +904,11 @@ export class ChatSocketEvents
 					else
 						action.payload.message = "You have been banned from " + channel.name;
 				
+					const indexToRemove = channel.admins.findIndex((admin) =>
+					{
+						return (admin.profileId === target.profileId);
+					})
+					channel.admins.splice(indexToRemove, 1);
 					targetClient.emit("left-message", action);
 				}
 				else

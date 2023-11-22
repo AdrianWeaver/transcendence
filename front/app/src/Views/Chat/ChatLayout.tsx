@@ -756,7 +756,7 @@ const	ChatLayout = () =>
 			{
 				for (const blocked of blockedListRef.current)
 				{
-					if (blocked === data.payload.myProfileId)
+					if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
 					{
 						const newMessage: MessageModel = {
 							sender: "server",
@@ -788,7 +788,7 @@ const	ChatLayout = () =>
 				{
 					for (const blocked of blockedListRef.current)
 					{
-						if (blocked === data.payload.myProfileId)
+						if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
 						{
 							const newMessage: MessageModel = {
 								sender: "server",
