@@ -8,7 +8,7 @@
 /* eslint-disable max-lines-per-function */
 // eslint-disable-next-line max-len
 // https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
-import controllerSlice from "./controller-slice";
+import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
@@ -165,6 +165,24 @@ export const	userRegistrationStepThree = ()
 	});
 };
 
+export const	userRegistrationStepFour = ()
+	: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch, getState) =>
+	{
+		const	previousState = getState();
+		const	response: ControllerModel = {
+			...previousState.controller,
+			registration:
+			{
+				...previousState.controller.registration,
+				step: 3,
+			}
+		};
+		dispatch(controllerActions.userRegistrationStepFour(response));
+	});
+};
+
 export const	setCanvasSize = (size: CanvasModel)
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -204,7 +222,7 @@ export const	reinitialiseUser = (logout: boolean)
 		{
 			await UserServices.revokeToken(prev.controller.user.bearerToken, prev.server.uri);
 			dispatch(logOffUser());
-			dispatch(resetRegistration());
+			// dispatch(resetRegistration());
 		}
 		dispatch(controllerActions.reinitialiseUser());
 	});
@@ -551,7 +569,8 @@ export const setRegistrationProcessSuccess = ()
 			user:
 			{
 				...prev.controller.user,
-				registrationProcess: false
+				registrationProcess: false,
+				registered: true,
 			}
 		};
 		dispatch(controllerActions.setRegistrationProcessSuccess(response));
@@ -688,18 +707,26 @@ export const registerClientWithCode = (code : string)
 			// dispatch(controllerActions.registerClientWithCode(prev.controller));
 			return ;
 		}
-		dispatch(setRegistrationProcessStart())
-		// console.log("Code is equals to : ", code);
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
-		if (data === "ERROR")
+		console.log("Patch: ", data);
+		if (data.error === "you are already register")
 		{
-			// console.error("erreur");
-			dispatch(setRegistrationProcessError("Already used account, please login"));
+			console.log("Patch: ca fait des chocapics");
+			dispatch(setRegistrationProcessSuccess());
+			return ;
+		}
+		else if (data === "ERROR")
+		{
+			console.log("UUUSEER", prev.controller.user);
+			response.registration.abortRequested = true;
+			dispatch(controllerActions.setAbortRequestedValue(response));
 			return ;
 		}
 		else
 		{
+			dispatch(setRegistrationProcessStart())
+			console.log("LA DATA WESH", data);
 			const	array: BackUserModel[] = [...prev.controller.allUsers];
 
 			array.forEach((elem) =>
@@ -743,6 +770,10 @@ export const registerClientWithCode = (code : string)
 				...prev.controller,
 				allUsers: [...array],
 				allFrontUsers: [...arrayFront],
+				registration: {
+					...prev.controller.registration,
+					step: 1
+				},
 				user:
 				{
 					...prev.controller.user,
@@ -1899,5 +1930,14 @@ export const	userSignIn = (username: string, password: string)
 			}
 			dispatch(controllerActions.setNewToken(response));
 		}
+	});
+}
+
+export const	resetController = ()
+: ThunkAction<void, RootState, unknown, AnyAction> =>
+{
+	return ((dispatch) =>
+	{
+		dispatch(controllerActions.resetController(initialControllerState));
 	});
 }

@@ -21,6 +21,7 @@ import StepTwo from "./contentSteps/StepTwo";
 import HorizontalStepper from "./Header/HorizontalStepper";
 import StepZero from "./contentSteps/StepZero";
 import { useEffect } from "react";
+import StepThree from "./contentSteps/StepThree";
 
 const	styleMainBox = {
 	marginTop: 8,
@@ -56,6 +57,8 @@ const	Signup = () =>
 		content = <StepOne />;
 	else if (stepper === 2)
 		content = <StepTwo />;
+	else if (stepper === 3)
+		content = <StepThree />;
 	else
 		content = <></>;
 	return (

@@ -10,7 +10,7 @@ import
 import	{ ControllerModel } from "../models/redux-models";
 // import	{ NIL as NILUUID } from "uuid";
 
-const	initialControllerState: ControllerModel = {
+export const	initialControllerState: ControllerModel = {
 	activeView: "loading",
 	themeMode: "light",
 	previousPage: "/",
@@ -154,6 +154,10 @@ const	controllerSlice = createSlice(
 		{
 			state.registration.step = action.payload.registration.step;
 		},
+		userRegistrationStepFour(state, action: PayloadAction<ControllerModel>)
+		{
+			state.registration.step = action.payload.registration.step;
+		},
 		setCanvasSize(state, action: PayloadAction<ControllerModel>)
 		{
 			state.canvas = action.payload.canvas;
@@ -245,6 +249,7 @@ const	controllerSlice = createSlice(
 			state.user.avatar = action.payload.user.avatar;
 			state.user.location = action.payload.user.location;
 			state.allUsers = action.payload.allUsers;
+			state.registration.step = action.payload.registration.step;
 		},
 		registerNumberForDoubleAuth(state, action: PayloadAction<ControllerModel>)
 		{
@@ -299,27 +304,6 @@ const	controllerSlice = createSlice(
 		{
 			state.registration = initialControllerState.registration;
 			state.user = initialControllerState.user;
-			// state.user.login = action.payload.user.login;
-			// state.user.bearerToken = action.payload.user.bearerToken;
-			// state.user.doubleAuth = action.payload.user.doubleAuth;
-			// state.user.email = action.payload.user.email;
-			// state.user.firstName = action.payload.user.firstName;
-			// state.user.lastName = action.payload.user.lastName;
-			// state.user.id = action.payload.user.id;
-			// state.user.isLoggedIn = action.payload.user.isLoggedIn;
-			// state.user.phoneNumber = action.payload.user.phoneNumber;
-			// state.user.registered = action.payload.user.registered;
-			// state.user.username = action.payload.user.username;
-			// state.user.registrationProcess = action.payload.user.registrationProcess;
-			// state.user.registrationError = action.payload.user.registrationError;
-			// state.user.rememberMe = action.payload.user.rememberMe;
-			// state.user.avatar = action.payload.user.avatar;
-			// state.user.chat.pseudo = action.payload.user.chat.pseudo;
-			// state.user.password = action.payload.user.password;
-			// state.user.profile = action.payload.user.profile;
-			// state.user.ftAvatar = action.payload.user.ftAvatar;
-			// state.user.otpCode = action.payload.user.otpCode;
-			// state.user.codeValidated = action.payload.user.codeValidated;
 		},
 		setAvatar(state, action: PayloadAction<ControllerModel>)
 		{
@@ -462,6 +446,16 @@ const	controllerSlice = createSlice(
 			state.user.ftAvatar = action.payload.user.ftAvatar;
 			// state.user.password = action.payload.user.password;
 		},
+		resetController(state, action: PayloadAction<ControllerModel>)
+		{
+			state.activeView = action.payload.activeView;
+			state.allFrontUsers = action.payload.allFrontUsers;
+			state.allUsers = action.payload.allUsers;
+			state.canvas = action.payload.canvas;
+			state.myStats = action.payload.myStats;
+			state.themeMode = action.payload.themeMode;
+			state.user = action.payload.user;
+		}
 	}
 });
 

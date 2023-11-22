@@ -20,10 +20,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setFt, setUserData, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
+import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, userRegistrationStepFour, userRegistrationStepThree, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 // import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
 // import { setAuthApiLinks } from "../../../Redux/store/serverAction";
 import axios from "axios";
+import { useSavePrevPage } from "../../../Router/Hooks/useSavePrevPage";
 
 const	getText = () =>
 {
@@ -91,22 +92,29 @@ const	locationIsARedirectedPage = (pathname: string) =>
 	return (true);
 };
 
-// const	getUrlFT = () =>
-// {
-// 	return ("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-8aa9db498628bfc0f7404bee5a48f6b5da74bd58af97184135e3e1018af58563&redirect_uri=http%3A%2F%2Fmade-f0Br4s4.clusters.42paris.fr&response_type=code");
-// };
-
 const	StepZero = () =>
 {
 	const	query = useLocation();
-	// const	urlFt = useAppSelector((state) =>
-	// {
-	// 	return (state.server.links.authApiUrl);
-	// });
-	// console.log("The query", query);
 	const	imgSource = coalitionImage;
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
+	const	savePrevPage = useSavePrevPage();
+
+	const	abort = useAppSelector((state) =>
+	{
+		return (state.controller.registration.abortRequested);
+	});
+
+	useEffect(() =>
+	{
+		console.log("Abort value", abort);
+		if (abort === true)
+		{
+			savePrevPage("/signin");
+			navigate("/cancel");
+		}
+	}, [abort]);
+
 	const	ftUrl = useAppSelector((state) =>
 	{
 		return (state.server.links.authApiUrl);
@@ -148,19 +156,7 @@ const	StepZero = () =>
 		window.open(ftUrl, "_self");
 	};
 
-	// const	authUrl = useAppSelector((state) =>
-	// {
-	// 	return (state.server.links.authApiUrl);
-	// });
 
-	// console.log("Inside step zero link api 42", authUrl);
-
-	// useEffect(() =>
-	// {
-	// 	if (authUrl === undefined)
-	// 		dispatch(setAuthApiLinks());
-	// 	console.log(authUrl);
-	// });
 	useEffect(() =>
 	{
 		const timer = setTimeout(() =>
@@ -172,22 +168,27 @@ const	StepZero = () =>
 			clearTimeout(timer);
 		});
 	});
-
+	let	start: boolean;
 	const	responseQuery = checkQueryParams(query);
 	const	alertInfo = AlertComponent(responseQuery);
-	if (responseQuery.code)
+	start = false;
+	if (responseQuery.code && (!start))
 	{
 		dispatch(registerClientWithCode(responseQuery.code));
+		start = true;
 	}
-	if (user.bearerToken !== "undefined" && !user.alreadyExists)
+	// eslint-disable-next-line eqeqeq
+	if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
 	{
 		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}
-	else if (user.alreadyExists)
+	else if (abort === true)
 	{
-		navigate("/signin");
+		// dispatch(setAbortRequestedValue(false));
+		// dispatch(userRegistrationStepFour());
+		console.log("ABORT TO FALSE ????d");
 	}
 
 	useEffect(() =>

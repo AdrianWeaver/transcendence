@@ -887,8 +887,6 @@ public	register(data: UserModel)
 	{
 		return (user.id === data.id);
 	});
-	if (searchUser?.registrationProcessEnded === true)
-		throw new BadRequestException("Account already created");
 	if (searchUser !== undefined)
 	{
 		const	index = this.user.findIndex((user) =>
@@ -898,7 +896,6 @@ public	register(data: UserModel)
 		if (index !== -1)
 			this.user.splice(index, 1);
 	}
-	// const	secretToken = randomBytes(64).toString("hex");
 	const newUser : UserModel= {
 		registrationStarted: true,
 		registrationProcessEnded: false,
