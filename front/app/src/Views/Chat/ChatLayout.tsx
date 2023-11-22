@@ -748,21 +748,6 @@ const	ChatLayout = () =>
 			setArrayListUser(data.payload.arrayListUser);
 		};
 
-		// const	goToChannel = (chanName: string, kind: string, okContinue: boolean) =>
-		// {
-		// 	if (okContinue === false)
-		// 		return ;
-		// 	const	action = {
-		// 		type: "did-I-join",
-		// 		payload: {
-		// 			chanName: chanName,
-		// 			kind: kind,
-		// 			userId: activeId
-		// 		}
-		// 	};
-		// 	socketRef.current.emit("channel-info", action);
-		// };
-
 		const	updateMessages = (data: any) =>
 		{
 			const	kind = data.payload.kind;
@@ -933,7 +918,6 @@ const	ChatLayout = () =>
 				if (searchBlocked === -1)
 				{
 					setBlockedList(data.payload.blockedList);
-					console.log("BLOCKED LIST 1 ", data.payload.blockedList);
 					alertMessage = "You have blocked " + data.payload.newBlocked + ".";
 				}
 				else
@@ -954,6 +938,11 @@ const	ChatLayout = () =>
 			}
 
 			if (data.type === "make-admin")
+			{
+				alert(data.payload.message);
+			}
+
+			if (data.type === "unsuccessful-kick")
 			{
 				alert(data.payload.message);
 			}

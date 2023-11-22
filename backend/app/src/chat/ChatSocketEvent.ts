@@ -373,7 +373,6 @@ export class ChatSocketEvents
 		 */
 		public	handleInfoSentMessage(client: Socket, data: ActionSocket)
 		{
-			console.log("HANDLE INFO SENT MESSAGE");
 			let	channel;
 			let	kind;
 			let	playPong;
@@ -860,45 +859,32 @@ export class ChatSocketEvents
 				const	target = this.chatService.getUserBySocketId(targetClient.id);
 				if (target === undefined)
 					return ;
-				channel.leaveChannel(targetClient);
-				targetClient.leave(channel.name);
 				const id = channel.messages.length + 1;
-				// const profId = this.chatService.getProfileIdFromSocketId(client.id);
-				// if (profId === undefined || profId === "undefined")
-				// 	return ;
-				// const	searchUser = this.chatService.getUserWithProfileId(profId);
-				// if (searchUser === undefined)
-				// 	throw new Error("User not found - kick/ban-member ChtSocketEvent");
+	
 				let message: string;
-				if (data.type === "kick-member")
-				{
-					// const	chanIndex = searchUser.channels.findIndex((elem) =>
-					// {
-					// 	return (elem === channel.id);
-					// });
-					// if (chanIndex === -1)
-					// 	return ;
-					// searchUser.channels.splice(chanIndex, 1);
-					message = target.name + " has been kicked.";
-				}
-				else
-				{
-					// const	chanIndex = searchUser.channels.findIndex((elem) =>
-					// {
-					// 	return (elem === channel.id);
-					// });
-					// if (chanIndex === -1)
-					// 	return ;
-					// searchUser.channels.splice(chanIndex, 1);
-					message = target.name + " has been banned.";
-					channel.addToBanned(target.id, target.profileId);
-				}
 				const newMessage: MessageModel = {
 					sender: "server",
-					message: message,
+					message: "",
 					id: id,
 					username: "server",
 				};
+				if (channel.isOwner(targetClient.id) === false)
+				{
+					channel.leaveChannel(targetClient);
+					targetClient.leave(channel.name);
+					if (data.type === "kick-member")
+					{
+						message = target.name + " has been kicked.";
+					}
+					else
+					{
+						message = target.name + " has been banned.";
+						channel.addToBanned(target.id, target.profileId);
+					}
+				}
+				else
+					message = "Don't touch the owner of the channel !";
+
 				channel.addNewMessage(newMessage);
 				const	action = {
 					type: "left-channel",
@@ -909,12 +895,22 @@ export class ChatSocketEvents
 						kind: "channel",
 					}
 				};
-				this.server.to(channel.name).emit("update-messages", action);
-				if (data.type === "kick-member")
-					action.payload.message = "You have been kicked from " + channel.name;
+				
+				if (channel.isOwner(targetClient.id) === false)
+				{
+					this.server.to(channel.name).emit("update-messages", action);
+					if (data.type === "kick-member")
+						action.payload.message = "You have been kicked from " + channel.name;
+					else
+						action.payload.message = "You have been banned from " + channel.name;
+				
+					targetClient.emit("left-message", action);
+				}
 				else
-					action.payload.message = "You have been banned from " + channel.name;
-				targetClient.emit("left-message", action);
+				{
+					action.type = "unsuccessful-kick";
+					client.emit("user-info", action);
+				}
 				this.chatService.updateDatabase();
 			}
 
@@ -1257,7 +1253,7 @@ export class ChatSocketEvents
 				const id = channel.messages.length + 1;
 					const newMessage: MessageModel = {
 						sender: "server",
-						message: this.chatService.getUsernameWithProfileId(targetClient.id) + " is now an admin.",
+						message: this.chatService.getUsernameWithProfileId(tmpUser.profileId) + " is now an admin.",
 						id: id,
 						username: "server",
 					};
