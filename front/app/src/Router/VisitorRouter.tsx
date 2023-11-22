@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import
 {
@@ -5,6 +6,7 @@ import
 	Navigate,
 	Route,
 	Routes,
+	useNavigate,
 }	from "react-router-dom";
 import Signup from "../Views/Signup/Signup";
 import CancelRegister from "../Views/CancelRegister/CancelRegister";
@@ -16,6 +18,23 @@ import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
 // import ChatLayout from "../Views/Chat/ChatLayout";
 import MyStats from "../Views/MyStats/MyStats";
 import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
+import { persistor } from "../Redux/store";
+import { useSavePrevPage } from "./Hooks/useSavePrevPage";
+
+
+const	UndefinedHandler = () =>
+{
+	const	savePrevPage = useSavePrevPage();
+	const	navigate = useNavigate();
+
+	savePrevPage("/signin");
+	setTimeout(() =>
+	{
+		persistor.purge();
+		navigate("/signin");
+	}, 1500);
+	return (<>redirection vous etes deja enregistre</>);
+};
 
 /**
  * This is unauth router
@@ -72,7 +91,10 @@ const	VisitorRouter = () =>
 					path="/my-stats"
 					element={<MyStats />}
 				/>
-				{/* show 404 when route not found */}
+				<Route
+					path="/undefined"
+					element={<UndefinedHandler/>}
+				/>
 				<Route
 					path="*"
 					element={<h1>Error 404: visitor router</h1>}
