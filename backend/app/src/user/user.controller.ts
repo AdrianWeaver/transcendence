@@ -193,7 +193,7 @@ export class UserController
 		dataAPI.append("client_secret", this.env.parsed.FT_SECRET);
 		dataAPI.append("redirect_uri", file.getRedirectURI());
 		console.log("url", file.getRedirectURI());
-
+		this.logger.error("code", body.code);
 		this.logger.debug("DATA API", dataAPI);
 		const config = {
 			method: "post",

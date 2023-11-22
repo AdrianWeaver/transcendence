@@ -151,7 +151,8 @@ const	TestBall = () =>
 		};
 
 		const	connectError = (_error: Error) =>
-		{	
+		{
+			navigate("/stats");
 		};
 
 		const	updateGame = (data: any) =>
@@ -294,7 +295,7 @@ const	TestBall = () =>
 			time = undefined;
 			if (data.type === "already-connected")
 			{
-				window.alert("Vous etes deja connectes a un socket veuillez visiter /my-active-games");
+				navigate("/my-active-games");
 			}
 			if (data.type === "the-end")
 			{
@@ -303,6 +304,11 @@ const	TestBall = () =>
 				{
 					navigate("/game-setup");
 				}, 4000);
+			}
+			if (data.type === "abandon")
+			{
+				// socket.disconnect();
+				navigate("/stats");
 			}
 			return (() =>
 			{

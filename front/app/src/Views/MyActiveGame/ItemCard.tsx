@@ -149,7 +149,8 @@ const	ItemCard = (props: ItemCardModel) =>
 									size="small"
 									onClick={() =>
 									{
-										alert("note to dev : please fix my route")
+										alert("note to dev : please fix my route game.uuid: ", game.uuid);
+										console.log(game.uuid);
 										dispatch(revokeGameWithUuid(game.uuid));
 									}}
 								>

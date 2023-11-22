@@ -125,6 +125,22 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number, instance: GameServe) =>
 		{
+			if (instance.revoked === true)
+			{
+				// this.logger.debug(frame);
+				if (frame === 0)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
+				}
+				else
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
+					this.gameService.recordMatchHistory(instance);
+				}
+				this.logger.error("error in revoked", instance);
+				console.log(instance);
+				return ;
+			}
 			if (instance.loop && instance.loop.gameActive === false)
 				return ;
 			this.update(instance);
@@ -825,7 +841,6 @@ export class GameSocketEvents
 			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
 
 		this.gameService.setGameActiveToFalse(indexInstance);
-		
 		instance.userConnected -= 1;
 		// send the new number of users and users ready
 		const	action = {
@@ -854,6 +869,24 @@ export class GameSocketEvents
 					this.gameService.roomCount = 0;
 				}
 			}
+		}
+		if (instance.revoked)
+		{
+			this.logger.verbose("The game will be destroyed");
+			// console.log(instance);
+			// before data is erased 
+			instance.revoked = false;
+			const	idToErase = this.gameService.gameInstances.findIndex((game) =>
+			{
+				return (game.uuid === instance.uuid);
+			});
+			if (idToErase !== -1)
+				this.gameService.gameInstances.splice(idToErase, 1);
+			if (this.gameService.gameInstances.length === 0)
+			{
+				this.gameService.roomCount = 0;
+			}
+			// console.log(instance);
 		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
