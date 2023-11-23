@@ -35,6 +35,7 @@ import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
 import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
+import * as bcrypt from "bcrypt";
 
 type	ActionSocket = {
 	type: string,
@@ -561,7 +562,7 @@ export class ChatSocketEvents
 		}
 
 		@SubscribeMessage("channel-info")
-		handleChannels(
+		async handleChannels(
 			@MessageBody() data: ActionSocket,
 			@ConnectedSocket() client: Socket
 		)
@@ -575,6 +576,19 @@ export class ChatSocketEvents
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
+
+					if (this.chatService.searchChannelByName(data.payload.chanName) != undefined)
+					{
+						const	actionBis = {
+							type: "channel-exists",
+							payload: {
+								message: "A channel with the same name already exists",
+							}
+						};
+						client.emit("channel-info", actionBis);
+						return ;
+					}
+
 					if (searchUser > -1 && data.payload.kind !== "channel")
 					{
 						tmp = this.chatService.getUserBySocketId(client.id);
@@ -650,6 +664,10 @@ export class ChatSocketEvents
 						client.join(newChannel.name);
 						searchUser?.channels.push(newChannel.id);
 						this.chatService.addNewChannel(newChannel, data.payload.chanId, kind);
+						if (data.payload.chanMode === "protected")
+						{
+							newChannel.setPassword(await this.chatService.hashPassword(data.payload.chanPassword, data.payload.chanName));
+						}
 						this.chatService.updateDatabase();
 						const	action = {
 							type: "add-new-channel",
@@ -785,7 +803,10 @@ export class ChatSocketEvents
 					}
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
-				if (channel?.password === data.payload.password)
+				if (channel === undefined)
+					return ;
+				const	valid = await bcrypt.compare(data.payload.password, channel.password as string);
+				if (valid === true)
 				{
 					action.payload.correct = "true";
 				}
