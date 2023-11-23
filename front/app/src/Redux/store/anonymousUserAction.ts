@@ -190,14 +190,8 @@ export const	createAnonymousSession = ()
 		{
 			if (prevState.anonymousUser.uuid === NILUUID)
 			{
-				console.log("user is NIL");
 				dispatch(setAnonymousUuid());
 				dispatch(registerAnonymousUser());
-			}
-			else
-			{
-				console.error("UUID is " + prevState.anonymousUser.uuid);
-				console.error("Anonymous user is " + prevState.anonymousUser);
 			}
 		}
 		dispatch(action.createAnonymousSession(response));

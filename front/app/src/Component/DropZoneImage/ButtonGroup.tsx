@@ -13,7 +13,6 @@ const	sendImage = (files: FileObject[], token: string, uri: string) =>
 		return ;
 	const	formData = new FormData();
 	formData.append("image", files[0].file);
-console.log("uri should not have port", uri);
 	const config = {
 		method: "post",
 		maxBodyLength: Infinity,
@@ -27,7 +26,7 @@ console.log("uri should not have port", uri);
 	axios(config)
 	.then((response) =>
 	{
-		console.log(response);
+		// console.log(response);
 	})
 	.catch((error) =>
 	{
@@ -58,10 +57,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 	{
 		buttonValidate = (
 			<Button
-				// onClick={sendImage}
 				disabled={true}
-				// color="secondary"
-				// variant="contained"
 			>
 				Valider
 			</Button>);
@@ -70,9 +66,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 	{
 		buttonValidate = (
 			<Button
-				// onClick={sendImage}
 				color="secondary"
-				// variant="contained"
 			>
 				Ajuster
 			</Button>);
@@ -106,7 +100,6 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 					<Grid
 						item
 						xs={3}
-						// sx={{border: "1px solid #000"}}
 					>
 						<Button
 							onClick={() =>

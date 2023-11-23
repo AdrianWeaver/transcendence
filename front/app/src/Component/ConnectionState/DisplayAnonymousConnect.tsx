@@ -131,7 +131,6 @@ const	DisplayAnonymousConnect = () =>
 					&& anonymousUser.expireAt > Date.now())
 				{
 					dispatch(verifyTokenAnonymousUser());
-					console.log("Verifing token");
 				}
 				else
 				{

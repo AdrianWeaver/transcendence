@@ -1421,9 +1421,6 @@ const	ChatLayout = () =>
 
 	const	addPasswordToChannel = (chanName: string, newPassword: string) =>
 	{
-		console.log("GOT TO FRONT");
-		console.log("CHANNEL ", chanName);
-		console.log("PASSWORD ", newPassword);
 		const	action = {
 			type: "add-password",
 			payload: {
@@ -1483,9 +1480,6 @@ const	ChatLayout = () =>
 								onClick={() =>
 								{
 									changeTabOperations();
-									// refreshListUser();
-									// setPrivMessages([]);
-									// dispatch(setCurrentChannel(""));
 								}}
 							/>
 							<Tab
@@ -1495,10 +1489,6 @@ const	ChatLayout = () =>
 								onClick={() =>
 								{
 									changeTabOperations();
-									// refreshListUser();
-									// setChanMessages([]);
-									// setPrivMessages([]);
-									// dispatch(setCurrentChannel(""));
 								}}
 							/>
 							<Tab
@@ -1664,7 +1654,6 @@ const	ChatLayout = () =>
 														</Button>
 														<Button onClick={() =>
 														{
-															// addPasswordToChannel(clickedChannel);
 															setPasswordDialogueOpen(true);
 														}}>
 															Add password
@@ -1711,12 +1700,9 @@ const	ChatLayout = () =>
 														}}>
 															Members
 														</Button>
-														{/* TEST TO INVITE A USER TO THIS CHANNEL */}
-
 														<Button onClick={() =>
 														{
 															setInviteDialogOpen(true);
-															// inviteUserToChannel(member.name);
 														}}>
 															Invite
 														</Button>
@@ -1741,7 +1727,6 @@ const	ChatLayout = () =>
 															<DialogActions>
 																<Button onClick={() =>
 																	{
-																		// setUserToInvite(getProfileId(userToInvite));
 																		inviteUserToChannel(userToInvite);
 																		setInviteDialogOpen(false);
 																		setUserToInvite("");
@@ -1774,7 +1759,6 @@ const	ChatLayout = () =>
 																				<>
 																					<Button onClick={() =>
 																					{
-																						// alert(uniqueId);
 																						kickUserFromChannel(member.name, clickedChannel);
 																						handleMembersClose();
 																					}}>

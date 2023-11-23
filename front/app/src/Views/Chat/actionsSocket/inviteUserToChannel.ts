@@ -6,8 +6,6 @@ export const	inviteUserToChannel
 	socketRef: React.MutableRefObject<any>
 ) =>
 {
-	console.log("member: " + userName);
-	console.log("chanel : " + channelToInvite);
 	const	action = {
 		type: "invite-member",
 		payload: {

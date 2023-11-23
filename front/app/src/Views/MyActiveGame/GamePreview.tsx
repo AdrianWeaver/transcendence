@@ -28,7 +28,6 @@ const	GamePreview = (props: GamePreviewProps) =>
 			{
 				const	ratioX = width / props.board.dim.width;
 				const	ratioY = height / props.board.dim.height;
-				// console.log("ratio x and y", ratioX, ratioY);
 
 				const ballPos = {
 					x: props.ball.pos.x * ratioX,

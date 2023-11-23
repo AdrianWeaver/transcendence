@@ -86,7 +86,6 @@ class Board
 				this.game.ball.pos.x *= multiplicatorWidth;
 				this.game.ball.pos.y *= multiplicatorHeight;
 			}
-			console.log("update after resize called", this.dim);
 			const	action = {
 				type: "resize",
 			};

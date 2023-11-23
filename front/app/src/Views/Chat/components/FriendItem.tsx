@@ -26,7 +26,6 @@ const FriendItem = (props: FriendItemProps) =>
 {
 	return (<></>);
 	let status;
-	console.log(" FRIEND ITEM ", props);
 	status = props.online ? "💚" : "🔴";
 	if (props.status === "playing" && props.online)
 		status = "🏓";

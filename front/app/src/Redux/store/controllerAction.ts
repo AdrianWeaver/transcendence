@@ -610,7 +610,6 @@ export const	setUserData = (data: any)
 		const	prev = getState();
 
 		const	array: BackUserModel[] = [...prev.controller.allUsers];
-		console.log("SET USER DATA", data);
 		array.forEach((elem) =>
 		{
 			if (elem.id === data.id)
@@ -684,8 +683,7 @@ export const verifyToken = ()
 			dispatch(reinitialiseUser(false));
 			return ;
 		}
-		// console.log("Data inside verify token ");
-		// console.log(data);
+
 		dispatch(setRegistrationProcessSuccess());
 		dispatch(userRegistrationStepTwo());
 	})
@@ -704,16 +702,13 @@ export const registerClientWithCode = (code : string)
 			|| prev.controller.user.registrationProcess
 			|| prev.controller.user.registrationError !== "undefined")
 		{
-			// dispatch(controllerActions.registerClientWithCode(prev.controller));
 			return ;
 		}
 		dispatch(setRegistrationProcessStart())
 		const	data: any = await UserServices.register(
 			code, prev.server.uri);
-		console.log("Patch: ", data);
 		if (data === "already registered")
 		{
-			console.log("Patch: ca fait des chocapics");
 			const	alreadyResponse: ControllerModel = {
 				...prev.controller,
 				registration:
@@ -723,7 +718,6 @@ export const registerClientWithCode = (code : string)
 				}
 			}
 			dispatch(controllerActions.setAbortRequestedValue(alreadyResponse));
-			console.log("ABORT ?");
 			// return ;
 		}
 		else if (data.msg === "ERROR" || data === "ERROR")
@@ -733,7 +727,6 @@ export const registerClientWithCode = (code : string)
 		}
 		else
 		{
-			// console.log("LA DATA WESH", data);
 			response = {
 				...prev.controller,
 				registration: {
@@ -762,7 +755,6 @@ export const registerClientWithCode = (code : string)
 			}
 			dispatch(controllerActions.registerClientWithCode(response));
 			// dispatch(controllerActions.verifyToken());
-			console.log("end of registration");
 		}
 	});
 };
@@ -797,10 +789,8 @@ export const registerNumberForDoubleAuth = (numero : string, token: string)
 					phoneNumber: numero
 				}
 			}
-			// console.log("controller action 791  ", data);
 		}
 		dispatch(controllerActions.registerNumberForDoubleAuth(response));
-		console.log("phone number enregistre");
 	});
 };
 
@@ -834,10 +824,8 @@ export const receiveValidationCode = (numero : string, token: string)
 					phoneNumber: numero
 				}
 			}
-			// console.log("controller action 791  ", data);
 		}
 		dispatch(controllerActions.receiveValidationCode(response));
-		console.log("phone number enregistre");
 	});
 };
 
@@ -848,7 +836,6 @@ export const GetValidationCode = (otpCode : string, token: string)
 	{
 		const 	prev = getState();
 		let		response: ControllerModel;
-		console.log("TEST ");
 		response = prev.controller;
 		if (prev.controller.user.isLoggedIn
 			|| prev.controller.user.registrationError !== "undefined")
@@ -857,13 +844,11 @@ export const GetValidationCode = (otpCode : string, token: string)
 			prev.controller.user.phoneNumber, otpCode, token, prev.server.uri);
 		if (data === "error")
 		{
-			console.log("TEST error");
 			dispatch(setRegistrationProcessError());
 			return ;
 		}
 		else
 		{
-			// console.log("TEST data validated cde", data.data);
 			response = {
 				...prev.controller,
 				user:
@@ -873,10 +858,8 @@ export const GetValidationCode = (otpCode : string, token: string)
 					codeValidated: data.data
 				}
 			}
-			// console.log("controller action 791  ", data.data);
 		}
 		dispatch(controllerActions.getValidationCode(response));
-		console.log("code enregistre");
 	});
 };
 
@@ -898,11 +881,9 @@ export const receiveCode = (token: string)
 				prev.controller.user.id.toString(), token, prev.server.uri);
 		if (data === "ERROR")
 		{
-			console.log("error receiving code");
 			dispatch(setRegistrationProcessError());
 			return ;
 		}
-		console.log("phone number enregistre");
 	});
 };
 
@@ -917,7 +898,6 @@ export const GetCode = (otpCode : string, token: string)
 		response = prev.controller;
 		if (response.user.doubleAuth === true)
 		{
-			console.log("DOUBLE AUTH IS SET AS TRUE");
 			if (prev.controller.user.isLoggedIn
 				|| prev.controller.user.registrationError !== "undefined")
 				return ;
@@ -925,13 +905,11 @@ export const GetCode = (otpCode : string, token: string)
 				prev.controller.user.id.toString(), otpCode, token, prev.server.uri);
 			if (data === "error")
 			{
-				console.log("TEST error");
 				dispatch(setRegistrationProcessError());
 				return ;
 			}
 			else
 			{
-				// console.log("TEST data validated cde", data.data);
 				response = {
 					...prev.controller,
 					user:
@@ -941,11 +919,9 @@ export const GetCode = (otpCode : string, token: string)
 						codeValidated: data.data
 					}
 				}
-				// console.log("controller action 791  ", data.data);
 			}
 		}
 		dispatch(controllerActions.getValidationCode(response));
-		console.log("code enregistre");
 	});
 };
 
@@ -1031,7 +1007,6 @@ export const	setRegistered = ()
 		const	data: any = UserServices.registrationValidation(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "error")
 		{
-			console.log("TEST error");
 			setAlreadyExists(true);
 			return ;
 		}
@@ -1200,7 +1175,6 @@ export const	setEmail = (email: string)
 		const	prev = getState();
 		const	response: ControllerModel = {
 			...prev.controller,
-			// allUsers: updatedUsers,
 			user:
 			{
 				...prev.controller.user,
@@ -1243,7 +1217,6 @@ export const	setAllUsers = ()
 			console.error("Error to get users");
 			return ;
 		}
-		// console.log("here theUsers", theUsers);
 		const array: BackUserModel[] = theUsers;
 
 		const	response: ControllerModel = {
@@ -1295,20 +1268,17 @@ export const	registerInfosInBack = (info: string, doubleAuth: boolean, field: st
 		await UserServices.registerInfosInBack(prev.controller.user.bearerToken, info, field, doubleAuth, prev.server.uri)
 		.then(() =>
 		{
-			console.log("okay registered in back");
 		})
 		.catch((error) =>
 		{
 			console.error(error);
 		});
-		console.log("HEREEEE REGISTER INGOS", info);
 		if (field === "username")
 			dispatch(setPseudo(info as string));
 		else if (field === "email")
 			dispatch(setEmail(info as string));
 		else if (field === "phoneNumber" && info !== undefined)
 			dispatch(setPhoneNumber(info as string));
-		console.log("DOUBLE AUTH REGISTER IN BACK FRONT WAY", doubleAuth);
 		if (doubleAuth !== undefined)
 			dispatch(setDoubleAuth(doubleAuth));
 		dispatch(setAllUsers());
@@ -1323,9 +1293,8 @@ export const	hashPassword = (password: string)
 		const	prev = getState();
 		await UserServices.hashPassword(prev.controller.user.bearerToken,
 			password, prev.server.serverLocation, prev.controller.user.id)
-		.then((data) =>
+		.then((_data) =>
 		{
-			console.log("okay", data);
 		})
 		.catch((error) =>
 		{
@@ -1365,7 +1334,6 @@ export const	decodePassword = (username: string, password: string)
 				password, username,
 				prev.server.uri
 			);
-			console.log("data: ", data);
 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
 			newUser.bearerToken = data.token;
@@ -1375,26 +1343,14 @@ export const	decodePassword = (username: string, password: string)
 				...prev.controller,
 				user: newUser
 			}
-			console.log("newUser = ", newUser);
 			dispatch(controllerActions.setUserData(response));
 			// dispatch(controllerActions.setNewToken(response));
 		}
 		catch (error)
 		{
 			dispatch(controllerActions.setUserData({...prev.controller}))
-			console.log(error);
 			return ;
 		}
-		// .then((data) =>
-		// {
-		// 	console.log("okay", data);
-		// 	dispatch(setNewToken(data.ret.token));
-		// 	dispatch(setUserLoggedIn());
-		// })
-		// .catch((error) =>
-		// {
-		// 	console.error("error", error);
-		// });
 	});
 }
 
@@ -1408,7 +1364,6 @@ export const	addUserAsFriend = (myId: string, friendId: string)
 			friendId, prev.server.uri, myId)
 		.then((_data) =>
 		{
-			// console.log("okay", data);
 		})
 		.catch((error) =>
 		{
@@ -1452,13 +1407,10 @@ export const	setOnline = (online: boolean, user: UserModel)
 		const	array = [...prev.controller.user.chat.users];
 		const	index = array.findIndex((elem) =>
 		{
-			console.log("SET ONLINE", user.username);
-			console.log("SET ONLINE", elem.name);
 			return (elem.name === user.username);
 		});
 		if (index === -1)
 			return ;
-			// throw new Error("controllerAction setOnline, user doesnt exist");
 		else
 			array[index].online = online;
 		const	response: ControllerModel = {
@@ -1490,7 +1442,6 @@ export const	setStatus = (status: string, user: UserModel)
 		});
 		if (index === -1)
 			return ;
-			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
 		else
 		{
 			array[index].status = status;
@@ -1807,7 +1758,6 @@ export const	getAchievements = (profileId: string)
 		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	data = await UserServices.getAchievements(token, uri, profileId);
-		console.log("achievements data", data);
 		if (data.length)
 		{
 			const	response: ControllerModel = {
@@ -1832,11 +1782,9 @@ export const	setUserBackFromDB = (token: string)
 		const	data = await UserServices.getUserBackFromDB(token, prev.server.uri);
 		if (data === "ERROR")
 		{
-			console.log("ERROR GET USER BACK");
 			dispatch(controllerActions.setUserBackFromDB(prev.controller));
 			return ;
 		}
-		console.log("DATA HERE user back ", data);
 		let	loggin: boolean, doubleAuth: boolean;
 		loggin = false;
 		doubleAuth = false;
@@ -1844,7 +1792,6 @@ export const	setUserBackFromDB = (token: string)
 			loggin = true;
 		else
 			doubleAuth = true;
-		console.log("login", loggin, " et douable auth", doubleAuth);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1882,7 +1829,6 @@ export const	userSignIn = (username: string, password: string)
 			return ;
 		else
 		{
-			console.log("DATA HERE ", data.token);
 			dispatch(setUserBackFromDB(data.token));
 			const	response: ControllerModel = {
 				...prev.controller,
@@ -1915,7 +1861,6 @@ export const	getPlayingStatus = (profileId: string)
 		});
 		if (index === -1)
 			return ;
-			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
 		else
 		{
 			if (!prev.controller.user.chat.users[index].online)

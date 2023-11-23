@@ -129,7 +129,6 @@ const	SecondStepFormContent = () =>
 	const	handleChangeTwoAuthCode = (event: any) =>
 	{
 		event.preventDefault();
-		console.log(event.target.value);
 		setTwoAuthCode(event.target.value);
 	};
 
@@ -208,7 +207,6 @@ const	SecondStepFormContent = () =>
 		{
 			if (numberRegistered && muiPhone)
 			{
-				console.log("mui phone ", muiPhone);
 				dispatch(receiveValidationCode(formattingPhoneNumber(muiPhone), user.bearerToken));
 				setSendSMS(true);
 			}
@@ -216,7 +214,6 @@ const	SecondStepFormContent = () =>
 
 		const handleFinishToRegister = () =>
 		{
-			console.log("valid ", user.codeValidated);
 			if (user.codeValidated)
 			{
 				dispatch(setUserLoggedIn());
