@@ -9,12 +9,12 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, Param, NotFoundException, Ip } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
-import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserRegisterResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as busboy from "busboy";
@@ -165,16 +165,11 @@ export class UserController
 
 	@Post("register")
 	getUserRegister(
-		// @RealIP() realIp: string,
 		@Req() req: Request,
 		@Body() body: RegisterDto,
 		@Res() res: Response)
 	{
-		// const	ip = "real ip";
-		// console.log(realIp);
-		// console.log(req.socket.remoteAddress);
 		this.logger.log("A User want to register");
-		// need to throw 5xx exception
 		if (!this.env)
 			throw new Error(".env not found");
 		if (!this.env.parsed)
@@ -297,14 +292,11 @@ export class UserController
 							}
 						});
 						res.status(200).send(retValue.res);
-						// mise a jour vers la database
 						this.logger.log("Ending processing image");
 					}
 				})
 				.catch((error) =>
 				{
-					this.logger.error("Get my information route", error);
-					// throw new InternalServerErrorException();
 					res.status(401).send({
 						message: "Wrong usage of the api by the client, rejected",
 						error: error
@@ -323,25 +315,15 @@ export class UserController
 
 	@Post("register-forty-three")
 	getUserRegisterFortyThree(
-		// @Body() body: RegisterDto,
 		@Res() res: Response)
 	{
 		this.logger.log("A no 42 User want to register");
-		// need to throw 5xx exception
-		if (!this.env)
-			throw new InternalServerErrorException();
-		if (!this.env.parsed)
-			throw new InternalServerErrorException();
-		if (!this.env.parsed.FT_UID
-			|| !this.env.parsed.FT_SECRET)
-			throw new InternalServerErrorException();
 		let	retValue;
 
 		let	profileId: number;
 		profileId = Math.floor((Math.random() * 100000) + 1);
 		while (!this.userService.isProfileIDUnique(profileId))
 			profileId = Math.floor((Math.random() * 100000) + 1);
-		// const profileId = 10101042;
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
 			registrationStarted: true,
@@ -396,33 +378,13 @@ export class UserController
 		};
 		if (this.userService.getUserById(userObject.id) !== undefined)
 		{
-			this.logger.error("User Already register ");
-			// console.log()
 			res.status(400).json({error: "you are already register"});
 		}
 		else
 		{
 			this.logger.log("Starting register forty three user");
-			// const newUserObj = this.userService.downloadAvatar(userObject);
 			retValue = this.userService.register(userObject);
-			// this.userService.createUserToDatabase(userObject)
-			// .then((data) =>
-			// {
-			// 	if (data === "ERROR")
-			// 	{
-			// 		this.logger.error("Client create a error");
-			// 	}
-			// 	else if (data === "SUCCESS")
-			// 	{
-			// 		this.logger.debug("Client create is a success");
-			// 	}
-			// 	else
-			// 	{
-			// 		this.logger.error("Logic error await/async ");
-			// 	}
-			// });
 			res.status(200).send(retValue.res);
-			// mise a jour vers la database
 			this.logger.log("Ending forty three user processing register");
 		}
 	}
@@ -431,8 +393,7 @@ export class UserController
 	getAllUser()
 		: UserModel[]
 	{
-		this.logger.verbose("request user data");
-		this.logger.verbose(this.userService.getUserArray());
+		this.logger.verbose("request all users data");
 		return (this.userService.getUserArray());
 	}
 
@@ -457,7 +418,6 @@ export class UserController
 	@Post("validate-registration")
 	@UseGuards(UserAuthorizationGuard)
 	userValidateRegistration(
-		// @Body() body: any,
 		@Req() req: any,
 		@Res() res: Response)
 	{
@@ -625,26 +585,20 @@ export class UserController
 			throw new UnauthorizedException();
 		console.log(this.env);
 		if (!this.env)
-			throw new InternalServerErrorException();
+			throw new Error(".env not found");
 		if (!this.env.parsed)
-			throw new InternalServerErrorException();
+			throw new Error(".env not parsed correctly");
 		if (!this.env.parsed.TWILIO_ACCOUNT_SID
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
-			throw new InternalServerErrorException();
+			throw new Error("twilio env variables not found");
 		const	number = body.to;
 		if (number === "undefined" || number === undefined)
-			throw new InternalServerErrorException();
-		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
-		// const readLine = readline.createInterface({
-				// input: process.stdin,
-				// output: process.stdout,
-			// });
+			throw new Error("phone number not found");
+		const	client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
 		if (verify === undefined)
-			throw new InternalServerErrorException();
-		// readLine.question("Please enter the OTP:", (otpCode: string) =>
-		// {
+			throw new Error("twilio verify env var not found");
 		client.verify.v2
 			.services(verify)
 			.verificationChecks.create(
@@ -664,12 +618,10 @@ export class UserController
 				else
 					throw new UnauthorizedException();
 			})
-			.catch((err) =>
+			.catch(() =>
 			{
-				console.log("err");
-				throw new InternalServerErrorException();
+				throw new Error("Connection to twilio failed");
 			});
-		// });
 	}
 
 	@Post("login-get-code")
@@ -686,26 +638,20 @@ export class UserController
 			throw new UnauthorizedException();
 		console.log(this.env);
 		if (!this.env)
-			throw new InternalServerErrorException();
+			throw new Error(".env not found");
 		if (!this.env.parsed)
-			throw new InternalServerErrorException();
+			throw new Error(".env not parsed correctly");
 		if (!this.env.parsed.TWILIO_ACCOUNT_SID
 			|| !this.env.parsed.TWILIO_AUTH_TOKEN
 			|| !this.env.parsed.TWILIO_VERIFY_SERVICE_SID)
-			throw new InternalServerErrorException();
+			throw new Error("twilio env variables not found");
 		const	number = this.userService.getPhoneNumber(body.profileId);
 		if (number === "undefined" || number === undefined)
-			throw new InternalServerErrorException();
-		const client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
-		// const readLine = readline.createInterface({
-				// input: process.stdin,
-				// output: process.stdout,
-			// });
+			throw new Error("phone number not found");
+		const	client = twilio(this.env.parsed.TWILIO_ACCOUNT_SID, this.env.parsed.TWILIO_AUTH_TOKEN);
 		const	verify = this.env.parsed.TWILIO_VERIFY_SERVICE_SID;
 		if (verify === undefined)
-			throw new InternalServerErrorException();
-		// readLine.question("Please enter the OTP:", (otpCode: string) =>
-		// {
+			throw new Error("twilio verify env var not found");
 		client.verify.v2
 			.services(verify)
 			.verificationChecks.create(
@@ -715,8 +661,6 @@ export class UserController
 				})
 			.then((verificationCheck) =>
 			{
-				console.log("status : ", verificationCheck.status);
-				console.log("VERIF : ", verificationCheck);
 				if (verificationCheck.status === "approved")
 				{
 					res.send(true);
@@ -725,12 +669,10 @@ export class UserController
 				else
 					throw new UnauthorizedException();
 			})
-			.catch((err) =>
+			.catch(() =>
 			{
-				console.log("err");
-				throw new InternalServerErrorException();
+				throw new Error("Twilio connection failed");
 			});
-		// });
 	}
 
 	@Post("/update-photo")
@@ -804,13 +746,13 @@ export class UserController
 				}
 				catch (error)
 				{
-					return (res.status(500).json({error: true}));
+					return (res.status(418).json({error: true}));
 				}
 				return (fileCfg.fullPath());
 			})
 			.catch((error) =>
 			{
-				res.status(500).json({error: true});
+				res.status(418).json({error: true});
 				console.log(error);
 				return ;
 			});
@@ -822,7 +764,7 @@ export class UserController
 		catch (error)
 		{
 			this.logger.error(error);
-			res.status(500).json({error: true});
+			res.status(418).json({error: true});
 		}
 	}
 	@Post("change-infos")

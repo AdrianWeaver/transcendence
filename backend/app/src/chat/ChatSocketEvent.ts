@@ -132,7 +132,6 @@ export class ChatSocketEvents
 
 					const alreadyConnected = this.chatService.chat.memberSocketIds.find((user) =>
 					{
-		
 						return (user.profileId === profileId
 							&& (user.memberSocketId !== "disconnected" && user.memberSocketId !== "undefined"));
 					});
@@ -795,11 +794,17 @@ export class ChatSocketEvents
 
 			if (data.type === "did-I-join")
 			{
+				let	priv: boolean;
 				let	channel: Channel;
+				priv = false;
 				channel = this.chatService.searchChannelByName(data.payload.chanName) as Channel;
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName) as Channel;
+					if (channel === undefined)
+						return ;
+					else
+						priv = true;
 				}
 				const	action = {
 					type: "confirm-is-inside-channel",
@@ -811,7 +816,12 @@ export class ChatSocketEvents
 					}
 				};
 				if (channel.isMember(client.id) === false)
-					action.payload.isInside = "You must first join the channel";
+				{
+					if (priv)
+						action.payload.isInside = "This conversation is private";
+					else
+						action.payload.isInside = "You must first join the channel";
+				}
 				client.emit("channel-info", action);
 			}
 
@@ -859,8 +869,6 @@ export class ChatSocketEvents
 				if (target === undefined)
 					return ;
 				const id = channel.messages.length + 1;
-	
-				let message: string;
 				const newMessage: MessageModel = {
 					sender: "server",
 					message: "",
@@ -894,7 +902,6 @@ export class ChatSocketEvents
 						kind: "channel",
 					}
 				};
-				
 				if (channel.isOwner(targetClient.id) === false)
 				{
 					this.server.to(channel.name).emit("update-messages", action);
@@ -902,7 +909,6 @@ export class ChatSocketEvents
 						action.payload.message = "You have been kicked from " + channel.name;
 					else
 						action.payload.message = "You have been banned from " + channel.name;
-				
 					const indexToRemove = channel.admins.findIndex((admin) =>
 					{
 						return (admin.profileId === target.profileId);
@@ -1084,8 +1090,6 @@ export class ChatSocketEvents
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 				if (userMe === undefined)
 					return ;
-				// const	searchSocket = this.chatService.getUserBySocketId(data.payload.blockedName);
-				
 				const	userToBlock = this.chatService.getUserWithProfileId(data.payload.blockedName);
 				if (userToBlock === undefined)
 					return ;
