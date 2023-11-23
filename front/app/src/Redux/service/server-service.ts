@@ -99,10 +99,9 @@ const	ServerService = {
 					// 401 : not implemented yet
 					return ({statusCode: 501});
 				})
-				.catch((error) =>
+				.catch((_error) =>
 				{
 					// To do : implement errors 
-					console.log(error);
 					return ({statusCode: 501});
 				})
 		);
@@ -132,7 +131,6 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
-					console.log("Login data", data);
 					const response : AnonymousUserLoginResponseModel
 						= {
 							statusCode: 200,
@@ -140,12 +138,10 @@ const	ServerService = {
 							message: data.message,
 							token: data.token
 						};
-					console.log("data login: ", data);
 					return (response);
 				})
 				.catch((error) =>
 				{
-					console.error("login anonymous error");
 					return ({
 						statusCode: 501,
 						error: error});
@@ -161,7 +157,6 @@ const	ServerService = {
 				"Authorization": token
 			}
 		};
-		console.log("the token -->", token);
 		return (
 			Api(serverLocation)
 				.post("anonymous-user/verify-token", {}, config)
@@ -169,14 +164,12 @@ const	ServerService = {
 				{
 					return (res.data);
 				})
-				.then((data) =>
+				.then((_data) =>
 				{
-					console.log(data);
 					return ("SUCCESS");
 				})
-				.catch((error) =>
+				.catch((_error) =>
 				{
-					console.log(error);
 					return ("ERROR");
 				})
 		);
@@ -271,7 +264,6 @@ const	ServerService = {
 				})
 				.catch((error) =>
 				{
-					console.log(error);
 					return ({
 						success: false,
 						data: undefined
@@ -302,7 +294,6 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
-					console.log("DATA", data.data);
 					return (
 						{
 							success: true,
@@ -312,7 +303,6 @@ const	ServerService = {
 				})
 				.catch((error) =>
 				{
-					console.log(error);
 					return ({
 						success: false,
 						data: undefined
@@ -338,7 +328,6 @@ const	ServerService = {
 				})
 				.then((data) =>
 				{
-					console.log("DATA", data.data);
 					return (
 						{
 							success: true,
@@ -346,9 +335,8 @@ const	ServerService = {
 						}
 					);
 				})
-				.catch((error) =>
+				.catch((_error) =>
 				{
-					console.log(error);
 					return ({
 						success: false,
 						data: undefined

@@ -419,12 +419,8 @@ export const	getMyActiveGame = ()
 
 		const data = await ServerService
 			.getMyActiveGame(token, prev.server.uri);
-		console.log("data fetched", data);
 		if (data.success === true)
 		{
-			console.log("getMyGameActive success called", data);
-			console.log("values ", data.data);
-			console.log("classical", data.data.classical);
 			const	response: Model = {
 				...prev.gameEngine,
 				myGameActive:
@@ -434,13 +430,10 @@ export const	getMyActiveGame = ()
 					upsideDown: data.data.upsideDown
 				}
 			};
-			console.error("before dispatch");
-			console.log("Response: ", response);
 			dispatch(action.getMyActiveGame(response));
 		}
 		else
 		{
-			console.log("getMyGameActive Failure");
 			dispatch(action.getMyActiveGame({...prev.gameEngine}));
 		}
 	});
@@ -456,15 +449,12 @@ export const	revokeGameWithUuid = (gameUuid: string)
 		const	serverLoc = prev.server.uri;
 		const	data = await ServerService
 			.revokeGameWithUuid(token, serverLoc, gameUuid);
-		console.log("data revoke", data);
 		if (data.success === true)
 		{
-			console.log("revoke game success");
 			dispatch(action.revokeMyGame({...prev.gameEngine}));
 		}
 		else
 		{
-			console.log("revoke game abort");
 			dispatch(action.revokeMyGame({...prev.gameEngine}));
 		}
 	});
@@ -514,13 +504,3 @@ export const	resetGameEngine = ()
 	});
 };
 
-// export const	revokeGameByUUID = (uuidToRevoke: string)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return (async (dispatch, getState) =>
-// 	{
-// 		const	prev = getState();
-
-// 		const token = prev.controller.user.bearerToken;
-// 	});
-// };

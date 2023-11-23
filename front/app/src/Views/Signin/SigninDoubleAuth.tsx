@@ -39,7 +39,6 @@ const	SigninDoubleAuth = () =>
 	{
 		if ((!user.doubleAuth) && !user.isLoggedIn)
 		{
-			console.log("User wants to simple log in");
 			navigate("/signin");
 		}
 	}, [user.doubleAuth]);
@@ -48,11 +47,8 @@ const	SigninDoubleAuth = () =>
 	{
 		if (user.isLoggedIn === true)
 		{
-			console.log("Navigate executed");
 			navigate("/");
 		}
-		else
-			console.log("unlogged");
 	}, [
 		user.isLoggedIn,
 		navigate
@@ -119,15 +115,9 @@ const	SigninDoubleAuth = () =>
 				key;
 				return (value === true);
 			});
-			console.log("filtered", filtered);
-			console.log("ici", allUsers);
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				console.log("Data to send", {
-					username: userLogIn.username,
-					password: passwordValue
-				});
 				dispatch(userSignIn(userLogIn.username, userLogIn.password));
 			}
 	};
@@ -144,13 +134,11 @@ const	SigninDoubleAuth = () =>
 	const	handleReceiveCode = () =>
 	{
 		dispatch(receiveCode(user.bearerToken));
-		console.log("Handle receive mg");
 		setSendSMS(true);
 	};
 
 	const handleFinishToRegister = () =>
 	{
-		console.log("valid ", user.codeValidated);
 		if (user.codeValidated)
 		{
 			dispatch(setUserLoggedIn());

@@ -1,8 +1,6 @@
 
 export const	pagesLinksVisitor = [
 	"/",
-	"/redux-test-view",
-	"/starter-pack"
 ];
 
 /**
@@ -15,6 +13,4 @@ export const	pagesVisitor = [
 	"Accueil",
 
 	// these page are for dev purpose, not final navigation
-	"Redux Test View",
-	"Starter Pack"
 ];

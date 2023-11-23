@@ -13,8 +13,6 @@ export const	Landing = () =>
 
 	const	dispatch = useAppDispatch();
 
-	console.log("chat value :", controller.user.chat);
-
 	if (controller.user.chat.window.bigWindow === false)
 		dispatch(setBigWindow());
 	setTimeout(() =>

@@ -22,7 +22,6 @@ const	StepThree = () =>
 
 	const	handleLogin = () =>
 	{
-		console.log("STEP THREE USER ", user);
 		navigate("/");
 	}
 
