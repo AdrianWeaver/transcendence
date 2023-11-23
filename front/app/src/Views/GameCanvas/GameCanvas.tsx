@@ -112,8 +112,8 @@ const	GameCanvas = () =>
 				{
 					game.continueAnimating = true;
 				});
-				if (game.playerOne.score === 7
-					|| game.playerTwo.score === 7)
+				if (game.playerOne.score === 2
+					|| game.playerTwo.score === 2)
 				{
 					game.continueAnimating = false;
 					game.displayEndMessage();
