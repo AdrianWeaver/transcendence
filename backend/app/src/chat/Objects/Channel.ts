@@ -217,7 +217,6 @@ class Channel
 		this.findClientById = (socketOrProfileId: string) =>
 		{
 			let memberSocketIdMod;
-		
 			memberSocketIdMod = this.users.find((elem) =>
 			{
 				return (elem.profileId === socketOrProfileId);
@@ -260,7 +259,11 @@ class Channel
 
 	public	setFromDatabaseAdmins(admins :MemberSocketIdModel[])
 	{
-		this.admins = [...admins];
+		this.admins = admins.map((member: MemberSocketIdModel) =>
+		{
+			member.memberSocketId = "disconnected";
+			return (member);
+		});
 	}
 }
 

@@ -75,8 +75,6 @@ export	class ChatService implements OnModuleInit
 	{
 		this.log.verbose("Chat Service is constructed with id: " + this.uuid);
 		this.chat = new Chat();
-		// this.initDB();
-		// this.updateDB();
 	}
 
 	private onTableCreate()
@@ -156,145 +154,14 @@ export	class ChatService implements OnModuleInit
 			})
 			.catch(() =>
 			{
-			});
-	}
-
-	private	loadTableToMemoryOld()
-	{
-		this.prismaService
-			.prisma.chatJson
-			.findUnique(
-			{
-				where:
-				{
-					chatJsonID: this.chatID,
-				}
-			}
-			)
-			.then((data: any) =>
-			{
-				if (data === null)
-				{
-					this.onTableCreate();
-					this.loadTableToMemory();
-				}
-				else
-				{
-					const rawobj = JSON.parse(data.contents);
-
-					const	newChatInstance = new Chat();
-
-					const arrayUser: User[] = [];
-					rawobj.users.forEach((strobj: string) =>
-					{
-						const rawUser = JSON.parse(strobj);
-
-						const	newUserInstance = new User(
-							rawUser.name,
-							rawUser.profileId);
-						// NEED TO KNOW WHAT TO DO WITH null SOCKET
-						newUserInstance.setClient(null);
-						newUserInstance.chat = this.chat;
-						newUserInstance.setStatus(rawUser.status);
-						newUserInstance.setOnline(rawUser.online);
-						newUserInstance.setAvatar(rawUser.avatar);
-						newUserInstance.id = rawUser.id;
-						const blockedArray: Array<MemberSocketIdModel> = [];
-						rawUser.blocked.forEach((blocked: MemberSocketIdModel) =>
-						{
-							const newBlocked: MemberSocketIdModel = {
-								memberSocketId: blocked.memberSocketId,
-								profileId: blocked.profileId,
-							};
-							blockedArray.push(newBlocked);
-						});
-						newUserInstance.blocked = blockedArray;
-
-						if (rawUser.friends !== undefined)
-						{
-							const arrayFriendList: Array<FriendsModel> = [];
-							rawUser.friends.forEach((elem: FriendsModel) =>
-							{
-								const	objToMemory: FriendsModel = {
-									id: elem.id,
-									name: elem.name,
-									profileId: elem.profileId,
-									avatar: elem.avatar,
-									status: elem.status
-								};
-								arrayFriendList.push(objToMemory);
-							});
-							newUserInstance.friends = arrayFriendList;
-						}
-						arrayUser.push(newUserInstance);
-					});
-					newChatInstance.users = arrayUser;
-
-					const	arrayChanMap: Array<ChanMapModel> = [];
-					rawobj.chanMap.forEach((elem: ChanMapModel) =>
-					{
-						const	objToMemory: ChanMapModel = {
-							id: elem.id,
-							mode: elem.mode,
-							name: elem.name
-						};
-						arrayChanMap.push(objToMemory);
-					});
-					newChatInstance.chanMap = arrayChanMap;
-
-					// RETRIEVING CHANNELS
-					const arrayChannels: Channel[] = [];
-
-					const	arrMemberSocketIds: Array<MemberSocketIdModel> = [];
-					rawobj.memberSocketIds.forEach((elem: MemberSocketIdModel) =>
-					{
-						const	objToMemory: MemberSocketIdModel = {
-							memberSocketId: elem.memberSocketId,
-							profileId: elem.profileId,
-						};
-						arrMemberSocketIds.push(objToMemory);
-					});
-					newChatInstance.memberSocketIds = arrMemberSocketIds;
-					this.chat = newChatInstance;
-
-					this.chat.channels.forEach((channel: Channel) =>
-					{
-						channel.chat = this.chat;
-					});
-
-					rawobj.users.forEach((strobj: string) =>
-					{
-						const rawUser = JSON.parse(strobj);
-						const chanArray: string[] = [];
-						rawUser.channels.forEach((chan: string) =>
-						{
-							const tmpChan = JSON.parse(chan);
-							const searchChan = this.chat.channels.find((chanToFind) =>
-							{
-								return (chanToFind.name === tmpChan.name);
-							});
-							if(searchChan !== undefined)
-								chanArray.push(searchChan.id);
-						});
-						const searchUser = this.chat.users.find((element) =>
-						{
-							return (element.profileId === rawUser.profileId);
-						});
-						if (searchUser !== undefined)
-							searchUser.channels = chanArray;
-					});
-				}
-			})
-			.catch((error: any) =>
-			{
-				this.log.error(error);
+				console.log("load table skipped");
 			});
 	}
 
 	onModuleInit()
 	{
-		this.log.verbose("Get from SQL database to In Memory DB");
-		this.loadTableToMemory();
+		// this.log.verbose("Get from SQL database to In Memory DB");
+		// this.loadTableToMemory();
 	}
 
 	public	updateDatabase()
