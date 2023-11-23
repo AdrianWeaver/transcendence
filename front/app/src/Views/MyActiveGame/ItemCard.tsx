@@ -145,7 +145,7 @@ const	ItemCard = (props: ItemCardModel) =>
 								>
 									Entrer en jeu
 								</Button>
-								<Button
+								{/* <Button
 									size="small"
 									onClick={() =>
 									{
@@ -155,7 +155,7 @@ const	ItemCard = (props: ItemCardModel) =>
 									}}
 								>
 									Abandonner
-								</Button>
+								</Button> */}
 							</CardActions>
 						</Card>
 					</Grid>

@@ -127,8 +127,10 @@ export class GameSocketEvents
 		{
 			if (instance.revoked === true)
 			{
-				this.gameService.recordMatchHistory(instance);
+				// this.gameService.recordMatchHistory(instance);
 				// this.logger.debug(frame);
+				instance.revoked = false;
+				this.logger.debug("instance not killed");
 				if (frame === 0)
 				{
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
@@ -137,8 +139,9 @@ export class GameSocketEvents
 				{
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
 				}
-				this.logger.error("error in revoked", instance);
-				console.log(instance);
+				// this.logger.error("error in revoked", instance);
+				// this.gameService.recordMatchHistory(instance);
+				// console.log(instance);
 				return ;
 			}
 			if (instance.loop && instance.loop.gameActive === false)
@@ -851,7 +854,7 @@ export class GameSocketEvents
 			}
 		};
 		const	gameMode = instance.gameMode;
-		if (gameMode === "classical" || gameMode === "upside-down")
+		if (gameMode === "classical" || gameMode === "upside-down" || gameMode === "friend")
 		{
 			const	playerOne = instance.playerOne;
 			const	playerTwo = instance.playerTwo;
@@ -893,7 +896,8 @@ export class GameSocketEvents
 		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
-
+		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
+		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);
 		const game = this.gameService.findGameInstanceWithClientId(client.id);
 		if (game)
 		{

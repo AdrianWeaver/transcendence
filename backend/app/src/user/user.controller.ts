@@ -1038,7 +1038,7 @@ export class UserController
 					adversaire: stat.playerTwoProfileId as string,
 					advScore: stat.scorePlayerTwo.toString(),
 					elapsedTime: (frameCount / frameRate) + " secondes",
-					myScore: stat.playerOneProfileId as string,
+					myScore: stat.scorePlayerOne.toString(),
 					adversaireAvatar: searchPlayerTwo.avatar,
 					myAvatar: searchPlayerOne.avatar
 				};
