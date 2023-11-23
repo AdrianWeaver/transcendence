@@ -851,8 +851,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			}
 		},
 		password: data.password,
-		friendsProfileId: []
-		// tokenSecret: secretToken
+		friendsProfileId: [],
+		achievements: []
 	};
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
@@ -934,7 +934,8 @@ public	register(data: UserModel)
 			}
 		},
 		password: data.password,
-		friendsProfileId: []
+		friendsProfileId: [],
+		achievements: []
 		// tokenSecret: secretToken
 	};
 	this.user.push(newUser);
@@ -1505,17 +1506,6 @@ public	register(data: UserModel)
 			revokedConnectionRequest: false,
 			authService:
 			{
-				// Do we get a new token here or in the route with login ?
-				// token: "Bearer " + jwt.sign(
-				// 	{
-				// 		id: data.id,
-				// 		email: data.email
-				// 	},
-				// 	this.secret,
-				// 	{
-				// 		expiresIn: "1d"
-				// 	}
-				// ),
 				token: data.token,
 				expAt: data.expAt,
 				doubleAuth:
@@ -1529,7 +1519,8 @@ public	register(data: UserModel)
 				}
 			},
 			password: data.password,
-			friendsProfileId: [...data.friendsProfileId]
+			friendsProfileId: [...data.friendsProfileId],
+			achievements: [...data.achievements]
 		};
 		// console.log("BACK TO OBJ", toObj);
 		newUsers.push(toObj);
