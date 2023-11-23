@@ -4,14 +4,12 @@
 import { useEffect } from "react";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import { Avatar, Typography } from "@mui/material";
-import { Image } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 
 const	Home = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 
-	// dispatch(verifyTokenAnonymousUser());
 	useEffect(() =>
 	{
 		savePrevPage("/");

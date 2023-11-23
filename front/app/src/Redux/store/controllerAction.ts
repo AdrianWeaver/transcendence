@@ -609,7 +609,10 @@ export const	setUserData = (data: any)
 	{
 		const	prev = getState();
 
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
+		const	array: BackUserModel[] = prev.controller.allUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		console.log("SET USER DATA", data);
 		array.forEach((elem) =>
 		{
@@ -1054,8 +1057,10 @@ export const	setAvatar = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
-
+		const	array: BackUserModel[] = prev.controller.allUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		array.forEach((elem) =>
 		{
 			if (elem.id === prev.controller.user.id)
@@ -1261,7 +1266,10 @@ export const	setProfileId = (name: string, profileId: string)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		array.map((elem) =>
 		{
 			if (elem.name === name)
@@ -1425,7 +1433,10 @@ export const	addFrontUser = (user: UserModel)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.allFrontUsers];
+		const	array = prev.controller.allFrontUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.id === user.id);
@@ -1449,16 +1460,16 @@ export const	setOnline = (online: boolean, user: UserModel)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	index = array.findIndex((elem) =>
 		{
-			console.log("SET ONLINE", user.username);
-			console.log("SET ONLINE", elem.name);
 			return (elem.name === user.username);
 		});
 		if (index === -1)
 			return ;
-			// throw new Error("controllerAction setOnline, user doesnt exist");
 		else
 			array[index].online = online;
 		const	response: ControllerModel = {
@@ -1483,7 +1494,10 @@ export const	setStatus = (status: string, user: UserModel)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});;
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.name === user.username);
@@ -1549,8 +1563,14 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 	{
 		const	prev = getState();
 
-		const	connected = [...prev.controller.user.chat.connectedUsers];
-		const	disconnected = [...prev.controller.user.chat.disconnectedUsers];
+		const	connected = prev.controller.user.chat.connectedUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
+		const	disconnected = prev.controller.user.chat.disconnectedUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	indexConnect = connected.findIndex((elem) =>
 		{
 			return (elem.name === user.name);
@@ -1915,7 +1935,6 @@ export const	getPlayingStatus = (profileId: string)
 		});
 		if (index === -1)
 			return ;
-			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
 		else
 		{
 			if (!prev.controller.user.chat.users[index].online)
