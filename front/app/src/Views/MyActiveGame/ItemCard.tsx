@@ -145,16 +145,17 @@ const	ItemCard = (props: ItemCardModel) =>
 								>
 									Entrer en jeu
 								</Button>
-								<Button
+								{/* <Button
 									size="small"
 									onClick={() =>
 									{
-										alert("note to dev : please fix my route")
+										alert("note to dev : please fix my route game.uuid: ", game.uuid);
+										console.log(game.uuid);
 										dispatch(revokeGameWithUuid(game.uuid));
 									}}
 								>
 									Abandonner
-								</Button>
+								</Button> */}
 							</CardActions>
 						</Card>
 					</Grid>

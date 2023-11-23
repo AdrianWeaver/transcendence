@@ -39,10 +39,10 @@ const	GameSetup = () =>
     return (
         <>
         < MenuBar />
-        <head>
-            <title>Welcome to Our PONG Game</title>
-        </head>
-        <body>
+        {/* <head> */}
+            {/* <title>Welcome to Our PONG Game</title> */}
+        {/* </head> */}
+        {/* <body> */}
             <h1>Welcome to our version of PONG game!</h1>
             <p>This game was realized in the framework of our project <em>ft_transcendance</em> at 42 school in Paris. It may have made us cry at times, but we are happy to present it to you today.</p>
 
@@ -66,7 +66,7 @@ const	GameSetup = () =>
 				<button style={buttonStyle} onClick={goToClassicGame}>Classic mode</button>
 				<button style={buttonStyle} onClick={goToSpecialGame}> Special mode</button>
 			</div>
-        </body>
+        {/* </body> */}
         </>
     );
 };

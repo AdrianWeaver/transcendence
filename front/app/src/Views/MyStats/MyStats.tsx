@@ -34,7 +34,7 @@ const	columns: GridColDef[] = [
 	},
 	{
 		field: "myAvatar",
-		headerName: "",
+		headerName: "player one",
 		renderCell: (params) =>
 		{
 			return (
@@ -46,7 +46,7 @@ const	columns: GridColDef[] = [
 	},
 	{
 		field: "adversaireAvatar",
-		headerName: "",
+		headerName: "player two",
 		renderCell: (params) =>
 		{
 			return (
@@ -56,19 +56,19 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
-	{
-		field: "adversaire",
-		headerName: "Adversaire",
-		type: "string"
-	},
+	// {
+	// 	field: "adversaire",
+	// 	headerName: "Adversaire",
+	// 	type: "string"
+	// },
 	{
 		field: "myScore",
-		headerName: "My Score",
+		headerName: "Score p. One",
 		type: "number"
 	},
 	{
 		field: "advScore",
-		headerName: "Adv. Score",
+		headerName: "Score p. Two",
 		type: "number"
 	},
 	{
@@ -76,7 +76,6 @@ const	columns: GridColDef[] = [
 		headerName: "Temps de jeu",
 		type: "string"
 	},
-
 ];
 
 // const	fakeRows: any = [];

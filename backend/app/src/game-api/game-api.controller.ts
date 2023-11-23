@@ -68,6 +68,11 @@ export class GameApiController
 		return (this.gameApiService.getGameServiceCopy());
 	}
 
+	/**
+	 * @deprecated not used final release
+	 * @param friend 
+	 * @returns 
+	 */
 	@Get("/invite/friends")
 	// @UseGuards(UserAuthorizationGuard)
 	inviteFriend(@Param("invited") friend: string)

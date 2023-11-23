@@ -453,10 +453,10 @@ export const	revokeGameWithUuid = (gameUuid: string)
 	{
 		const	prev = getState();
 		const	token = prev.controller.user.bearerToken;
-		const	serverLoc = prev.server.serverLocation;
+		const	serverLoc = prev.server.uri;
 		const	data = await ServerService
 			.revokeGameWithUuid(token, serverLoc, gameUuid);
-		console.log("data");
+		console.log("data revoke", data);
 		if (data.success === true)
 		{
 			console.log("revoke game success");

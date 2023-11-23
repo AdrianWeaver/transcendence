@@ -125,6 +125,25 @@ export class GameSocketEvents
 
 		this.printPerformance = (timestamp: number, frame: number, instance: GameServe) =>
 		{
+			if (instance.revoked === true)
+			{
+				// this.gameService.recordMatchHistory(instance);
+				// this.logger.debug(frame);
+				instance.revoked = false;
+				this.logger.debug("instance not killed");
+				if (frame === 0)
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
+				}
+				else
+				{
+					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
+				}
+				// this.logger.error("error in revoked", instance);
+				// this.gameService.recordMatchHistory(instance);
+				// console.log(instance);
+				return ;
+			}
 			if (instance.loop && instance.loop.gameActive === false)
 				return ;
 			this.update(instance);
@@ -823,7 +842,6 @@ export class GameSocketEvents
 			this.gameService.gameInstances[indexInstance].playerTwo.socketId = "disconnected";
 
 		this.gameService.setGameActiveToFalse(indexInstance);
-		
 		instance.userConnected -= 1;
 		// send the new number of users and users ready
 		const	action = {
@@ -834,7 +852,7 @@ export class GameSocketEvents
 			}
 		};
 		const	gameMode = instance.gameMode;
-		if (gameMode === "classical" || gameMode === "upside-down")
+		if (gameMode === "classical" || gameMode === "upside-down" || gameMode === "friend")
 		{
 			const	playerOne = instance.playerOne;
 			const	playerTwo = instance.playerTwo;
@@ -853,9 +871,31 @@ export class GameSocketEvents
 				}
 			}
 		}
+		if (instance.revoked)
+		{
+			this.logger.verbose("The game will be destroyed");
+			// console.log(instance);
+			// before data is erased 
+			if (instance.userConnected === 0)
+			{
+				instance.revoked = false;
+				const	idToErase = this.gameService.gameInstances.findIndex((game) =>
+				{
+					return (game.uuid === instance.uuid);
+				});
+				if (idToErase !== -1)
+					this.gameService.gameInstances.splice(idToErase, 1);
+				if (this.gameService.gameInstances.length === 0)
+				{
+					this.gameService.roomCount = 0;
+				}
+			}
+			// console.log(instance);
+		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
-
+		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
+		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);
 		const game = this.gameService.findGameInstanceWithClientId(client.id);
 		if (game)
 		{

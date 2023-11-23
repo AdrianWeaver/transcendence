@@ -221,6 +221,8 @@ export class	GameService implements OnModuleInit
 	}
 	public	removeOneSocketIdReadyWithIndex(index: number)
 	{
+		if (index === -1)
+			return ;
 		this.socketIdReady.splice(index, 1);
 	}
 	public	pushClientIdIntoSocketIdReady(clientId: string, profileId: string)
