@@ -14,7 +14,7 @@ import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
-import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, ChatUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as busboy from "busboy";
@@ -1027,19 +1027,16 @@ export class UserController
 			res.status(201).send(data);
 	}
 
-	@Post("user-playing")
+	@Get("user-playing")
 	@UseGuards(UserAuthorizationGuard)
-	async GetPlayingStatus(@Body() body: any)
+	async GetPlayingStatus()
 	{
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
 		playing = false;
-		const	length = await this.gameService.getStatusConnectedToGameFromProfileId(body.profileId);
-		if (length)
-			playing = true;
-		this.chatService.setStatus(body.profileId, playing);
-		this.userService.setStatus(body.profileId, playing);
-		return (playing);
+		this.chatService.updateStatus(this.gameService);
+		this.userService.updateStatus(this.gameService);
+		return (this.chatService.getAllUsers());
 	}
 
 	@Post("/get-achievements")

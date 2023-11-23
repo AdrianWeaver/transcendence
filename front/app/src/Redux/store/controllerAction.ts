@@ -1917,52 +1917,31 @@ export const	userSignIn = (username: string, password: string)
 	});
 }
 
-export const	getPlayingStatus = (profileId: string)
+export const	getPlayingStatus = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		let		status: string;
-		status = "";
-		const	array = prev.controller.user.chat.users.map((elem) =>
+		const	data = await UserServices.getPlayingStatus(prev.controller.user.bearerToken, prev.server.uri);
+		if (data === "ERROR")
+			dispatch(controllerActions.setStatus(prev.controller));
+		else if (data.length)
 		{
-			return (Object.assign(elem));
-		});
-		const	index = array.findIndex((elem) =>
-		{
-			return (elem.id.toString() === profileId);
-		});
-		if (index === -1)
-			return ;
-		else
-		{
-			if (!prev.controller.user.chat.users[index].online)
-				status = "offline";
-			else
-			{
-				const	data = await UserServices.getPlayingStatus(profileId, prev.controller.user.bearerToken, prev.server.uri);
-				if (data === true)
-					status = "playing";
-				else if (data === false)
-					status = "online";
-			}
-			if (status.length)
-				array[index].status = status;
-		}
-		const	response: ControllerModel = {
-			...prev.controller,
-			user:
-			{
-				...prev.controller.user,
-				chat:
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
 				{
-					...prev.controller.user.chat,
-					users: array
+					...prev.controller.user,
+					chat:
+					{
+						...prev.controller.user.chat,
+						users: data
+					}
 				}
 			}
+			dispatch(controllerActions.setStatus(response));
 		}
-		dispatch(controllerActions.setStatus(response));
 	});
 }
 

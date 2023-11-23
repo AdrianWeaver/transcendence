@@ -55,6 +55,7 @@ import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
 import Chat from "src/chat/Objects/Chat";
+import { GameService } from "src/game-socket/Game.service";
 
 
 @Injectable()
@@ -1628,24 +1629,25 @@ public	register(data: UserModel)
 			location: this.user[index].location,
 			doubleAuth: this.user[index].authService.doubleAuth.enable,
 			bearerToken: this.user[index].authService.token,
-			// friendsProfileId: [...this.user[index].friendsProfileId]
 		};
 		return (user);
 	}
 
-	public	setStatus(profileId: string, playing: boolean)
+	public	updateStatus(gameService: GameService)
 	{
-		const	index = this.user.findIndex((elem) =>
+		this.user.forEach((elem) =>
 		{
-			return (elem.id.toString() === profileId);
-		});
-		if (index !== undefined)
-		{
-			if (playing)
-				this.user[index].status = "playing";
+			if (!elem.online)
+				elem.status = "offline";
 			else
-				this.user[index].status
-					= this.user[index].online ? "online" : "offline";
-		}
+			{
+				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
+				if (playing)
+					elem.status = "playing";
+				else
+					elem.status = "online";
+			}
+		});
+		console.log("UPDATE STATUS WORKED ?", this.user);
 	}
 }

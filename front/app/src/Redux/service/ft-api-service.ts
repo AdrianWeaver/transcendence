@@ -512,7 +512,7 @@ const	UserServices = {
 		);
 	},
 
-	async	getPlayingStatus(profileId: string | number, token :string, hostname: string)
+	async	getPlayingStatus(token: string, hostname: string)
 	{
 		console.log("get user back from db");
 		const	config: AxiosRequestConfig = {
@@ -521,15 +521,12 @@ const	UserServices = {
 				"Authorization": token
 			},
 		};
-		const	data = {
-			profileId: profileId,
-		};
 		return (
 			Api(hostname)
-			.post("user/user-playing", data, config)
+			.get("user/user-playing", config)
 			.then((data) =>
 			{
-				console.log(data.data);
+				console.log("front side user-playing", data.data);
 				return (data.data);
 			})
 			.catch((error) =>

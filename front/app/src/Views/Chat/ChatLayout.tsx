@@ -31,7 +31,6 @@ import {
 
 import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
-import FriendItem from "./components/FriendItem";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -62,7 +61,7 @@ import {
 	setProfileFriendView,
 	setProfilePublicView,
 	setPreviousPage,
-	getPlayingStatus
+	getPlayingStatus,
 }	from "../../Redux/store/controllerAction";
 
 import { useNavigate } from "react-router-dom";
@@ -185,15 +184,11 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user);
 	});
-
-	users.forEach((elem) =>
-	{
-		dispatch(getPlayingStatus(elem.profileId));
-	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
+	dispatch(getPlayingStatus());
 
 	const	createNewConv = (activeId: string) =>
 	{
