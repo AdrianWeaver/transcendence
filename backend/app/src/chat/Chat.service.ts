@@ -722,6 +722,7 @@ export	class ChatService implements OnModuleInit
 	async	hashPassword(password: string, chanName: string)
 	{
 		const	saltRounds = 10;
+		console.log("CHANNAME ", chanName);
 		const	index = this.chat.channels.findIndex((elem) =>
 		{
 			return (elem.name === chanName);

@@ -660,16 +660,15 @@ export class ChatSocketEvents
 						newChannel.setId();
 						newChannel.setKind(kind);
 						newChannel.setPassword(data.payload.chanPassword);
-						if (data.payload.chanMode === "protected")
-						{
-							const	protectedPassword = 
-							newChannel.setPassword(await this.chatService.hashPassword(data.payload.chanPassword, data.payload.chanName));
-						}
 						newChannel.setMode(data.payload.chanMode);
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
 						searchUser?.channels.push(newChannel.id);
 						this.chatService.addNewChannel(newChannel, data.payload.chanId, kind);
+						if (data.payload.chanMode === "protected")
+						{
+							newChannel.setPassword(await this.chatService.hashPassword(data.payload.chanPassword, data.payload.chanName));
+						}
 						this.chatService.updateDatabase();
 						const	action = {
 							type: "add-new-channel",
