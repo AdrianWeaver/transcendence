@@ -132,7 +132,7 @@ const	GameCanvas = () =>
 	return (
 		<>
 			<div style={{textAlign: "center"}}>
-				FT_TRANSCENDANCE
+				FT_TRANSCENDENCE
 			</div>
 			<br></br>
 			<div style={{textAlign: "center"}}>
