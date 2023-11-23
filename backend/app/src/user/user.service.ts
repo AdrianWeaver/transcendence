@@ -1417,6 +1417,7 @@ public	register(data: UserModel)
 			authService: {...user.authService},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
+			achievements: [],
 			revokedConnectionRequest: user.revokedConnectionRequest
 		};
 		// this.userDB.push(objToDB);
@@ -1603,7 +1604,7 @@ public	register(data: UserModel)
 		return (fakeRows);
 	}
 
-	public	registerIpAddress(profileId: string | number, ip: string, changeIp: boolean)
+	public	getAchievements(profileId: string | number)
 		: any
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -1614,21 +1615,9 @@ public	register(data: UserModel)
 		{
 			return ("error");
 		}
-		const	oldIp = searchUser.authService.doubleAuth.lastIpClient;
-		const	index = this.user.findIndex((elem) =>
-		{
-			return (profileId.toString() === elem.id.toString());
-		});
-		if (index === -1)
-			return ("error");
-		if (changeIp || oldIp === "undefined")
-			this.user[index].authService.doubleAuth.lastIpClient = ip;
-		const	res = {
-			newIp: ip,
-			oldIp: oldIp,
-			ipChanged: changeIp
-		};
-		return (res);
+		if (!searchUser.achievements.length)
+			return ("no achievements");
+		return (searchUser.achievements);
 	}
 
 	public	getUserBackFromDB(profileId: string | number)
