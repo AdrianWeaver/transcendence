@@ -1,20 +1,17 @@
 /* eslint-disable max-lines-per-function */
 // import { Public } from "@mui/icons-material";
 import UserProfileEdit from "./UserProfileEdit";
-// import { UserModel } from "../Redux/models/redux-models";
 /* eslint-disable max-statements */
 
 
 class	UserProfileEditChecker
 {
-	public	password: boolean;
 	public	uniqueness: boolean;
 	public	username: boolean;
 	public	phoneNumber: boolean;
 
 	constructor()
 	{
-		this.password = false;
 		this.uniqueness = false;
 		this.username = false;
 		this.phoneNumber = false;
@@ -23,17 +20,6 @@ class	UserProfileEditChecker
 	public checkData(data: UserProfileEdit)
 	{
 		this.resetError();
-		if (data.pwModified)
-		{
-			if (data.password === undefined || data.password === "undefined"
-				|| data.passwordConfirm === undefined
-				|| data.password.length === 0
-				|| data.passwordConfirm.length === 0
-				|| data.password !== data.passwordConfirm)
-				this.password = true;
-			if (data.uniquenessPassword !== "AgreeWithUniquenessOfPassword")
-				this.uniqueness = true;
-		}
 		// check username unique
 		if (data.username === undefined || data.username === "undefined"
 			|| data.username.length === 0 )
@@ -64,7 +50,6 @@ class	UserProfileEditChecker
 
 	public	resetError = () =>
 	{
-		this.password = false;
 		this.uniqueness = false;
 		this.username = false;
 		this.phoneNumber = false;
@@ -73,7 +58,6 @@ class	UserProfileEditChecker
 	public	getPlainObject = () =>
 	{
 		return ({
-			password: this.password,
 			uniqueness: this.uniqueness,
 			username: this.username,
 			phoneNumer: this.phoneNumber,

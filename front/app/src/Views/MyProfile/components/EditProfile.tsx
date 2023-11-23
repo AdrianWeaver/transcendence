@@ -23,7 +23,6 @@ import {
 	hashPassword,
 	registerInfosInBack,
 	setDoubleAuth,
-	setPassword,
 	setProfileMyView,
 	updateChatUsers,
 } from "../../../Redux/store/controllerAction";
@@ -73,92 +72,92 @@ const	stringContainCharOfString = (string: string, charset: string) =>
 	return (false);
 };
 
-const	PasswordAlert = (props: PasswordAlertProps) =>
-{
-	const	message = [];
-	const	digit = "0-9";
-	const	uperCase = "A-Z";
-	const	lowerCase = "a-z";
-	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+// const	PasswordAlert = (props: PasswordAlertProps) =>
+// {
+// 	const	message = [];
+// 	const	digit = "0-9";
+// 	const	uperCase = "A-Z";
+// 	const	lowerCase = "a-z";
+// 	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-	if (props.password.length === 0 && props.firstTrigger === false)
-		return (<></>);
-	if (props.firstTrigger === false
-		&& props.passwordConfirm)
-		return (<></>);
-	if (props.passwordConfirm !== undefined )
-	{
-		console.log(props);
-		if (props.firstTrigger === false)
-			return (<></>);
-		if (props.password !== props.passwordConfirm)
-			return (
-				<Grid item xs={12}>
-					<Alert
-						severity="error"
-					>
-						Password mismatch
-					</Alert>
-				</Grid>
-			);
-		else
-			return (<></>);
-	}
-	if (props.password.length < 8)
-		message.push("minimum 8 character");
-	if (stringContainChar(props.password, digit) === false)
-		message.push("minimum 1 digit");
-	if (stringContainChar(props.password, uperCase) === false)
-		message.push("minimum 1 upercase");
-	if (stringContainChar(props.password, lowerCase) === false)
-		message.push("minimum 1 lowercase");
-	if (stringContainCharOfString(props.password, specialChar) === false)
-		message.push("minimum 1 special char : " + specialChar);
-	if (message.length === 0)
-		return (<></>);
-	return (
-		<Grid item xs={12}>
-			<Alert
-				severity="info"
-			>
-				<AlertTitle>You must have:</AlertTitle>
-				<List
-					sx={
-					{
-						m: 0,
-						fontSize: "0.7rem"
-					}}
-				>
-				{
-					message.map((msg) =>
-					{
-						return (
-							<ListItem key={msg}>
-								{msg}
-							</ListItem>
-						);
-					})
-				}
-				</List>
-			</Alert>
-		</Grid>
-	);
-};
+// 	if (props.password.length === 0 && props.firstTrigger === false)
+// 		return (<></>);
+// 	if (props.firstTrigger === false
+// 		&& props.passwordConfirm)
+// 		return (<></>);
+// 	if (props.passwordConfirm !== undefined )
+// 	{
+// 		console.log(props);
+// 		if (props.firstTrigger === false)
+// 			return (<></>);
+// 		if (props.password !== props.passwordConfirm)
+// 			return (
+// 				<Grid item xs={12}>
+// 					<Alert
+// 						severity="error"
+// 					>
+// 						Password mismatch
+// 					</Alert>
+// 				</Grid>
+// 			);
+// 		else
+// 			return (<></>);
+// 	}
+// 	if (props.password.length < 8)
+// 		message.push("minimum 8 character");
+// 	if (stringContainChar(props.password, digit) === false)
+// 		message.push("minimum 1 digit");
+// 	if (stringContainChar(props.password, uperCase) === false)
+// 		message.push("minimum 1 upercase");
+// 	if (stringContainChar(props.password, lowerCase) === false)
+// 		message.push("minimum 1 lowercase");
+// 	if (stringContainCharOfString(props.password, specialChar) === false)
+// 		message.push("minimum 1 special char : " + specialChar);
+// 	if (message.length === 0)
+// 		return (<></>);
+// 	return (
+// 		<Grid item xs={12}>
+// 			<Alert
+// 				severity="info"
+// 			>
+// 				<AlertTitle>You must have:</AlertTitle>
+// 				<List
+// 					sx={
+// 					{
+// 						m: 0,
+// 						fontSize: "0.7rem"
+// 					}}
+// 				>
+// 				{
+// 					message.map((msg) =>
+// 					{
+// 						return (
+// 							<ListItem key={msg}>
+// 								{msg}
+// 							</ListItem>
+// 						);
+// 					})
+// 				}
+// 				</List>
+// 			</Alert>
+// 		</Grid>
+// 	);
+// };
 
-type UniqueAlertProps = {
-	isUnique: boolean
-};
+// type UniqueAlertProps = {
+// 	isUnique: boolean
+// };
 
-const UniqueAlert = (props: UniqueAlertProps) =>
-{
-	if (props.isUnique)
-		return (
-		<Alert severity="warning" >
-			Faites Attention !
-		</Alert>);
-	else
-		return (<></>);
-};
+// const UniqueAlert = (props: UniqueAlertProps) =>
+// {
+// 	if (props.isUnique)
+// 		return (
+// 		<Alert severity="warning" >
+// 			Faites Attention !
+// 		</Alert>);
+// 	else
+// 		return (<></>);
+// };
 
 type	EditProfileProps =
 {
@@ -178,73 +177,73 @@ const	EditProfile = (props: EditProfileProps) =>
 		return (state.controller.user);
 	});
 
-	const	[
-		firstTriggerPassword,
-		setPasswordFirstTrigger
-	] = useState(false);
+	// const	[
+	// 	firstTriggerPassword,
+	// 	setPasswordFirstTrigger
+	// ] = useState(false);
 
-	const	[
-		firstTriggerPasswordConfirm,
-		setPasswordFirstTriggerConfirm
-	] = useState(false);
+	// const	[
+	// 	firstTriggerPasswordConfirm,
+	// 	setPasswordFirstTriggerConfirm
+	// ] = useState(false);
 	const	[
 		errorValidation,
 		setErrorValidation
 	] = useState(new UserProfileEditChecker());
 
-	const	[
-		passwordValue,
-		setPasswordValue
-	] = useState("");
+	// const	[
+	// 	passwordValue,
+	// 	setPasswordValue
+	// ] = useState("");
 
-	const
-	[
-		passwordModified,
-		setPasswordModified
-	] = useState(false);
+	// const
+	// [
+	// 	passwordModified,
+	// 	setPasswordModified
+	// ] = useState(false);
 
 	const
 	[
 		required,
 		setRequired
 	] = useState(false);
-	const	[
-		uniquePassword,
-		setUniquePassword
-	] = useState(false);
+	// const	[
+	// 	uniquePassword,
+	// 	setUniquePassword
+	// ] = useState(false);
 
-	const	handleUniquePassword = () =>
-	{
-		setUniquePassword(true);
-	};
+	// const	handleUniquePassword = () =>
+	// {
+	// 	setUniquePassword(true);
+	// };
 
-	const	handlePasswordChangeValue = (
-		event: React.ChangeEvent<HTMLInputElement>
-	) =>
-	{
-		event.preventDefault();
-		console.log("value pw", event.target.value, " length", event.target.value.length);
-		if (event.target.value.length)
-			setPasswordModified(true);
-		else
-			setPasswordModified(false);
-		setPasswordValue(event.target.value);
-		setPasswordFirstTrigger(true);
-	};
+	// const	handlePasswordChangeValue = (
+	// 	event: React.ChangeEvent<HTMLInputElement>
+	// ) =>
+	// {
+	// 	event.preventDefault();
+	// 	console.log("value pw", event.target.value, " length", event.target.value.length);
+	// 	if (event.target.value.length)
+	// 		setPasswordModified(true);
+	// 	else
+	// 		setPasswordModified(false);
+	// 	setPasswordValue(event.target.value);
+	// 	setPasswordFirstTrigger(true);
+	// };
 
-	const	[
-		passwordConfirmValue,
-		setPasswordConfirm
-	] = useState("");
+	// const	[
+	// 	passwordConfirmValue,
+	// 	setPasswordConfirm
+	// ] = useState("");
 
-	const	handlePasswordConfirmChangeValue = (
-		event: React.ChangeEvent<HTMLInputElement>
-	) =>
-	{
-		event.preventDefault();
-		setPasswordConfirm(event.target.value);
-		setPasswordFirstTriggerConfirm(true);
-	};
+	// const	handlePasswordConfirmChangeValue = (
+	// 	event: React.ChangeEvent<HTMLInputElement>
+	// ) =>
+	// {
+	// 	event.preventDefault();
+	// 	setPasswordConfirm(event.target.value);
+	// 	setPasswordFirstTriggerConfirm(true);
+	// };
 
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
@@ -277,8 +276,6 @@ const	EditProfile = (props: EditProfileProps) =>
 			}
 			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
 			console.log("CHANGES ", userChanges);
-			if (userChanges.password !== undefined && userChanges.password.length)
-				dispatch(hashPassword(userChanges.password));
 			if (user.phoneNumber !== userChanges.phoneNumber || required !== user.doubleAuth)
 				dispatch(registerInfosInBack(userChanges.phoneNumber, required, "phoneNumber"));
 			if (props.setting)
@@ -318,8 +315,8 @@ const	EditProfile = (props: EditProfileProps) =>
 		</Grid>
 	);
 
-	const	disclamer = "Je suis sur de ne pas utiliser"
-		+ " le meme mot de passe de connexion a l'intra 42";
+	// const	disclamer = "Je suis sur de ne pas utiliser"
+	// 	+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
@@ -360,7 +357,7 @@ const	EditProfile = (props: EditProfileProps) =>
 					: <></>
 				}
 				</Grid>
-				<Grid item xs={12}>
+				{/* <Grid item xs={12}>
 					<TextField
 						required
 						fullWidth
@@ -382,8 +379,8 @@ const	EditProfile = (props: EditProfileProps) =>
 				<PasswordAlert
 					password={passwordValue}
 					firstTrigger={firstTriggerPassword}
-					/>
-				<Grid item xs={12}>
+					/> */}
+				{/* <Grid item xs={12}>
 					<TextField
 						required
 						fullWidth
@@ -401,8 +398,8 @@ const	EditProfile = (props: EditProfileProps) =>
 								: ""
 						}
 					/>
-				</Grid>
-				<PasswordAlert
+				</Grid> */}
+				{/* <PasswordAlert
 					password={passwordValue}
 					firstTrigger={firstTriggerPasswordConfirm}
 					passwordConfirm={passwordConfirmValue}
@@ -425,7 +422,7 @@ const	EditProfile = (props: EditProfileProps) =>
 							<UniqueAlert isUnique={uniquePassword} />
 						</Grid>
 						: <></>
-					}
+					} */}
 			</Grid>
 			<Button
 				type="submit"
