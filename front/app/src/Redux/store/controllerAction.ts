@@ -1905,7 +1905,10 @@ export const	getPlayingStatus = (profileId: string)
 		const	prev = getState();
 		let		status: string;
 		status = "";
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.id.toString() === profileId);
