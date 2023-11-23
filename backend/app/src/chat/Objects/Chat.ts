@@ -233,22 +233,32 @@ class Chat
 			};
 			return (databaseObj);
 		};
-		this.databaseToObject = (rawObj: any) =>
+		this.databaseToObject = (rawObj: Chat) =>
 		{
 			const	rawChannels = rawObj.channels;
 			const	rawPrivateMessages = rawObj.privateMessage;
 			const	rawUsers = rawObj.users;
 
-			rawChannels.forEach((raw: any) =>
+			rawChannels.forEach((raw: Channel) =>
 			{
 				const	newChannel = new Channel(raw.name);
-				newChannel.setOwner({...raw.owner});
+				newChannel.setOwner({
+					memberSocketId: "disconnected",
+					profileId: raw.owner.profileId
+				});
 				newChannel.setFromDatabaseAdmins([...raw.admins]);
 				newChannel.setKind(raw.kind);
-				newChannel.setPassword(raw.password);
+				if (raw.password)
+					newChannel.setPassword(raw.password);
+				else
+					newChannel.setPassword("");
 				newChannel.setMode(raw.mode);
 				newChannel.id = raw.id;
-				newChannel.users = [...raw.users];
+				newChannel.users = raw.users.map((member: MemberSocketIdModel) =>
+				{
+					member.memberSocketId = "disconnected";
+					return (member);
+				});
 				this.channels.push(newChannel);
 			});
 			rawPrivateMessages.forEach((raw: any) =>
@@ -272,19 +282,27 @@ class Chat
 					if (elem !== null)
 						newChanArray.push(elem);
 				});
-				newUser.id = raw.id;
-				newUser.blocked = [...raw.blocked];
+				newUser.id = "disconnected";
+				newUser.blocked = raw.blocked.map((member: MemberSocketIdModel) =>
+				{
+					member.memberSocketId = "disconnected";
+					return (member);
+				});
 				newUser.friends = [...raw.friends];
 				newUser.channels = [...newChanArray];
 				newUser.avatar = raw.avatar;
-				newUser.status = raw.status;
-				newUser.online = raw.online;
+				newUser.status = "offline";
+				newUser.online = false;
 				newUser.stats = {...raw.stats};
 				this.users.push(newUser);
 			});
 			this.chanMap = [...rawObj.chanMap];
 			this.privateMessageMap = [...rawObj.privateMessageMap];
-			this.memberSocketIds = [...rawObj.memberSocketIds];
+			this.memberSocketIds = rawObj.memberSocketIds.map((member) =>
+			{
+				member.memberSocketId = "disconnected";
+				return (member);
+			});
 		};
 	}
 }

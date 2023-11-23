@@ -432,32 +432,32 @@ const	UserServices = {
 			})
 		);
 	},
-	// async	getIpAddress(token: string, hostname: string, changeIp: boolean)
-	// {
-	// 	console.log("Get Ip address");
-	// 	const	config: AxiosRequestConfig = {
-	// 		headers: {
-	// 			"content-type": "application/x-www-form-urlencoded",
-	// 			"Authorization": token,
-	// 		},
-	// 	};
-	// 	const	data = {
-	// 		changeIp: changeIp,
-	// 	};
-	// 	return (
-	// 		Api(hostname)
-	// 		.post("user/get-ip", data, config)
-	// 		.then((data) =>
-	// 		{
-	// 			return (data.data);
-	// 		})
-	// 		.catch((error) =>
-	// 		{
-	// 			console.error(error);
-	// 			return ("ERROR");
-	// 		})
-	// 	);
-	// },
+	async	getAchievements(token: string, hostname: string, profileId: string)
+	{
+		console.log("Get a user achievements");
+		const	config: AxiosRequestConfig = {
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+				"Authorization": token,
+			},
+		};
+		const	data = {
+			id: profileId,
+		};
+		return (
+			Api(hostname)
+			.post("user/get-achievements", data, config)
+			.then((data) =>
+			{
+				return (data.data);
+			})
+			.catch(() =>
+			{
+				console.log("GET ACHIEVEMENTS ERROR")
+				return ("error");
+			})
+		);
+	},
 	async	getUserBackFromDB(token: string, hostname: string)
 	{
 		console.log("get user back from db");

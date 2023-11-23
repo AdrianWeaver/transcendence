@@ -26,6 +26,8 @@ import GlobalStats from "../Views/MyStats/GlobalStats";
 import Signin from "../Views/Signin/Signin";
 import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
 import { NavigationTwoTone } from "@mui/icons-material";
+import MyAchievements from "../Views/Achievements/MyAchievements";
+import Achievements from "../Views/Achievements/Achievements";
 
 
 /**
@@ -125,6 +127,14 @@ const	LoggedRouter = () =>
 				<Route
 					path="/global-stats"
 					element={<GlobalStats />}
+				/>
+				<Route
+					path="/my-achievements"
+					element={<MyAchievements />}
+				/>
+				<Route
+					path="/achievements"
+					element={<Achievements />}
 				/>
 				<Route
 					path="*"
