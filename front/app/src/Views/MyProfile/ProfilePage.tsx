@@ -41,9 +41,6 @@ const	ProfilePage = () =>
 		<>
 			<MenuBar />
 			{
-				// (user.profile.editView)
-				// ? 	<EditProfile
-				// 		setting={false} />
 				<div className="wrapper">
 					<Grid container>
 						<Grid item xs={12} sm={6}>
@@ -55,6 +52,7 @@ const	ProfilePage = () =>
 									prevPage={prevPage}
 									isMe={false}
 									isFriend={user.chat.currentProfileIsFriend}
+									profileId={userSelected.profileId}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>

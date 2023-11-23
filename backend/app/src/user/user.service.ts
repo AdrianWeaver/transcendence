@@ -885,8 +885,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			}
 		},
 		password: data.password,
-		friendsProfileId: []
-		// tokenSecret: secretToken
+		friendsProfileId: [],
+		achievements: []
 	};
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
@@ -968,7 +968,8 @@ public	register(data: UserModel)
 			}
 		},
 		password: data.password,
-		friendsProfileId: []
+		friendsProfileId: [],
+		achievements: []
 		// tokenSecret: secretToken
 	};
 	this.user.push(newUser);
@@ -1471,6 +1472,7 @@ public	register(data: UserModel)
 			},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
+			achievements: [],
 			revokedConnectionRequest: user.revokedConnectionRequest
 		};
 		const	toDB = JSON.stringify(objToDB);
@@ -1514,7 +1516,8 @@ public	register(data: UserModel)
 				}
 			},
 			password: data.password,
-			friendsProfileId: [...data.friendsProfileId]
+			friendsProfileId: [...data.friendsProfileId],
+			achievements: [...data.achievements]
 		};
 		this.user.push(toObj);
 		// console.log(JSON.stringify(this.user));
@@ -1547,14 +1550,47 @@ public	register(data: UserModel)
 		return (true);
 	}
 
-	/**
-	 * @deprecated not used in this project
-	 * @param profileId 
-	 * @param ip 
-	 * @param changeIp 
-	 * @returns 
-	 */
-	public	registerIpAddress(profileId: string | number, ip: string, changeIp: boolean)
+	public	getMyStats()
+	{
+		const fakeRows = [
+			{
+				id: 1,
+				date: "Yesterday Night",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 2,
+				date: "Yesterday ",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+			{
+				id: 3,
+				date: "Toto",
+				gameMode: "classical",
+				adversaire: "Adversaire 1 (username)",
+				myScore: "7",
+				advScore: "0",
+				elapsedTime: "42 secondes",
+				myAvatar: "https://thispersondoesnotexist.com/",
+				adversaireAvatar: "https://thispersondoesnotexist.com/"
+			},
+		];
+		return (fakeRows);
+	}
+
+	public	getAchievements(profileId: string | number)
 		: any
 	{
 		const	searchUser = this.user.find((elem) =>
@@ -1565,21 +1601,9 @@ public	register(data: UserModel)
 		{
 			return ("error");
 		}
-		const	oldIp = searchUser.authService.doubleAuth.lastIpClient;
-		const	index = this.user.findIndex((elem) =>
-		{
-			return (profileId.toString() === elem.id.toString());
-		});
-		if (index === -1)
-			return ("error");
-		if (changeIp || oldIp === "undefined")
-			this.user[index].authService.doubleAuth.lastIpClient = ip;
-		const	res = {
-			newIp: ip,
-			oldIp: oldIp,
-			ipChanged: changeIp
-		};
-		return (res);
+		if (!searchUser.achievements.length)
+			return ("no achievements");
+		return (searchUser.achievements);
 	}
 
 	public	getUserBackFromDB(profileId: string | number)

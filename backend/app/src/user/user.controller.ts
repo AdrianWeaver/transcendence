@@ -281,7 +281,8 @@ export class UserController
 								}
 							},
 							password: "undefined",
-							friendsProfileId: []
+							friendsProfileId: [],
+							achievements: []
 						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
@@ -388,7 +389,8 @@ export class UserController
 				}
 			},
 			password: "undefined",
-			friendsProfileId: []
+			friendsProfileId: [],
+			achievements: []
 		};
 		if (this.userService.getUserById(userObject.id) !== undefined)
 		{
@@ -1038,5 +1040,16 @@ export class UserController
 		this.chatService.setStatus(body.profileId, playing);
 		this.userService.setStatus(body.profileId, playing);
 		return (playing);
+	}
+
+	@Post("/get-achievements")
+	@UseGuards(UserAuthorizationGuard)
+	getAchievements(
+		@Body() body: any)
+	{
+		console.log("'get-achievements' route requested");
+		const	res = this.userService.getAchievements(body.id);
+		console.log("res", res);
+		return (res);
 	}
 }

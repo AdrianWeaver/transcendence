@@ -97,6 +97,7 @@ export const	initialControllerState: ControllerModel = {
 		alreadyExists: false,
 		ipAddress: "undefined",
 		date: "undefined",
+		achievements: []
 	},
 	registration:
 	{
@@ -425,9 +426,9 @@ const	controllerSlice = createSlice(
 		{
 			state.stats = action.payload.stats;
 		},
-		setIpAddress(state, action: PayloadAction<ControllerModel>)
+		setAchievements(state, action: PayloadAction<ControllerModel>)
 		{
-			state.user.ipAddress = action.payload.user.ipAddress;
+			state.user.achievements = action.payload.user.achievements;
 		},
 		setUserBackFromDB(state, action: PayloadAction<ControllerModel>)
 		{

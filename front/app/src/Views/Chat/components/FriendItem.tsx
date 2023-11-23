@@ -12,20 +12,27 @@ type FriendItemProps = {
 	avatar?: string;
 	online?: boolean;
 	status?: string;
-	key?: number;
+	// key?: React.Key;
 	ind?: number;
 	isFriend?: boolean;
 };
 
+/**
+ * @deprecated
+ * @param props 
+ * @returns 
+ */
 const FriendItem = (props: FriendItemProps) =>
 {
+	return (<></>);
 	let status;
 	console.log(" FRIEND ITEM ", props);
 	status = props.online ? "💚" : "🔴";
 	if (props.status === "playing" && props.online)
 		status = "🏓";
 	return (
-		<ListItem >
+		<ListItem key={props.key}>
+		{/* <ListItem > */}
 			<ListItemIcon>
 				<Avatar
 					alt={props.name}

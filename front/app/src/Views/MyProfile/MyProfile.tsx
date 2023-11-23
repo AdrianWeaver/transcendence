@@ -49,6 +49,7 @@ const	MyProfile = () =>
 									prevPage={prevPage}
 									isMe={true}
 									isFriend={true}
+									profileId={user.id.toString()}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -60,7 +61,6 @@ const	MyProfile = () =>
 					</Grid>
 				</div>
 			}
-			<UpdateMyProfilePicture />
 		</>
 	);
 };
