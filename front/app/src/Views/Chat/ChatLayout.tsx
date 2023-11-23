@@ -6,6 +6,7 @@
 // import * as SocketIOClient from "socket.io-client";
 // 🏓 🔴 🟢 🗨
 import {
+	Avatar,
 	Box,
 	Button,
 	Divider,
@@ -14,6 +15,7 @@ import {
 	List,
 	ListItem,
 	ListItemText,
+	ListItemIcon,
 	Paper,
 	Tab,
 	Tabs,
@@ -72,6 +74,13 @@ type MessageModel =
 	message: string,
 	id: number,
 	username: string
+}
+
+type	FriendListModel =
+{
+	name: string,
+	avatar: string,
+	status: string
 }
 
 type MembersModel =
@@ -417,7 +426,7 @@ const	ChatLayout = () =>
 	const [
 		friendList,
 		setFriendList
-	] = useState<string[]>([]);
+	] = useState<FriendListModel[]>([]);
 
 	const [
 		blockedList,
@@ -427,6 +436,11 @@ const	ChatLayout = () =>
 	const [
 		isMuted,
 		setIsMuted
+	] = useState(false);
+
+	const [
+		passwordDialogueOpen,
+		setPasswordDialogueOpen
 	] = useState(false);
 
 	const [
@@ -448,6 +462,10 @@ const	ChatLayout = () =>
 	});
 
 	const [
+		channelToChangePassword,
+		setChannelToChangePassword
+	] = useState("");
+	const [
 		inviteDialogOpen,
 		setInviteDialogOpen
 	] = useState(false);
@@ -460,6 +478,11 @@ const	ChatLayout = () =>
 	const [
 		userToInvite,
 		setUserToInvite
+	] = useState("");
+
+	const [
+		newPassword,
+		setNewPassword
 	] = useState("");
 
 	const handleClickOpen = () =>
@@ -757,7 +780,6 @@ const	ChatLayout = () =>
 
 		const serverInfo = (data: any) =>
 		{
-			// 🏓 🔴 🟢
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
@@ -886,6 +908,14 @@ const	ChatLayout = () =>
 			{
 				alert(data.payload.message);
 			}
+
+			if (data.type === "changed-password")
+			{
+				if (data.payload.message !== "")
+					alert (data.payload.message);
+				else
+					setChannels(data.payload.chanMap);
+			}
 		};
 
 		const	leftChannelMessage = (data: any) =>
@@ -903,6 +933,7 @@ const	ChatLayout = () =>
 					dispatch(setCurrentChannel("undefined"));
 				}
 				alert(data.payload.message);
+				setIsChannelAdmin(false);
 			}
 		};
 
@@ -1373,6 +1404,21 @@ const	ChatLayout = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
+	const	addPasswordToChannel = (chanName: string, newPassword: string) =>
+	{
+		console.log("GOT TO FRONT");
+		console.log("CHANNEL ", chanName);
+		console.log("PASSWORD ", newPassword);
+		const	action = {
+			type: "add-password",
+			payload: {
+				chanName: chanName,
+				newPassword: newPassword,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
 	const	changeTabOperations = () =>
 	{
 		refreshListUser();
@@ -1601,6 +1647,49 @@ const	ChatLayout = () =>
 														}}>
 															Remove
 														</Button>
+														<Button onClick={() =>
+														{
+															// addPasswordToChannel(clickedChannel);
+															setPasswordDialogueOpen(true);
+														}}>
+															Add password
+														</Button>
+														<Dialog open={passwordDialogueOpen} onClose={() =>
+															{
+																setPasswordDialogueOpen(false);
+															}}
+															maxWidth="sm" fullWidth>
+															<DialogTitle>Add a new password to the channel</DialogTitle>
+															<DialogContent>
+																<TextField
+																label="New password"
+																variant="outlined"
+																fullWidth
+																value={newPassword}
+																onChange={(e) =>
+																{
+																	setNewPassword(e.target.value);
+																	setChannelToChangePassword(clickedChannel);
+																}}/>
+															</DialogContent>
+															<DialogActions>
+																<Button onClick={() =>
+																	{
+																		addPasswordToChannel(clickedChannel, newPassword);
+																		setPasswordDialogueOpen(false);
+																		setNewPassword("");
+																		setChannelToChangePassword("");
+																	}} color="primary">
+																	Add password
+																</Button>
+																<Button onClick={() =>
+																{
+																	setPasswordDialogueOpen(false);
+																}} color="primary">
+																Cancel
+																</Button>
+															</DialogActions>
+														</Dialog>
 														<Button onClick={() =>
 														{
 															return handleMembersClickOpen(clickedChannel);
@@ -1916,12 +2005,18 @@ const	ChatLayout = () =>
 								{
 									return (
 										<ListItem style={listItemStyle} key={index}>
+											<ListItemIcon>
+												<Avatar
+													alt={friend.name}
+													src={friend.avatar}
+												/>
+											</ListItemIcon>
 											<ListItemText
 												style={listItemTextStyle}
-												primary={friend}
+												primary={friend.name}
 											/>
 											<ListItemText
-												secondary={status}
+												secondary={friend.status}
 												sx={{ align: "right" }}
 										></ListItemText>
 										</ListItem>

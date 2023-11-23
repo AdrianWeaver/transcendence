@@ -60,7 +60,7 @@ import Chat from "src/chat/Objects/Chat";
 @Injectable()
 export class UserService implements OnModuleInit, OnModuleDestroy
 {
-	private	user: Array<UserModel> = [];
+	public	user: Array<UserModel> = [];
 	private	matchHistory: Array<HistoryModel> = [];
 	private	secret: string;
 
@@ -184,7 +184,41 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			})
 			.then(() =>
 			{
-				this.logger.verbose("user succesfully created ");
+				this.logger.error("user succesfully created ");
+				return ("SUCCESS");
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error("On table Create User error");
+				this.logger.error(error);
+				return ("ERROR");
+			});
+		this.logger.debug("value of status " + status);
+		return (status);
+	}
+
+	public	async updateUserToDatabase(user: UserModel)
+		: Promise<string>
+	{
+		this.logger.debug("Create the user into the table User");
+		const	toDB = this.prepareUserForDB(user.id.toString());
+
+		const status = await this.prismaService.prisma
+			.userJson
+			.update(
+				{
+					where:
+					{
+						userJsonID: user.id.toString()
+					},
+					data: {
+						contents: JSON.stringify(toDB)
+					}
+				}
+			)
+			.then(() =>
+			{
+				this.logger.error("user succesfully created ");
 				return ("SUCCESS");
 			})
 			.catch((error: any) =>
@@ -200,62 +234,62 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private onTableCreate(user: UserModel)
 	{
 		this.logger.verbose("Creating a new version User inside database");
-			this.prismaService.prisma
-				.userJson
-				.findUnique(
-					{
-						where:
+		this.prismaService.prisma
+			.userJson
+			.findUnique(
+				{
+					where:
+						{
+							userJsonID: user.id.toString()
+						}
+				}
+			)
+			.then((data: any) =>
+			{
+				if (data)
+				{
+					const	content = JSON.parse(data.contents);
+					// console.log("content ", content);
+					const	update = this.prepareUserForDB(user.id);
+					this.prismaService.prisma
+						.userJson
+						.update(
 							{
-								userJsonID: user.id.toString()
+								where:
+								{
+									userJsonID: user.id.toString()
+								},
+								data: {
+									contents: JSON.stringify(update)
+								}
 							}
-					}
-				)
-				.then((data: any) =>
+						);
+				}
+				else
 				{
-					if (data)
-					{
-						const	content = JSON.parse(data.contents);
-						// console.log("content ", content);
-						const	update = this.prepareUserForDB(user.id);
-						this.prismaService.prisma
-							.userJson
-							.update(
-								{
-									where:
-									{
-										userJsonID: user.id.toString()
-									},
-									data: {
-										contents: JSON.stringify(update)
-									}
-								}
-							);
-					}
-					else
-					{
-						const	toDB = this.prepareUserForDB(user.id.toString());
-						this.prismaService
-							.prisma
-							.userJson
-							.create(
+					const	toDB = this.prepareUserForDB(user.id.toString());
+					this.prismaService
+						.prisma
+						.userJson
+						.create(
+						{
+							data:
 							{
-								data:
-								{
-									userJsonID: user.id.toString(),
-									contents: JSON.stringify(toDB)
-								}
-							})
-							.catch((error: any) =>
-							{
-								this.logger.error("On table Create User error");
-								this.logger.error(error);
-							});
-					}
-				})
-				.catch((error) =>
-				{
-					console.log("error create entry", error);
-				});
+								userJsonID: user.id.toString(),
+								contents: JSON.stringify(toDB)
+							}
+						})
+						.catch((error: any) =>
+						{
+							this.logger.error("On table Create User error");
+							this.logger.error(error);
+						});
+				}
+			})
+			.catch((error) =>
+			{
+				console.log("error create entry", error);
+			});
 	}
 
 	private	loadTableToMemory()
@@ -999,6 +1033,7 @@ public	register(data: UserModel)
 					this.user[index].authService.token = searchUser.authService.token;
 					this.user[index].authService.expAt = searchUser.authService.expAt;
 					this.user[index].revokedConnectionRequest = false;
+					this.updateUserToDatabase(this.user[index]);
 				}
 				const	response: UserLoginResponseModel = {
 					message:
@@ -1035,6 +1070,7 @@ public	register(data: UserModel)
 		if (!user)
 			throw new Error("User not found, no action needed");
 		user.revokedConnectionRequest = true;
+		this.updateUserToDatabase(user);
 	}
 
 	public	getUserExpById(id: any)
@@ -1100,6 +1136,7 @@ public	register(data: UserModel)
 			return (elem.id === id);
 		});
 		if (searchUser !== undefined)
+		{
 			myInfo = {
 				id: searchUser.id,
 				email: searchUser.email,
@@ -1108,6 +1145,7 @@ public	register(data: UserModel)
 				login: searchUser.login,
 				username: searchUser.username
 			};
+		}
 		return (myInfo);
 	}
 
@@ -1122,6 +1160,7 @@ public	register(data: UserModel)
 			searchUser.authService.doubleAuth.enable = true;
 			searchUser.authService.doubleAuth.phoneNumber = numero;
 			searchUser.authService.doubleAuth.phoneRegistered = true;
+			this.updateUserToDatabase(searchUser);
 		}
 		return("ok");
 	}
@@ -1158,6 +1197,7 @@ public	register(data: UserModel)
 			searchUser.authService.doubleAuth.validationCode = code;
 			searchUser.authService.doubleAuth.valid = valid;
 			searchUser.registrationProcessEnded = valid;
+			this.updateUserToDatabase(searchUser);
 		}
 		return (valid);
 	}
@@ -1174,6 +1214,7 @@ public	register(data: UserModel)
 		const	hashed = await bcrypt.hash(password, saltRounds);
 		if (hashed)
 			this.user[index].password = hashed;
+		this.updateUserToDatabase(this.user[index]);
 		return (hashed);
 	}
 
@@ -1238,10 +1279,10 @@ public	register(data: UserModel)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
 					this.decodePassword(data.info, id);
-				console.log("DOUBLE AUTH CHANGE INFO", data.doubleAuth);
-				if (data.doubleAuth !== undefined)
-					this.user[index].authService.doubleAuth.enable = data.doubleAuth as boolean;
-
+			console.log("DOUBLE AUTH CHANGE INFO", data.doubleAuth);
+			if (data.doubleAuth !== undefined)
+				this.user[index].authService.doubleAuth.enable = data.doubleAuth as boolean;
+			this.updateUserToDatabase(this.user[index]);
 			// console.log(searchUser);
 			return ("okay");
 		}
@@ -1269,6 +1310,7 @@ public	register(data: UserModel)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
 		this.user[searchUserIndex].friendsProfileId.push(friendId);
+		this.updateUserToDatabase(this.user[searchUserIndex]);
 		return (searchFriend.username + " added as friend");
 	}
 
@@ -1370,6 +1412,8 @@ public	register(data: UserModel)
 			id: index,
 			name: this.user[myUserIndex].username,
 			profileId: this.user[myUserIndex].id,
+			avatar: this.user[myUserIndex].avatar,
+			status: this.user[myUserIndex].status
 		};
 		return (friend);
 	}
@@ -1385,7 +1429,6 @@ public	register(data: UserModel)
 			return ("undefined");
 		return (this.user[myUserIndex].username);
 	}
-	// public	doIHaveFriendRequest	
 
 	public	prepareUserForDB(userId: any)
 	{
@@ -1415,75 +1458,30 @@ public	register(data: UserModel)
 			ftAvatar: user.ftAvatar,
 			location: user.location,
 			url: user.url,
-			authService: {...user.authService},
+			authService: {
+				doubleAuth: {
+					enable: user.authService.doubleAuth.enable,
+					valid: user.authService.doubleAuth.valid,
+					lastIpClient: user.authService.doubleAuth.lastIpClient,
+					phoneNumber: user.authService.doubleAuth.phoneNumber,
+					phoneRegistered: user.authService.doubleAuth.phoneRegistered,
+					validationCode: user.authService.doubleAuth.validationCode
+				},
+				expAt: user.authService.expAt,
+				token: user.authService.token
+			},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
 			achievements: [],
 			revokedConnectionRequest: user.revokedConnectionRequest
 		};
-		// this.userDB.push(objToDB);
 		const	toDB = JSON.stringify(objToDB);
-		// this.userDBString.push(toDB);
+		console.log(toDB);
 		return (objToDB);
 	}
 
-	// public	updateUserForDB(userId: number)
-	// 	: UserDBModel | string
-	// {
-	// 	const	user = this.user.find((elem) =>
-	// 	{
-	// 		return (userId.toString() === elem.id.toString());
-	// 	});
-	// 	// TEST 
-	// 	if (user === undefined)
-	// 		return ("error");
-	// 	console.log("user ok");
-	// 	const	userDB = this.userDB.find((elem) =>
-	// 	{
-	// 		return (userId.toString() === elem.id.toString());
-	// 	});
-	// 	// TEST 
-	// 	if (userDB === undefined)
-	// 	{
-	// 		this.onTableCreate(user);
-	// 		return ("ok");
-	// 	}
-	// 	console.log("userDB ok");
-	// 	// or throw error ?
-	// 	const	index = this.userDB.findIndex((elem) =>
-	// 	{
-	// 		return (userId.toString() === elem.id.toString());
-	// 	});
-	// 	// TEST 
-	// 	if (index === -1)
-	// 		return ("error");
-	// 	console.log("userDB index ok");
-	// 	userDB.date = user.date,
-	// 	userDB.id = user.id,
-	// 	userDB.email = user.email,
-	// 	userDB.username = user.username,
-	// 	userDB.login = user.login,
-	// 	userDB.firstName = user.firstName,
-	// 	userDB.lastName = user.lastName,
-	// 	userDB.avatar = user.avatar,
-	// 	userDB.ftAvatar = user.ftAvatar,
-	// 	userDB.location = user.location,
-	// 	userDB.doubleAuth = {...user.authService.doubleAuth};
-	// 	userDB.password = user.password;
-	// 	userDB.friendsProfileId = [...user.friendsProfileId];
-	// 	const	toDB = JSON.stringify(userDB);
-	// 	this.userDBString[index] = toDB;
-	// 	console.log("update User updated for db ", user);
-	// 	console.log("update User updated to db ", userDB);
-	// 	console.log("update USER STRINGIFIED", this.userDBString);
-	// 	return (userDB);
-	// }
-
-	public	databaseToObject(data: any)
+	public	databaseToObject(data: UserModel)
 	{
-		// const	array = [...this.userDBString];
-		const	newUsers: UserModel[] = [];
-
 		const	toObj: UserModel = {
 			registrationStarted: data.registrationStarted,
 			registrationProcessEnded: data.registrationProcessEnded,
@@ -1502,31 +1500,27 @@ public	register(data: UserModel)
 			avatar: data.avatar,
 			ftAvatar: data.ftAvatar,
 			location: data.location,
-			// TEST I dont know if its important to keep it
 			revokedConnectionRequest: false,
 			authService:
 			{
-				token: data.token,
-				expAt: data.expAt,
+				token: data.authService.token,
+				expAt: data.authService.expAt,
 				doubleAuth:
 				{
-					enable: data.enable,
-					lastIpClient: data.lastIpClient,
-					phoneNumber: data.phoneNumber,
-					phoneRegistered: data.phoneRegistered,
-					validationCode: data.validationCode,
-					valid: data.valid,
+					enable: data.authService.doubleAuth.enable,
+					lastIpClient: data.authService.doubleAuth.lastIpClient,
+					phoneNumber: data.authService.doubleAuth.phoneNumber,
+					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+					validationCode: data.authService.doubleAuth.validationCode,
+					valid: data.authService.doubleAuth.valid,
 				}
 			},
 			password: data.password,
 			friendsProfileId: [...data.friendsProfileId],
 			achievements: [...data.achievements]
 		};
-		// console.log("BACK TO OBJ", toObj);
-		newUsers.push(toObj);
-		// console.log("new users", newUsers);
-		this.user = [...newUsers];
-		// console.log("THIS USERS", this.user);
+		this.user.push(toObj);
+		// console.log(JSON.stringify(this.user));
 	}
 
 	public	isProfileIDUnique(profileID: number | string)
@@ -1552,6 +1546,7 @@ public	register(data: UserModel)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
 		this.user[index].registrationStarted = false;
+		this.updateUserToDatabase(this.user[index]);
 		return (true);
 	}
 

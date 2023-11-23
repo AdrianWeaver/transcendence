@@ -9,7 +9,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-classes-per-file */
 
-import { Body, Controller, Get, HttpException, HttpStatus, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, HttpException, HttpStatus, Logger, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Request, Response } from "express";
@@ -117,7 +117,10 @@ export class UserController
 		this.logger.log("instance GameService loaded with instance if : " + this.gameService.getInstanceId());
 	}
 
-	// to delete
+	/**
+	 * @deprecated
+	 * @returns 
+	 */
 	@Get("all-user-Raw")
 	getAllUsersRaw()
 	{
@@ -160,7 +163,15 @@ export class UserController
 		const	update = await this.userService.updateUser(user.id, body, true);
 		if (update === "ERROR")
 			return (unauthorized(500, "try again later"), void(0));
-		return (res.status(200).json({message: "okay"}), void(0));
+		res.status(200).json({message: "okay"});
+		const	updatedUser = this.userService.user
+			.find((elem) =>
+			{
+				return (elem.id === user.id);
+			});
+		if (updatedUser !== undefined)
+			this.userService.updateUserToDatabase(updatedUser);
+		return (void(0));
 	}
 
 	@Post("register")
@@ -314,6 +325,9 @@ export class UserController
 			});
 	}
 
+	/**
+	 * @deprecated not inside the final release
+	 */
 	@Post("register-forty-three")
 	getUserRegisterFortyThree(
 		@Res() res: Response)
@@ -414,6 +428,7 @@ export class UserController
 		@Body() body: UserLoginDto)
 	: Promise<UserLoginResponseModel>
 	{
+		// update to db inside service checked
 		return (await this.userService.login(body.username, body.password));
 	}
 
@@ -430,6 +445,7 @@ export class UserController
 			res.status(200).send("ok");
 		else
 			res.status(401).send("Not ok");
+		// 
 	}
 
 
@@ -760,6 +776,12 @@ export class UserController
 			});
 			await this.userService.uploadPhoto(fileCfg, req.user);
 			res.status(200).json({message: "Success"});
+			const searchedUser = this.userService.user.find((elem) =>
+			{
+				return (elem.id.toString() == req.user.id.toString());
+			});
+			if (searchedUser)
+				this.userService.updateUserToDatabase(searchedUser);
 			// console.log("buffer", fileCfg.getBuffer());
 			this.logger.log("end update photo");
 		}
@@ -769,6 +791,7 @@ export class UserController
 			res.status(418).json({error: true});
 		}
 	}
+
 	@Post("change-infos")
 	@UseGuards(UserAuthorizationGuard)
 	ChangeUsername(
@@ -778,6 +801,7 @@ export class UserController
 	{
 		this.logger
 			.log("'change-infos' user route request");
+			//// check chat update
 		const	chatUsers = this.chatService.changeInfos(data, req.user.id);
 		const	users = this.userService.changeInfos(data, req.user.id);
 		if (chatUsers === "user doesnt exist" || users === "user doesnt exist")
@@ -794,6 +818,12 @@ export class UserController
 		return ("token revoked");
 	}
 
+	/**
+	 * @deprecated
+	 * @param body 
+	 * @param req 
+	 * @returns 
+	 */
 	@Post("hash-password")
 	@UseGuards(UserAuthorizationGuard)
 	HashPassword(
@@ -803,33 +833,24 @@ export class UserController
 	{
 		this.logger
 			.log("'hash-password' route requested");
+		if (req.user.id !== body.id)
+			throw new ForbiddenException();
 		this.userService.hashPassword(body.password, body.id);
 		return ("okay");
 	}
 
-	// @Post("decode-password")
-	// async DecodePassword(
-	// 	@Body() body: any)
-	// : Promise<any>
-	// {
-	// 	this.logger
-	// 		.log("'decode-password' route requested");
-	// 	const	ret = await this.userService.decodePassword(body.password, body.username);
-	// 	console.log(ret);
-	// 	if (!ret || ret === "ERROR")
-	// 		return ("error");
-	// 	return (ret);
-	// }
-
-
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
 	AddFriend(
-		@Body() body: any)
+		@Body() body: any,
+		@Req()	req: any
+	)
 	{
 		// console
 		this.logger
 			.log("'add-friend' route requested");
+		if (req.user.id !== body.id)
+			throw new ForbiddenException();
 		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
 

@@ -23,17 +23,44 @@ services:
     networks:
       - transcendence
 
+  postgres:
+    <<: *service-base
+    container_name: postgres
+    image: database
+    env_file:
+      - ./backend/app/.env
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    ports:
+      - 6500:5432
+    volumes: 
+       - postgres:/var/lib/postgresql/data
+        # - ./postgres:/var/lib/postgresql/data # to see the data
+    networks:
+      transcendence:
+        ipv4_address: 172.19.0.42
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "max_connections=200"
+
   backend:
     <<: *service-base
     container_name: backend
     image: backend
+    env_file:
+      - backend/app/.env
     build:
-      dockerfile: Dockerfile
       context: ./backend
+      dockerfile: Dockerfile
     # command: npm run start:dev
     volumes:
       - ./backend/app/:/app
       - ./backend/script:/srv
+      - /app/node_modules
     ports:
       - 3000:3000
       - 5555:5555
@@ -57,10 +84,11 @@ services:
     container_name: front
     image: front
     build:
-      dockerfile: Dockerfile
       context: ./front
+      dockerfile: Dockerfile
     volumes:
       - ./front/app:/app
+      - /app/node_modules
     ports:
       - 3001:3000
     networks:
@@ -69,35 +97,6 @@ services:
     links:
       - backend
 
-  postgres:
-    <<: *service-base
-    container_name: postgres
-    image: database
-    build:
-      dockerfile: Dockerfile
-      context: ./database
-    # depends_on:
-    #   - backend
-    env_file:
-      - ./backend/app/.env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
-      POSTGRES_DB: ${POSTGRES_DB} 
-    ports:
-      - 6500:5432
-    volumes: 
-       - postgres:/var/lib/postgresql/data
-        # - ./postgres:/var/lib/postgresql/data # to see the data
-    networks:
-      transcendence:
-        ipv4_address: 172.19.0.42
-    command:
-      - "postgres"
-      - "-c"
-      - "shared_buffers=256MB"
-      - "-c"
-      - "max_connections=200"
 
 networks:
   transcendence:
