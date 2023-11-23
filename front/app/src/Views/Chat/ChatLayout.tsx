@@ -67,6 +67,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
+import { ChatUserModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
 {
@@ -188,7 +189,9 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
-	dispatch(getPlayingStatus());
+	dispatch(getPlayingStatus(user.id.toString()));
+
+
 
 	const	createNewConv = (activeId: string) =>
 	{
@@ -233,15 +236,15 @@ const FriendsList = (props: FriendsListProps) =>
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						return (
-							<>
+						return (		
+							(elem.profileId !== user.id.toString())
+							? <>
 								<div key={index} onClick={() =>
-								{
-									dispatch(setActiveConversationId(elem.id));
-									createNewConv(elem.id);
-								}}>
+									{
+										dispatch(setActiveConversationId(elem.id));
+										createNewConv(elem.id);
+									}}>
 									<ListItem key={index}>
-									{/* <ListItem > */}
 										<ListItemIcon>
 											<Avatar
 												alt={elem.name}
@@ -262,6 +265,7 @@ const FriendsList = (props: FriendsListProps) =>
 									</ListItem>
 								</div>
 							</>
+							: <></>
 						);
 					})
 				}

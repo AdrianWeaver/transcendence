@@ -25,6 +25,7 @@ import * as twilio from "twilio";
 import Configuration from "src/Configuration";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+import User from "src/chat/Objects/User";
 
 type	ResponseRow = {
 	id: number;
@@ -1027,16 +1028,34 @@ export class UserController
 			res.status(201).send(data);
 	}
 
-	@Get("user-playing")
+	@Post("user-playing")
 	@UseGuards(UserAuthorizationGuard)
-	async GetPlayingStatus()
+	async GetPlayingStatus(@Body() body: any)
 	{
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
 		playing = false;
 		this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
-		return (this.chatService.getAllUsers());
+		const	chatUsers: any[] = [];
+		console.log("user-playing", body.id);
+		this.chatService.chat.users.map((elem) =>
+		{
+			if (elem.profileId.toString() !== body.id.toString())
+			{
+				const	usr = {
+					name: elem.name,
+					profileId: elem.profileId,
+					online: elem.online,
+					status: elem.status,
+					avatar: elem.avatar,
+					id: elem.id,
+				}
+				chatUsers.push(usr);
+			}
+		});
+		console.log("NEW CHAT USERS", chatUsers);
+		return (chatUsers);
 	}
 
 	@Post("/get-achievements")

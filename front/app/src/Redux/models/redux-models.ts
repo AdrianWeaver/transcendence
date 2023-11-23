@@ -24,17 +24,12 @@ export	interface	StatsModel
 }
 export	interface ChatUserModel
 {
-	// name == pseudo
 	"name": string,
 	"online": boolean,
 	"status": string,
 	"id": string,
 	"avatar": string,
-	"password": string,
 	"profileId": string,
-	// "matchHistory": MatchHistoryModel[],
-	// "Stats": StatsModel
-	// "friends": string[],
 }
 
 export interface BackUserModel

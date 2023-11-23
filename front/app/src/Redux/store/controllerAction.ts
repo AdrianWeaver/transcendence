@@ -1584,7 +1584,6 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 			avatar: user.avatar,
 			id: user.id,
 			profileId: user.profileId,
-			password: user.password,
 			online: online,
 			status: online ? "online" : "offline"
 		}
@@ -1917,13 +1916,13 @@ export const	userSignIn = (username: string, password: string)
 	});
 }
 
-export const	getPlayingStatus = ()
+export const	getPlayingStatus = (profileId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	data = await UserServices.getPlayingStatus(prev.controller.user.bearerToken, prev.server.uri);
+		const	data = await UserServices.getPlayingStatus(profileId, prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 			dispatch(controllerActions.setStatus(prev.controller));
 		else if (data.length)
