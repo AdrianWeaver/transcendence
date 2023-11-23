@@ -14,8 +14,6 @@ import ReduxTestView from "../Views/ReduxTestView/ReduxTestView";
 import Home from "../Views/Home/Home";
 import Signin from "../Views/Signin/Signin";
 import BaseViewFromViteJs from "../Views/BaseViewFromVitejs/BaseViewFromViteJs";
-// import Chat from "../Views/Chat/Chat";
-// import ChatLayout from "../Views/Chat/ChatLayout";
 import MyStats from "../Views/MyStats/MyStats";
 import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
 import { persistor } from "../Redux/store";
@@ -74,10 +72,6 @@ const	VisitorRouter = () =>
 					path="/signup"
 					element={<Signup />}
 				/>
-
-				{/* Must be a protected route with abortRequested 
-					cannot be acceced with no register before
-				*/}
 				<Route
 					path="/cancel"
 					element={<CancelRegister />}
@@ -99,8 +93,6 @@ const	VisitorRouter = () =>
 					path="*"
 					element={<h1>Error 404: visitor router</h1>}
 				/>
-
-
 			</Routes>
 		</BrowserRouter>
 	);

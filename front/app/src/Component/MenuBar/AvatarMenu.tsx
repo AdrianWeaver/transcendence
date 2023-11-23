@@ -38,11 +38,6 @@ const	AvatarMenu = () =>
 		setAnchorElUser
 	] = React.useState<null | HTMLElement>(null);
 
-	useEffect(() =>
-	{
-		console.log(user.chat.currentProfile);
-	}, [user]);
-
 	const	handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
 	{
 		setAnchorElUser(event.currentTarget);

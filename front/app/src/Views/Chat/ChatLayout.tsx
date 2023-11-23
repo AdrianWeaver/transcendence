@@ -186,10 +186,8 @@ const FriendsList = (props: FriendsListProps) =>
 		return (state.controller.user);
 	});
 
-	users.forEach((elem) =>
-	{
-		dispatch(getPlayingStatus(elem.profileId));
-	});
+	dispatch(getPlayingStatus());
+
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
@@ -1038,7 +1036,7 @@ const	ChatLayout = () =>
 				alert("Vous etes deja connecte sur une autre page");
 			}
 			navigate("/");
-		}
+		};
 
 		socket.on("connect-state", connectState);
 		socket.on("connect", connect);
@@ -1056,7 +1054,7 @@ const	ChatLayout = () =>
 		socket.on("add-chat-user", createChatUser);
 		socket.on("is-my-conv", isMyConversation);
 
-        socket.connect();
+		socket.connect();
 
 		return (() =>
 		{

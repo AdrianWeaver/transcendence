@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable init-declarations */
 /* eslint-disable prefer-const */
 /* eslint-disable curly */
@@ -7,7 +8,6 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 // eslint-disable-next-line max-len
-// https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
 import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
@@ -15,18 +15,9 @@ import { RootState } from "./index";
 import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
-// import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
-// import UserRegistration from "../../Object/UserRegistration";
-// import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
-import { useNavigate } from "react-router-dom";
-// type MessageModel =
-// {
-// 	sender: string,
-// 	message: string,
-// 	mode: string,
-// 	username: string,
-// }
+import ConnectionState from "../../Component/ConnectionState";
+
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -120,8 +111,6 @@ export const	userRequestRegistration = ()
 			{
 				...previousState.controller.registration,
 				startedRegister: true,
-				// TEST
-				// step: 0
 			}
 		};
 		dispatch(controllerActions.userRequestRegistration(response));
@@ -582,11 +571,6 @@ export const setRegistrationProcessError = (message?: string)
 {
 	return ((dispatch, getState) =>
 	{
-		// let errorMsg: string;
-		// if (message)
-		// 	errorMsg = message;
-		// else
-		// 	errorMsg = "error";
 		const prev = getState();
 
 		const response: ControllerModel = {
@@ -634,10 +618,6 @@ export const	setUserData = (data: any)
 				firstName: data.firstName,
 				lastName: data.lastName,
 				username: data.username,
-				// avatar: data.avatar,
-				// ftAvatar: data.ftAvatar,
-				// doubleAuth: data.doubleAuth,
-				// location: data.location
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -674,8 +654,6 @@ export const verifyToken = ()
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
-		// const	protocole = window.location.protocol; protocole + "//" + prev.server.serverLocation
-		// localhost I DONT KNOW WHYYYY ITS NOT UPDATED THE URI
 		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 		{
@@ -684,8 +662,6 @@ export const verifyToken = ()
 			dispatch(reinitialiseUser(false));
 			return ;
 		}
-		// console.log("Data inside verify token ");
-		// console.log(data);
 		dispatch(setRegistrationProcessSuccess());
 		dispatch(userRegistrationStepTwo());
 	})
@@ -1897,40 +1873,54 @@ export const	userSignIn = (username: string, password: string)
 	});
 }
 
-export const	getPlayingStatus = (profileId: string)
+export const	getPlayingStatus = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
-		const	prev = getState();
 		let		status: string;
+		const	prev = getState();
+		const	newChatUserModelArray: ChatUserModel[] = [];
+		const	elem: ChatUserModel = {
+			avatar: "undefined",
+			id: "undefined",
+			name: "undefined",
+			online: false,
+			password: "no-data",
+			profileId: "undefined",
+			status: "undefined"
+		};
 		status = "";
-		const	array = prev.controller.user.chat.users.map((elem) =>
+		const	array = prev.controller.user.chat.users;
+		for (const user of array)
 		{
-			return (Object.assign(elem));
-		});
-		const	index = array.findIndex((elem) =>
-		{
-			return (elem.id.toString() === profileId);
-		});
-		if (index === -1)
-			return ;
-			// TEST throw new Error("controllerAction setOnline, user doesnt exist");
-		else
-		{
-			if (!prev.controller.user.chat.users[index].online)
-				status = "offline";
+			elem.avatar = user.avatar;
+			elem.id = user.id;
+			elem.name = user.name;
+			elem.online = user.online;
+			elem.password = user.password;
+			elem.profileId = user.profileId;
+			const	data = await UserServices.getPlayingStatus(user.profileId, prev.controller.user.bearerToken, prev.server.uri);
+			console.log("datea", data);
+			if (data === "ERROR")
+			{
+				console.error("get playing status route error");
+			}
 			else
 			{
-				const	data = await UserServices.getPlayingStatus(profileId, prev.controller.user.bearerToken, prev.server.uri);
-				if (data === true)
-					status = "playing";
-				else if (data === false)
-					status = "online";
+				if (!user.online)
+					elem.status = "offline";
+				else
+				{
+					if (data)
+						elem.status = "playing";
+					else
+						elem.status = "online";
+				}
 			}
-			if (status.length)
-				array[index].status = status;
+			newChatUserModelArray.push(elem);
 		}
+
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1939,7 +1929,7 @@ export const	getPlayingStatus = (profileId: string)
 				chat:
 				{
 					...prev.controller.user.chat,
-					users: array
+					users: newChatUserModelArray
 				}
 			}
 		}
