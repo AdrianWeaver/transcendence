@@ -74,6 +74,13 @@ type MessageModel =
 	username: string
 }
 
+type	FriendListModel =
+{
+	name: string,
+	avatar: string,
+	status: string
+}
+
 type MembersModel =
 {
 	id: number,
@@ -417,7 +424,7 @@ const	ChatLayout = () =>
 	const [
 		friendList,
 		setFriendList
-	] = useState<string[]>([]);
+	] = useState<FriendListModel[]>([]);
 
 	const [
 		blockedList,
@@ -757,7 +764,6 @@ const	ChatLayout = () =>
 
 		const serverInfo = (data: any) =>
 		{
-			// 🏓 🔴 🟢
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
@@ -1916,12 +1922,18 @@ const	ChatLayout = () =>
 								{
 									return (
 										<ListItem style={listItemStyle} key={index}>
+											<ListItemIcon>
+												<Avatar
+													alt={friend.name}
+													src={friend.avatar}
+												/>
+											</ListItemIcon>
 											<ListItemText
 												style={listItemTextStyle}
-												primary={friend}
+												primary={friend.name}
 											/>
 											<ListItemText
-												secondary={status}
+												secondary={friend.status}
 												sx={{ align: "right" }}
 										></ListItemText>
 										</ListItem>
