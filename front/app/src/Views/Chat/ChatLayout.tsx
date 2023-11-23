@@ -881,6 +881,11 @@ const	ChatLayout = () =>
 					setBlockedList(data.payload.blockedList);
 				refreshListUser();
 			}
+
+			if (data.type === "channel-exists")
+			{
+				alert(data.payload.message);
+			}
 		};
 
 		const	leftChannelMessage = (data: any) =>

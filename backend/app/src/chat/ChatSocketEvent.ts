@@ -576,6 +576,19 @@ export class ChatSocketEvents
 					const	searchUser = this.chatService.searchUserIndex(data.payload.activeId);
 					let		chanName;
 					let		searchConv;
+
+					if (this.chatService.searchChannelByName(data.payload.chanName) != undefined)
+					{
+						const	actionBis = {
+							type: "channel-exists",
+							payload: {
+								message: "A channel with the same name already exists",
+							}
+						};
+						client.emit("channel-info", actionBis);
+						return ;
+					}
+
 					if (searchUser > -1 && data.payload.kind !== "channel")
 					{
 						tmp = this.chatService.getUserBySocketId(client.id);
