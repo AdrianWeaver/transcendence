@@ -795,11 +795,17 @@ export class ChatSocketEvents
 
 			if (data.type === "did-I-join")
 			{
+				let	priv: boolean;
 				let	channel: Channel;
+				priv = false;
 				channel = this.chatService.searchChannelByName(data.payload.chanName) as Channel;
 				if (channel === undefined)
 				{
 					channel = this.chatService.searchPrivateConvByName(data.payload.chanName) as Channel;
+					if (channel === undefined)
+						return ;
+					else
+						priv = true;
 				}
 				const	action = {
 					type: "confirm-is-inside-channel",
@@ -811,7 +817,12 @@ export class ChatSocketEvents
 					}
 				};
 				if (channel.isMember(client.id) === false)
-					action.payload.isInside = "You must first join the channel";
+				{
+					if (priv)
+						action.payload.isInside = "This conversation is private";
+					else
+						action.payload.isInside = "You must first join the channel";
+				}
 				client.emit("channel-info", action);
 			}
 
