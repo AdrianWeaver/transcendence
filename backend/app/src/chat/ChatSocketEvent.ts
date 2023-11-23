@@ -35,6 +35,7 @@ import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
 import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
+import * as bcrypt from "bcrypt";
 
 type	ActionSocket = {
 	type: string,
@@ -804,7 +805,10 @@ export class ChatSocketEvents
 					}
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
-				if (channel?.password === data.payload.password)
+				if (channel === undefined)
+					return ;
+				const	valid = await bcrypt.compare(data.payload.password, channel.password as string);
+				if (valid === true)
 				{
 					action.payload.correct = "true";
 				}
