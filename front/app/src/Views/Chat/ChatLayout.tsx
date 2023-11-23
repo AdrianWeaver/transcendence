@@ -491,6 +491,11 @@ const	ChatLayout = () =>
 		setClickedChannel
 	] = useState("");
 
+	const [
+		clickedChanMode,
+		setClickedChanMode
+	] = useState("");
+
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
@@ -508,6 +513,7 @@ const	ChatLayout = () =>
 				kind: kindOfConversation
 			}
 		};
+		console.log("SELECTED CHAN MODE: ", action.payload.chanMode);
 		dispatch(setNumberOfChannels(channels.length));
 		socketRef.current?.emit("channel-info", action);
 	};
@@ -741,6 +747,7 @@ const	ChatLayout = () =>
 
 			if (data.type === "protected-password")
 			{
+				console.log("Yop !");
 				if (data.payload.correct === "true")
 				{
 					joinChannel(joiningChannelNameRef.current);
@@ -1061,6 +1068,7 @@ const	ChatLayout = () =>
 
 	const handlePasswordSubmit = (password: string) =>
 	{
+		console.log("PASSWORD: ", password);
 		const	action = {
 			type: "password-for-protected",
 			payload: {
@@ -1219,6 +1227,7 @@ const	ChatLayout = () =>
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
 	{
+		console.log("SELECTED MODE ", selectedMode);
 		if (chanMode === "protected")
 		{
 			setJoiningChannelName(chanName);
@@ -1478,6 +1487,89 @@ const	ChatLayout = () =>
 								setChanPassword={setChanPassword}
 								chanPassword={chanPassword}
 							/>
+							<Dialog open={open} onClose={handleClose}>
+								<DialogTitle>Enter Information</DialogTitle>
+								<DialogContent>
+									<DialogContentText>
+										Please enter the following information:
+									</DialogContentText>
+									<input
+										type="text"
+										placeholder="User name"
+										value={channelName}
+										onChange={(e) =>
+										{
+											setKindOfConversation("channel");
+											const inputValue = e.target.value;
+											if (inputValue.length <= 8)
+												setChannelName(inputValue);
+											else
+												setChannelName(inputValue.slice(0, 8));
+										}}
+									/>
+									<br />
+									<div>
+										<input
+										type="radio"
+										id="option1"
+										name="answerOption"
+										value="public"
+										checked={selectedMode === "public"}
+										onChange={() =>
+										{
+											setSelectedMode("public");
+										}}
+										/>
+										<label htmlFor="option1">Public</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option2"
+										name="answerOption"
+										value="protected"
+										checked={selectedMode === "protected"}
+										onChange={() =>
+										{
+											setSelectedMode("protected");
+											console.log("PROTECTED SET");
+										}}
+										/>
+										<label htmlFor="option2">Protected</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option3"
+										name="answerOption"
+										value="private"
+										checked={selectedMode === "private"}
+										onChange={() =>
+										{
+											setSelectedMode("private");
+										}}
+										/>
+										<label htmlFor="option3">Private</label>
+									</div>
+									<input
+										type="text"
+										placeholder="Password (if protected)"
+										value={chanPassword}
+										onChange={(e) =>
+										{
+											setChanPassword(e.target.value);
+										}}
+									/>
+								</DialogContent>
+								<DialogActions>
+									<Button onClick={handleClose} color="primary">
+										Cancel
+									</Button>
+									<Button onClick={handleSave} color="primary">
+										Save
+									</Button>
+								</DialogActions>
+							</Dialog>
 							<List>
 								{
 									channels.map((channel: any, index: number) =>
@@ -1501,6 +1593,7 @@ const	ChatLayout = () =>
 												<Button onClick={() =>
 												{
 													setClickedChannel(channel.name);
+													setClickedChanMode(channel.mode);
 													handleDialogOpen(false);
 													setButtonSelection(channel.name);
 													refreshListUser();
@@ -1514,7 +1607,7 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(buttonSelection.mode, clickedChannel);
+															return handleJoinButtonClick(clickedChanMode, clickedChannel);
 														}}>
 															Join
 														</Button>

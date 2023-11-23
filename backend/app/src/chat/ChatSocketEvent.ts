@@ -716,7 +716,7 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join" && data.payload.kind !== "privateMessage")
+			if (data.type === "asked-join")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
@@ -779,10 +779,11 @@ export class ChatSocketEvents
 
 			if(data.type === "password-for-protected")
 			{
+				console.log("I AM HERE");
 				const	action = {
 					type: "protected-password",
 					payload: {
-						correct: ""
+						correct: "false"
 					}
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
@@ -790,6 +791,7 @@ export class ChatSocketEvents
 				{
 					action.payload.correct = "true";
 				}
+				console.log("PASSWORD CORRECT: ", action.payload.correct);
 				client.emit("display-channels", action);
 			}
 
