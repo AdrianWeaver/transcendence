@@ -60,6 +60,7 @@ type MemberSocketIdModel ={
 };
 
 import { v4 as uuidv4 } from "uuid";
+import { GameService } from "src/game-socket/Game.service";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -606,4 +607,22 @@ export	class ChatService implements OnModuleInit
 		return (hashed);
 	}
 
+	public	updateStatus(gameService: GameService)
+	{
+		this.chat.users.forEach((elem) =>
+		{
+			if (!elem.online)
+				elem.status = "offline";
+			else
+			{
+				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
+				if (playing)
+					elem.status = "playing";
+				else
+					elem.status = "online";
+			}
+		});
+		console.log("UPDATE STATUS WORKED ?", this.chat.users);
+		return (this.chat.users);
+	}
 }

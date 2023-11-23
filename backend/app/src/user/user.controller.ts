@@ -14,7 +14,7 @@ import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
-import { ApplicationUserModel, BackUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, ChatUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as busboy from "busboy";
@@ -25,6 +25,7 @@ import * as twilio from "twilio";
 import Configuration from "src/Configuration";
 import { ChatService } from "src/chat/Chat.service";
 import { GameService, MatchHistoryModel } from "src/game-socket/Game.service";
+import User from "src/chat/Objects/User";
 
 type	ResponseRow = {
 	id: number;
@@ -1034,12 +1035,27 @@ export class UserController
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
 		playing = false;
-		const	length = await this.gameService.getStatusConnectedToGameFromProfileId(body.profileId);
-		if (length)
-			playing = true;
-		this.chatService.setStatus(body.profileId, playing);
-		this.userService.setStatus(body.profileId, playing);
-		return (playing);
+		this.chatService.updateStatus(this.gameService);
+		this.userService.updateStatus(this.gameService);
+		const	chatUsers: any[] = [];
+		console.log("user-playing", body.id);
+		this.chatService.chat.users.map((elem) =>
+		{
+			if (elem.profileId.toString() !== body.id.toString())
+			{
+				const	usr = {
+					name: elem.name,
+					profileId: elem.profileId,
+					online: elem.online,
+					status: elem.status,
+					avatar: elem.avatar,
+					id: elem.id,
+				}
+				chatUsers.push(usr);
+			}
+		});
+		console.log("NEW CHAT USERS", chatUsers);
+		return (chatUsers);
 	}
 
 	@Post("/get-achievements")

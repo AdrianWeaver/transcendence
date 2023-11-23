@@ -31,7 +31,6 @@ import {
 
 import MessageItem from "./components/MessageItem";
 import Myself from "./components/Myself";
-import FriendItem from "./components/FriendItem";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
@@ -62,12 +61,13 @@ import {
 	setProfileFriendView,
 	setProfilePublicView,
 	setPreviousPage,
-	getPlayingStatus
+	getPlayingStatus,
 }	from "../../Redux/store/controllerAction";
 
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
+import { ChatUserModel } from "../../Redux/models/redux-models";
 
 type MessageModel =
 {
@@ -185,15 +185,13 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user);
 	});
-
-	users.forEach((elem) =>
-	{
-		dispatch(getPlayingStatus(elem.profileId));
-	});
 	const	numberOfChannels = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
+	dispatch(getPlayingStatus(user.id.toString()));
+
+
 
 	const	createNewConv = (activeId: string) =>
 	{
@@ -238,15 +236,15 @@ const FriendsList = (props: FriendsListProps) =>
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						return (
-							<>
+						return (		
+							(elem.profileId !== user.id.toString())
+							? <>
 								<div key={index} onClick={() =>
-								{
-									dispatch(setActiveConversationId(elem.id));
-									createNewConv(elem.id);
-								}}>
+									{
+										dispatch(setActiveConversationId(elem.id));
+										createNewConv(elem.id);
+									}}>
 									<ListItem key={index}>
-									{/* <ListItem > */}
 										<ListItemIcon>
 											<Avatar
 												alt={elem.name}
@@ -267,6 +265,7 @@ const FriendsList = (props: FriendsListProps) =>
 									</ListItem>
 								</div>
 							</>
+							: <></>
 						);
 					})
 				}

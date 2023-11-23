@@ -458,7 +458,7 @@ const	UserServices = {
 		);
 	},
 
-	async	getPlayingStatus(profileId: string | number, token :string, hostname: string)
+	async	getPlayingStatus(profileId: string, token: string, hostname: string)
 	{
 		const	config: AxiosRequestConfig = {
 			headers: {
@@ -467,8 +467,8 @@ const	UserServices = {
 			},
 		};
 		const	data = {
-			profileId: profileId,
-		};
+			id: profileId
+		}
 		return (
 			Api(hostname)
 			.post("user/user-playing", data, config)

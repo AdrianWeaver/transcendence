@@ -64,7 +64,6 @@ export const	initialControllerState: ControllerModel = {
 				online: false,
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
-				password: "undefined",
 				profileId: "undefined",
 			}
 			],
