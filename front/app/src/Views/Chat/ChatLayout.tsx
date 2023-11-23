@@ -67,6 +67,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
+import { Socket } from "socket.io-client/debug";
 
 type MessageModel =
 {
@@ -163,8 +164,8 @@ const TabPanel = (props: TabPanelProps) =>
 
 type FriendsListProps = {
 	arrayListUsers: string[],
-	socketRef: React.MutableRefObject<SocketIOClient.Socket>
-	friends: string[]
+	socketRef: React.MutableRefObject<Socket>
+	friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
@@ -233,23 +234,37 @@ const FriendsList = (props: FriendsListProps) =>
 				{
 					users.map((elem, index) =>
 					{
+						let status;
+						status = elem.online ? "💚" : "🔴";
+						if (elem.status === "playing" && elem.online)
+							status = "🏓";
 						return (
 							<>
-								<div key={props.tabMode + index} onClick={() =>
+								<div key={index} onClick={() =>
 								{
 									dispatch(setActiveConversationId(elem.id));
 									createNewConv(elem.id);
 								}}>
-									<FriendItem
-										// name={elem.name + ": " + elem.id}
-										name={elem.name}
-										avatar={elem.avatar}
-										online={elem.online}
-										status={elem.status}
-										key={index}
-										ind={index}
-										isFriend={currentProfileIsFriend}
-									/>
+									<ListItem key={index}>
+									{/* <ListItem > */}
+										<ListItemIcon>
+											<Avatar
+												alt={elem.name}
+												src={elem.avatar}
+											/>
+										</ListItemIcon>
+										<ListItemText primary={elem.name}>
+											{elem.name}
+										</ListItemText>
+										{
+											(currentProfileIsFriend)
+											? <ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
+											: <></>
+										}
+									</ListItem>
 								</div>
 							</>
 						);
@@ -1892,10 +1907,8 @@ const	ChatLayout = () =>
 									privateMessage.map((channel: any, privId: number) =>
 									{
 										return (
-											<>
-											{
-												<>
-												<ListItem style={listItemStyle} key={privId}>
+											<div key={privId}>
+												<ListItem style={listItemStyle}>
 													<ListItemText
 														style={
 															channel.name === currentChannelRef.current
@@ -1984,8 +1997,7 @@ const	ChatLayout = () =>
 															</Button>
 														</DialogActions>
 												</Dialog>
-												</>}
-												</>
+											</div>
 											);
 									})
 								}
@@ -2007,6 +2019,7 @@ const	ChatLayout = () =>
 										<ListItem style={listItemStyle} key={index}>
 											<ListItemIcon>
 												<Avatar
+													key={index}
 													alt={friend.name}
 													src={friend.avatar}
 												/>
