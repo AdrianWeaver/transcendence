@@ -779,7 +779,6 @@ export class ChatSocketEvents
 
 			if(data.type === "password-for-protected")
 			{
-				console.log("I AM HERE");
 				const	action = {
 					type: "protected-password",
 					payload: {
@@ -791,7 +790,6 @@ export class ChatSocketEvents
 				{
 					action.payload.correct = "true";
 				}
-				console.log("PASSWORD CORRECT: ", action.payload.correct);
 				client.emit("display-channels", action);
 			}
 

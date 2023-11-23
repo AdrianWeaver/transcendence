@@ -513,7 +513,6 @@ const	ChatLayout = () =>
 				kind: kindOfConversation
 			}
 		};
-		console.log("SELECTED CHAN MODE: ", action.payload.chanMode);
 		dispatch(setNumberOfChannels(channels.length));
 		socketRef.current?.emit("channel-info", action);
 	};
@@ -609,13 +608,10 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "create-chat-user")
 			{
-				console.log("create chat user front ", data.payload);
 				if (data.payload.newChatUser === undefined)
 					return ;
 				dispatch(addChatUser(data.payload.newChatUser));
 				dispatch(connectChatUser(data.payload.newChatUser, data.payload.online));
-				console.log("connecteed", user.chat.connectedUsers);
-				console.log("disconnected", user.chat.disconnectedUsers);
 			}
 		};
 
@@ -629,7 +625,6 @@ const	ChatLayout = () =>
 			});
 			if (searchChatUser === undefined)
 			{
-				console.log("does not exist");
 				const	action = {
 					type: "create-chat-user",
 					payload: {
@@ -642,7 +637,6 @@ const	ChatLayout = () =>
 			}
 			else
 			{
-				console.log("already exists");
 				dispatch(connectChatUser(searchChatUser, true));
 			}
 		};
@@ -692,14 +686,12 @@ const	ChatLayout = () =>
 					setPrivateMessage(data.payload.privateMessage);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
-				console.log("friendList update channels", friendList);
 			}
 
 			if (data.type === "sending-list-user")
 			{
 				if (data.payload.friendsList !== undefined)
 					setFriendList(data.payload.friendsList);
-				console.log("sending list user", data.payload, " ", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -727,7 +719,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert(data.payload.message);
-					console.log(data.payload.message);
 				}
 			}
 
@@ -736,7 +727,6 @@ const	ChatLayout = () =>
 				if (data.payload.message !== "")
 				{
 					alert(data.payload.message);
-					console.log(data.payload.message);
 				}
 				else
 				{
@@ -747,7 +737,6 @@ const	ChatLayout = () =>
 
 			if (data.type === "protected-password")
 			{
-				console.log("Yop !");
 				if (data.payload.correct === "true")
 				{
 					joinChannel(joiningChannelNameRef.current);
@@ -757,7 +746,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert("Incorrect password, try again !");
-					console.log("Incorrect password, try again !");
 				}
 			}
 		};
@@ -770,10 +758,8 @@ const	ChatLayout = () =>
 		const serverInfo = (data: any) =>
 		{
 			// 🏓 🔴 🟢
-			console.log("data Pyaload list users", data.payload);
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
-			// console.log("information from server: ", data);
 			setArrayListUser(data.payload.arrayListUsers);
 		};
 
@@ -867,7 +853,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert(data.payload.isInside);
-					console.log(data.payload.isInside);
 				}
 			}
 
@@ -923,7 +908,6 @@ const	ChatLayout = () =>
 				if (data.payload.alreadyFriend !== "")
 				{
 					alert("ALERT" + data.payload.alreadyFriend);
-					console.log("ALERT" + data.payload.alreadyFriend);
 				}
 				else
 				{
@@ -985,7 +969,6 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
-				console.log("repopulate FRIENDS LIST", friendList);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
@@ -994,7 +977,6 @@ const	ChatLayout = () =>
 
 		const	isMyConversation = (data: any) =>
 		{
-			console.log("is my converation data,", data.payload);
 			setIsMyConv(data.payload.isMyConv);
 		};
 
@@ -1068,7 +1050,6 @@ const	ChatLayout = () =>
 
 	const handlePasswordSubmit = (password: string) =>
 	{
-		console.log("PASSWORD: ", password);
 		const	action = {
 			type: "password-for-protected",
 			payload: {
@@ -1134,7 +1115,6 @@ const	ChatLayout = () =>
 		if (isMuted === true)
 		{
 			alert("You are muted for the moment being.");
-			console.log("You are muted for the moment being.");
 		}
 		else
 			setText(e.target.value);
@@ -1155,7 +1135,6 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (username: string) =>
 	{
-		console.log("Go to ", username, "'s profile");
 		dispatch(setPreviousPage("/the-chat"));
 		const	searchUser = chatUsers.find((elem) =>
 		{
@@ -1227,7 +1206,6 @@ const	ChatLayout = () =>
 
 	const handleJoinButtonClick = (chanMode: string, chanName: string) =>
 	{
-		console.log("SELECTED MODE ", selectedMode);
 		if (chanMode === "protected")
 		{
 			setJoiningChannelName(chanName);
@@ -1257,7 +1235,6 @@ const	ChatLayout = () =>
 
 	const handleMembersClickOpen = (chanName: string) =>
 	{
-		console.log(chanName);
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1311,8 +1288,6 @@ const	ChatLayout = () =>
 
 	const	addUserToBlocked = (userName: string) =>
 	{
-		console.log("userrname", userName);
-		console.log("FRIEND PROFILE ID ", friendProfileId);
 		const	action = {
 			type: "block-user",
 			payload: {
@@ -1532,7 +1507,6 @@ const	ChatLayout = () =>
 										onChange={() =>
 										{
 											setSelectedMode("protected");
-											console.log("PROTECTED SET");
 										}}
 										/>
 										<label htmlFor="option2">Protected</label>
@@ -1574,7 +1548,6 @@ const	ChatLayout = () =>
 								{
 									channels.map((channel: any, index: number) =>
 									{
-										// console.log("channels map", channel);
 										return (
 											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
@@ -1824,7 +1797,6 @@ const	ChatLayout = () =>
 								{
 									privateMessage.map((channel: any, privId: number) =>
 									{
-										// console.log("private message map", channel);
 										return (
 											<>
 											{

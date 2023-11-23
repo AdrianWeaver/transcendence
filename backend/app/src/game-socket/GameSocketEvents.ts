@@ -706,7 +706,6 @@ export class GameSocketEvents
 		const { handShake, token, error} = this.doHandShake(client);
 		if (error === true || token === undefined || handShake === undefined)
 			return ;
-		// console.log(handShake);
 		const	profileId = token.profileId;
 		const	gameModeRequest = handShake.gameMode;
 		const	uuid = handShake.uuid;
@@ -741,7 +740,6 @@ export class GameSocketEvents
 		if (roomName === "The void")
 			return ;
 		const	roomInfo = this.server.sockets.adapter.rooms.get(roomName);
-		// console.log("room infos: ", roomInfo);
 		if (roomInfo)
 		{
 			const	userMessage: ActionSocket = {
