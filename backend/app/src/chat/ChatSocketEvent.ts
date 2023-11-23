@@ -71,6 +71,8 @@ export type	FriendsModel =
 	id: number,
 	name: string,
 	profileId: string,
+	avatar: string,
+	status: string
 }
 
 
@@ -238,11 +240,19 @@ export class ChatSocketEvents
 			if (userMe !== undefined)
 			{
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
-				const	friendsArr: string[] = [];
+				const	friendsArr: FriendsModel[] = [];
 
 				userMe.friends.forEach((friend) =>
 				{
-					friendsArr.push(friend.name);
+					const	fr: FriendsModel = {
+						name: friend.name,
+						id: friend.id,
+						profileId: friend.profileId,
+						avatar: friend.avatar,
+						status: friend.status
+						
+					}
+					friendsArr.push(fr);
 				});
 				const	action = {
 					type: "init-channels",
@@ -469,10 +479,17 @@ export class ChatSocketEvents
 			if (searchUser !== -1)
 				copyUsers.splice(searchUser, 1);
 			const	newArray= [...regularUsers];
-			const	friendsList: string[] = [];
+			const	friendsList: FriendsModel[] = [];
 			me.friends.map((elem) =>
 			{
-				friendsList.push(elem.name);
+				const	friend: FriendsModel = {
+					name: elem.name,
+					id: elem.id,
+					profileId: elem.profileId,
+					avatar: elem.avatar,
+					status: elem.status
+				}
+				friendsList.push(friend);
 			});
 			copyUsers.forEach((elem) =>
 			{
@@ -1133,7 +1150,7 @@ export class ChatSocketEvents
 				const	action = {
 					type: "add-friend",
 					payload: {
-						friendList: myFriendNameArray,
+						friendList: myFriendArray,
 						newFriend: friendUser.name,
 						alreadyFriend: message,
 						friendProfileId: friendUser.profileId

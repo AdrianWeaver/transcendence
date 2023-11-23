@@ -18,7 +18,7 @@ const	Logout = () =>
 	{
 		dispatch(reinitialiseUser(true));
 		localStorage.clear();
-		navigate("/");
+		navigate("/cancel");
 	};
 
 	return (

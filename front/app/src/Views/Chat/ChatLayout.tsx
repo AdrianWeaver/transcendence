@@ -6,6 +6,7 @@
 // import * as SocketIOClient from "socket.io-client";
 // 🏓 🔴 🟢 🗨
 import {
+	Avatar,
 	Box,
 	Button,
 	Divider,
@@ -14,6 +15,7 @@ import {
 	List,
 	ListItem,
 	ListItemText,
+	ListItemIcon,
 	Paper,
 	Tab,
 	Tabs,
@@ -72,6 +74,13 @@ type MessageModel =
 	message: string,
 	id: number,
 	username: string
+}
+
+type	FriendListModel =
+{
+	name: string,
+	avatar: string,
+	status: string
 }
 
 type MembersModel =
@@ -417,7 +426,7 @@ const	ChatLayout = () =>
 	const [
 		friendList,
 		setFriendList
-	] = useState<string[]>([]);
+	] = useState<FriendListModel[]>([]);
 
 	const [
 		blockedList,
@@ -771,7 +780,6 @@ const	ChatLayout = () =>
 
 		const serverInfo = (data: any) =>
 		{
-			// 🏓 🔴 🟢
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
@@ -1997,12 +2005,18 @@ const	ChatLayout = () =>
 								{
 									return (
 										<ListItem style={listItemStyle} key={index}>
+											<ListItemIcon>
+												<Avatar
+													alt={friend.name}
+													src={friend.avatar}
+												/>
+											</ListItemIcon>
 											<ListItemText
 												style={listItemTextStyle}
-												primary={friend}
+												primary={friend.name}
 											/>
 											<ListItemText
-												secondary={status}
+												secondary={friend.status}
 												sx={{ align: "right" }}
 										></ListItemText>
 										</ListItem>

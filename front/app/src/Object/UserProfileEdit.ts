@@ -6,15 +6,11 @@ import UserProfileEditChecker from "./UserProfileEditChecker";
 class	UserProfileEdit
 {
 	private	data: FormData;
-	public	password: string;
-	public	passwordConfirm: string;
-	public	uniquenessPassword: string;
 	public	errorTable: UserProfileEditChecker;
 	public	username: string;
 	public	phoneNumber: string;
 	public	doubleAuth: boolean;
 	public	user: UserModel;
-	public	pwModified: boolean;
 
 	public	constructor(data: FormData, doubleAuth: boolean, user: UserModel)
 	{
@@ -22,19 +18,6 @@ class	UserProfileEdit
 		this.username = this.form("username");
 		if (this.username.length === 0)
 			this.username = user.username;
-		this.password = this.form("password");
-		if (this.password.length === 0)
-			this.pwModified = false;
-		else
-			this.pwModified = true;
-		this.passwordConfirm = this.form("passwordConfirm");
-		if (this.passwordConfirm.length === 0)
-		{
-			this.passwordConfirm = user.password;
-			this.uniquenessPassword = "AgreeWithUniquenessOfPassword";
-		}
-		else
-			this.uniquenessPassword = this.form("uniquePassword");
 		this.errorTable = new UserProfileEditChecker();
 		if (doubleAuth)
 			if ((this.form("phoneNumber") === null
@@ -65,9 +48,6 @@ class	UserProfileEdit
 		return (
 		{
 			username: this.username,
-			password: this.password,
-			passwordConfirm: this.passwordConfirm,
-			uniquenessPassword: this.uniquenessPassword,
 			phoneNumber: this.phoneNumber,
 			doubleAuth: this.doubleAuth
 		});

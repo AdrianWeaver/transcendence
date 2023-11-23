@@ -1411,6 +1411,8 @@ public	register(data: UserModel)
 			id: index,
 			name: this.user[myUserIndex].username,
 			profileId: this.user[myUserIndex].id,
+			avatar: this.user[myUserIndex].avatar,
+			status: this.user[myUserIndex].status
 		};
 		return (friend);
 	}

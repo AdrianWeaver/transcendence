@@ -11,7 +11,9 @@ import { type } from "os";
 type	FriendsModel = {
 	id: number,
 	name: string,
-	profileId: string
+	profileId: string,
+	avatar: string,
+	status: string
 };
 
 type	ProfileModel = {
