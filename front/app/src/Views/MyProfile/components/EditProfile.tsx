@@ -24,6 +24,48 @@ import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
 import UpdateMyProfilePicture from "../../../Component/DropZoneImage/UpdateMyProfilePicture";
 
+type PasswordAlertProps ={
+	password: string,
+	firstTrigger: boolean,
+	passwordConfirm?: string
+}
+
+const	stringContainChar = (string: string, char: string) =>
+{
+	let	i;
+
+	i = 0;
+	while (i < string.length)
+	{
+		if (string.charAt(i) >= char.charAt(0)
+			&& string.charAt(i) <= char.charAt(char.length - 1))
+			return (true);
+		i++;
+	}
+	return (false);
+};
+
+const	stringContainCharOfString = (string: string, charset: string) =>
+{
+	let	i;
+	let	j;
+
+	i = 0;
+	j = 0;
+	while (i < string.length)
+	{
+		while (j < charset.length)
+		{
+			if (string.charAt(i) === charset.charAt(j))
+				return (true);
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+	return (false);
+};
+
 type	EditProfileProps =
 {
 	setting: boolean
@@ -69,6 +111,7 @@ const	EditProfile = (props: EditProfileProps) =>
 			key;
 			return (value === true);
 		});
+
 		if (filtered.length === 0)
 		{
 			if (user.username !== userChanges.username)
@@ -76,8 +119,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(updateChatUsers(user.id.toString(), userChanges.username));
 				dispatch(registerInfosInBack(userChanges.username, required, "username"));
 			}
-			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
-			console.log("CHANGES ", userChanges);
 			if (user.phoneNumber !== userChanges.phoneNumber || required !== user.doubleAuth)
 				dispatch(registerInfosInBack(userChanges.phoneNumber, required, "phoneNumber"));
 			if (props.setting)
@@ -87,7 +128,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(setProfileMyView());
 				navigate("/me/profile");
 			}
-			console.log("num === ", user.phoneNumber);
 		}
 	};
 
@@ -128,8 +168,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						id="username"
 						label="Username"
 						error={errorValidation.username}
-						helperText={
-							// NEED TO CHECK IS IT S USED
+						helperText= {
 							errorValidation.username
 								? "Username is required"
 								: ""

@@ -108,7 +108,6 @@ const	StepZero = () =>
 
 	useEffect(() =>
 	{
-		console.log("Abort value", abort);
 		if (abort === true)
 		{
 			savePrevPage("/signin");
@@ -182,7 +181,6 @@ const	StepZero = () =>
 	// eslint-disable-next-line eqeqeq
 	if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
 	{
-		console.log("already exists >", user.alreadyExists);
 		dispatch(verifyToken());
 		dispatch(userRegistrationStepTwo());
 	}
@@ -207,7 +205,6 @@ const	StepZero = () =>
 		.post(uri + ":3000/user/register-forty-three")
 		.then((data) =>
 		{
-			console.log("fortythree data:", data);
 			dispatch(setUserData(data.data));
 			dispatch(userRegistrationStepTwo());
 		})

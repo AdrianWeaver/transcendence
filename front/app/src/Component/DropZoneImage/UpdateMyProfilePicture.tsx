@@ -90,10 +90,6 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 					onLoad={(event) =>
 						{
 							const img = event.target as HTMLImageElement;
-							console.log("image cast");
-							console.log(event.target);
-							console.log(img);
-							console.log(img.naturalHeight, img.naturalWidth);
 							if (img.naturalHeight !== img.naturalWidth)
 							{
 								props.setIsImageSquare(false);
@@ -180,7 +176,6 @@ const CropMyImage = (props: CropMyImageProps) =>
 						step={0.01}
 						onChange={(event: any) =>
 						{
-							// console.log(event.target.value);
 							setZoom(event.target.value);
 						}}
 					/>
@@ -193,15 +188,10 @@ const CropMyImage = (props: CropMyImageProps) =>
 							if (editor.current !== null)
 							{
 								const	oldImage = props.remplacement[0];
-								// console.log("next value is old images");
-								// console.log(oldImage);
 
 								const dataURL = editor
 									.current?.getImageScaledToCanvas()
 									.toDataURL(oldImage.file.type);
-								// props.setFiles([scaled]);
-								// console.log("Next value is scalled ");
-								// console.log(dataURL);
 								const	fileData = dataURLtoFile(
 									dataURL,
 									oldImage.file.name,
@@ -211,11 +201,7 @@ const CropMyImage = (props: CropMyImageProps) =>
 									data: dataURL,
 									file: fileData
 								};
-								console.log("New file created: ");
-								console.log(file);
 								props.setFiles([file]);
-								// dataURLtgoFile
-								// console.log(props.remplaceement[0]);
 								props.setReadyExport(true);
 							}
 						}}
@@ -231,7 +217,6 @@ const CropMyImage = (props: CropMyImageProps) =>
 type	DisplayAreaProps = {
 	remplacementFile?: FileObject[],
 	setFiles: React.Dispatch<React.SetStateAction<FileObject[]>>;
-	// readyExport: boolean
 	readyExport: boolean;
 	setReadyExport: React.Dispatch<React.SetStateAction<boolean>>
 };
@@ -258,7 +243,6 @@ const	DisplayArea = (props: DisplayAreaProps) =>
 				remplacementFile={props.remplacementFile}
 				setIsImageSquare={setIsImageSquare}
 				isImageSquare={isImageSquare}
-				// readyExport={readyExport}
 			/>
 		);
 	}
@@ -296,19 +280,10 @@ const	DisplayArea = (props: DisplayAreaProps) =>
 						xs={10}
 						sx={
 						{
-							// border: "1px solid #000",
 							textAlign: "center"
 						}}
 					>
 						{content}
-						{/* <CropMyImage
-							userInfo={userInfo}
-							remplacement={files}
-							setFiles = {setFiles}
-							readyExport={readyExport}
-							setReadyExport={setReadyExport} */}
-							{/* // readyExport={readyExport} */}
-						{/* /> */}
 					</Grid>
 					<Spacer space={1}/>
 				</Grid>
@@ -329,7 +304,6 @@ const	DropArea = (props: DropAreaProps) =>
 
 	const	handleAddFile = (newFile: any) =>
 	{
-		console.log(newFile);
 		setTimeout(() =>
 		{
 			props.setFiles(newFile);
@@ -361,7 +335,6 @@ const	DropArea = (props: DropAreaProps) =>
 				filesLimit={1}
 				dropzoneText="Glissez-deposez votre image ici"
 				acceptedFiles={acceptedFiles}
-				// showPreviews={true}
 				showFileNames={false}
 				maxFileSize={10000000}
 				clearOnUnmount={true}

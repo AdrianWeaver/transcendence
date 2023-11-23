@@ -22,7 +22,6 @@ export const	setIsFetching = (value : boolean)
 	return ((dispatch, getState) =>
 	{
 		const	previousState = getState();
-		console.log("Set is fetching value : ", previousState);
 		const	response: ServerModel = {
 			...previousState.server,
 			isFetching: value,
@@ -47,7 +46,6 @@ export const	resetConnexionAttempt = ()
 export const	increaseConnectionAttempt = ()
 	: ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	console.log("Connection attempt ");
 	return ((dispatch, getState) =>
 	{
 		const	prevState = getState();
@@ -87,9 +85,6 @@ export const	resetState = ()
 export const	setServerConnectionErr = (basicErrMsg: string, fullMsg: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
-	// console.log("Failure to connect to server ");
-	// console.log("Basic err message : ", basicErrMsg);
-	// console.log("Full message :", fullMsg);
 	return (async (dispatch, getState) =>
 	{
 		const	prevState = getState();
@@ -100,7 +95,6 @@ export const	setServerConnectionErr = (basicErrMsg: string, fullMsg: string)
 			error: true,
 			message: basicErrMsg + ": " + fullMsg
 		};
-		console.info("Response error", response);
 		dispatch(serverActions.setServerConnectionError(response));
 	});
 };
@@ -120,7 +114,6 @@ export const	setServerConnectionSuccess = (
 				authApiUrl: links.authApiUrl
 			}
 		};
-		// console.log(response);
 		dispatch(serverActions.setServerConnectionSuccess(response));
 		dispatch(serverActions.setAuthApiLinks(response));
 	});
@@ -141,7 +134,6 @@ export	const	getServerConnection = ()
 			.getConnection(prevState.server.uri);
 		if (data.success === false)
 		{
-			// console.log("data tyes", data);
 			dispatch(increaseConnectionAttempt());
 			if (server.connexionAttempt < 3)
 				setTimeout(() =>
@@ -155,7 +147,6 @@ export	const	getServerConnection = ()
 		}
 		else
 		{
-			console.log("Flag response server-status: ", data.links.authApiUrl);
 			dispatch(
 				setServerConnectionSuccess(data.availableSince, data.links)
 			);
@@ -199,7 +190,6 @@ export const	setAuthApiLinks = ()
 		.getAuthApiLinks(prev.server.uri);
 		if (data.success === true)
 		{
-			console.log("Action reducer data set auth links: ", data);
 			const	response: ServerModel = {
 				...prev.server,
 				links: {
@@ -211,7 +201,6 @@ export const	setAuthApiLinks = ()
 		}
 		else
 		{
-			console.log("Set auth links fails");
 			dispatch(serverActions.setAuthApiLinks({...prev.server}));
 		}
 	});
@@ -223,7 +212,6 @@ export const	setUri = (uri: string)
 	return (async (dispatch, getState) =>
 	{
 		const prev = getState();
-			console.log("setUri: ", uri);
 			const	response: ServerModel = {
 				...prev.server,
 				uri: uri

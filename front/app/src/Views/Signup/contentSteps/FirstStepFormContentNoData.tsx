@@ -25,137 +25,6 @@ import {
 	// userRegistrationStepTwo,
 } from "../../../Redux/store/controllerAction";
 import axios from "axios";
-// import { useWillChange } from "framer-motion";
-
-// type PasswordAlertProps ={
-// 	password: string,
-// 	firstTrigger: boolean,
-// 	passwordConfirm?: string
-// }
-
-// const	stringContainChar = (string: string, char: string) =>
-// {
-// 	let	i;
-
-// 	i = 0;
-// 	console.log("last Char = ", char.charAt(char.length - 1));
-// 	while (i < string.length)
-// 	{
-// 		if (string.charAt(i) >= char.charAt(0)
-// 			&& string.charAt(i) <= char.charAt(char.length - 1))
-// 			return (true);
-// 		i++;
-// 	}
-// 	return (false);
-// };
-
-// const	stringContainCharOfString = (string: string, charset: string) =>
-// {
-// 	let	i;
-// 	let	j;
-
-// 	i = 0;
-// 	j = 0;
-// 	while (i < string.length)
-// 	{
-// 		while (j < charset.length)
-// 		{
-// 			if (string.charAt(i) === charset.charAt(j))
-// 				return (true);
-// 			j++;
-// 		}
-// 		j = 0;
-// 		i++;
-// 	}
-// 	return (false);
-// };
-
-// const	PasswordAlert = (props: PasswordAlertProps) =>
-// {
-// 	const	message = [];
-// 	const	digit = "0-9";
-// 	const	uperCase = "A-Z";
-// 	const	lowerCase = "a-z";
-// 	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
-// 	if (props.password.length === 0 && props.firstTrigger === false)
-// 		return (<></>);
-// 	if (props.firstTrigger === false
-// 		&& props.passwordConfirm)
-// 		return (<></>);
-// 	if (props.passwordConfirm !== undefined )
-// 	{
-// 		console.log(props);
-// 		if (props.firstTrigger === false)
-// 			return (<></>);
-// 		if (props.password !== props.passwordConfirm)
-// 			return (
-// 				<Grid item xs={12}>
-// 					<Alert
-// 						severity="error"
-// 					>
-// 						Password mismatch
-// 					</Alert>
-// 				</Grid>
-// 			);
-// 		else
-// 			return (<></>);
-// 	}
-// 	if (props.password.length < 8)
-// 		message.push("minimum 8 character");
-// 	if (stringContainChar(props.password, digit) === false)
-// 		message.push("minimum 1 digit");
-// 	if (stringContainChar(props.password, uperCase) === false)
-// 		message.push("minimum 1 upercase");
-// 	if (stringContainChar(props.password, lowerCase) === false)
-// 		message.push("minimum 1 lowercase");
-// 	if (stringContainCharOfString(props.password, specialChar) === false)
-// 		message.push("minimum 1 special char : " + specialChar);
-// 	if (message.length === 0)
-// 		return (<></>);
-// 	return (
-// 		<Grid item xs={12}>
-// 			<Alert
-// 				severity="info"
-// 			>
-// 				<AlertTitle>You must have:</AlertTitle>
-// 				<List
-// 					sx={
-// 					{
-// 						m: 0,
-// 						fontSize: "0.7rem"
-// 					}}
-// 				>
-// 				{
-// 					message.map((msg) =>
-// 					{
-// 						return (
-// 							<ListItem key={msg}>
-// 								{msg}
-// 							</ListItem>
-// 						);
-// 					})
-// 				}
-// 				</List>
-// 			</Alert>
-// 		</Grid>
-// 	);
-// };
-
-// type UniqueAlertProps = {
-// 	isUnique: boolean
-// };
-
-// const UniqueAlert = (props: UniqueAlertProps) =>
-// {
-// 	if (props.isUnique)
-// 		return (
-// 		<Alert severity="warning" >
-// 			Faites Attention !
-// 		</Alert>);
-// 	else
-// 		return (<></>);
-// };
 
 type PasswordAlertProps ={
 	password: string,
@@ -168,7 +37,6 @@ const	stringContainChar = (string: string, char: string) =>
 	let	i;
 
 	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
 	while (i < string.length)
 	{
 		if (string.charAt(i) >= char.charAt(0)
@@ -215,7 +83,6 @@ const	PasswordAlert = (props: PasswordAlertProps) =>
 		return (<></>);
 	if (props.passwordConfirm !== undefined )
 	{
-		console.log(props);
 		if (props.firstTrigger === false)
 			return (<></>);
 		if (props.password !== props.passwordConfirm)
@@ -317,11 +184,6 @@ const	FirstStepFormContentNoData = () =>
 		setPasswordValue
 	] = useState("");
 
-	// const	[
-	// 	usernameValue,
-	// 	setUsernameValue
-	// ] = useState("");
-
 	const	[
 		uniquePassword,
 		setUniquePassword
@@ -353,14 +215,6 @@ const	FirstStepFormContentNoData = () =>
 		setPasswordFirstTrigger(true);
 	};
 
-	// const	handleUsernameChangeValue = (
-	// 	event: React.ChangeEvent<HTMLInputElement>
-	// ) =>
-	// {
-	// 	event.preventDefault();
-	// 	setUsernameValue(event.target.value);
-	// };
-
 	const	[
 		passwordConfirmValue,
 		setPasswordConfirm
@@ -390,7 +244,6 @@ const	FirstStepFormContentNoData = () =>
 		const	userSignup = new UserRegistration(data);
 		userSignup.check();
 		setErrorValidation(userSignup.errorTable);
-		// console.log(errorValidation);
 		const	asArray
 			= Object.entries(userSignup.errorTable.getPlainObject());
 		const	filtered = asArray.filter(
@@ -421,7 +274,6 @@ const	FirstStepFormContentNoData = () =>
 					"Authorization": token
 				}
 			};
-			console.log("PLAIN OBJ", objToSend, " uri: ", server.uri);
 			axios
 			.post(server.uri + ":3000/user/register/step-one",
 				objToSend,
@@ -429,7 +281,6 @@ const	FirstStepFormContentNoData = () =>
 			)
 			.then((response) =>
 			{
-				console.log(response);
 				dispatch(userRegistrationStepThree());
 			})
 			.catch((error: any) =>
@@ -454,7 +305,6 @@ const	FirstStepFormContentNoData = () =>
 						label="Username"
 						error={errorValidation.username}
 						helperText={
-							// NEED TO CHECK IS IT S USED
 							errorValidation.username
 								? "Username is required"
 								: ""

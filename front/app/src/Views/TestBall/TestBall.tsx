@@ -217,8 +217,6 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
-			console.log(data.payload);
-
 			switch (data.type)
 			{
 				case "connect":

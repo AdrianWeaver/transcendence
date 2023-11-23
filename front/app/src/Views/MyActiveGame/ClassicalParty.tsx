@@ -19,7 +19,6 @@ const	ClassicalParty = () =>
 	let	pausedParty;
 	let	playingParty;
 
-	console.log(classicalArray);
 	if (classicalArray.disconnected.length !== 0)
 	{
 		pausedParty = (

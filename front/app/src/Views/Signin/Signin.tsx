@@ -37,7 +37,6 @@ const	Signin = () =>
 	{
 		if (user.doubleAuth && !user.isLoggedIn)
 		{
-			console.log("User wants to double auth log in");
 			navigate("/signin-double-auth");
 		}
 	}, [user.doubleAuth]);
@@ -46,11 +45,8 @@ const	Signin = () =>
 	{
 		if (user.isLoggedIn === true)
 		{
-			console.log("Navigate executed");
 			navigate("/");
 		}
-		else
-			console.log("unlogged");
 	}, [
 		user.isLoggedIn,
 		navigate
@@ -92,17 +88,10 @@ const	Signin = () =>
 				key;
 				return (value === true);
 			});
-			console.log("filtered", filtered);
-			console.log("ici", allUsers);
 			// verifier toute les informations
 			if (filtered.length === 0)
 			{
-				console.log("Data to send", {
-					username: userLogIn.username,
-					password: passwordValue
-				});
 				dispatch(userSignIn(userLogIn.username, userLogIn.password));
-				console.log("USER UPDATED ?", user);
 			}
 	};
 
