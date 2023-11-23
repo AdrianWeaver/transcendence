@@ -430,6 +430,11 @@ const	ChatLayout = () =>
 	] = useState(false);
 
 	const [
+		passwordDialogueOpen,
+		setPasswordDialogueOpen
+	] = useState(false);
+
+	const [
 		buttonSelection,
 		setButtonSelection
 	] = useState<ChanMapModel>({
@@ -448,6 +453,10 @@ const	ChatLayout = () =>
 	});
 
 	const [
+		channelToChangePassword,
+		setChannelToChangePassword
+	] = useState("");
+	const [
 		inviteDialogOpen,
 		setInviteDialogOpen
 	] = useState(false);
@@ -460,6 +469,11 @@ const	ChatLayout = () =>
 	const [
 		userToInvite,
 		setUserToInvite
+	] = useState("");
+
+	const [
+		newPassword,
+		setNewPassword
 	] = useState("");
 
 	const handleClickOpen = () =>
@@ -886,6 +900,14 @@ const	ChatLayout = () =>
 			{
 				alert(data.payload.message);
 			}
+
+			if (data.type === "changed-password")
+			{
+				if (data.payload.message !== "")
+					alert (data.payload.message);
+				else
+					setChannels(data.payload.chanMap);
+			}
 		};
 
 		const	leftChannelMessage = (data: any) =>
@@ -903,6 +925,7 @@ const	ChatLayout = () =>
 					dispatch(setCurrentChannel("undefined"));
 				}
 				alert(data.payload.message);
+				setIsChannelAdmin(false);
 			}
 		};
 
@@ -1373,6 +1396,21 @@ const	ChatLayout = () =>
 		socketRef.current.emit("user-info", action);
 	};
 
+	const	addPasswordToChannel = (chanName: string, newPassword: string) =>
+	{
+		console.log("GOT TO FRONT");
+		console.log("CHANNEL ", chanName);
+		console.log("PASSWORD ", newPassword);
+		const	action = {
+			type: "add-password",
+			payload: {
+				chanName: chanName,
+				newPassword: newPassword,
+			}
+		};
+		socketRef.current.emit("channel-info", action);
+	};
+
 	const	changeTabOperations = () =>
 	{
 		refreshListUser();
@@ -1601,6 +1639,49 @@ const	ChatLayout = () =>
 														}}>
 															Remove
 														</Button>
+														<Button onClick={() =>
+														{
+															// addPasswordToChannel(clickedChannel);
+															setPasswordDialogueOpen(true);
+														}}>
+															Add password
+														</Button>
+														<Dialog open={passwordDialogueOpen} onClose={() =>
+															{
+																setPasswordDialogueOpen(false);
+															}}
+															maxWidth="sm" fullWidth>
+															<DialogTitle>Add a new password to the channel</DialogTitle>
+															<DialogContent>
+																<TextField
+																label="New password"
+																variant="outlined"
+																fullWidth
+																value={newPassword}
+																onChange={(e) =>
+																{
+																	setNewPassword(e.target.value);
+																	setChannelToChangePassword(clickedChannel);
+																}}/>
+															</DialogContent>
+															<DialogActions>
+																<Button onClick={() =>
+																	{
+																		addPasswordToChannel(clickedChannel, newPassword);
+																		setPasswordDialogueOpen(false);
+																		setNewPassword("");
+																		setChannelToChangePassword("");
+																	}} color="primary">
+																	Add password
+																</Button>
+																<Button onClick={() =>
+																{
+																	setPasswordDialogueOpen(false);
+																}} color="primary">
+																Cancel
+																</Button>
+															</DialogActions>
+														</Dialog>
 														<Button onClick={() =>
 														{
 															return handleMembersClickOpen(clickedChannel);

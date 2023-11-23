@@ -681,6 +681,43 @@ export class ChatSocketEvents
 						this.server.emit("display-channels", action);
 					}
 			}
+			
+			if (data.type === "add-password")
+			{
+				const	userMe = this.chatService.searchUserWithProfileId(this.chatService.getProfileIdFromSocketId(client.id));
+				if (userMe === undefined)
+					return ;
+				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
+				if (channel === undefined)
+					return ;
+				const	action = {
+					type: "changed-password",
+					payload: {
+						message: "",
+						chanMap: this.chatService.getChanMap(),
+					}
+				};
+				if (channel.isOwner(userMe.id) !== true)
+				{
+					action.payload.message = "Only the owner can change the password";
+					client.emit("channel-info", action);
+				}
+				else
+				{
+					action.payload.message = "";
+					channel.mode = "protected";
+					channel.password = await this.chatService.hashPassword(data.payload.newPassword, channel.name);
+					this.chatService.chat.chanMap.forEach((elem) =>
+					{
+						if (elem.name === data.payload.chanName)
+							elem.mode = "protected";
+					});
+					action.payload.chanMap = this.chatService.getChanMap();
+					this.server.emit("channel-info", action);
+					this.chatService.updateDatabase();
+				}
+			}
+
 			if (data.type === "destroy-channel")
 			{
 				let	searchChannel: Channel | undefined;
