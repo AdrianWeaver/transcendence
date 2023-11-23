@@ -11,6 +11,7 @@ import User from "./Objects/User";
 import Channel from "./Objects/Channel";
 import { Socket, Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
+import * as bcrypt from "bcrypt";
 
 export interface MessageRoomModel
 {
@@ -153,7 +154,6 @@ export	class ChatService implements OnModuleInit
 			})
 			.catch(() =>
 			{
-				console.log("error");
 			});
 	}
 
@@ -718,4 +718,21 @@ export	class ChatService implements OnModuleInit
 					= this.chat.users[index].online ? "online" : "offline";
 		}
 	}
+
+	async	hashPassword(password: string, chanName: string)
+	{
+		const	saltRounds = 10;
+		console.log("CHANNAME ", chanName);
+		const	index = this.chat.channels.findIndex((elem) =>
+		{
+			return (elem.name === chanName);
+		});
+		if (index === -1)
+			throw new Error("User not found - hashPassword user.service");
+		const	hashed = await bcrypt.hash(password, saltRounds);
+		if (hashed)
+			this.chat.channels[index].password = hashed;
+		return (hashed);
+	}
+
 }

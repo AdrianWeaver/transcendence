@@ -5,7 +5,6 @@ import
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
-	InternalServerErrorException,
 	Logger,
 	OnModuleInit
 }	from "@nestjs/common";
@@ -20,7 +19,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 
 @Injectable()
 export class AnonymousUserService implements OnModuleInit
@@ -231,9 +229,9 @@ export class AnonymousUserService implements OnModuleInit
 			return (user.uuid === uuid);
 		});
 		if (!user)
-			throw new InternalServerErrorException();
+			throw new Error("User doesnt exist");
 		if (user.revokeConnectionRequest === false)
-			throw new InternalServerErrorException();
+			throw new Error("No action");
 		user.lastConnection = Date.now();
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
@@ -248,7 +246,7 @@ export class AnonymousUserService implements OnModuleInit
 			return (user.uuid === uuid);
 		});
 		if (!user)
-			throw new InternalServerErrorException();
+			throw new Error("User doesnt exist");
 		user.revokeConnectionRequest = true;
 	}
 

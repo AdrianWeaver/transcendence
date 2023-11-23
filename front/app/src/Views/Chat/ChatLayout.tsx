@@ -491,6 +491,11 @@ const	ChatLayout = () =>
 		setClickedChannel
 	] = useState("");
 
+	const [
+		clickedChanMode,
+		setClickedChanMode
+	] = useState("");
+
 	const joiningChannelNameRef = useRef(joiningChannelName);
 	const blockedListRef = useRef(blockedList);
 
@@ -603,13 +608,10 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "create-chat-user")
 			{
-				console.log("create chat user front ", data.payload);
 				if (data.payload.newChatUser === undefined)
 					return ;
 				dispatch(addChatUser(data.payload.newChatUser));
 				dispatch(connectChatUser(data.payload.newChatUser, data.payload.online));
-				console.log("connecteed", user.chat.connectedUsers);
-				console.log("disconnected", user.chat.disconnectedUsers);
 			}
 		};
 
@@ -623,7 +625,6 @@ const	ChatLayout = () =>
 			});
 			if (searchChatUser === undefined)
 			{
-				console.log("does not exist");
 				const	action = {
 					type: "create-chat-user",
 					payload: {
@@ -636,7 +637,6 @@ const	ChatLayout = () =>
 			}
 			else
 			{
-				console.log("already exists");
 				dispatch(connectChatUser(searchChatUser, true));
 			}
 		};
@@ -686,14 +686,12 @@ const	ChatLayout = () =>
 					setPrivateMessage(data.payload.privateMessage);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
-				console.log("friendList update channels", friendList);
 			}
 
 			if (data.type === "sending-list-user")
 			{
 				if (data.payload.friendsList !== undefined)
 					setFriendList(data.payload.friendsList);
-				console.log("sending list user", data.payload, " ", friendList);
 			}
 
 			if(data.type === "add-new-channel")
@@ -721,7 +719,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert(data.payload.message);
-					console.log(data.payload.message);
 				}
 			}
 
@@ -730,7 +727,6 @@ const	ChatLayout = () =>
 				if (data.payload.message !== "")
 				{
 					alert(data.payload.message);
-					console.log(data.payload.message);
 				}
 				else
 				{
@@ -750,7 +746,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert("Incorrect password, try again !");
-					console.log("Incorrect password, try again !");
 				}
 			}
 		};
@@ -763,10 +758,8 @@ const	ChatLayout = () =>
 		const serverInfo = (data: any) =>
 		{
 			// 🏓 🔴 🟢
-			console.log("data Pyaload list users", data.payload);
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
-			// console.log("information from server: ", data);
 			setArrayListUser(data.payload.arrayListUsers);
 		};
 
@@ -860,7 +853,6 @@ const	ChatLayout = () =>
 				else
 				{
 					alert(data.payload.isInside);
-					console.log(data.payload.isInside);
 				}
 			}
 
@@ -889,6 +881,11 @@ const	ChatLayout = () =>
 					setBlockedList(data.payload.blockedList);
 				refreshListUser();
 			}
+
+			if (data.type === "channel-exists")
+			{
+				alert(data.payload.message);
+			}
 		};
 
 		const	leftChannelMessage = (data: any) =>
@@ -916,7 +913,6 @@ const	ChatLayout = () =>
 				if (data.payload.alreadyFriend !== "")
 				{
 					alert("ALERT" + data.payload.alreadyFriend);
-					console.log("ALERT" + data.payload.alreadyFriend);
 				}
 				else
 				{
@@ -978,7 +974,6 @@ const	ChatLayout = () =>
 					setChannels(data.payload.channels);
 				if (data.payload.friends !== undefined)
 					setFriendList(data.payload.friends);
-				console.log("repopulate FRIENDS LIST", friendList);
 				if (data.payload.privateMessage !== undefined)
 					setPrivateMessage(data.payload.privateMessage);
 				setUniqueId(data.payload.uniqueId);
@@ -987,7 +982,6 @@ const	ChatLayout = () =>
 
 		const	isMyConversation = (data: any) =>
 		{
-			console.log("is my converation data,", data.payload);
 			setIsMyConv(data.payload.isMyConv);
 		};
 
@@ -1126,7 +1120,6 @@ const	ChatLayout = () =>
 		if (isMuted === true)
 		{
 			alert("You are muted for the moment being.");
-			console.log("You are muted for the moment being.");
 		}
 		else
 			setText(e.target.value);
@@ -1147,7 +1140,6 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (username: string) =>
 	{
-		console.log("Go to ", username, "'s profile");
 		dispatch(setPreviousPage("/the-chat"));
 		const	searchUser = chatUsers.find((elem) =>
 		{
@@ -1248,7 +1240,6 @@ const	ChatLayout = () =>
 
 	const handleMembersClickOpen = (chanName: string) =>
 	{
-		console.log(chanName);
 		setMembersOpen(true);
 		const	action = {
 			type: "member-list",
@@ -1302,8 +1293,6 @@ const	ChatLayout = () =>
 
 	const	addUserToBlocked = (userName: string) =>
 	{
-		console.log("userrname", userName);
-		console.log("FRIEND PROFILE ID ", friendProfileId);
 		const	action = {
 			type: "block-user",
 			payload: {
@@ -1478,11 +1467,92 @@ const	ChatLayout = () =>
 								setChanPassword={setChanPassword}
 								chanPassword={chanPassword}
 							/>
+							<Dialog open={open} onClose={handleClose}>
+								<DialogTitle>Enter Information</DialogTitle>
+								<DialogContent>
+									<DialogContentText>
+										Please enter the following information:
+									</DialogContentText>
+									<input
+										type="text"
+										placeholder="User name"
+										value={channelName}
+										onChange={(e) =>
+										{
+											setKindOfConversation("channel");
+											const inputValue = e.target.value;
+											if (inputValue.length <= 8)
+												setChannelName(inputValue);
+											else
+												setChannelName(inputValue.slice(0, 8));
+										}}
+									/>
+									<br />
+									<div>
+										<input
+										type="radio"
+										id="option1"
+										name="answerOption"
+										value="public"
+										checked={selectedMode === "public"}
+										onChange={() =>
+										{
+											setSelectedMode("public");
+										}}
+										/>
+										<label htmlFor="option1">Public</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option2"
+										name="answerOption"
+										value="protected"
+										checked={selectedMode === "protected"}
+										onChange={() =>
+										{
+											setSelectedMode("protected");
+										}}
+										/>
+										<label htmlFor="option2">Protected</label>
+									</div>
+									<div>
+										<input
+										type="radio"
+										id="option3"
+										name="answerOption"
+										value="private"
+										checked={selectedMode === "private"}
+										onChange={() =>
+										{
+											setSelectedMode("private");
+										}}
+										/>
+										<label htmlFor="option3">Private</label>
+									</div>
+									<input
+										type="text"
+										placeholder="Password (if protected)"
+										value={chanPassword}
+										onChange={(e) =>
+										{
+											setChanPassword(e.target.value);
+										}}
+									/>
+								</DialogContent>
+								<DialogActions>
+									<Button onClick={handleClose} color="primary">
+										Cancel
+									</Button>
+									<Button onClick={handleSave} color="primary">
+										Save
+									</Button>
+								</DialogActions>
+							</Dialog>
 							<List>
 								{
 									channels.map((channel: any, index: number) =>
 									{
-										// console.log("channels map", channel);
 										return (
 											<ListItem style={listItemStyle} key={index}>
 												<ListItemText
@@ -1501,6 +1571,7 @@ const	ChatLayout = () =>
 												<Button onClick={() =>
 												{
 													setClickedChannel(channel.name);
+													setClickedChanMode(channel.mode);
 													handleDialogOpen(false);
 													setButtonSelection(channel.name);
 													refreshListUser();
@@ -1514,7 +1585,7 @@ const	ChatLayout = () =>
 													<DialogContent>
 														<Button onClick={() =>
 														{
-															return handleJoinButtonClick(buttonSelection.mode, clickedChannel);
+															return handleJoinButtonClick(clickedChanMode, clickedChannel);
 														}}>
 															Join
 														</Button>
@@ -1731,7 +1802,6 @@ const	ChatLayout = () =>
 								{
 									privateMessage.map((channel: any, privId: number) =>
 									{
-										// console.log("private message map", channel);
 										return (
 											<>
 											{
