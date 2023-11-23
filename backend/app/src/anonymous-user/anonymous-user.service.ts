@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { randomBytes } from "crypto";
 import	* as jwt from "jsonwebtoken";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class AnonymousUserService implements OnModuleInit
@@ -29,12 +30,16 @@ export class AnonymousUserService implements OnModuleInit
 	private	logger = new Logger("anymous-user-service itself");
 	private	readonly secretId = "anonymous-user-service-secret";
 
-	public constructor ()
+	public constructor (
+		private readonly prismaService : PrismaService
+	)
 	{
 		this.anonymousUser = [];
 		this.uuidInstance = uuidv4();
 		this.logger.log("An instance of service is started with id: "
 			+ this.uuidInstance);
+		this.logger.log("An instance of prisma service is loaded with uid "
+			+ this.prismaService.uuid);
 	}
 
 	onModuleInit()
@@ -44,58 +49,67 @@ export class AnonymousUserService implements OnModuleInit
 
 	private	generateSecretForDB()
 	{
-		// const	toDB = {
-		// 	"secret_id": this.secretId,
-		// 	"value": randomBytes(64).toString("hex")
-		// };
-		// const	prisma = new PrismaClient();
-		// prisma.secretTable
-		// 	.create(
-		// 		{
-		// 			data: toDB
-		// 		}
-		// 	).then(() =>
-		// 	{
-		// 		this.loadSecretFromDB();
-		// 	})
-		// 	.catch((error: any) =>
-		// 	{
-		// 		this.logger.error(error);
-		// 	});
+		const	toDB = {
+			"secret_id": this.secretId,
+			"value": randomBytes(64).toString("hex")
+		};
+
+		this.prismaService.prisma.secretTable
+			.create(
+				{
+					data: toDB
+				}
+			).then(() =>
+			{
+				this.loadSecretFromDB();
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+			});
 	}
 
 	private loadSecretFromDB()
 	{
-		// const	prisma = new PrismaClient();
-		// prisma.secretTable
-		// 	.findUnique({
-		// 		where:
-		// 		{
-		// 			// eslint-disable-next-line camelcase
-		// 			secret_id: this.secretId,
-		// 		}
-		// 	}).then((data: any) =>
-		// 	{
-		// 		if (data === null)
-		// 			this.generateSecretForDB();
-		// 		else
-		// 			this.secret = data?.value;
-					// patch 
-					this.secret = randomBytes(64).toString("hex");
-		// 		this.logger.verbose("secret form db is:" + this.secret);
-		// 	})
-		// 	.catch((error: any) =>
-		// 	{
-		// 		this.logger.error(error);
-		// 	})
-		// 	.finally(() =>
-		// 	{
-		// 		this.logger.debug("end of load into database ");
-		// 	});
+		this.prismaService.prisma.secretTable
+			.findUnique({
+				where:
+				{
+					// eslint-disable-next-line camelcase
+					secret_id: this.secretId,
+				}
+			}).then((data: any) =>
+			{
+				if (data === null)
+					this.generateSecretForDB();
+				else
+					this.secret = data?.value;
+				this.logger.verbose("secret form db is:" + this.secret);
+			})
+			.catch((error: any) =>
+			{
+				this.logger.error(error);
+			})
+			.finally(() =>
+			{
+				this.logger.debug("end of load into database ");
+			});
 	}
 
 	public	populateFromDBObject(data: any[])
 	{
+		this.logger.verbose("\tcreate user from database ");
+		this.prismaService
+			.prisma.anonymousUser
+			.findMany()
+			.then((data) =>
+			{
+				console.log(data);
+			})
+			.catch((error: any ) =>
+			{
+				this.logger.error("Ca fait  pas des chocapics ");
+			});
 		// const	cast = data as AnonymousUserModel[];
 		// cast.forEach(el =>
 		// {
