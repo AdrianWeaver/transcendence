@@ -71,6 +71,14 @@ const	RightSide = (props: RightSideProps) =>
 			navigate("/stats");
 	};
 
+	const	displayAchievements = () =>
+	{
+		if (props.isMe)
+			navigate("/my-achievements");
+		else
+			navigate("/achievements");
+	};
+
 	return (
 		<>
 		<div className="right">
@@ -100,6 +108,14 @@ const	RightSide = (props: RightSideProps) =>
 					</Typography>
 					<Button onClick={displayStats}>
 						click to see the stats
+					</Button>
+				</Grid>
+				<Grid item xs={12}>
+					<Typography variant="h5">
+						ACHIEVEMENTS
+					</Typography>
+					<Button onClick={displayAchievements}>
+						click to see the achievements
 					</Button>
 				</Grid>
 				{
