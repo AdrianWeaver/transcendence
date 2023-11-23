@@ -716,7 +716,7 @@ export class ChatSocketEvents
 				}
 			}
 
-			if (data.type === "asked-join" && data.payload.kind !== "privateMessage")
+			if (data.type === "asked-join")
 			{
 				const	searchChannel = this.chatService.searchChannelByName(data.payload.chanName);
 				const 	action = {
@@ -782,7 +782,7 @@ export class ChatSocketEvents
 				const	action = {
 					type: "protected-password",
 					payload: {
-						correct: ""
+						correct: "false"
 					}
 				};
 				const	channel = this.chatService.searchChannelByName(data.payload.chanName);
