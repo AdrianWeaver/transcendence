@@ -6,6 +6,7 @@ import { FileObject } from "mui-file-dropzone";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import axios from "axios";
 import Spacer from "./extra/Spacer";
+import { useNavigate } from "react-router-dom";
 
 const	sendImage = (files: FileObject[], token: string, uri: string) =>
 {
@@ -44,6 +45,7 @@ export type	ButtonGroupProps = {
 const	ButtonGroup = (props: ButtonGroupProps) =>
 {
 	let		buttonValidate;
+	const	navigate = useNavigate();
 	const	uri = useAppSelector((state) =>
 	{
 		return (state.server.uri);
@@ -79,6 +81,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 				{
 					sendImage(props.files, token, uri);
 					props.setDisplayModalBox(false);
+					navigate("/");
 				}}
 				disabled={false}
 			>

@@ -421,7 +421,7 @@ const	ButtonOpenModal = (props: ButtonOpenModalProps) =>
 					props.setDisplayOpenButton(false);
 				}}
 			>
-				Changer mon image de profil
+				Change my avatar
 			</Button>
 		</>
 	);

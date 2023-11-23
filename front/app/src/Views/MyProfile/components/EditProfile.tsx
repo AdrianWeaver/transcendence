@@ -3,16 +3,10 @@
 /* eslint-disable max-lines-per-function */
 import { useState } from "react";
 import {
-	Alert,
-	AlertTitle,
 	FormControlLabel,
 	Grid,
-
-	List,
-	ListItem,
 	TextField,
 	Button,
-	Checkbox,
 	Box,
 	Switch,
 }	from "@mui/material";
@@ -20,7 +14,6 @@ import {
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
-	hashPassword,
 	registerInfosInBack,
 	setDoubleAuth,
 	setProfileMyView,
@@ -29,6 +22,7 @@ import {
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
+import UpdateMyProfilePicture from "../../../Component/DropZoneImage/UpdateMyProfilePicture";
 
 type PasswordAlertProps ={
 	password: string,
@@ -81,10 +75,6 @@ const	EditProfile = (props: EditProfileProps) =>
 {
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
-	const	server = useAppSelector((state) =>
-	{
-		return (state.server);
-	});
 	const	user	= useAppSelector((state) =>
 	{
 		return (state.controller.user);
@@ -121,7 +111,7 @@ const	EditProfile = (props: EditProfileProps) =>
 			key;
 			return (value === true);
 		});
-		// verifier toute les informations
+
 		if (filtered.length === 0)
 		{
 			if (user.username !== userChanges.username)
@@ -206,6 +196,7 @@ const	EditProfile = (props: EditProfileProps) =>
 					: <></>
 				}
 				</Grid>
+				<UpdateMyProfilePicture />
 			</Grid>
 			<Button
 				type="submit"

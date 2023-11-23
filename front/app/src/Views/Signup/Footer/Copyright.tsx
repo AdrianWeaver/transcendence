@@ -20,7 +20,6 @@ const	Copyright = (props: CopyrightProps) =>
 {
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
-	const	url = props.uri + ":3001";
 	const
 	[
 		alreadyClicked,
@@ -51,7 +50,6 @@ const	Copyright = (props: CopyrightProps) =>
 			<Link
 				onClick={handleClick}
 				color="inherit"
-				// href={url}
 			>
 				{"ft_transcendence "}
 			</Link>

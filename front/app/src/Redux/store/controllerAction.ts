@@ -609,7 +609,10 @@ export const	setUserData = (data: any)
 	{
 		const	prev = getState();
 
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
+		const	array: BackUserModel[] = prev.controller.allUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		array.forEach((elem) =>
 		{
 			if (elem.id === data.id)
@@ -633,10 +636,6 @@ export const	setUserData = (data: any)
 				firstName: data.firstName,
 				lastName: data.lastName,
 				username: data.username,
-				// avatar: data.avatar,
-				// ftAvatar: data.ftAvatar,
-				// doubleAuth: data.doubleAuth,
-				// location: data.location
 			}
 		}
 		dispatch(controllerActions.setUserData(response));
@@ -673,8 +672,6 @@ export const verifyToken = ()
 		if (prev.controller.user.registrationError !== "undefined"
 			|| prev.controller.user.bearerToken === "undefined")
 			return ;
-		// const	protocole = window.location.protocol; protocole + "//" + prev.server.serverLocation
-		// localhost I DONT KNOW WHYYYY ITS NOT UPDATED THE URI
 		const	data = await UserServices.verifyToken(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 		{
@@ -722,7 +719,6 @@ export const registerClientWithCode = (code : string)
 		}
 		else if (data.msg === "ERROR" || data === "ERROR")
 		{
-			// dispatch(setRegistrationProcessError(""));
 			return ;
 		}
 		else
@@ -1029,8 +1025,10 @@ export const	setAvatar = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	array: BackUserModel[] = [...prev.controller.allUsers];
-
+		const	array: BackUserModel[] = prev.controller.allUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		array.forEach((elem) =>
 		{
 			if (elem.id === prev.controller.user.id)
@@ -1234,7 +1232,10 @@ export const	setProfileId = (name: string, profileId: string)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		array.map((elem) =>
 		{
 			if (elem.name === name)
@@ -1380,7 +1381,10 @@ export const	addFrontUser = (user: UserModel)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.allFrontUsers];
+		const	array = prev.controller.allFrontUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.id === user.id);
@@ -1404,7 +1408,10 @@ export const	setOnline = (online: boolean, user: UserModel)
 	{
 		const	prev = getState();
 
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.name === user.username);
@@ -1435,7 +1442,10 @@ export const	setStatus = (status: string, user: UserModel)
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	array = [...prev.controller.user.chat.users];
+		const	array = prev.controller.user.chat.users.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});;
 		const	index = array.findIndex((elem) =>
 		{
 			return (elem.name === user.username);
@@ -1500,8 +1510,14 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 	{
 		const	prev = getState();
 
-		const	connected = [...prev.controller.user.chat.connectedUsers];
-		const	disconnected = [...prev.controller.user.chat.disconnectedUsers];
+		const	connected = prev.controller.user.chat.connectedUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
+		const	disconnected = prev.controller.user.chat.disconnectedUsers.map((elem) =>
+		{
+			return (Object.assign(elem));
+		});
 		const	indexConnect = connected.findIndex((elem) =>
 		{
 			return (elem.name === user.name);

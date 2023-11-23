@@ -5,7 +5,6 @@
 /* eslint-disable eqeqeq */
 import { Avatar } from "@mui/material";
 import { useState } from "react";
-// import { render } from "react-dom";
 
 
 type	MyAvatarProps =
@@ -49,7 +48,6 @@ const	MyAvatar = (props: MyAvatarProps) =>
     });
   };
   renderImage();
-   // use where u want
    const myImage = defaultImage ? <Avatar
 										alt={props.pseudo}
 										src={props.defaultUrl}
