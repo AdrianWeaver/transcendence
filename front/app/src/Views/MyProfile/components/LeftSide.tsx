@@ -75,9 +75,6 @@ const	LeftSide = (props: LeftSideProps) =>
 	{
 		dispatch(setProfileEditView());
 	};
-	console.log("is me ?", props.isMe);
-	console.log("user selected", userSelected);
-	console.log("userme", userMe);
 	return (
 		<div className="left">
 			<Grid container>
