@@ -804,13 +804,13 @@ export class UserController
 				}
 				catch (error)
 				{
-					return (res.status(500).json({error: true}));
+					return (res.status(418).json({error: true}));
 				}
 				return (fileCfg.fullPath());
 			})
 			.catch((error) =>
 			{
-				res.status(500).json({error: true});
+				res.status(418).json({error: true});
 				console.log(error);
 				return ;
 			});
@@ -822,7 +822,7 @@ export class UserController
 		catch (error)
 		{
 			this.logger.error(error);
-			res.status(500).json({error: true});
+			res.status(418).json({error: true});
 		}
 	}
 	@Post("change-infos")
