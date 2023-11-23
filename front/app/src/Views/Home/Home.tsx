@@ -23,7 +23,7 @@ const	Home = () =>
 	const body = (
 		<>
 			<Typography variant="h2" align="center">Welcome to our ft_transcendence project !</Typography>
-			<Typography variant="h3" align="center">It was made with love and tears by apayet, jcourtoi and nboratko.</Typography>
+			<Typography variant="h3" align="center">It was made with love and tears by alambert, apayet, jcourtoi and nboratko.</Typography>
 			<Typography variant="h3" align="center">Here is a picture of a kitten:</Typography>
 			<center>
 				<img src="https://images.ctfassets.net/sfnkq8lmu5d7/1NaIFGyBn0qwXYlNaCJSEl/ad59ce5eefa3c2322b696778185cc749/2021_0825_Kitten_Health.jpg?w=1000&h=750&q=70&fm=webp" alt="Kitten"/>
