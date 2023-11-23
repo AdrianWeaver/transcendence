@@ -562,7 +562,7 @@ export class ChatSocketEvents
 		}
 
 		@SubscribeMessage("channel-info")
-		handleChannels(
+		async handleChannels(
 			@MessageBody() data: ActionSocket,
 			@ConnectedSocket() client: Socket
 		)
@@ -659,6 +659,11 @@ export class ChatSocketEvents
 						newChannel.setId();
 						newChannel.setKind(kind);
 						newChannel.setPassword(data.payload.chanPassword);
+						if (data.payload.chanMode === "protected")
+						{
+							const	protectedPassword = 
+							newChannel.setPassword(await this.chatService.hashPassword(data.payload.chanPassword, data.payload.chanName));
+						}
 						newChannel.setMode(data.payload.chanMode);
 						newChannel.chat = this.chatService.getChat();
 						client.join(newChannel.name);
