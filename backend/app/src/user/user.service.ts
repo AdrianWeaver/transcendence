@@ -10,7 +10,6 @@ import
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
-	InternalServerErrorException,
 	Logger,
 	OnModuleDestroy,
 	OnModuleInit
@@ -552,12 +551,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		try
 		{
 			const	metadata = await sourceImage.metadata();
-			// console.log(metadata);
 			if ((metadata.width === undefined || metadata.height === undefined)
 				|| metadata.width !== metadata.height)
-				throw new InternalServerErrorException();
+				throw new Error("image metadata not found");
 			const	coef = this.getCoefResize(metadata.width, destSize);
-			// this.logger.log(coef);
 			if (coef.operator === "divide")
 			{
 				const resizedImage = sourceImage.resize(Math.floor(metadata.width / coef.value));
@@ -587,7 +584,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	: Promise<UserModel>
 	{
 		this.logger.debug("Starting the downmload of the avatar");
-		// console.log(userObj);
 		const	targetUrl = userObj.ftAvatar.link;
 		this.logger.verbose("This is the target downlad: " + targetUrl);
 		const filename = this.publicPath + "/" + userObj.username + ".jpeg";
@@ -1021,9 +1017,9 @@ public	register(data: UserModel)
 			return (user.id.toString() === id.toString());
 		});
 		if (!user)
-			throw new InternalServerErrorException();
+			throw new Error("User not found, no action needed");
 		if (user.revokedConnectionRequest === false)
-			throw new InternalServerErrorException();
+			throw new Error("No action needed");
 		user.authService.token = "no token";
 		user.revokedConnectionRequest = false;
 		return (false);
@@ -1036,7 +1032,7 @@ public	register(data: UserModel)
 			return (user.id.toString() === id.toString());
 		});
 		if (!user)
-			throw new InternalServerErrorException();
+			throw new Error("User not found, no action needed");
 		user.revokedConnectionRequest = true;
 	}
 
