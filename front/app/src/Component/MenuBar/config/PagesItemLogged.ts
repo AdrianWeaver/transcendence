@@ -2,7 +2,6 @@
 export const	pagesLinksLogged = [
 	"/",
 	"/game-setup",
-	"/starter-pack",
 	"/global-stats",
 	"/the-chat",
 	"/my-active-games"
@@ -20,7 +19,6 @@ export const	pagesLinksLogged = [
 export const	pagesLogged = [
 	"Accueil",
 	"Play The Game",
-	"Starter Pack",
 	"High Score",
 	"The Chat",
 	"My Active Game"
