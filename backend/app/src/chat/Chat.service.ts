@@ -50,6 +50,8 @@ type	FriendsModel = {
 	id: number,
 	name: string,
 	profileId: string,
+	avatar: string,
+	status: string
 };
 
 type MemberSocketIdModel ={
@@ -217,6 +219,8 @@ export	class ChatService implements OnModuleInit
 									id: elem.id,
 									name: elem.name,
 									profileId: elem.profileId,
+									avatar: elem.avatar,
+									status: elem.status
 								};
 								arrayFriendList.push(objToMemory);
 							});
