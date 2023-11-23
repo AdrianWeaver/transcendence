@@ -29,7 +29,6 @@ const	Small = () =>
 			>
 				<img src={icon} />
 			</Icon>
-			{/* <Logo /> */}
 			<Typography sx={sxDyntitle} variant="h5">
 				42_transcendence
 			</Typography>

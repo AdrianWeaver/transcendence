@@ -28,7 +28,7 @@ const	MenuBar = () =>
 					<IconTitle display="hidde-medium" />
 					<LargeMenu />
 					{
-						("HEEERE ",controllerState.user.isLoggedIn)
+						(controllerState.user.isLoggedIn)
 						? <AvatarMenu />
 						: <LoginSignupButton />
 					}
