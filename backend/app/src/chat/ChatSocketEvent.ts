@@ -25,13 +25,6 @@ import { ChatService, ChatUserModel } from "./Chat.service";
 import { Logger } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
-import { error, profile } from "console";
-import { elementAt } from "rxjs";
-import { constants } from "buffer";
-import { UserModel } from "src/user/user.interface";
-
-import { UserAuthorizationGuard } from "src/user/user.authorizationGuard";
-
 import GameServe from "src/game-socket/Objects/GameServe";
 import { GameService } from "src/game-socket/Game.service";
 import { NodeAnimationFrame } from "../game-socket/NodeAnimationFrame";
@@ -76,7 +69,7 @@ export type	FriendsModel =
 }
 
 
-type MemberSocketIdModel ={
+type MemberSocketIdModel = {
 	memberSocketId: string,
 	profileId: string
 }
