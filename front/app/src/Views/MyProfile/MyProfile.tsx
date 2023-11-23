@@ -61,7 +61,6 @@ const	MyProfile = () =>
 					</Grid>
 				</div>
 			}
-			<UpdateMyProfilePicture />
 		</>
 	);
 };
