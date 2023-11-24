@@ -27,14 +27,12 @@ const	ProfilePage = () =>
 	});
 	if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
 		throw new Error("currentProfile undefined");
-	console.log("Current Profile", currentProfile);
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);
 	});
 	if (userSelected === undefined)
 		throw new Error("user profile doesnt exist");
-	console.log(userSelected.name, "'s profile !!!");
 	const	online = userSelected.online ? "online 🟢" : "offline 🔴";
 	const	status = userSelected.status === "playing" ? "playing... 🏓" : online;
 	return (

@@ -55,6 +55,7 @@ import ServerConfig from "../serverConfig";
 import { Subject } from "rxjs";
 import { FriendsModel } from "src/chat/ChatSocketEvent";
 import Chat from "src/chat/Objects/Chat";
+import { GameService } from "src/game-socket/Game.service";
 
 
 @Injectable()
@@ -1279,11 +1280,9 @@ public	register(data: UserModel)
 					this.user[index].authService.doubleAuth.phoneNumber = data.info;
 				else if (data.field === "password")
 					this.decodePassword(data.info, id);
-			console.log("DOUBLE AUTH CHANGE INFO", data.doubleAuth);
 			if (data.doubleAuth !== undefined)
 				this.user[index].authService.doubleAuth.enable = data.doubleAuth as boolean;
 			this.updateUserToDatabase(this.user[index]);
-			// console.log(searchUser);
 			return ("okay");
 		}
 		return ("user doesnt exist");
@@ -1354,7 +1353,6 @@ public	register(data: UserModel)
 	public	addFriends(myProfileId: any, targetProfileId: any)
 		: string
 	{
-		console.log("ADD FRIEND ", myProfileId);
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
 			return (user.id.toString() === myProfileId.toString());
@@ -1376,7 +1374,6 @@ public	register(data: UserModel)
 			if (findProfileIndex === -1)
 			{
 				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
-				console.log("addFriedns user serv isFriend ", this.user[myUserIndex].friendsProfileId);
 			}
 			else
 			{
@@ -1476,7 +1473,6 @@ public	register(data: UserModel)
 			revokedConnectionRequest: user.revokedConnectionRequest
 		};
 		const	toDB = JSON.stringify(objToDB);
-		console.log(toDB);
 		return (objToDB);
 	}
 
@@ -1520,7 +1516,6 @@ public	register(data: UserModel)
 			achievements: [...data.achievements]
 		};
 		this.user.push(toObj);
-		// console.log(JSON.stringify(this.user));
 	}
 
 	public	isProfileIDUnique(profileID: number | string)
@@ -1615,7 +1610,6 @@ public	register(data: UserModel)
 		});
 		if (index === -1)
 			return ("error");
-		console.log("get user back from db with profileId ", profileId, " et token ", this.user[index].authService.token);
 		const	user: UserDBFrontModel = {
 			date: this.user[index].date,
 			id: this.user[index].id.toString(),
@@ -1628,24 +1622,25 @@ public	register(data: UserModel)
 			location: this.user[index].location,
 			doubleAuth: this.user[index].authService.doubleAuth.enable,
 			bearerToken: this.user[index].authService.token,
-			// friendsProfileId: [...this.user[index].friendsProfileId]
 		};
 		return (user);
 	}
 
-	public	setStatus(profileId: string, playing: boolean)
+	public	updateStatus(gameService: GameService)
 	{
-		const	index = this.user.findIndex((elem) =>
+		this.user.forEach((elem) =>
 		{
-			return (elem.id.toString() === profileId);
-		});
-		if (index !== undefined)
-		{
-			if (playing)
-				this.user[index].status = "playing";
+			if (!elem.online)
+				elem.status = "offline";
 			else
-				this.user[index].status
-					= this.user[index].online ? "online" : "offline";
-		}
+			{
+				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
+				if (playing)
+					elem.status = "playing";
+				else
+					elem.status = "online";
+			}
+		});
+		console.log("UPDATE STATUS WORKED ?", this.user);
 	}
 }

@@ -217,8 +217,6 @@ const	TestBall = () =>
 
 		const	playerInfo = (data: any) =>
 		{
-			console.log(data.payload);
-
 			switch (data.type)
 			{
 				case "connect":
@@ -302,7 +300,7 @@ const	TestBall = () =>
 				dispatch(setGameOver(true));
 				time = setTimeout(() =>
 				{
-					navigate("/game-setup");
+					navigate("/global-stats");
 				}, 4000);
 			}
 			if (data.type === "abandon")

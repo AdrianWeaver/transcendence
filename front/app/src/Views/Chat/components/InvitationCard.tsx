@@ -28,7 +28,6 @@ type	InvitationCardProps = {
 const	InvitationCard = (props: InvitationCardProps) =>
 {
 	const navigate = useNavigate();
-	console.log("message here", props.message);
 	const	theme = useTheme();
 	const	message = props.message.split("!");
 	if (message.length !== 3)
@@ -38,8 +37,6 @@ const	InvitationCard = (props: InvitationCardProps) =>
 	const	playerTwoId = message[1].split(":")[0];
 	const	playerTwo = message[1].split(":")[1];
 	const	gameUuid = message[2];
-	console.log("invite", playerOne);
-	console.log("INvite ", gameUuid);
 
 	const	isExistInAliveGame = true;
 

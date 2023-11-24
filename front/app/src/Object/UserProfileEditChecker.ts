@@ -20,13 +20,11 @@ class	UserProfileEditChecker
 	public checkData(data: UserProfileEdit)
 	{
 		this.resetError();
-		// check username unique
 		if (data.username === undefined || data.username === "undefined"
 			|| data.username.length === 0 )
 			this.username = true;
 		const	validChar = /^[A-Za-z][A-Za-z0-9_]{3,8}$/;
 		this.username = !(validChar.test(data.username));
-		console.log("valid user ", validChar, " ", this.username);
 		if (data.doubleAuth)
 		{
 			let	tmp;

@@ -176,14 +176,10 @@ const	DisplayAnonymousConnection = () =>
 				// stored value tested to trigger:
 				// eslint-disable-next-line max-len
 				// {"registrationStep":"\"undefined\"","uuid":"\"161e3594-be9d-4afd-bdfe-d21aa7128350\"","creationDate":"\"\"","password":"\"\"","message":"\"\"","expireAt":"-1","token":"\"\"","error":"false","errorMessage":"\"\"","errorStatusCode":"0","_persist":"{\"version\":-1,\"rehydrated\":true}"}
-				console.error("Logic failure",
-				"Unidentified registration state can't"
-					+ " be with a generated uuid");
 				dispatch(setAnonymousRegistrationStep("reset"));
 			}
 			else
 			{
-				console.log("need to create uuid");
 				dispatch(setAnonymousUuid());
 				dispatch(setAnonymousRegistrationStep("uuid-creation-sucess"));
 			}
@@ -209,13 +205,8 @@ const	DisplayAnonymousConnection = () =>
 			);
 		else if (registrationStep === "token-verification-started")
 			dispatch(verifyTokenAnonymousUser());
-		else if (registrationStep === "token-verification-failure")
-		{
-			console.log("token failure");
-		}
 		else if (registrationStep === "token-verification-success")
 		{
-			console.log("token success");
 			const	timerUnmount = setTimeout(() =>
 			{
 				dispatch(setIsFetching(false));
@@ -224,10 +215,6 @@ const	DisplayAnonymousConnection = () =>
 			{
 				clearTimeout(timerUnmount);
 			});
-		}
-		else
-		{
-			console.log("already make uuid");
 		}
 	},
 	// eslint-disable-next-line react-hooks/exhaustive-deps

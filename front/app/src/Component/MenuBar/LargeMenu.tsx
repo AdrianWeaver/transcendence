@@ -32,7 +32,6 @@ const	LargeMenu = () =>
 		{
 			return (elem === text);
 		});
-		// console.log(pagesLinks[linkId]);
 		navigate(pagesLinksVisitor[linkId]);
 	};
 
@@ -44,7 +43,6 @@ const	LargeMenu = () =>
 		{
 			return (elem === text);
 		});
-		// console.log(pagesLinks[linkId]);
 		navigate(pagesLinksLogged[linkId]);
 	};
 

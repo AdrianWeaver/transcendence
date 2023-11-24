@@ -23,7 +23,6 @@ export const	checkQueryParams = (pQuery : object) =>
 	buffer = search.split("?");
 	if (buffer.length === 1)
 	{
-		console.log("no response - not clicked yet");
 		return (
 			{
 				message:
@@ -36,7 +35,6 @@ export const	checkQueryParams = (pQuery : object) =>
 	const	params = buffer.split("&");
 	if (params.length === 2)
 	{
-		console.log("response error append", params);
 		if (params[0].split("=").length !== 2)
 			error = {error: "malformed_query"};
 		else
@@ -48,22 +46,18 @@ export const	checkQueryParams = (pQuery : object) =>
 				...error,
 				errorDescription: params[1].split("=")[1].split("+").join(" ")
 			};
-		console.log("Results error", error);
 		return (error);
 	}
 	else if (params.length === 1)
 	{
-		// console.log("Code is provied");
 		if (params[0].split("=").length !== 2)
 			message = {error: "malformed_query"};
 		else
 			message = { code: params[0].split("=")[1]};
-		// console.log("Response parsed ", message);
 		return (message);
 	}
 	else
 	{
-		console.log("Something went wrong");
 		return ({
 			error: "malformed_query",
 		});

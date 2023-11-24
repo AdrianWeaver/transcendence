@@ -184,7 +184,6 @@ const	AnonymouseUserSessionVerificator = () =>
 			}
 			else
 			{
-				console.log("need to create uuid");
 				dispatch(setAnonymousUuid());
 				dispatch(setAnonymousRegistrationStep("uuid-creation-sucess"));
 			}
@@ -210,13 +209,8 @@ const	AnonymouseUserSessionVerificator = () =>
 			);
 		else if (registrationStep === "token-verification-started")
 			dispatch(verifyTokenAnonymousUser());
-		else if (registrationStep === "token-verification-failure")
-		{
-			console.log("token failure");
-		}
 		else if (registrationStep === "token-verification-success")
 		{
-			console.log("token success");
 			const	timerUnmount = setTimeout(() =>
 			{
 				dispatch(setIsFetching(false));
@@ -225,10 +219,6 @@ const	AnonymouseUserSessionVerificator = () =>
 			{
 				clearTimeout(timerUnmount);
 			});
-		}
-		else
-		{
-			console.log("already make uuid");
 		}
 	},
 	// eslint-disable-next-line react-hooks/exhaustive-deps

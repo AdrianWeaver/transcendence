@@ -5,8 +5,6 @@ import RegistrationRouter from "./RegistrationRouter";
 import VisitorRouter from "./VisitorRouter";
 
 import { useAppSelector } from "../Redux/hooks/redux-hooks";
-// import Configuration from "../Configuration";
-// import { setUri } from "../Redux/store/serverAction";
 
 const	MainRouter: React.FC = () =>
 {

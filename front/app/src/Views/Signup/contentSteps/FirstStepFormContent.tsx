@@ -40,7 +40,6 @@ const	stringContainChar = (string: string, char: string) =>
 	let	i;
 
 	i = 0;
-	console.log("last Char = ", char.charAt(char.length - 1));
 	while (i < string.length)
 	{
 		if (string.charAt(i) >= char.charAt(0)
@@ -87,7 +86,6 @@ const	PasswordAlert = (props: PasswordAlertProps) =>
 		return (<></>);
 	if (props.passwordConfirm !== undefined )
 	{
-		console.log(props);
 		if (props.firstTrigger === false)
 			return (<></>);
 		if (props.password !== props.passwordConfirm)
@@ -270,7 +268,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 		const	userSignup = new UserRegistration(data);
 		userSignup.check();
 		setErrorValidation(userSignup.errorTable);
-		// console.log(errorValidation);
 		const	asArray
 			= Object.entries(userSignup.errorTable.getPlainObject());
 		const	filtered = asArray.filter(
@@ -308,7 +305,6 @@ const	FirstStepFormContent = (props: FirstStepFormContentProps) =>
 			)
 			.then((response) =>
 			{
-				console.log(response);
 				dispatch(userRegistrationStepThree());
 			})
 			.catch((error: any) =>

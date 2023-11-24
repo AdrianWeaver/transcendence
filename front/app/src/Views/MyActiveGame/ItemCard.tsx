@@ -12,8 +12,6 @@ import {
 	Button
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
-import { revokeGameWithUuid } from "../../Redux/store/gameEngineAction";
 import GamePreview from "./GamePreview";
 
 export type	ItemCardModel =
@@ -25,14 +23,12 @@ export type	ItemCardModel =
 const	ItemCard = (props: ItemCardModel) =>
 {
 	const	navigate = useNavigate();
-	const	dispatch = useAppDispatch();
 
 	return (
 		<Grid container spacing={4}>
 		{
 			props.array.map((game, index: number) =>
 			{
-				console.log("card", game);
 				const	score = game.playerOne.score
 					+ " - " + game.playerTwo.score;
 				let	elapsedTime;
@@ -145,17 +141,6 @@ const	ItemCard = (props: ItemCardModel) =>
 								>
 									Entrer en jeu
 								</Button>
-								{/* <Button
-									size="small"
-									onClick={() =>
-									{
-										alert("note to dev : please fix my route game.uuid: ", game.uuid);
-										console.log(game.uuid);
-										dispatch(revokeGameWithUuid(game.uuid));
-									}}
-								>
-									Abandonner
-								</Button> */}
 							</CardActions>
 						</Card>
 					</Grid>

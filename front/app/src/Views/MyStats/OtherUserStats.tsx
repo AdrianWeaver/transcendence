@@ -87,7 +87,6 @@ const	HistoryTable = () =>
 	{
 		return (state.controller.stats);
 	});
-	console.log("rowStats", rowStats);
 	if (rowStats.length === 0)
 	{
 		return (

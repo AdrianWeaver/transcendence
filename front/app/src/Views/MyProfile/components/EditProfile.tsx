@@ -3,16 +3,10 @@
 /* eslint-disable max-lines-per-function */
 import { useState } from "react";
 import {
-	Alert,
-	AlertTitle,
 	FormControlLabel,
 	Grid,
-
-	List,
-	ListItem,
 	TextField,
 	Button,
-	Checkbox,
 	Box,
 	Switch,
 }	from "@mui/material";
@@ -20,7 +14,6 @@ import {
 import {
 	useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
-	hashPassword,
 	registerInfosInBack,
 	setDoubleAuth,
 	setProfileMyView,
@@ -29,6 +22,7 @@ import {
 import UserProfileEdit from "../../../Object/UserProfileEdit";
 import UserProfileEditChecker from "../../../Object/UserProfileEditChecker";
 import { useNavigate } from "react-router-dom";
+import UpdateMyProfilePicture from "../../../Component/DropZoneImage/UpdateMyProfilePicture";
 
 type PasswordAlertProps ={
 	password: string,
@@ -72,93 +66,6 @@ const	stringContainCharOfString = (string: string, charset: string) =>
 	return (false);
 };
 
-// const	PasswordAlert = (props: PasswordAlertProps) =>
-// {
-// 	const	message = [];
-// 	const	digit = "0-9";
-// 	const	uperCase = "A-Z";
-// 	const	lowerCase = "a-z";
-// 	const	specialChar = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
-// 	if (props.password.length === 0 && props.firstTrigger === false)
-// 		return (<></>);
-// 	if (props.firstTrigger === false
-// 		&& props.passwordConfirm)
-// 		return (<></>);
-// 	if (props.passwordConfirm !== undefined )
-// 	{
-// 		console.log(props);
-// 		if (props.firstTrigger === false)
-// 			return (<></>);
-// 		if (props.password !== props.passwordConfirm)
-// 			return (
-// 				<Grid item xs={12}>
-// 					<Alert
-// 						severity="error"
-// 					>
-// 						Password mismatch
-// 					</Alert>
-// 				</Grid>
-// 			);
-// 		else
-// 			return (<></>);
-// 	}
-// 	if (props.password.length < 8)
-// 		message.push("minimum 8 character");
-// 	if (stringContainChar(props.password, digit) === false)
-// 		message.push("minimum 1 digit");
-// 	if (stringContainChar(props.password, uperCase) === false)
-// 		message.push("minimum 1 upercase");
-// 	if (stringContainChar(props.password, lowerCase) === false)
-// 		message.push("minimum 1 lowercase");
-// 	if (stringContainCharOfString(props.password, specialChar) === false)
-// 		message.push("minimum 1 special char : " + specialChar);
-// 	if (message.length === 0)
-// 		return (<></>);
-// 	return (
-// 		<Grid item xs={12}>
-// 			<Alert
-// 				severity="info"
-// 			>
-// 				<AlertTitle>You must have:</AlertTitle>
-// 				<List
-// 					sx={
-// 					{
-// 						m: 0,
-// 						fontSize: "0.7rem"
-// 					}}
-// 				>
-// 				{
-// 					message.map((msg) =>
-// 					{
-// 						return (
-// 							<ListItem key={msg}>
-// 								{msg}
-// 							</ListItem>
-// 						);
-// 					})
-// 				}
-// 				</List>
-// 			</Alert>
-// 		</Grid>
-// 	);
-// };
-
-// type UniqueAlertProps = {
-// 	isUnique: boolean
-// };
-
-// const UniqueAlert = (props: UniqueAlertProps) =>
-// {
-// 	if (props.isUnique)
-// 		return (
-// 		<Alert severity="warning" >
-// 			Faites Attention !
-// 		</Alert>);
-// 	else
-// 		return (<></>);
-// };
-
 type	EditProfileProps =
 {
 	setting: boolean
@@ -168,82 +75,21 @@ const	EditProfile = (props: EditProfileProps) =>
 {
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
-	const	server = useAppSelector((state) =>
-	{
-		return (state.server);
-	});
 	const	user	= useAppSelector((state) =>
 	{
 		return (state.controller.user);
 	});
 
-	// const	[
-	// 	firstTriggerPassword,
-	// 	setPasswordFirstTrigger
-	// ] = useState(false);
-
-	// const	[
-	// 	firstTriggerPasswordConfirm,
-	// 	setPasswordFirstTriggerConfirm
-	// ] = useState(false);
 	const	[
 		errorValidation,
 		setErrorValidation
 	] = useState(new UserProfileEditChecker());
-
-	// const	[
-	// 	passwordValue,
-	// 	setPasswordValue
-	// ] = useState("");
-
-	// const
-	// [
-	// 	passwordModified,
-	// 	setPasswordModified
-	// ] = useState(false);
 
 	const
 	[
 		required,
 		setRequired
 	] = useState(false);
-	// const	[
-	// 	uniquePassword,
-	// 	setUniquePassword
-	// ] = useState(false);
-
-	// const	handleUniquePassword = () =>
-	// {
-	// 	setUniquePassword(true);
-	// };
-
-	// const	handlePasswordChangeValue = (
-	// 	event: React.ChangeEvent<HTMLInputElement>
-	// ) =>
-	// {
-	// 	event.preventDefault();
-	// 	console.log("value pw", event.target.value, " length", event.target.value.length);
-	// 	if (event.target.value.length)
-	// 		setPasswordModified(true);
-	// 	else
-	// 		setPasswordModified(false);
-	// 	setPasswordValue(event.target.value);
-	// 	setPasswordFirstTrigger(true);
-	// };
-
-	// const	[
-	// 	passwordConfirmValue,
-	// 	setPasswordConfirm
-	// ] = useState("");
-
-	// const	handlePasswordConfirmChangeValue = (
-	// 	event: React.ChangeEvent<HTMLInputElement>
-	// ) =>
-	// {
-	// 	event.preventDefault();
-	// 	setPasswordConfirm(event.target.value);
-	// 	setPasswordFirstTriggerConfirm(true);
-	// };
 
 	const	handleSubmit = (event: React.FormEvent<HTMLFormElement>) =>
 	{
@@ -265,8 +111,7 @@ const	EditProfile = (props: EditProfileProps) =>
 			key;
 			return (value === true);
 		});
-		console.log("filtered", filtered);
-		// verifier toute les informations
+
 		if (filtered.length === 0)
 		{
 			if (user.username !== userChanges.username)
@@ -274,8 +119,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(updateChatUsers(user.id.toString(), userChanges.username));
 				dispatch(registerInfosInBack(userChanges.username, required, "username"));
 			}
-			// NEED TO ENCRYPT IT IN THE DB AND HERE TOO
-			console.log("CHANGES ", userChanges);
 			if (user.phoneNumber !== userChanges.phoneNumber || required !== user.doubleAuth)
 				dispatch(registerInfosInBack(userChanges.phoneNumber, required, "phoneNumber"));
 			if (props.setting)
@@ -285,7 +128,6 @@ const	EditProfile = (props: EditProfileProps) =>
 				dispatch(setProfileMyView());
 				navigate("/me/profile");
 			}
-			console.log("num === ", user.phoneNumber);
 		}
 	};
 
@@ -315,8 +157,6 @@ const	EditProfile = (props: EditProfileProps) =>
 		</Grid>
 	);
 
-	// const	disclamer = "Je suis sur de ne pas utiliser"
-	// 	+ " le meme mot de passe de connexion a l'intra 42";
 	return (
 		<Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
 			<Grid container spacing={2}>
@@ -328,8 +168,7 @@ const	EditProfile = (props: EditProfileProps) =>
 						id="username"
 						label="Username"
 						error={errorValidation.username}
-						helperText={
-							// NEED TO CHECK IS IT S USED
+						helperText= {
 							errorValidation.username
 								? "Username is required"
 								: ""
@@ -357,72 +196,7 @@ const	EditProfile = (props: EditProfileProps) =>
 					: <></>
 				}
 				</Grid>
-				{/* <Grid item xs={12}>
-					<TextField
-						required
-						fullWidth
-						name="password"
-						label="Password"
-						type="password"
-						id="password"
-						autoComplete="new-password"
-						value={passwordValue}
-						onChange={handlePasswordChangeValue}
-						error={errorValidation.password}
-						helperText={
-							errorValidation.password
-								? "Please check password"
-								: ""
-						}
-					/>
-				</Grid>
-				<PasswordAlert
-					password={passwordValue}
-					firstTrigger={firstTriggerPassword}
-					/> */}
-				{/* <Grid item xs={12}>
-					<TextField
-						required
-						fullWidth
-						name="passwordConfirm"
-						label="Password confirm"
-						type="password"
-						id="passwordConfirm"
-						autoComplete="new-password"
-						value={passwordConfirmValue}
-						onChange={handlePasswordConfirmChangeValue}
-						error={errorValidation.password}
-						helperText={
-							errorValidation.password
-								? "Please check password"
-								: ""
-						}
-					/>
-				</Grid> */}
-				{/* <PasswordAlert
-					password={passwordValue}
-					firstTrigger={firstTriggerPasswordConfirm}
-					passwordConfirm={passwordConfirmValue}
-					/>
-					{
-						(passwordModified)
-						? <Grid item xs={12}>
-							<FormControlLabel
-								control={
-									<Checkbox
-										required
-										value="AgreeWithUniquenessOfPassword"
-										color="primary"
-										name="uniquePassword"
-										onClick={handleUniquePassword}
-									/>
-								}
-								label={disclamer}
-							/>
-							<UniqueAlert isUnique={uniquePassword} />
-						</Grid>
-						: <></>
-					} */}
+				<UpdateMyProfilePicture />
 			</Grid>
 			<Button
 				type="submit"

@@ -56,11 +56,6 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
-	// {
-	// 	field: "adversaire",
-	// 	headerName: "Adversaire",
-	// 	type: "string"
-	// },
 	{
 		field: "myScore",
 		headerName: "Score p. One",
@@ -84,7 +79,6 @@ const	HistoryTable = () =>
 	{
 		return (state.controller.stats);
 	});
-	console.log("rowStats", rowStats);
 	if (rowStats.length === 0)
 	{
 		return (

@@ -91,9 +91,6 @@ const	MyAvatarCard = (props: MyAvatarCardProps) =>
 					onLoad={(event) =>
 						{
 							const img = event.target as HTMLImageElement;
-							console.log("image cast");
-							console.log(img);
-							console.log(img.naturalHeight, img.naturalWidth);
 							if (img.naturalHeight !== img.naturalWidth)
 							{
 								setIsImageSquare(false);
@@ -130,7 +127,6 @@ const	CropMyImage = (props: CropMyImageProps) =>
 
 	if (props.remplacement?.length === 0 || props.readyExport)
 	{
-		// return (<>Please import file</>); // can display here
 		return (
 			<MyAvatarCard
 				userInfo={props.userInfo}
@@ -146,7 +142,6 @@ const	CropMyImage = (props: CropMyImageProps) =>
 			50,
 			0.3
 		];
-		// console.log(props.remplacement[0]);
 
 		const	dataURLtoFile = (
 			dataURL: string,
@@ -192,7 +187,6 @@ const	CropMyImage = (props: CropMyImageProps) =>
 							step={0.01}
 							onChange={(event: any) =>
 							{
-								// console.log(event.target.value);
 								setZoom(event.target.value);
 							}}
 						/>
@@ -205,15 +199,10 @@ const	CropMyImage = (props: CropMyImageProps) =>
 								if (editor.current !== null)
 								{
 									const	oldImage = props.remplacement[0];
-									// console.log("next value is old images");
-									// console.log(oldImage);
 
 									const dataURL = editor
 										.current?.getImageScaledToCanvas()
 										.toDataURL(oldImage.file.type);
-									// props.setFiles([scaled]);
-									// console.log("Next value is scalled ");
-									// console.log(dataURL);
 									const	fileData = dataURLtoFile(
 										dataURL,
 										oldImage.file.name,
@@ -223,11 +212,7 @@ const	CropMyImage = (props: CropMyImageProps) =>
 										data: dataURL,
 										file: fileData
 									};
-									console.log("New file created: ");
-									console.log(file);
 									props.setFiles([file]);
-									// dataURLtgoFile
-									// console.log(props.remplaceement[0]);
 									props.setReadyExport(true);
 								}
 							}}
@@ -268,7 +253,6 @@ const DropZoneImage = () =>
 	});
 	const	handleAddFile = (newFile: any) =>
 	{
-		console.log(newFile);
 		setFiles(newFile);
 	};
 
@@ -305,10 +289,8 @@ const DropZoneImage = () =>
 				fileObjects={files}
 				onAdd={handleAddFile}
 				onDelete={handleDeleteFile}
-				// filesLimit={}
 				dropzoneText="Glissez-deposez votre image ici"
 				acceptedFiles={acceptedFiles}
-				// showPreviews={true}
 				showFileNames={false}
 				maxFileSize={10000000}
 				clearOnUnmount={false}
@@ -323,16 +305,13 @@ const DropZoneImage = () =>
 			return ;
 		const	formData = new FormData();
 		formData.append("image", files[0]);
-// localhost
 		axios.post(uri + ":3000/user/update-photo", formData, {
 			headers: {
-				// "Content-Type": "multipart/form-data",
 				"Authorization": token
 			}
 		})
-		.then((response) =>
+		.then((_response) =>
 		{
-			console.log(response.data);
 		})
 		.catch((error) =>
 		{
@@ -365,7 +344,6 @@ const DropZoneImage = () =>
 						<Grid
 							item
 							xs={12}
-							// sx={{ border: "1px solid #000" }}
 						>
 							<Grid
 								container
@@ -384,22 +362,15 @@ const DropZoneImage = () =>
 									xs={10}
 									sx={
 									{
-										// border: "1px solid #000",
 										textAlign: "center"
 									}}
 								>
-									{/* <MyAvatarCard
-										userInfo={userInfo}
-										remplacement={files}
-										// readyExport={readyExport}
-									/> */}
 									<CropMyImage
 										userInfo={userInfo}
 										remplacement={files}
 										setFiles = {setFiles}
 										readyExport={readyExport}
 										setReadyExport={setReadyExport}
-										// readyExport={readyExport}
 									/>
 								</Grid>
 								<Grid

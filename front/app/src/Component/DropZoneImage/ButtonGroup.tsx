@@ -6,6 +6,7 @@ import { FileObject } from "mui-file-dropzone";
 import { useAppSelector } from "../../Redux/hooks/redux-hooks";
 import axios from "axios";
 import Spacer from "./extra/Spacer";
+import { useNavigate } from "react-router-dom";
 
 const	sendImage = (files: FileObject[], token: string, uri: string) =>
 {
@@ -13,7 +14,6 @@ const	sendImage = (files: FileObject[], token: string, uri: string) =>
 		return ;
 	const	formData = new FormData();
 	formData.append("image", files[0].file);
-console.log("uri should not have port", uri);
 	const config = {
 		method: "post",
 		maxBodyLength: Infinity,
@@ -27,7 +27,7 @@ console.log("uri should not have port", uri);
 	axios(config)
 	.then((response) =>
 	{
-		console.log(response);
+		// console.log(response);
 	})
 	.catch((error) =>
 	{
@@ -45,6 +45,7 @@ export type	ButtonGroupProps = {
 const	ButtonGroup = (props: ButtonGroupProps) =>
 {
 	let		buttonValidate;
+	const	navigate = useNavigate();
 	const	uri = useAppSelector((state) =>
 	{
 		return (state.server.uri);
@@ -58,10 +59,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 	{
 		buttonValidate = (
 			<Button
-				// onClick={sendImage}
 				disabled={true}
-				// color="secondary"
-				// variant="contained"
 			>
 				Valider
 			</Button>);
@@ -70,9 +68,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 	{
 		buttonValidate = (
 			<Button
-				// onClick={sendImage}
 				color="secondary"
-				// variant="contained"
 			>
 				Ajuster
 			</Button>);
@@ -85,6 +81,7 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 				{
 					sendImage(props.files, token, uri);
 					props.setDisplayModalBox(false);
+					navigate("/");
 				}}
 				disabled={false}
 			>
@@ -106,7 +103,6 @@ const	ButtonGroup = (props: ButtonGroupProps) =>
 					<Grid
 						item
 						xs={3}
-						// sx={{border: "1px solid #000"}}
 					>
 						<Button
 							onClick={() =>
