@@ -238,10 +238,11 @@ const FriendsList = (props: FriendsListProps) =>
 									</ListItemText>
 									{
 										(currentProfileIsFriend)
-										? <ListItemText
-												secondary={status}
-												sx={{ align: "right" }}
-										></ListItemText>
+										? 
+											<ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
 										: <></>
 									}
 								</ListItem>
@@ -1125,15 +1126,13 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (chanName: string) =>
 	{
-		const	userMe = chatUsers.find((elem) =>
-		{
-			return (elem.profileId === uniqueId);
-		});
+		console.log("GO TO PORFILE", chanName, "u", uniqueId);
+		console.log("userMe go to profile", user);
 		let substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>
 		{
-			if (elem !== userMe?.name)
+			if (elem !== user?.username)
 				username = elem;
 		});
 		dispatch(setPreviousPage("/the-chat"));
@@ -1158,6 +1157,7 @@ const	ChatLayout = () =>
 		}
 		setTalkingUserProfileId(searchUser.profileId);
 		navigate("/profile/");
+		setClickedChannel("");
 	};
 
 	const	leaveChannel = (chanName: string) =>
@@ -1926,7 +1926,6 @@ const	ChatLayout = () =>
 													<Button onClick={() =>
 													{
 														goToProfilePage(clickedChannel);
-														setClickedChannel("");
 													}}>
 														see profile page
 													</Button>

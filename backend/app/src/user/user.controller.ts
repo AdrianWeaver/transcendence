@@ -842,18 +842,18 @@ export class UserController
 
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
-	AddFriend(
+	async AddFriend(
 		@Body() body: any,
 		@Req()	req: any
 	)
 	{
-		// console
 		this.logger
 			.log("'add-friend' route requested");
-		if (req.user.id !== body.id)
-			throw new ForbiddenException();
-		return (this.userService.addUserAsFriend(body.friendId, body.myId));
+
+		return (await this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
+
+
 
 	@Post("/my-stats")
 	@UseGuards(UserAuthorizationGuard)
