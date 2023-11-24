@@ -1112,7 +1112,6 @@ export class ChatSocketEvents
 		{
 			if (data.type === "add-friend")
 			{
-				this.logger.debug("add friend requested");
 				const	friendUser = this.chatService.getUserWithProfileId(data.payload.friendProfileId);
 				const	userMe = this.chatService.getUserBySocketId(client.id);
 
