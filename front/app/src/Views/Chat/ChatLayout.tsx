@@ -911,8 +911,7 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
-					// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
+					dispatch(addUserAsFriend(data.payload.friendProfileId));
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";

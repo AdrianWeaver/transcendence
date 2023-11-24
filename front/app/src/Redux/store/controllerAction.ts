@@ -1351,7 +1351,7 @@ export const	addUserAsFriend = (friendId: string)
 		{
 			const	newFriend = {
 				profileIdOwner: prev.controller.user.id.toString(),
-				profileIdFriend: friendId
+				profileIdFriend: friendId.toString()
 			}
 			const	newFriends = prev.controller.user.chat.friends.map((elem) =>
 			{

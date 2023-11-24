@@ -9,8 +9,7 @@ import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { addUserAsFriend } from "../../Redux/store/controllerAction";
-// import EditProfile from "./components/EditProfile";
-// import { addUserAsFriend, setProfileEditView } from "../../Redux/store/controllerAction";
+import { useEffect } from "react";
 
 const	ProfilePage = () =>
 {
@@ -23,16 +22,10 @@ const	ProfilePage = () =>
 	{
 		return (state.controller.user);
 	});
-	const	index = user.chat.users.findIndex((elem) =>
-	{
-		return (elem.profileId === user.id.toString());
-	});
 	const	currentProfile = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
-	// if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
-	// 	throw new Error("currentProfile undefined");
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);
@@ -51,19 +44,15 @@ const	ProfilePage = () =>
 	}
 	let	isFriend: boolean;
 	isFriend = false;
-	if (index !== -1)
+	const	searchFriend = user.chat.friends.find((elem) =>
 	{
-		const	searchFriend = user.chat.friends.find((elem) =>
-		{
-			return (elem.profileIdFriend.toString() === userSelected?.profileId.toString()
-				&& elem.profileIdOwner.toString() === user.id.toString());
-		})
-		if (searchFriend)
-			isFriend = true;
-		else
-			isFriend = false;
-	}
-	
+		return (elem.profileIdFriend.toString() === userSelected?.profileId.toString()
+			&& elem.profileIdOwner.toString() === user.id.toString());
+	})
+	if (searchFriend)
+		isFriend = true;
+	else
+		isFriend = false;
 
 	return (
 		<>
