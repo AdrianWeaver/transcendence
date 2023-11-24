@@ -12,7 +12,7 @@ import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
+import { BackUserModel, BackUserVTwoModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 
 import UserServices from "../service/ft-api-service";
 // import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
@@ -655,8 +655,14 @@ export const	verifyTokenAtRefresh = ()
 				user.bearerToken,
 				prevState.server.uri
 			);
+		console.log("verify token", data);
+		if (data === "OKay")
+		{
+			dispatch(setUserLoggedIn());
+		}
 		if (data === "ERROR")
 		{
+			// dispatch(logOffUser());
 			dispatch(controllerActions.reinitialiseUser());
 		}
 	});
@@ -680,7 +686,6 @@ export const verifyToken = ()
 			dispatch(reinitialiseUser(false));
 			return ;
 		}
-
 		dispatch(setRegistrationProcessSuccess());
 		dispatch(userRegistrationStepTwo());
 	})
@@ -1215,7 +1220,7 @@ export const	setAllUsers = ()
 			console.error("Error to get users");
 			return ;
 		}
-		const array: BackUserModel[] = theUsers;
+		const array: BackUserVTwoModel[] = theUsers;
 
 		const	response: ControllerModel = {
 			...prev.controller,

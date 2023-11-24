@@ -30,7 +30,7 @@ const	LeftSide = (props: LeftSideProps) =>
 	const	navigate = useNavigate();
 	const	dispatch = useAppDispatch();
 	let		chatUserSelected: ChatUserModel | undefined;
-	let		userSelected: BackUserModel | undefined;
+	let		userSelected: BackUserVtwoModel | undefined;
 	const	userMe = useAppSelector((state) =>
 	{
 		return (state.controller.user);
@@ -110,7 +110,6 @@ const	LeftSide = (props: LeftSideProps) =>
 							{
 								(!props.isFriend)
 								? <>
-											
 									<Typography style={{color: "green"}}>
 										_______________
 									</Typography>

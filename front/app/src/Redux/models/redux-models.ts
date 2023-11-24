@@ -178,9 +178,22 @@ export interface	CanvasModel
 	"width": number
 }
 
+export interface BackUserVTwoModel
+{
+	id: number | string;
+	email: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	avatar: string;
+	location: string;
+	ipAddress: string;
+	doubleAuth: boolean;
+}
+
 export interface	ControllerModel
 {
-	"allUsers": BackUserModel[],
+	"allUsers": BackUserVTwoModel[],
 	"allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,

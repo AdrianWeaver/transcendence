@@ -14,7 +14,7 @@ import { UserService } from "./user.service";
 import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Request, Response } from "express";
 import	Api from "../Api";
-import { ApplicationUserModel, BackUserModel, ChatUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
+import { ApplicationUserModel, BackUserModel, BackUserVTwoModel, ChatUserModel, UserLoginResponseModel, UserModel, UserPublicResponseModel, UserVerifyTokenResModel } from "./user.interface";
 import { UserAuthorizationGuard } from "./user.authorizationGuard";
 import * as dotenv from "dotenv";
 import * as busboy from "busboy";
@@ -419,7 +419,7 @@ export class UserController
 	 */
 	@Get("get-all-users")
 	getAllUsers()
-		: BackUserModel[]
+		: BackUserVTwoModel[]
 	{
 		return (this.userService.getBackUserModelArray());
 	}

@@ -236,7 +236,7 @@ const FriendsList = (props: FriendsListProps) =>
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						return (		
+						return (
 							(elem.profileId !== user.id.toString())
 							? <>
 								<div key={index} onClick={() =>

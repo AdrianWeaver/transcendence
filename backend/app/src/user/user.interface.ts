@@ -45,6 +45,7 @@ export	interface ChatUserModel
 	"password": string,
 }
 
+
 export interface BackUserModel
 {
 	id: number | string;

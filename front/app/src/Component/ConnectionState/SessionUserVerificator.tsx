@@ -69,7 +69,7 @@ const SessionUserVerificator = () =>
 			{
 				dispatch(verifyTokenAtRefresh());
 				setFirstDisplay(false);
-			}, 200);
+			}, 1200);
 		}
 		else
 		{

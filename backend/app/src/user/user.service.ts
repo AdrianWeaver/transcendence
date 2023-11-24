@@ -18,6 +18,7 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
+	BackUserVTwoModel,
 	HistoryModel,
 	UserDBFrontModel,
 	UserLoginResponseModel,
@@ -485,10 +486,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		return (this.user);
 	}
 
-	public	getBackUserModelArray(): BackUserModel[]
+	public	getBackUserModelArray(): BackUserVTwoModel[]
 	{
-		const	users: BackUserModel[] = [];
-		const	searchUser = this.user.find((elem) =>
+		const	users: BackUserVTwoModel[] = [];
+		this.user.forEach((elem: UserModel) =>
 		{
 			const	user = {
 				id: elem.id,
@@ -500,7 +501,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				location: elem.location,
 				ipAddress: elem.authService.doubleAuth.lastIpClient,
 				doubleAuth: elem.authService.doubleAuth.enable,
-				token: elem.authService.token
+				// I remove this one cause securiy issues
+				// token: elem.authService.token
 			};
 			users.push(user);
 		});

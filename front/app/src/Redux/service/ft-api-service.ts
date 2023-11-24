@@ -70,7 +70,8 @@ const	UserServices = {
 			.post("/user/verify-token", {}, config)
 			.then((data) =>
 			{
-				return ("OKay");
+				// console.log(data);
+				return ("OKAY");
 			})
 			.catch(() =>
 			{
@@ -104,6 +105,7 @@ const	UserServices = {
 	},
 	async	getAllTheUsers(hostname: string)
 	{
+		console.log("getAllTheUsers called" );
 		return (
 			Api(hostname)
 			.get("/user/get-all-users", {})
