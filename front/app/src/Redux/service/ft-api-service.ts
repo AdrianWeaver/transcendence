@@ -458,7 +458,7 @@ const	UserServices = {
 		);
 	},
 
-	async	getPlayingStatus(profileId: string, token: string, hostname: string)
+	async	getPlayingStatus(token: string, hostname: string)
 	{
 		const	config: AxiosRequestConfig = {
 			headers: {
@@ -466,12 +466,9 @@ const	UserServices = {
 				"Authorization": token
 			},
 		};
-		const	data = {
-			id: profileId
-		}
 		return (
 			Api(hostname)
-			.post("user/user-playing", data, config)
+			.post("user/user-playing", {}, config)
 			.then((data) =>
 			{
 				return (data.data);

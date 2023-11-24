@@ -1030,7 +1030,7 @@ export class UserController
 
 	@Post("user-playing")
 	@UseGuards(UserAuthorizationGuard)
-	async GetPlayingStatus(@Body() body: any)
+	async GetPlayingStatus(@Req() req: any)
 	{
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
@@ -1038,10 +1038,10 @@ export class UserController
 		this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
 		const	chatUsers: any[] = [];
-		console.log("user-playing", body.id);
+		console.log("user-playing", req.user.id);
 		this.chatService.chat.users.map((elem) =>
 		{
-			if (elem.profileId.toString() !== body.id.toString())
+			if (elem.profileId.toString() !== req.user.id.toString())
 			{
 				const	usr = {
 					name: elem.name,

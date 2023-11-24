@@ -1418,8 +1418,18 @@ export const	setOnline = (online: boolean, user: UserModel)
 		});
 		if (index === -1)
 			return ;
-		else
-			array[index].online = online;
+		// else
+		// 	array[index].online = online;
+		let nextIndex = index + 1;
+		const newUsers = [
+			// Items before the insertion point:
+			...array.slice(0, index),
+			// New item:
+			{ id: nextIndex++, online: online },
+			// Items after the insertion point:
+			...array.slice(index)
+		];
+		console.log("NEW USERS", newUsers);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1428,7 +1438,7 @@ export const	setOnline = (online: boolean, user: UserModel)
 				chat:
 				{
 					...prev.controller.user.chat,
-					users: array
+					users: newUsers
 				}
 			}
 		}
@@ -1858,13 +1868,13 @@ export const	userSignIn = (username: string, password: string)
 	});
 }
 
-export const	getPlayingStatus = (profileId: string)
+export const	getPlayingStatus = ()
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	data = await UserServices.getPlayingStatus(profileId, prev.controller.user.bearerToken, prev.server.uri);
+		const	data = await UserServices.getPlayingStatus(prev.controller.user.bearerToken, prev.server.uri);
 		if (data === "ERROR")
 			dispatch(controllerActions.setStatus(prev.controller));
 		else if (data.length)
