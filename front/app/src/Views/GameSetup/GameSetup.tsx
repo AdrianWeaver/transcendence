@@ -34,7 +34,7 @@ const	GameSetup = () =>
     return (
         <>
         < MenuBar />
-		<div style={{textAlign: 'center'}}>
+		{/* <div style={{textAlign: 'center'}}>
 			<div style={{padding: '1rem'}}>
 			<div style={{marginTop: '.5rem'}}></div>
 				<h1 style={{fontSize: '1.875rem'}}>Welcome to our version of PONG game!</h1>
@@ -64,7 +64,7 @@ const	GameSetup = () =>
 					<button style={{padding: '.2rem'}} onClick={goToSpecialGame}> Special mode</button>
 				</div>
 			</div>
-		</div>
+		</div> */}
         {/* </body> */}
         </>
     );

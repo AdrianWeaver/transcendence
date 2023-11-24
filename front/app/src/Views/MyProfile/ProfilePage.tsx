@@ -43,16 +43,18 @@ const	ProfilePage = () =>
 	}
 	let	isFriend: boolean;
 	isFriend = false;
-	const	searchFriend = user.chat.friends.find((elem) =>
+	if (user.chat.friends.length)
 	{
-		return (elem.profileIdFriend.toString() === userSelected?.profileId.toString()
-			&& elem.profileIdOwner.toString() === user.id.toString());
-	})
-	if (searchFriend)
-		isFriend = true;
-	else
-		isFriend = false;
-
+		const	searchFriend = user.chat.friends.find((elem) =>
+		{
+			return (elem.profileIdFriend.toString() === userSelected?.profileId.toString()
+				&& elem.profileIdOwner.toString() === user.id.toString());
+		})
+		if (searchFriend)
+			isFriend = true;
+		else
+			isFriend = false;
+	}
 	return (
 		<>
 			<MenuBar />

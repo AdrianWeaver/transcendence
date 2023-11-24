@@ -838,14 +838,14 @@ export class UserController
 
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
-	async AddFriend(
+	AddFriend(
 		@Body() body: any,
 		@Req()	req: any
 	)
 	{
 		this.logger
 			.log("'add-friend' route requested");
-		return (await this.userService.addUserAsFriend(body.friendId, req.user.id));
+		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
 
 	@Post("/my-stats")

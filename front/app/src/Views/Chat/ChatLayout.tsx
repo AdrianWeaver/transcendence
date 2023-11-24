@@ -1932,12 +1932,12 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-													<Button onClick={() =>
-													{
-														goToProfilePage(clickedChannel);
-													}}>
-														see profile page
-													</Button>
+														<Button onClick={() =>
+														{
+															goToProfilePage(clickedChannel);
+														}}>
+															see profile page
+														</Button>
 													</DialogContent>
 														<DialogActions>
 															<Button onClick={handleDialogClose} color="primary">
