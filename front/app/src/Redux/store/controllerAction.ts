@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable init-declarations */
 /* eslint-disable prefer-const */
 /* eslint-disable curly */
@@ -7,13 +8,13 @@
 /* eslint-disable max-len */
 /* eslint-disable max-lines-per-function */
 // eslint-disable-next-line max-len
-// https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
 import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "./index";
 import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 import UserServices from "../service/ft-api-service";
 import ServerService from "../service/server-service";
+import ConnectionState from "../../Component/ConnectionState";
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -107,8 +108,6 @@ export const	userRequestRegistration = ()
 			{
 				...previousState.controller.registration,
 				startedRegister: true,
-				// TEST
-				// step: 0
 			}
 		};
 		dispatch(controllerActions.userRequestRegistration(response));
@@ -569,11 +568,6 @@ export const setRegistrationProcessError = (message?: string)
 {
 	return ((dispatch, getState) =>
 	{
-		// let errorMsg: string;
-		// if (message)
-		// 	errorMsg = message;
-		// else
-		// 	errorMsg = "error";
 		const prev = getState();
 
 		const response: ControllerModel = {
