@@ -217,20 +217,36 @@ const FriendsList = (props: FriendsListProps) =>
 				{
 					users.map((elem, index) =>
 					{
+						let status;
+						status = elem.online ? "💚" : "🔴";
+						if (elem.status === "playing" && elem.online)
+							status = "🏓";
 						return (		
 							(elem.profileId !== user.id.toString())
 							?	<div key={Number(elem.profileId)} onClick={() =>
-								{
-									dispatch(setActiveConversationId(elem.id));
-									createNewConv(elem.id);
-								}}> 
-
-							<Test index={Number(elem.profileId)}
-								name={elem.name}
-								avatar={elem.avatar}
-								status={elem.status}
-								isFriend={currentProfileIsFriend}
-								online={elem.online} />
+									{
+										dispatch(setActiveConversationId(elem.id));
+										createNewConv(elem.id);
+									}}>
+									<ListItem key={Number(elem.profileId)} >
+									<ListItemIcon>
+										<Avatar
+											alt={elem.name}
+											src={elem.avatar}
+										/>
+									</ListItemIcon>
+									<ListItemText primary={elem.name}>
+										{elem.name}
+									</ListItemText>
+									{
+										(currentProfileIsFriend)
+										? <ListItemText
+												secondary={status}
+												sx={{ align: "right" }}
+										></ListItemText>
+										: <></>
+									}
+								</ListItem>
 							</div>
 							: <></>
 						);
