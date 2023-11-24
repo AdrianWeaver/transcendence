@@ -245,10 +245,6 @@ const FriendsList = (props: FriendsListProps) =>
 													sx={{ align: "right" }}
 											></ListItemText>
 										: <></>
-										<ListItemText
-												secondary={status}
-												sx={{ align: "right" }}
-										></ListItemText>
 									}
 								</ListItem>
 							</div>
