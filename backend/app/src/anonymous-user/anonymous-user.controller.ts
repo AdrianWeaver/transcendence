@@ -67,7 +67,7 @@ export class AnonymousUserController implements OnApplicationBootstrap
 	{
 		this.logger
 			.log("Loading fron database before the connection is accepted");
-		
+		return ;
 		this.prismaService.prisma.anonymousUser
 			.findMany()
 			.then((data: any) =>
@@ -97,7 +97,8 @@ export class AnonymousUserController implements OnApplicationBootstrap
 			.end();
 		const	obj = retValue.toDB;
 		this.logger.debug("User has registration finish");
-		this.logger.debug(obj);
+		// this.logger.debug(obj);
+		return ;
 		this.prismaService.prisma.anonymousUser.create(
 			{
 				data:
@@ -136,6 +137,7 @@ export class AnonymousUserController implements OnApplicationBootstrap
 		this.logger.debug("User has login finish");
 		const obj = ret.db;
 		this.logger.debug(obj);
+		return ;
 		this.prismaService.prisma.anonymousUser.update({
 			where: {
 				uuid: obj.uuid

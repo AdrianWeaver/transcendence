@@ -44,7 +44,7 @@ export class AnonymousUserService implements OnModuleInit
 
 	onModuleInit()
 	{
-		this.loadSecretFromDB();
+		//this.loadSecretFromDB();
 	}
 
 	private	generateSecretForDB()
@@ -71,6 +71,7 @@ export class AnonymousUserService implements OnModuleInit
 
 	private loadSecretFromDB()
 	{
+		return ;
 		this.prismaService.prisma.secretTable
 			.findUnique({
 				where:
@@ -99,6 +100,7 @@ export class AnonymousUserService implements OnModuleInit
 	public	populateFromDBObject(data: any[])
 	{
 		this.logger.verbose("\tcreate user from database ");
+		return ;
 		this.prismaService
 			.prisma.anonymousUser
 			.findMany()
