@@ -606,6 +606,11 @@ export	class ChatService implements OnModuleInit
 		return (hashed);
 	}
 
+	/**
+	 * @deprecated
+	 * @param gameService 
+	 * @returns 
+	 */
 	public	updateStatus(gameService: GameService)
 	{
 		this.chat.users.forEach((elem) =>

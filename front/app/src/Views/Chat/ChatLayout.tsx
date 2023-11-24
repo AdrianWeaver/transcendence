@@ -219,14 +219,15 @@ const FriendsList = (props: FriendsListProps) =>
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
+						let keyIndex = crypto.randomUUID();
 						return (		
 							(elem.profileId !== user.id.toString())
-							?	<div key={Number(elem.profileId)} onClick={() =>
+							?	<div key={keyIndex} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={Number(elem.profileId)} >
+									<ListItem key={keyIndex} >
 									<ListItemIcon>
 										<Avatar
 											alt={elem.name}
@@ -244,6 +245,10 @@ const FriendsList = (props: FriendsListProps) =>
 													sx={{ align: "right" }}
 											></ListItemText>
 										: <></>
+										<ListItemText
+												secondary={status}
+												sx={{ align: "right" }}
+										></ListItemText>
 									}
 								</ListItem>
 							</div>
@@ -829,7 +834,7 @@ const	ChatLayout = () =>
 					}
 					if (data.payload.kind === "privateMessage")
 					{
-						setCurrentChannel(data.payload.chanName);	
+						setCurrentChannel(data.payload.chanName);
 						setPrivMessages(data.payload.chanMessages);
 						goToChannel(data.payload.chanName, "privateMessage", false);
 						// goToChannel(data.payload.chanName, data.payload.kind, true);
