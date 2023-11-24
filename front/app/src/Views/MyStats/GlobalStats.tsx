@@ -121,7 +121,6 @@ const	Header = () =>
 	const	dispatch = useAppDispatch();
 	const	handleRefresh = () =>
 	{
-		
 		dispatch(getAllStats());
 	};
 	return (
@@ -173,8 +172,8 @@ const	Header = () =>
 const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-	// const	dispatch = useAppDispatch();
-	// savePrevPage("/global-stats");
+
+	savePrevPage("/global-stats");
 	return (
 		<>
 			<MenuBar />
