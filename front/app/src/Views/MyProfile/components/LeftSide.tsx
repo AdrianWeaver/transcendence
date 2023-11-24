@@ -106,47 +106,44 @@ const	LeftSide = (props: LeftSideProps) =>
 								♡♡♡
 							</Typography>
 						</>
-						: <Typography>
-							{
-								(!props.isFriend)
-								? <>
-											
-									<Typography style={{color: "green"}}>
-										_______________
-									</Typography>
-										{props.pseudo}
-									<Typography style={{color: "green"}}>
-										___________________
-										___________________
-										___________________
-										___________________
-									</Typography>
-								</>
-								: (userSelected === undefined)
-									? <></>
-									: <>
-										<Grid item xs={12}>
-											<Typography>
-												{userSelected.firstName}  {userSelected.lastName}
-											</Typography>
-										</Grid>
-										<Typography style={{color: "green"}}>
-											___________________
-											___________________
+						: 
+							(!props.isFriend)
+							? <>
+										
+								<Typography style={{color: "green"}}>
+									_______________
+								</Typography>
+									{props.pseudo}
+								<Typography style={{color: "green"}}>
+									___________________
+									___________________
+									___________________
+									___________________
+								</Typography>
+							</>
+							: (userSelected === undefined)
+								? <></>
+								: <>
+									<Grid item xs={12}>
+										<Typography>
+											{userSelected.firstName}  {userSelected.lastName}
 										</Typography>
-										<Grid item xs={12}>
-											<Typography>
-												{props.pseudo} is {props.status}
-											</Typography>
-										</Grid>
-										<Grid item xs={12}>
-											<Typography>
-												{userSelected.location}
-											</Typography>
-										</Grid>
-									</>
-							}
-						</Typography>
+									</Grid>
+									<Typography style={{color: "green"}}>
+										___________________
+										___________________
+									</Typography>
+									<Grid item xs={12}>
+										<Typography>
+											{props.pseudo} is {props.status}
+										</Typography>
+									</Grid>
+									<Grid item xs={12}>
+										<Typography>
+											{userSelected.location}
+										</Typography>
+									</Grid>
+								</>
 					}
 					{
 						(props.isMe)

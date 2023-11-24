@@ -20,12 +20,7 @@ import	UserRegistration from "../../../Object/UserRegistration";
 import UserRegistrationChecker from "../../../Object/UserRegistrationChecker";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
-	// hashPassword,
-	// registerInfosInBack,
-	setPassword,
-	// setPseudo,
 	userRegistrationStepThree,
-	// userRegistrationStepTwo,
 } from "../../../Redux/store/controllerAction";
 import axios from "axios";
 

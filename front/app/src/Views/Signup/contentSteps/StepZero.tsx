@@ -6,7 +6,6 @@
 import {
 	Alert,
 	AlertTitle,
-	Button,
 	Card,
 	CardActionArea,
 	CardContent,
@@ -20,12 +19,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import coalitionImage from "../assets/coalitions_v1.jpg";
 import { checkQueryParams } from "../extras/checkQueryParams";
 import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
-import { registerClientWithCode, setAbortRequestedValue, setFt, setUserData, userRegistrationStepFour, userRegistrationStepThree, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
-// import { ServerModel, UserModel } from "../../../Redux/models/redux-models";
-// import { setAuthApiLinks } from "../../../Redux/store/serverAction";
-import axios from "axios";
+import { registerClientWithCode, userRegistrationStepTwo, verifyToken } from "../../../Redux/store/controllerAction";
 import { useSavePrevPage } from "../../../Router/Hooks/useSavePrevPage";
-import { persistor } from "../../../Redux/store";
 
 const	getText = () =>
 {
@@ -108,10 +103,10 @@ const	StepZero = () =>
 
 	useEffect(() =>
 	{
+		savePrevPage("/signin");
 		if (abort === true)
 		{
-			savePrevPage("/signin");
-			// persistor.purge();
+			
 			navigate("/cancel");
 		}
 	}, [abort]);
@@ -119,10 +114,6 @@ const	StepZero = () =>
 	const	ftUrl = useAppSelector((state) =>
 	{
 		return (state.server.links.authApiUrl);
-	});
-	const	uri = useAppSelector((state) =>
-	{
-		return (state.server.uri);
 	});
 	const
 	[
@@ -169,21 +160,27 @@ const	StepZero = () =>
 			clearTimeout(timer);
 		});
 	});
-	let	start: boolean;
+	
 	const	responseQuery = checkQueryParams(query);
 	const	alertInfo = AlertComponent(responseQuery);
-	start = false;
-	if (responseQuery.code && (!start))
+	useEffect(() =>
 	{
-		dispatch(registerClientWithCode(responseQuery.code));
-		start = true;
-	}
+		if (responseQuery.code)
+		{
+			dispatch(registerClientWithCode(responseQuery.code));
+		}
+	}, [responseQuery])
+
 	// eslint-disable-next-line eqeqeq
-	if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
+	useEffect(() =>
 	{
-		dispatch(verifyToken());
-		dispatch(userRegistrationStepTwo());
-	}
+		if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
+		{
+			dispatch(verifyToken());
+			dispatch(userRegistrationStepTwo());
+		}
+	}, [user])
+
 
 	useEffect(() =>
 	{
@@ -198,70 +195,68 @@ const	StepZero = () =>
 			);
 	}, [visible]);
 
-	const	handleNoFt = () =>
-	{
-		dispatch(setFt(false));
-		axios
-		.post(uri + ":3000/user/register-forty-three")
-		.then((data) =>
-		{
-			dispatch(setUserData(data.data));
-			dispatch(userRegistrationStepTwo());
-		})
-		.catch((err) =>
-		{
-			console.error(err);
-		});
-	};
+	// const	handleNoFt = () =>
+	// {
+	// 	dispatch(setFt(false));
+	// 	axios
+	// 	.post(uri + ":3000/user/register-forty-three")
+	// 	.then((data) =>
+	// 	{
+	// 		dispatch(setUserData(data.data));
+	// 		dispatch(userRegistrationStepTwo());
+	// 	})
+	// 	.catch((err) =>
+	// 	{
+	// 		console.error(err);
+	// 	});
+	// };
 	useEffect(() =>
 	{
 		if (step === 0)
 		{
 			setRenderComponent(
 				<>
-				{/* ONLY TO HELP TEST FROM HOME */}
-				<Button onClick={handleNoFt}>Register without 42</Button>
-				<Card sx={{ m: 5}}>
-					<CardActionArea
-						onClick={openSameTab}
-					>
-						<CardMedia
-						component="img"
-						height="140"
-						image={imgSource}
-						alt="Image of intranet"
-						/>
-						<CardContent>
-							<Typography
-								gutterBottom
-								variant="h5"
-								component="div"
-							>
-								Connexion intra 42
-							</Typography>
-							<Typography
-								variant="body2"
-								color="text.secondary"
-							>
-							{
-								getText()
-							}
-							</Typography>
-						</CardContent>
-					</CardActionArea>
-					{displayRedirect}
-					{alertInfo}
-				</Card>
+					{/* ONLY TO HELP TEST FROM HOME */}
+					{/* <Button onClick={handleNoFt}>Register without 42</Button> */}
+					<Card sx={{ m: 5}}>
+						<CardActionArea
+							onClick={openSameTab}
+						>
+							<CardMedia
+							component="img"
+							height="140"
+							image={imgSource}
+							alt="Image of intranet"
+							/>
+							<CardContent>
+								<Typography
+									gutterBottom
+									variant="h5"
+									component="div"
+								>
+									Connexion intra 42
+								</Typography>
+								<Typography
+									variant="body2"
+									color="text.secondary"
+								>
+								{
+									getText()
+								}
+								</Typography>
+							</CardContent>
+						</CardActionArea>
+						{displayRedirect}
+						{alertInfo}
+					</Card>
 				</>
 			);
 		}
 		else
 			setRenderComponent(<></>);
-	},
-	[step]);
-	return (
-		renderComponent
-	);
+	}, [step]);
+
+	return (renderComponent);
 };
 
 export default StepZero;

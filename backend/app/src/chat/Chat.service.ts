@@ -80,23 +80,24 @@ export	class ChatService implements OnModuleInit
 
 	private onTableCreate()
 	{
-		this.log.verbose("Creating a new version inside database");
-		const	dbString = this.parseForDatabase();
-		this.prismaService
-			.prisma
-			.chatJson
-			.create(
-			{
-				data:
-				{
-					chatJsonID: this.chatID,
-					contents: dbString
-				}
-			})
-			.catch((_error: any) =>
-			{
-				// this.log.error(error);
-			});
+		return ;
+		// this.log.verbose("Creating a new version inside database");
+		// const	dbString = this.parseForDatabase();
+		// this.prismaService
+		// 	.prisma
+		// 	.chatJson
+		// 	.create(
+		// 	{
+		// 		data:
+		// 		{
+		// 			chatJsonID: this.chatID,
+		// 			contents: dbString
+		// 		}
+		// 	})
+		// 	.catch((_error: any) =>
+		// 	{
+		// 		// this.log.error(error);
+		// 	});
 	}
 
 	public getChatData()
@@ -119,14 +120,16 @@ export	class ChatService implements OnModuleInit
 		this.chat.updateChannelOwner(newSocketId, profileId);
 	}
 
-	public parseForDatabase() : string
+	public parseForDatabase()
 	{
+		return ;
 		const toDBObject = this.chat.parseForDatabase();
 		return (JSON.stringify(toDBObject));
 	}
 
 	private	loadTableToMemory()
 	{
+		return ;
 		this.prismaService
 			.prisma
 			.chatJson
@@ -167,6 +170,7 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
+		return ;
 		const dbString = this.parseForDatabase();
 		this.prismaService.prisma.chatJson
 		.update(
