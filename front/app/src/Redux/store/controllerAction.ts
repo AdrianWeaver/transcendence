@@ -1347,28 +1347,31 @@ export const	addUserAsFriend = (friendId: string)
 		if (data === "ERROR")
 			return ;
 		console.log("DATA ", data);
-		const	newFriend = {
-			profileIdOwner: prev.controller.user.id.toString(),
-			profileIdFriend: friendId
-		}
-		const	newFriends = prev.controller.user.chat.friends.map((elem) =>
+		if (data === "success")
 		{
-			return (elem);
-		});
-		newFriends.push(newFriend);
-		const	response: ControllerModel = {
-			...prev.controller,
-			user:
+			const	newFriend = {
+				profileIdOwner: prev.controller.user.id.toString(),
+				profileIdFriend: friendId
+			}
+			const	newFriends = prev.controller.user.chat.friends.map((elem) =>
 			{
-				...prev.controller.user,
-				chat:
+				return (elem);
+			});
+			newFriends.push(newFriend);
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
 				{
-					...prev.controller.user.chat,
-					friends: newFriends
+					...prev.controller.user,
+					chat:
+					{
+						...prev.controller.user.chat,
+						friends: newFriends
+					}
 				}
 			}
+			dispatch(controllerActions.setChatUsers(response));
 		}
-		dispatch(controllerActions.setChatUsers(response));
 	});
 }
 

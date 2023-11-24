@@ -358,7 +358,7 @@ const	UserServices = {
 			.then((_data) =>
 			{
 				console.log("DATA ADD FIEND", _data.data);
-				return ("ok");
+				return (_data.data);
 			})
 			.catch((_error) =>
 			{

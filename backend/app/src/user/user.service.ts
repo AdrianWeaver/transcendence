@@ -1315,6 +1315,8 @@ public	register(data: UserModel)
 		});
 		if (isFriend === undefined)
 			this.user[searchUserIndex].friendsProfileId.push(friendId);
+		else
+			return ("already friends");
 		console.log("LES USERS", this.user);
 		this.updateUserToDatabase(this.user[searchUserIndex]);
 	

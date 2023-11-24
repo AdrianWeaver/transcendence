@@ -849,17 +849,13 @@ export class UserController
 	{
 		this.logger
 			.log("'add-friend' route requested");
-
 		return (await this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
-
-
 
 	@Post("/my-stats")
 	@UseGuards(UserAuthorizationGuard)
 	getMyStats(@Req() req: any)
 	{
-		// return (["toto"]);
 		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
