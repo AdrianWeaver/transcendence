@@ -616,6 +616,7 @@ export	class ChatService implements OnModuleInit
 			else
 			{
 				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
+				console.log("PLAYIG", playing);
 				if (playing)
 					elem.status = "playing";
 				else

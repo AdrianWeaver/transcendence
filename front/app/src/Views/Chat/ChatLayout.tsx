@@ -189,7 +189,7 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
-	dispatch(getPlayingStatus(user.id.toString()));
+	// dispatch(getPlayingStatus());
 
 
 

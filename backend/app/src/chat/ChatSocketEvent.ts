@@ -457,6 +457,7 @@ export class ChatSocketEvents
 		public handleInfoGetUserList(client: Socket, data: ActionSocket)
 		{
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
+			this.chatService.updateStatus(this.gameService);
 			const copyUsers = this.chatService.getAllUsers();
 
 			const	me = this.chatService.getUserBySocketId(client.id);

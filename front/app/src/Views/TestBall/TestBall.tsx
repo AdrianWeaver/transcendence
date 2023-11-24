@@ -300,7 +300,7 @@ const	TestBall = () =>
 				dispatch(setGameOver(true));
 				time = setTimeout(() =>
 				{
-					navigate("/game-setup");
+					navigate("/global-stats");
 				}, 4000);
 			}
 			if (data.type === "abandon")

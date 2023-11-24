@@ -635,6 +635,7 @@ export class	GameService implements OnModuleInit
 					socketConvertedAsActive
 				)
 				.filtered.connected;
+		console.log("ACTIVE CON", activeConnection.length);
 		return (activeConnection.length);
 	}
 }
