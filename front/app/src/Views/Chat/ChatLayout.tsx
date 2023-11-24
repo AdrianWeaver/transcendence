@@ -162,8 +162,7 @@ const TabPanel = (props: TabPanelProps) =>
 
 type FriendsListProps = {
 	arrayListUsers: string[],
-	socketRef: any,
-	// React.MutableRefObject<Socket>
+	socketRef: React.MutableRefObject<Socket> | null
 	friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
@@ -201,7 +200,7 @@ const FriendsList = (props: FriendsListProps) =>
 				activeId: activeId
 			}
 		};
-		props.socketRef.current.emit("channel-info", action);
+		props.socketRef?.current.emit("channel-info", action);
 	};
 
 	return (
@@ -266,7 +265,7 @@ const a11yProps = (index: any) =>
 
 const	ChatLayout = () =>
 {
-	const	socketRef = useRef<Socket | null>(null);
+	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
@@ -298,12 +297,6 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user.bearerToken);
 	});
-
-	const
-	[
-		isMyConv,
-		setIsMyConv
-	] = useState(false);
 
 	const
 	[
@@ -380,12 +373,6 @@ const	ChatLayout = () =>
 
 	const
 	[
-		seeProfile,
-		setSeeProfile
-	] = useState(false);
-
-	const
-	[
 		talkingUser,
 		setTalkingUser
 	] = useState("");
@@ -453,6 +440,7 @@ const	ChatLayout = () =>
 		channelToChangePassword,
 		setChannelToChangePassword
 	] = useState("");
+
 	const [
 		inviteDialogOpen,
 		setInviteDialogOpen
@@ -544,8 +532,6 @@ const	ChatLayout = () =>
 	const handleSave = () =>
 	{
 		setKindOfConversation("channel");
-		// dispatch(setKindOfConversation("channel"));
-		// Check if Channel name is empty
 		if (channelName.trim() === "")
 		{
 			alert("Channel name cannot be empty");
@@ -583,23 +569,9 @@ const	ChatLayout = () =>
 				id: user.id
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
-	const
-	[
-		status,
-		setStatus
-	] = useState("🔴");
-
-	// useEffect(() =>
-	// {
-	// 	if (userStatus === "playing")
-	// 		setStatus("🏓");
-	// 	else if (userStatus === "online")
-	// 		setStatus("🟢");
-	// 	else if (userStatus === "offline")
-	// 		setStatus("🔴");
-	// }, [userStatus]);
 
 	useEffect(() =>
 	{
@@ -613,7 +585,6 @@ const	ChatLayout = () =>
 					token: profileToken
 				}
 			});
-
 		socketRef.current = socket;
 		const	createChatUser = (data: any) =>
 		{
@@ -629,7 +600,6 @@ const	ChatLayout = () =>
 		const connect = () =>
 		{
 			setConnected(true);
-			setStatus("💚");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -644,7 +614,8 @@ const	ChatLayout = () =>
 						status: "connected"
 					}
 				};
-				socketRef.current.emit("info", action);
+				if (socketRef.current !== null)
+					socketRef.current.emit("info", action);
 			}
 			else
 			{
@@ -655,7 +626,7 @@ const	ChatLayout = () =>
 		const disconnect = () =>
 		{
 			setConnected(false);
-			setStatus("🔴");
+			// setStatus("🔴");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -670,7 +641,8 @@ const	ChatLayout = () =>
 						status: "offline"
 					}
 				};
-				socketRef.current.emit("info", action);
+				if (socketRef.current !== null)
+					socketRef.current.emit("info", action);
 			}
 			else
 			{
@@ -684,7 +656,8 @@ const	ChatLayout = () =>
 				type: "is-my-conv",
 				payload: {name: name}
 			};
-			socketRef.current.emit("user-info", action);
+			if (socketRef.current !== null)
+				socketRef.current.emit("user-info", action);
 		};
 
 		const	updateChannels = (data: any) =>
@@ -831,7 +804,7 @@ const	ChatLayout = () =>
 			goToChannel(data.payload.chanName, data.payload.kind, true);
 			if (data.playPong === true)
 			{
-				inviteToPlayPong(data.payload.chanName, data.payload.MyProfileId, data.payload.friendProfileId);
+				// inviteToPlayPong(data.payload.chanName, data.payload.MyProfileId, data.payload.friendProfileId);
 			}
 		};
 
@@ -999,11 +972,6 @@ const	ChatLayout = () =>
 			}
 		};
 
-		const	isMyConversation = (data: any) =>
-		{
-			setIsMyConv(data.payload.isMyConv);
-		};
-
 		const	connectState = (data: any) =>
 		{
 			if (data.type === "already-connected")
@@ -1018,7 +986,6 @@ const	ChatLayout = () =>
 		socket.on("disconnect", disconnect);
 		socket.on("error", connectError);
 		socket.on("info", serverInfo);
-		// socket.on("send-message", sendMessageToUser);
 		socket.on("display-channels", updateChannels);
 		socket.on("channel-info", channelInfo);
 		socket.on("update-messages", updateMessages);
@@ -1027,7 +994,6 @@ const	ChatLayout = () =>
 		socket.on("user-info", userInfo);
 		socket.on("repopulate-on-reconnection", repopulateOnReconnection);
 		socket.on("add-chat-user", createChatUser);
-		socket.on("is-my-conv", isMyConversation);
 
         socket.connect();
 
@@ -1038,7 +1004,6 @@ const	ChatLayout = () =>
 			socket.off("disconnect", disconnect);
 			socket.off("error", connectError);
 			socket.off("info", serverInfo);
-			// socket.off("sending-message", sendMessageToUser);
 			socket.off("display-channels", updateChannels);
 			socket.off("channel-info", channelInfo);
 			socket.off("update-messages", updateMessages);
@@ -1047,7 +1012,6 @@ const	ChatLayout = () =>
 			socket.off("user-info", userInfo);
 			socket.off("repopulate-on-reconnection", repopulateOnReconnection);
 			socket.off("add-chat-user", createChatUser);
-			socket.off("is-my-conv", isMyConversation);
 			socket.disconnect();
         });
     }, []);
@@ -1081,7 +1045,8 @@ const	ChatLayout = () =>
 				chanName: joiningChannelName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) =>
@@ -1191,7 +1156,8 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const [
@@ -1266,7 +1232,8 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const handleMembersClose = () =>
@@ -1283,7 +1250,8 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const	banUserFromChannel = (userName: string, chanName: string) =>
@@ -1295,7 +1263,8 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const	addUserToFriends = (userName: string) =>
@@ -1307,7 +1276,8 @@ const	ChatLayout = () =>
 				friendProfileId: friendProfileId
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("user-info", action);
 	};
 
 	const	addUserToBlocked = (userName: string) =>
@@ -1319,7 +1289,8 @@ const	ChatLayout = () =>
 				friendProfileId: friendProfileId,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("user-info", action);
 	};
 
 	const	muteUserInChannel = (userName: string, chanName: string) =>
@@ -1331,7 +1302,8 @@ const	ChatLayout = () =>
 				userName: userName,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("user-info", action);
 	};
 
 	// END OF MEMBERS FUNCTIONS
@@ -1361,7 +1333,8 @@ const	ChatLayout = () =>
 				userName: profileId,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("user-info", action);
 	};
 
 	// END OF INVITE
@@ -1377,7 +1350,8 @@ const	ChatLayout = () =>
 				userId: activeId
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const	makeAdmin = (userName: string, chanName: string) =>
@@ -1389,7 +1363,8 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("user-info", action);
 	};
 
 	const	addPasswordToChannel = (chanName: string, newPassword: string) =>
@@ -1401,7 +1376,8 @@ const	ChatLayout = () =>
 				newPassword: newPassword,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		if (socketRef.current !== null)
+			socketRef.current.emit("channel-info", action);
 	};
 
 	const	changeTabOperations = () =>
@@ -1928,7 +1904,6 @@ const	ChatLayout = () =>
 																					</Button>
 																					<Button onClick={() =>
 																					{
-																						setSeeProfile(false);
 																						addUserToBlocked(friendProfileId);
 																					}}>
 																						Block

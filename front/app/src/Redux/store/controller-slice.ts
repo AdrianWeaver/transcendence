@@ -15,7 +15,7 @@ export const	initialControllerState: ControllerModel = {
 	themeMode: "light",
 	previousPage: "/",
 	allUsers: [],
-	allFrontUsers: [],
+	// allFrontUsers: [],
 	user:
 	{
 		isLoggedIn: false,
@@ -230,7 +230,7 @@ const	controllerSlice = createSlice(
 			state.user.avatar = action.payload.user.avatar;
 			state.user.location = action.payload.user.location;
 			state.user.doubleAuth = action.payload.user.doubleAuth;
-			state.allFrontUsers = action.payload.allFrontUsers;
+			// state.allFrontUsers = action.payload.allFrontUsers;
 			state.user.id = action.payload.user.id;
 			state.user.email = action.payload.user.email;
 			state.user.firstName = action.payload.user.firstName;
@@ -380,10 +380,10 @@ const	controllerSlice = createSlice(
 			state.user.ftAvatar = action.payload.user.ftAvatar;
 			state.user.password = action.payload.user.password;
 		},
-		addFrontUser(state, action: PayloadAction<ControllerModel>)
-		{
-			state.allFrontUsers = action.payload.allFrontUsers;
-		},
+		// addFrontUser(state, action: PayloadAction<ControllerModel>)
+		// {
+		// 	state.allFrontUsers = action.payload.allFrontUsers;
+		// },
 		setOnline(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
@@ -449,7 +449,7 @@ const	controllerSlice = createSlice(
 		resetController(state, action: PayloadAction<ControllerModel>)
 		{
 			state.activeView = action.payload.activeView;
-			state.allFrontUsers = action.payload.allFrontUsers;
+			// state.allFrontUsers = action.payload.allFrontUsers;
 			state.allUsers = action.payload.allUsers;
 			state.canvas = action.payload.canvas;
 			state.myStats = action.payload.myStats;

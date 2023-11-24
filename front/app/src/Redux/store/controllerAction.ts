@@ -10,23 +10,10 @@
 // https://itnext.io/build-a-react-redux-with-typescript-using-redux-toolkit-package-d17337aa6e39
 import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
-
 import { RootState } from "./index";
 import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
-
 import UserServices from "../service/ft-api-service";
-// import { AirlineSeatReclineNormalTwoTone, CoPresentSharp, JoinFullTwoTone } from "@mui/icons-material";
-// import UserRegistration from "../../Object/UserRegistration";
-// import { PersistPartial } from "redux-persist/es/persistReducer";
 import ServerService from "../service/server-service";
-import { useNavigate } from "react-router-dom";
-// type MessageModel =
-// {
-// 	sender: string,
-// 	message: string,
-// 	mode: string,
-// 	username: string,
-// }
 
 export const	controllerActions = controllerSlice.actions;
 
@@ -618,10 +605,11 @@ export const	setUserData = (data: any)
 			if (elem.id === data.id)
 			{
 				elem.id = data.id;
-				elem.email = data.email;
 				elem.firstName = data.firstName;
 				elem.lastName = data.lastName;
 				elem.username = data.username;
+				elem.location = data.location;
+				elem.avatar = data.avatar;
 			}
 		});
 		const	response: ControllerModel = {
@@ -631,7 +619,6 @@ export const	setUserData = (data: any)
 			{
 				...prev.controller.user,
 				id: data.id,
-				email: data.email,
 				bearerToken: data.token,
 				firstName: data.firstName,
 				lastName: data.lastName,
@@ -1322,38 +1309,38 @@ export const	setNewToken = (newToken: string)
 	});
 }
 
-export const	decodePassword = (username: string, password: string)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return (async (dispatch, getState) =>
-	{
-		const	prev = getState();
-		try
-		{
-			const	data = await UserServices.decodePassword(
-				prev.controller.user.bearerToken,
-				password, username,
-				prev.server.uri
-			);
-			const	newUser = {...prev.controller.allFrontUsers[data.index]};
+// export const	decodePassword = (username: string, password: string)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return (async (dispatch, getState) =>
+// 	{
+// 		const	prev = getState();
+// 		try
+// 		{
+// 			const	data = await UserServices.decodePassword(
+// 				prev.controller.user.bearerToken,
+// 				password, username,
+// 				prev.server.uri
+// 			);
+// 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
 
-			newUser.bearerToken = data.token;
-			// newUser.isLoggedIn = true;
+// 			newUser.bearerToken = data.token;
+// 			// newUser.isLoggedIn = true;
 
-			const	response: ControllerModel =	{
-				...prev.controller,
-				user: newUser
-			}
-			dispatch(controllerActions.setUserData(response));
-			// dispatch(controllerActions.setNewToken(response));
-		}
-		catch (error)
-		{
-			dispatch(controllerActions.setUserData({...prev.controller}))
-			return ;
-		}
-	});
-}
+// 			const	response: ControllerModel =	{
+// 				...prev.controller,
+// 				user: newUser
+// 			}
+// 			dispatch(controllerActions.setUserData(response));
+// 			// dispatch(controllerActions.setNewToken(response));
+// 		}
+// 		catch (error)
+// 		{
+// 			dispatch(controllerActions.setUserData({...prev.controller}))
+// 			return ;
+// 		}
+// 	});
+// }
 
 export const	addUserAsFriend = (myId: string, friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -1374,32 +1361,32 @@ export const	addUserAsFriend = (myId: string, friendId: string)
 	});
 }
 
-export const	addFrontUser = (user: UserModel)
-: ThunkAction<void, RootState, unknown, AnyAction> =>
-{
-	return (async (dispatch, getState) =>
-	{
-		const	prev = getState();
+// export const	addFrontUser = (user: UserModel)
+// : ThunkAction<void, RootState, unknown, AnyAction> =>
+// {
+// 	return (async (dispatch, getState) =>
+// 	{
+// 		const	prev = getState();
 
-		const	array = prev.controller.allFrontUsers.map((elem) =>
-		{
-			return (Object.assign(elem));
-		});
-		const	index = array.findIndex((elem) =>
-		{
-			return (elem.id === user.id);
-		});
-		if (index === -1)
-			array.push(user);
-		else
-			array[index] = user;
-		const	response: ControllerModel = {
-			...prev.controller,
-			allFrontUsers: array
-		}
-		dispatch(controllerActions.addFrontUser(response));
-	});
-}
+// 		const	array = prev.controller.allFrontUsers.map((elem) =>
+// 		{
+// 			return (Object.assign(elem));
+// 		});
+// 		const	index = array.findIndex((elem) =>
+// 		{
+// 			return (elem.id === user.id);
+// 		});
+// 		if (index === -1)
+// 			array.push(user);
+// 		else
+// 			array[index] = user;
+// 		const	response: ControllerModel = {
+// 			...prev.controller,
+// 			allFrontUsers: array
+// 		}
+// 		dispatch(controllerActions.addFrontUser(response));
+// 	});
+// }
 
 export const	setOnline = (online: boolean, user: UserModel)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
