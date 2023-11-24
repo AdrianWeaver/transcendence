@@ -100,6 +100,11 @@ const	Header = () =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
+	const	handleRefresh = () =>
+	{
+		dispatch(getAchievements(currentProfile));
+	}
+
 
 	return (
 		<>
@@ -136,10 +141,7 @@ const	Header = () =>
 					>
 						<Button
 							variant="contained"
-							onClick={() =>
-							{
-								dispatch(getAchievements(currentProfile));
-							}}>
+							onClick={handleRefresh}>
 							Refresh
 						</Button>
 					</Stack>
@@ -152,18 +154,7 @@ const	Header = () =>
 const	Achievements = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-	const	dispatch = useAppDispatch();
-	const	currentProfile = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.currentProfile);
-	});
-	useEffect(() =>
-	{
-		dispatch(getStats(currentProfile));
-	}, [
-		dispatch,
-		currentProfile
-	]);
+
 	savePrevPage("/achievements");
 	return (
 		<>

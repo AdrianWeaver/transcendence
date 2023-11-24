@@ -5,6 +5,7 @@ import RegistrationRouter from "./RegistrationRouter";
 import VisitorRouter from "./VisitorRouter";
 
 import { useAppSelector } from "../Redux/hooks/redux-hooks";
+import { useEffect, useState } from "react";
 
 const	MainRouter: React.FC = () =>
 {
@@ -13,15 +14,33 @@ const	MainRouter: React.FC = () =>
 		return (state.controller);
 	});
 
-	if (controller.user.isLoggedIn)
-		return (<LoggedRouter />);
-	else
+	const
+	[
+		routerSwitch,
+		setRouterSwitch
+	] = useState(<VisitorRouter />);
+
+	useEffect(() =>
 	{
-		if (controller.registration.startedRegister === true
-			&& !controller.registration.abortRequested)
-				return (<RegistrationRouter />);
-		return (<VisitorRouter />);
-	}
+		if (controller.user.isLoggedIn)
+		{
+			setRouterSwitch(<LoggedRouter />);
+		}
+		else
+		{
+			if (controller.registration.startedRegister === true
+				&& !controller.registration.abortRequested)
+					setRouterSwitch(<RegistrationRouter />);
+			else
+				setRouterSwitch(<VisitorRouter />);
+		}
+	}, [
+		controller.user.isLoggedIn,
+		controller.registration.startedRegister,
+		controller.registration.abortRequested
+	]);
+
+	return (routerSwitch)
 };
 
 export default	MainRouter;

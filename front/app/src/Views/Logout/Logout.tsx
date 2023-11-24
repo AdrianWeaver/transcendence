@@ -8,16 +8,19 @@ import MenuBar from "../../Component/MenuBar/MenuBar";
 import { reinitialiseUser } from "../../Redux/store/controllerAction";
 import { Button } from "@mui/material";
 import { useAppDispatch } from "../../Redux/hooks/redux-hooks";
+import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 
 const	Logout = () =>
 {
 	const	navigate = useNavigate();
 	const	dispatch = useAppDispatch();
+	const	savePrevPage = useSavePrevPage();
 
 	const	logUserOut = () =>
 	{
 		dispatch(reinitialiseUser(true));
 		localStorage.clear();
+		savePrevPage("/");
 		navigate("/cancel");
 	};
 

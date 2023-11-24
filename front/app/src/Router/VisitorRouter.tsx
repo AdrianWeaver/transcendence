@@ -91,7 +91,7 @@ const	VisitorRouter = () =>
 				/>
 				<Route
 					path="*"
-					element={<h1>Error 404: visitor router</h1>}
+					element={<Navigate to="/"/>}
 				/>
 			</Routes>
 		</BrowserRouter>

@@ -56,11 +56,6 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
-	// {
-	// 	field: "adversaire",
-	// 	headerName: "Adversaire",
-	// 	type: "string"
-	// },
 	{
 		field: "myScore",
 		headerName: "Score p. One",
@@ -124,6 +119,10 @@ const	HistoryTable = () =>
 const	Header = () =>
 {
 	const	dispatch = useAppDispatch();
+	const	handleRefresh = () =>
+	{
+		dispatch(getMyStats())
+	};
 	return (
 		<>
 			<Box
@@ -160,11 +159,7 @@ const	Header = () =>
 					>
 						<Button
 							variant="contained"
-							onClick={() =>
-							{
-								// dispatch(getMyActiveGame());
-								dispatch(getMyStats());
-							}}>
+							onClick={handleRefresh}>
 							Rafraichir
 						</Button>
 						{/* 
@@ -180,12 +175,7 @@ const	Header = () =>
 const	MyStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-	const	dispatch = useAppDispatch();
 
-	useEffect(() =>
-	{
-		dispatch(getMyStats());
-	}, [dispatch]);
 	savePrevPage("/my-stats");
 	return (
 		<>
