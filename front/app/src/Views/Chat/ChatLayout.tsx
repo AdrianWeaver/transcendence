@@ -226,13 +226,11 @@ const FriendsList = (props: FriendsListProps) =>
 						{
 							return (elem.profileId.toString() === el.toString())
 						});
-						// console.log("dounf", found);
 						if (found === undefined)
 						{
 							ind = Number(elem.profileId);
 							alreadyHere.push(elem.profileId);
 						}
-						// console.log("IND", ind, alreadyHere);
 						return (		
 							(elem.profileId !== user.id.toString() && ind !== -1)
 							?	<div key={ind} onClick={() =>

@@ -26,7 +26,7 @@ export class AnonymousUserService implements OnModuleInit
 {
 	private	anonymousUser: Array<AnonymousUserModel> = [];
 	private	secret: string;
-	private	uuidInstance: string;
+	private	uuidInstance: string = "42";
 	private	logger = new Logger("anymous-user-service itself");
 	private	readonly secretId = "anonymous-user-service-secret";
 
