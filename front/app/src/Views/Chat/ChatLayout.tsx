@@ -1119,12 +1119,23 @@ const	ChatLayout = () =>
 				message: text,
 			}
 		};
-		socketRef.current.emit("info", action);
+		socketRef.current?.emit("info", action);
 		setText("");
 	};
 
-	const	goToProfilePage = (username: string) =>
+	const	goToProfilePage = (chanName: string) =>
 	{
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		let	username: string;
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				username = elem;
+		});
 		dispatch(setPreviousPage("/the-chat"));
 		const	searchUser = chatUsers.find((elem) =>
 		{
@@ -1233,6 +1244,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("channel-info", action);
 	};
@@ -1251,6 +1263,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("channel-info", action);
 	};
@@ -1264,6 +1277,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("channel-info", action);
 	};
@@ -1274,22 +1288,39 @@ const	ChatLayout = () =>
 			type: "add-friend",
 			payload: {
 				friendName: userName,
-				friendProfileId: friendProfileId
+				friendProfileId: friendProfileId,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("user-info", action);
 	};
 
-	const	addUserToBlocked = (userName: string) =>
+	const	addUserToBlocked = (userName: string, chanName: string) =>
 	{
+		let	blockedName: string;
+		blockedName = userName;
+		if (chanName !== "")
+		{
+			const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				blockedName = elem;
+		});
+		}
 		const	action = {
 			type: "block-user",
 			payload: {
-				blockedName: userName,
-				friendProfileId: friendProfileId,
+				blockedName: blockedName,
+				// friendProfileId: friendProfileId,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("user-info", action);
 	};
@@ -1303,6 +1334,7 @@ const	ChatLayout = () =>
 				userName: userName,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("user-info", action);
 	};
@@ -1334,6 +1366,7 @@ const	ChatLayout = () =>
 				userName: profileId,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("user-info", action);
 	};
@@ -1351,6 +1384,7 @@ const	ChatLayout = () =>
 				userId: activeId
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("channel-info", action);
 	};
@@ -1364,6 +1398,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("user-info", action);
 	};
@@ -1377,6 +1412,7 @@ const	ChatLayout = () =>
 				newPassword: newPassword,
 			}
 		};
+
 		if (socketRef.current !== null)
 			socketRef.current.emit("channel-info", action);
 	};
@@ -1389,13 +1425,27 @@ const	ChatLayout = () =>
 		dispatch(setCurrentChannel(""));
 	}
 
+	const	getUserFromChannel = (chanName: string) =>
+	{
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		let	username: string;
+		username = "";
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				username = elem;
+		});
+		return (username);
+	};
+
 	return (
 		<div>
 			<MenuBar />
-			<div>
-				connected:{connected}
-				<button onClick={refreshListUser}>click to refresh</button>
-			</div>
+			<br />
 			<Grid
 				container
 				component={Paper}
@@ -1748,7 +1798,7 @@ const	ChatLayout = () =>
 																							</Button>
 																							<Button onClick={() =>
 																							{
-																								addUserToBlocked(member.name);
+																								addUserToBlocked(member.name, "");
 																							}}>
 																								Block
 																							</Button>
@@ -1860,6 +1910,8 @@ const	ChatLayout = () =>
 												<Button
 													onClick={() =>
 													{
+														setTalkingUser(getUserFromChannel(channel.name));
+														setClickedChannel(channel.name);
 														handleDialogOpen(true);
 														setButtonSelectionPriv(channel);
 													}}
@@ -1871,58 +1923,13 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														<Button onClick={() =>
-														{
-															return handleMembersClickOpen(buttonSelectionPriv.name);
-														}}>
-															Other options
-														</Button>
-														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
-															<DialogContent>
-																<ul>
-																{
-																	<li>
-																		{
-																			(talkingUser !== undefined)
-																			? <>
-																				{talkingUser}
-																				<>
-																					{
-																						(!isFriend)
-																						? <Button onClick={() =>
-																						{
-																							addUserToFriends(talkingUser);
-																						}}>
-																							Add friend
-																						</Button>
-																						: <></>
-																					}
-																					<Button onClick={() =>
-																					{
-																						goToProfilePage(talkingUser);
-																					}}>
-																						see profile page
-																					</Button>
-																					<Button onClick={() =>
-																					{
-																						addUserToBlocked(friendProfileId);
-																					}}>
-																						Block
-																					</Button>
-																				</>
-																			</>
-																			: <></>
-																		}
-																	</li>
-																}
-																</ul>
-															</DialogContent>
-															<DialogActions>
-																<Button onClick={handleMembersClose} color="primary">
-																	Close
-																</Button>
-															</DialogActions>
-														</Dialog>
+													<Button onClick={() =>
+													{
+														goToProfilePage(clickedChannel);
+														setClickedChannel("");
+													}}>
+														see profile page
+													</Button>
 													</DialogContent>
 														<DialogActions>
 															<Button onClick={handleDialogClose} color="primary">
