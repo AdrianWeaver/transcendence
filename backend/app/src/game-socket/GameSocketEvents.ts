@@ -127,8 +127,6 @@ export class GameSocketEvents
 		{
 			if (instance.revoked === true)
 			{
-				// this.gameService.recordMatchHistory(instance);
-				// this.logger.debug(frame);
 				instance.revoked = false;
 				this.logger.debug("instance not killed");
 				if (frame === 0)
@@ -139,9 +137,6 @@ export class GameSocketEvents
 				{
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
 				}
-				// this.logger.error("error in revoked", instance);
-				// this.gameService.recordMatchHistory(instance);
-				// console.log(instance);
 				return ;
 			}
 			if (instance.loop && instance.loop.gameActive === false)
@@ -311,7 +306,6 @@ export class GameSocketEvents
 		const token = this.isTokenValid(client.handshake.auth.token);
 		if (token.isValid === false)
 		{
-			console.log(token);
 			client.disconnect();
 			return ({error: true});
 		}
@@ -435,11 +429,8 @@ export class GameSocketEvents
 		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, classicalGameMode);
 		let		roomName: string;
 
-		console.log("classical filtered", classicalArray);
-		this.logger.debug("Checking socket state for state of classical games");
 		if (classicalArray.filtered.disconnected.length === 0)
 		{
-			this.logger.verbose("\tThe user has no pending games");
 		}
 		else
 		{
@@ -456,7 +447,6 @@ export class GameSocketEvents
 				});
 			if (indexClassicalDisconnected === -1)
 			{
-				this.logger.error("The user must not be in this conditions !!");
 			}
 			else
 			{
@@ -471,12 +461,10 @@ export class GameSocketEvents
 						roomName = this.gameService.gameInstances[indexClassicalDisconnected]
 							.roomName;
 						await client.join(roomName);
-						this.logger.verbose("The user is reconnected as player one!");
 						return (roomName);
 					}
 					else
 					{
-						this.logger.error("Must not be in this conditions");
 						client.disconnect();
 						return ("The void");
 					}
@@ -492,12 +480,10 @@ export class GameSocketEvents
 						roomName = this.gameService.gameInstances[indexClassicalDisconnected]
 							.roomName;
 						await client.join(roomName);
-						this.logger.verbose("The user is reconnected as player Two!");
 						return (roomName);
 					}
 					else
 					{
-						this.logger.error("Must not be in this conditions");
 						client.disconnect();
 						return ("The void");
 					}
@@ -506,22 +492,16 @@ export class GameSocketEvents
 		}
 		if (classicalArray.filtered.invited.length !== 0)
 		{
-			this.logger.error("\tThis mode does not accept invite");
 		}
 		if (classicalArray.filtered.revoked.length === 0)
 		{
-			this.logger.verbose("\tThe user revoked a connection");
 		}
 		if (classicalArray.filtered.undefined.length === 0)
 		{
-			this.logger.verbose("\tThe user as no undefined games");
-			this.logger.debug("Search a game ");
 			const	indexClassicalAlone = this.gameService
 				.findIndexGameInstanceAloneByGameMode("classical");
 			if (indexClassicalAlone === -1)
 			{
-				this.logger.debug("\tNo player Alone in this gameMode");
-				this.logger.verbose("Creating game, the user will be player one");
 				this.gameService.increaseRoomCount();
 				// can put length of room dynamically to reject connection if liimiit trigger
 				// roomNameArray.length < roomCount : reject busy server
@@ -529,7 +509,6 @@ export class GameSocketEvents
 					+ roomNameArray [
 						this.gameService.getRoomCount()
 					];
-				this.logger.verbose("\tRoom name: " + roomName);
 				await client.join(roomName);
 				const	newRoom = new GameServe(roomName);
 				newRoom.gameMode = "classical";
@@ -547,7 +526,6 @@ export class GameSocketEvents
 				newRoom.loop.update(performance.now());
 
 				this.gameService.pushGameServeToGameInstance(newRoom);
-				this.logger.verbose("Game is created");
 			}
 			else
 			{
@@ -555,19 +533,15 @@ export class GameSocketEvents
 				{
 					this.gameService.gameInstances[indexClassicalAlone].playerOne.socketId = client.id;
 					this.gameService.gameInstances[indexClassicalAlone].playerOne.profileId = profileId;
-					this.logger.verbose("Joining game, the user will be player One");
 				}
 				else
 				{
 					this.gameService.gameInstances[indexClassicalAlone].playerTwo.socketId = client.id;
 					this.gameService.gameInstances[indexClassicalAlone].playerTwo.profileId = profileId;
-					this.logger.verbose("Joining game, the user will be player Two");
 				}
 				this.gameService.gameInstances[indexClassicalAlone].userConnected += 1;
 				roomName = this.gameService.gameInstances[indexClassicalAlone].roomName;
-				this.logger.verbose("\tRoom name: " + roomName);
 				await client.join(roomName);
-				this.logger.verbose("Joined the game");
 			}
 			return (roomName);
 		}
@@ -581,11 +555,8 @@ export class GameSocketEvents
 		const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, upsideDownGameMode);
 		let		roomName: string;
 
-		console.log("upside-down filtered", upsideDownArray);
-		this.logger.debug("Checking socket state for state of upsideDown games");
 		if (upsideDownArray.filtered.disconnected.length === 0)
 		{
-			this.logger.verbose("\tThe user has no pending games");
 		}
 		else
 		{
@@ -601,7 +572,6 @@ export class GameSocketEvents
 				});
 			if (indexUpsideDownDisconnected === -1)
 			{
-				this.logger.error("The user must not be in this conditions !!");
 			}
 			else
 			{
@@ -616,12 +586,10 @@ export class GameSocketEvents
 						roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
 							.roomName;
 						await client.join(roomName);
-						this.logger.verbose("The user is reconnected as player one!");
 						return (roomName);
 					}
 					else
 					{
-						this.logger.error("Must not be in this conditions");
 						client.disconnect();
 						return ("The void");
 					}
@@ -637,12 +605,10 @@ export class GameSocketEvents
 						roomName = this.gameService.gameInstances[indexUpsideDownDisconnected]
 							.roomName;
 						await client.join(roomName);
-						this.logger.verbose("The user is reconnected as player Two!");
 						return (roomName);
 					}
 					else
 					{
-						this.logger.error("Must not be in this conditions");
 						client.disconnect();
 						return ("The void");
 					}

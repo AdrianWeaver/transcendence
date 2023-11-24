@@ -52,7 +52,6 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 				cleanup: async (app : any) =>
 				{
 					// releasing ressources
-					console.log("Releasing ressources");
 				},
 				gracefulShutdownTimeout:
 					Number(process.env.GRACEFULL_SHUTDOWN_TIMEOUT ?? 10000),

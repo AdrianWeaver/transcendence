@@ -33,9 +33,6 @@ export	class AuthorizationGuard implements CanActivate
 		const	bearer = token.split("Bearer ");
 		let		response: AuthorizationGuardSignatureModel;
 
-		// Must be length === 2
-		// console.log("Bearer splitting length : ", bearer.length);
-		// Put Logger here
 		if (bearer.length !== 2)
 			return ({validTokenSignature: false});
 		try
@@ -50,17 +47,14 @@ export	class AuthorizationGuard implements CanActivate
 				exp: decode.exp,
 				token: token
 			};
-			// console.log("Valid Signature :", response);
 			return (response);
 		}
 		catch (error)
 		{
 			if (error instanceof jwt.JsonWebTokenError)
 			{
-				console.log("User has tryed to use a wrong token signature");
 				throw new UnauthorizedException();
 			}
-			console.log("Error on Anonymous isValidTokenSignature : ", error);
 			return ({validTokenSignature: false});
 		}
 	}
@@ -86,7 +80,6 @@ export	class AuthorizationGuard implements CanActivate
 	{
 		if (user.token !== tok.token)
 		{
-			console.log("token mismatch", user.token, tok.token);
 			return (false);
 		}
 		return (true);

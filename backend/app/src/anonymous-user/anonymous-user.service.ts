@@ -84,7 +84,6 @@ export class AnonymousUserService implements OnModuleInit
 					this.generateSecretForDB();
 				else
 					this.secret = data?.value;
-				this.logger.verbose("secret form db is:" + this.secret);
 			})
 			.catch((error: any) =>
 			{
@@ -92,39 +91,20 @@ export class AnonymousUserService implements OnModuleInit
 			})
 			.finally(() =>
 			{
-				this.logger.debug("end of load into database ");
 			});
 	}
 
 	public	populateFromDBObject(data: any[])
 	{
-		this.logger.verbose("\tcreate user from database ");
 		this.prismaService
 			.prisma.anonymousUser
 			.findMany()
-			.then((data) =>
+			.then((_data) =>
 			{
-				console.log(data);
 			})
-			.catch((error: any ) =>
+			.catch((_error: any ) =>
 			{
-				this.logger.error("Ca fait  pas des chocapics ");
 			});
-		// const	cast = data as AnonymousUserModel[];
-		// cast.forEach(el =>
-		// {
-		// 	const	obj: AnonymousUserModel = {
-		// 		isRegistredAsRegularUser: el.isRegistredAsRegularUser,
-		// 		lastConnection: el.lastConnection,
-		// 		password: el.password,
-		// 		revokeConnectionRequest: el.revokeConnectionRequest,
-		// 		token: el.token,
-		// 		userCreatedAt: el.userCreatedAt,
-		// 		uuid: el.uuid,
-		// 	};
-		// 	this.anonymousUser.push(obj);
-		// });
-		this.logger.verbose(this.anonymousUser);
 	}
 
 	public	getUuidInstance (): string
@@ -249,7 +229,6 @@ export class AnonymousUserService implements OnModuleInit
 		user.lastConnection = Date.now();
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
-		console.log("Anonymous user revoke session uuid : " + user.uuid);
 		return (false);
 	}
 

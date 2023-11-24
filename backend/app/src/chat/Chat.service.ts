@@ -155,7 +155,6 @@ export	class ChatService implements OnModuleInit
 			})
 			.catch(() =>
 			{
-				console.log("load table skipped");
 			});
 	}
 
@@ -594,7 +593,6 @@ export	class ChatService implements OnModuleInit
 	async	hashPassword(password: string, chanName: string)
 	{
 		const	saltRounds = 10;
-		console.log("CHANNAME ", chanName);
 		const	index = this.chat.channels.findIndex((elem) =>
 		{
 			return (elem.name === chanName);
@@ -616,14 +614,12 @@ export	class ChatService implements OnModuleInit
 			else
 			{
 				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
-				console.log("PLAYIG", playing);
 				if (playing)
 					elem.status = "playing";
 				else
 					elem.status = "online";
 			}
 		});
-		console.log("UPDATE STATUS WORKED ?", this.chat.users);
 		return (this.chat.users);
 	}
 }
