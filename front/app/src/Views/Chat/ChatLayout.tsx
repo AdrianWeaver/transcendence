@@ -66,8 +66,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
-import { LteMobiledataOutlined } from "@mui/icons-material";
-import Test from "./Test";
 
 type MessageModel =
 {
@@ -268,9 +266,7 @@ const a11yProps = (index: any) =>
 
 const	ChatLayout = () =>
 {
-	// TEST
 	const	socketRef = useRef<Socket | null>(null);
-	// const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
