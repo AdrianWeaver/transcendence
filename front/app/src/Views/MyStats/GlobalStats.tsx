@@ -56,11 +56,6 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
-	// {
-	// 	field: "adversaire",
-	// 	headerName: "Adversaire",
-	// 	type: "string"
-	// },
 	{
 		field: "myScore",
 		headerName: "Score p. One",

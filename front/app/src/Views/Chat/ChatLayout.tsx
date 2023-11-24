@@ -61,13 +61,13 @@ import {
 	setProfileFriendView,
 	setProfilePublicView,
 	setPreviousPage,
-	getPlayingStatus,
 }	from "../../Redux/store/controllerAction";
 
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
-import { ChatUserModel } from "../../Redux/models/redux-models";
+import { LteMobiledataOutlined } from "@mui/icons-material";
+import Test from "./Test";
 
 type MessageModel =
 {
@@ -164,7 +164,8 @@ const TabPanel = (props: TabPanelProps) =>
 
 type FriendsListProps = {
 	arrayListUsers: string[],
-	socketRef: React.MutableRefObject<Socket>
+	socketRef: any,
+	// React.MutableRefObject<Socket>
 	friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
@@ -189,9 +190,6 @@ const FriendsList = (props: FriendsListProps) =>
 	{
 		return (state.controller.user.chat.numberOfChannels);
 	});
-	// dispatch(getPlayingStatus());
-
-
 
 	const	createNewConv = (activeId: string) =>
 	{
@@ -216,60 +214,28 @@ const FriendsList = (props: FriendsListProps) =>
 				: <></>
 			}
 			<Divider />
-			<Grid
-				item xs={12}
-				sx={{ padding: "10px" }}
-			>
-				<TextField
-					id="outlined-basic-email"
-					label="Search"
-					variant="outlined"
-					fullWidth
-				/>
-			</Grid>
-			<Divider />
-			<List>
 				{
 					users.map((elem, index) =>
 					{
-						let status;
-						status = elem.online ? "💚" : "🔴";
-						if (elem.status === "playing" && elem.online)
-							status = "🏓";
 						return (		
 							(elem.profileId !== user.id.toString())
-							? <>
-								<div key={index} onClick={() =>
-									{
-										dispatch(setActiveConversationId(elem.id));
-										createNewConv(elem.id);
-									}}>
-									<ListItem key={index}>
-										<ListItemIcon>
-											<Avatar
-												alt={elem.name}
-												src={elem.avatar}
-											/>
-										</ListItemIcon>
-										<ListItemText primary={elem.name}>
-											{elem.name}
-										</ListItemText>
-										{
-											(currentProfileIsFriend)
-											? <ListItemText
-													secondary={status}
-													sx={{ align: "right" }}
-											></ListItemText>
-											: <></>
-										}
-									</ListItem>
-								</div>
-							</>
+							?	<div key={Number(elem.profileId)} onClick={() =>
+								{
+									dispatch(setActiveConversationId(elem.id));
+									createNewConv(elem.id);
+								}}> 
+
+							<Test index={Number(elem.profileId)}
+								name={elem.name}
+								avatar={elem.avatar}
+								status={elem.status}
+								isFriend={currentProfileIsFriend}
+								online={elem.online} />
+							</div>
 							: <></>
 						);
 					})
 				}
-			</List>
 		</>
 	);
 };
@@ -286,7 +252,9 @@ const a11yProps = (index: any) =>
 
 const	ChatLayout = () =>
 {
-	const	socketRef = useRef<SocketIOClient.Socket | null>(null);
+	// TEST
+	const	socketRef = useRef<Socket | null>(null);
+	// const	socketRef = useRef<SocketIOClient.Socket | null>(null);
 	const	style = useTheme();
 	const	dispatch = useAppDispatch();
 	const	navigate = useNavigate();
@@ -310,16 +278,10 @@ const	ChatLayout = () =>
 	{
 		return (state.controller.user);
 	});
-
-	const	currentProfileIsFriend = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.currentProfileIsFriend);
-	});
 	const	activeId = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.activeConversationId);
 	});
-
 	const	profileToken = useAppSelector((state) =>
 	{
 		return (state.controller.user.bearerToken);
