@@ -28,6 +28,7 @@ import SigninDoubleAuth from "../Views/Signin/SigninDoubleAuth";
 import { NavigationTwoTone } from "@mui/icons-material";
 import MyAchievements from "../Views/Achievements/MyAchievements";
 import Achievements from "../Views/Achievements/Achievements";
+import CancelRegister from "../Views/CancelRegister/CancelRegister";
 
 
 /**
@@ -137,8 +138,12 @@ const	LoggedRouter = () =>
 					element={<Achievements />}
 				/>
 				<Route
+					path="/cancel"
+					element={<CancelRegister />}
+				/>
+				<Route
 					path="*"
-					element={<h1>Error 404: Logged User</h1>}
+					element={<Navigate to="/"/>}
 				/>
 			</Routes>
 		</BrowserRouter>
