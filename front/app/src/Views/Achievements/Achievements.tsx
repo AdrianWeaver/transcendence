@@ -155,7 +155,11 @@ const	Achievements = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 
-	savePrevPage("/achievements");
+	useEffect(() =>
+	{
+		savePrevPage("/achievements");
+	})
+	
 	return (
 		<>
 			<MenuBar />
