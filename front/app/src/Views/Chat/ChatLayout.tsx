@@ -219,14 +219,15 @@ const FriendsList = (props: FriendsListProps) =>
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
+						let keyIndex = crypto.randomUUID();
 						return (		
 							(elem.profileId !== user.id.toString())
-							?	<div key={Number(elem.profileId)} onClick={() =>
+							?	<div key={keyIndex} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={Number(elem.profileId)} >
+									<ListItem key={keyIndex} >
 									<ListItemIcon>
 										<Avatar
 											alt={elem.name}
@@ -237,12 +238,13 @@ const FriendsList = (props: FriendsListProps) =>
 										{elem.name}
 									</ListItemText>
 									{
-										(currentProfileIsFriend)
-										? <ListItemText
+										// (currentProfileIsFriend)
+										// ?
+										<ListItemText
 												secondary={status}
 												sx={{ align: "right" }}
 										></ListItemText>
-										: <></>
+										// : <></>
 									}
 								</ListItem>
 							</div>
