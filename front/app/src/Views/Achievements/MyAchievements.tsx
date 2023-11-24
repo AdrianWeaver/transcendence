@@ -99,6 +99,10 @@ const	Header = () =>
 	{
 		return (state.controller.user);
 	});
+	const	handleRefresh = () =>
+	{
+		dispatch(getAchievements(user.id.toString()));
+	}
 	return (
 		<>
 			<Box
@@ -134,11 +138,7 @@ const	Header = () =>
 					>
 						<Button
 							variant="contained"
-							onClick={() =>
-							{
-								// dispatch(getMyActiveGame());
-								dispatch(getAchievements(user.id.toString()));
-							}}>
+							onClick={handleRefresh}>
 							Refresh
 						</Button>
 						{/* 

@@ -35,15 +35,12 @@ export	interface ChatUserModel
 export interface BackUserModel
 {
 	id: number | string;
-	email: string;
 	username: string;
 	firstName: string;
 	lastName: string;
 	avatar: string;
 	location: string;
-	ipAddress: string;
-	doubleAuth: boolean;
-	token: string;
+	// doubleAuth: boolean;
 }
 
 export interface ChatModel
@@ -181,7 +178,7 @@ export interface	CanvasModel
 export interface	ControllerModel
 {
 	"allUsers": BackUserModel[],
-	"allFrontUsers": UserModel[],
+	// "allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,

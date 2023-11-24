@@ -56,6 +56,7 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
+
 	{
 		field: "myScore",
 		headerName: "Score p. One",
@@ -114,9 +115,14 @@ const	HistoryTable = () =>
 };
 
 
+
 const	Header = () =>
 {
 	const	dispatch = useAppDispatch();
+	const	handleRefresh = () =>
+	{
+		dispatch(getAllStats());
+	};
 	return (
 		<>
 			<Box
@@ -153,10 +159,7 @@ const	Header = () =>
 					>
 						<Button
 							variant="contained"
-							onClick={() =>
-							{
-								dispatch(getAllStats());
-							}}>
+							onClick={handleRefresh}>
 							Rafraichir
 						</Button>
 					</Stack>
@@ -169,11 +172,7 @@ const	Header = () =>
 const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-	const	dispatch = useAppDispatch();
-	useEffect(() =>
-	{
-		dispatch(getAllStats());
-	}, [dispatch,]);
+
 	savePrevPage("/global-stats");
 	return (
 		<>

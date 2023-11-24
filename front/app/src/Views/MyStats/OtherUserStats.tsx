@@ -56,11 +56,6 @@ const	columns: GridColDef[] = [
 				);
 		}
 	},
-	// {
-	// 	field: "adversaire",
-	// 	headerName: "Adversaire",
-	// 	type: "string"
-	// },
 	{
 		field: "myScore",
 		headerName: "Score p. One",
@@ -78,8 +73,6 @@ const	columns: GridColDef[] = [
 	},
 
 ];
-
-// const	fakeRows: any = [];
 
 const	HistoryTable = () =>
 {
@@ -129,6 +122,11 @@ const	Header = () =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
+	const	handleRefresh = () =>
+	{
+		dispatch(getStats(currentProfile));
+	};
+
 	return (
 		<>
 			<Box
@@ -165,10 +163,7 @@ const	Header = () =>
 					>
 						<Button
 							variant="contained"
-							onClick={() =>
-							{
-								dispatch(getStats(currentProfile));
-							}}>
+							onClick={handleRefresh}>
 							Rafraichir
 						</Button>
 					</Stack>
@@ -181,18 +176,7 @@ const	Header = () =>
 const	Stats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-	const	dispatch = useAppDispatch();
-	const	currentProfile = useAppSelector((state) =>
-	{
-		return (state.controller.user.chat.currentProfile);
-	});
-	useEffect(() =>
-	{
-		dispatch(getStats(currentProfile));
-	}, [
-		dispatch,
-		currentProfile
-	]);
+
 	savePrevPage("/stats");
 	return (
 		<>

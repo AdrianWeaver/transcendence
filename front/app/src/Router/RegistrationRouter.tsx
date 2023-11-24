@@ -9,6 +9,7 @@ import {
 import Signup from "../Views/Signup/Signup";
 import { useSavePrevPage } from "./Hooks/useSavePrevPage";
 import { persistor } from "../Redux/store";
+import CancelRegister from "../Views/CancelRegister/CancelRegister";
 
 const	UndefinedHandler = () =>
 {
@@ -36,6 +37,10 @@ const	RegistrationRouter = () =>
 				<Route
 					path="/undefined"
 					element={<UndefinedHandler/>}
+				/>
+					<Route
+					path="/cancel"
+					element={<CancelRegister />}
 				/>
 				<Route
 					path="*"

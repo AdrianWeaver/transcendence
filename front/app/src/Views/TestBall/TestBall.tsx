@@ -300,7 +300,7 @@ const	TestBall = () =>
 				dispatch(setGameOver(true));
 				time = setTimeout(() =>
 				{
-					navigate("/global-stats");
+					navigate("/game-setup");
 				}, 4000);
 			}
 			if (data.type === "abandon")
@@ -489,28 +489,28 @@ const	TestBall = () =>
 					disconnected={socketRef.current?.active}
 					gameOver={gameOver}
 				/> */}
-			<div style={displayStyle}>
+			{/* <div style={displayStyle}>
 				FT_TRANSCENDENCE
-			</div>
+			</div> */}
 
 			{/* This part show the connection to the websocket */}
-			<div style={displayStyle}>
+			{/* <div style={displayStyle}>
 				<ConnectState connected={connected} />
-			</div>
+			</div> */}
 
 			{/* This part show the number of client connected */}
-			<div style={displayStyle}>
+			{/* <div style={displayStyle}>
 				number of client connected : {theServer.numberOfUser}<br/>
 				number of client ready : {theServer.readyPlayerCount}
-			</div>
+			</div> */}
 
 			{/* This part show the frame number */}
-			<div style={displayStyle}>
+			{/* <div style={displayStyle}>
 				frame number (time server): {theServer.frameNumber} <br/>
-			</div>
+			</div> */}
 
 			{/* /* This part show more information */ }
-			<div style={displayStyle}>
+			{/* <div style={displayStyle}>
 				position ball x: {theBoard.ball.position.x} <br />
 				position ball y: {theBoard.ball.position.y} <br />
 				dimension width du server: {theServer.dimension.width} <br />
@@ -526,19 +526,17 @@ const	TestBall = () =>
 				position du player 2:
 							{JSON.stringify(theBoard.playerTwo.position)} <br />
 				value rotation mode spec : {theBoard.gameFace} <br/>
-			</div>
-			<div style={displayStyle}>
-				<button onClick={setReadyAction}>I'm ready</button>
-			</div>
+			</div> */}
 			{/* This is the canvas part */}
-
+			<div style={{ marginTop: '5rem' }}>
+			</div>
 			<div style={{ textAlign: 'center' }}>
 				<div
 					style={{
-					width: game.board.canvas?.width,
-					height: game.board.canvas?.height,
-					transform: `rotate(${theBoard.gameFace}deg)`,
-					// transition: 'transform 0.5s',
+						width: game.board.canvas?.width,
+						height: game.board.canvas?.height,
+						transform: `rotate(${theBoard.gameFace}deg)`,
+						// transition: 'transform 0.5s',
 					}}
 				>
 					<canvas
@@ -546,6 +544,9 @@ const	TestBall = () =>
 					width={game.board.canvas?.width}
 					ref={canvasRef}
 					/>
+				</div>
+				<div style={{marginTop: '2rem'}}>
+					<button style={{padding: '.2rem'}} onClick={setReadyAction}>I'm ready</button>
 				</div>
 			</div>
 			{/* <div style={{ textAlign: "center" }}>
