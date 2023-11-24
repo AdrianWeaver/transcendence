@@ -243,7 +243,6 @@ export class ChatSocketEvents
 						profileId: friend.profileId,
 						avatar: friend.avatar,
 						status: friend.status
-						
 					}
 					friendsArr.push(fr);
 				});
@@ -457,8 +456,32 @@ export class ChatSocketEvents
 		public handleInfoGetUserList(client: Socket, data: ActionSocket)
 		{
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
-			this.chatService.updateStatus(this.gameService);
-			const copyUsers = this.chatService.getAllUsers();
+			const	copyUsers: ChatUserModel[] = [];
+
+			console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
+			this.chatService.chat.users.forEach((user) =>
+			{
+				let status;
+
+				if (!user.online)
+					status = "offline";
+				else
+				{
+					if (this.gameService.getStatusConnectedToGameFromProfileId(profileId))
+						status = "playing";
+					else
+						status = "online";
+				}
+				const newUser: ChatUserModel = {
+					avatar: user.avatar,
+					id: user.id,
+					name: user.name,
+					online: user.online,
+					profileId: user.profileId,
+					status: status,
+				};
+				copyUsers.push(newUser);
+			});
 
 			const	me = this.chatService.getUserBySocketId(client.id);
 			if (me === undefined)

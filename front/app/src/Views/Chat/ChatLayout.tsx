@@ -828,7 +828,7 @@ const	ChatLayout = () =>
 					}
 					if (data.payload.kind === "privateMessage")
 					{
-						setCurrentChannel(data.payload.chanName);	
+						setCurrentChannel(data.payload.chanName);
 						setPrivMessages(data.payload.chanMessages);
 						goToChannel(data.payload.chanName, "privateMessage", false);
 						// goToChannel(data.payload.chanName, data.payload.kind, true);

@@ -636,7 +636,6 @@ export class	GameService implements OnModuleInit
 					socketConvertedAsActive
 				)
 				.filtered.connected;
-		
 		return (activeConnection.length);
 	}
 }
