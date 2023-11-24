@@ -1,3 +1,5 @@
+import { type } from "os";
+
 type MessageModel =
 {
 	sender: string,
@@ -22,6 +24,13 @@ export	interface	StatsModel
 	defeats: number,
 	lastGreatVictory: MatchHistoryModel;
 }
+
+// export type	FriendModel =
+// {
+// 	name: string,
+// 	profileId: string
+// }
+
 export	interface ChatUserModel
 {
 	"name": string,
@@ -30,6 +39,12 @@ export	interface ChatUserModel
 	"id": string,
 	"avatar": string,
 	"profileId": string,
+}
+
+export interface FriendsDataModel
+{
+	"profileIdOwner": string;
+	"profileIdFriend": string;
 }
 
 export interface BackUserModel
@@ -63,6 +78,7 @@ export interface ChatModel
 	"disconnectedUsers": ChatUserModel[],
 	"currentProfile": string;
 	"currentProfileIsFriend": boolean;
+	"friends": FriendsDataModel[];
 }
 
 export interface	ProfileModel
