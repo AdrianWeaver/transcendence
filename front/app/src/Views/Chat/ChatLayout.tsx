@@ -1153,12 +1153,23 @@ const	ChatLayout = () =>
 				message: text,
 			}
 		};
-		socketRef.current.emit("info", action);
+		socketRef.current?.emit("info", action);
 		setText("");
 	};
 
-	const	goToProfilePage = (username: string) =>
+	const	goToProfilePage = (chanName: string) =>
 	{
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		let	username: string;
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				username = elem;
+		});
 		dispatch(setPreviousPage("/the-chat"));
 		const	searchUser = chatUsers.find((elem) =>
 		{
@@ -1191,7 +1202,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const [
@@ -1266,7 +1277,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const handleMembersClose = () =>
@@ -1283,7 +1294,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const	banUserFromChannel = (userName: string, chanName: string) =>
@@ -1295,7 +1306,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const	addUserToFriends = (userName: string) =>
@@ -1304,22 +1315,37 @@ const	ChatLayout = () =>
 			type: "add-friend",
 			payload: {
 				friendName: userName,
-				friendProfileId: friendProfileId
-			}
-		};
-		socketRef.current.emit("user-info", action);
-	};
-
-	const	addUserToBlocked = (userName: string) =>
-	{
-		const	action = {
-			type: "block-user",
-			payload: {
-				blockedName: userName,
 				friendProfileId: friendProfileId,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		socketRef.current?.emit("user-info", action);
+	};
+
+	const	addUserToBlocked = (userName: string, chanName: string) =>
+	{
+		let	blockedName: string;
+		blockedName = userName;
+		if (chanName !== "")
+		{
+			const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				blockedName = elem;
+		});
+		}
+		const	action = {
+			type: "block-user",
+			payload: {
+				blockedName: blockedName,
+				// friendProfileId: friendProfileId,
+			}
+		};
+		socketRef.current?.emit("user-info", action);
 	};
 
 	const	muteUserInChannel = (userName: string, chanName: string) =>
@@ -1331,7 +1357,7 @@ const	ChatLayout = () =>
 				userName: userName,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		socketRef.current?.emit("user-info", action);
 	};
 
 	// END OF MEMBERS FUNCTIONS
@@ -1361,7 +1387,7 @@ const	ChatLayout = () =>
 				userName: profileId,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		socketRef.current?.emit("user-info", action);
 	};
 
 	// END OF INVITE
@@ -1377,7 +1403,7 @@ const	ChatLayout = () =>
 				userId: activeId
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const	makeAdmin = (userName: string, chanName: string) =>
@@ -1389,7 +1415,7 @@ const	ChatLayout = () =>
 				chanName: chanName,
 			}
 		};
-		socketRef.current.emit("user-info", action);
+		socketRef.current?.emit("user-info", action);
 	};
 
 	const	addPasswordToChannel = (chanName: string, newPassword: string) =>
@@ -1401,7 +1427,7 @@ const	ChatLayout = () =>
 				newPassword: newPassword,
 			}
 		};
-		socketRef.current.emit("channel-info", action);
+		socketRef.current?.emit("channel-info", action);
 	};
 
 	const	changeTabOperations = () =>
@@ -1412,13 +1438,27 @@ const	ChatLayout = () =>
 		dispatch(setCurrentChannel(""));
 	}
 
+	const	getUserFromChannel = (chanName: string) =>
+	{
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		let substrings: string[] = chanName.split("&");
+		let	username: string;
+		username = "";
+		substrings.forEach((elem) =>
+		{
+			if (elem !== userMe?.name)
+				username = elem;
+		});
+		return (username);
+	};
+
 	return (
 		<div>
 			<MenuBar />
-			<div>
-				connected:{connected}
-				<button onClick={refreshListUser}>click to refresh</button>
-			</div>
+			<br />
 			<Grid
 				container
 				component={Paper}
@@ -1771,7 +1811,7 @@ const	ChatLayout = () =>
 																							</Button>
 																							<Button onClick={() =>
 																							{
-																								addUserToBlocked(member.name);
+																								addUserToBlocked(member.name, "");
 																							}}>
 																								Block
 																							</Button>
@@ -1883,6 +1923,8 @@ const	ChatLayout = () =>
 												<Button
 													onClick={() =>
 													{
+														setTalkingUser(getUserFromChannel(channel.name));
+														setClickedChannel(channel.name);
 														handleDialogOpen(true);
 														setButtonSelectionPriv(channel);
 													}}
@@ -1894,59 +1936,13 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														<Button onClick={() =>
-														{
-															return handleMembersClickOpen(buttonSelectionPriv.name);
-														}}>
-															Other options
-														</Button>
-														<Dialog open={membersOpen} onClose={handleMembersClose} maxWidth="sm" fullWidth>
-															<DialogContent>
-																<ul>
-																{
-																	<li>
-																		{
-																			(talkingUser !== undefined)
-																			? <>
-																				{talkingUser}
-																				<>
-																					{
-																						(!isFriend)
-																						? <Button onClick={() =>
-																						{
-																							addUserToFriends(talkingUser);
-																						}}>
-																							Add friend
-																						</Button>
-																						: <></>
-																					}
-																					<Button onClick={() =>
-																					{
-																						goToProfilePage(talkingUser);
-																					}}>
-																						see profile page
-																					</Button>
-																					<Button onClick={() =>
-																					{
-																						setSeeProfile(false);
-																						addUserToBlocked(friendProfileId);
-																					}}>
-																						Block
-																					</Button>
-																				</>
-																			</>
-																			: <></>
-																		}
-																	</li>
-																}
-																</ul>
-															</DialogContent>
-															<DialogActions>
-																<Button onClick={handleMembersClose} color="primary">
-																	Close
-																</Button>
-															</DialogActions>
-														</Dialog>
+													<Button onClick={() =>
+													{
+														goToProfilePage(clickedChannel);
+														setClickedChannel("");
+													}}>
+														see profile page
+													</Button>
 													</DialogContent>
 														<DialogActions>
 															<Button onClick={handleDialogClose} color="primary">
