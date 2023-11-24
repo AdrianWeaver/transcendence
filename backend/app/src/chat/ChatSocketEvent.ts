@@ -458,7 +458,7 @@ export class ChatSocketEvents
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			const	copyUsers: ChatUserModel[] = [];
 
-			console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
+			// console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
 			this.chatService.chat.users.forEach((user) =>
 			{
 				let status;

@@ -170,7 +170,7 @@ type FriendsListProps = {
 const FriendsList = (props: FriendsListProps) =>
 {
 	const	dispatch = useAppDispatch();
-
+	const	alreadyHere: string[] = [];
 	const	currentProfileIsFriend = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfileIsFriend);
@@ -216,19 +216,30 @@ const FriendsList = (props: FriendsListProps) =>
 					users.map((elem, index) =>
 					{
 						let status;
+						let	ind: number;
+						ind = -1;
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						let keyIndex = crypto.randomUUID();
+						// let keyIndex = crypto.randomUUID();
+						const	found = alreadyHere.find((el) =>
+						{
+							return (elem.profileId.toString() === el.toString())
+						});
+						if (found === undefined)
+						{
+							ind = Number(elem.profileId);
+							alreadyHere.push(elem.profileId);
+						}
 						return (		
-							(elem.profileId !== user.id.toString())
-							?	<div key={keyIndex} onClick={() =>
+							(elem.profileId !== user.id.toString() && ind !== -1)
+							?	<div key={ind} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={keyIndex} >
-									<ListItemIcon>
+									<ListItem >
+									<ListItemIcon >
 										<Avatar
 											alt={elem.name}
 											src={elem.avatar}
@@ -245,12 +256,8 @@ const FriendsList = (props: FriendsListProps) =>
 													sx={{ align: "right" }}
 											></ListItemText>
 										: <></>
-										<ListItemText
-												secondary={status}
-												sx={{ align: "right" }}
-										></ListItemText>
 									}
-								</ListItem>
+                </ListItem>
 							</div>
 							: <></>
 						);
