@@ -247,7 +247,6 @@ export class UserController
 					}
 					else
 					{
-						console.log("ICI  655656?");
 						userObject = {
 							registrationProcessEnded: false,
 							registrationStarted: true,
@@ -564,7 +563,6 @@ export class UserController
 			return ;
 		}
 		const	number = this.userService.getPhoneNumber(body.profileId);
-		console.log("bYneror", number);
 		if (number === "undefined" || number === undefined)
 		{
 			res.status(400).send("number not found");
@@ -626,9 +624,7 @@ export class UserController
 					code: body.otpCode
 				})
 			.then((verificationCheck) =>
-			{
-				console.log("status : ", verificationCheck.status);
-				console.log("VERIF : ", verificationCheck);
+			{;
 				if (verificationCheck.status === "approved")
 				{
 					res.send(true);
@@ -1050,7 +1046,6 @@ export class UserController
 				chatUsers.push(usr);
 			}
 		});
-		console.log("NEW CHAT USERS", chatUsers);
 		return (chatUsers);
 	}
 

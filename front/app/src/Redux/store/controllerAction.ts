@@ -1346,7 +1346,6 @@ export const	addUserAsFriend = (friendId: string)
 			friendId, prev.server.uri)
 		if (data === "ERROR")
 			return ;
-		console.log("DATA ", data);
 		if (data === "success")
 		{
 			const	newFriend = {

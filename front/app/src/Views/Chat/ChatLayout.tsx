@@ -1125,8 +1125,6 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (chanName: string) =>
 	{
-		console.log("GO TO PORFILE", chanName, "u", uniqueId);
-		console.log("userMe go to profile", user);
 		let substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>

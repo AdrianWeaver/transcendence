@@ -40,7 +40,6 @@ const	ProfilePage = () =>
 	{
 		if (userSelected && !isFriend)
 			dispatch(addUserAsFriend(userSelected.profileId));
-		console.log("friends", user.chat.friends, "isFriend", isFriend);
 	}
 	let	isFriend: boolean;
 	isFriend = false;

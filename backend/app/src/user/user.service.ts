@@ -1256,11 +1256,8 @@ public	register(data: UserModel)
 		})
 		.catch((err) =>
 		{
-			console.log("ERROR HERE ?");
-			console.log(err);
 			return ("ERROR");
 		});
-		console.log("valid password ?", valid);
 		return (valid);
 	}
 
@@ -1317,7 +1314,6 @@ public	register(data: UserModel)
 			this.user[searchUserIndex].friendsProfileId.push(friendId);
 		else
 			return ("already friends");
-		console.log("LES USERS", this.user);
 		this.updateUserToDatabase(this.user[searchUserIndex]);
 	
 		return ("success");
