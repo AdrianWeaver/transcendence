@@ -30,6 +30,8 @@ export	interface ChatUserModel
 	"id": string,
 	"avatar": string,
 	"profileId": string,
+	"statusPong": string,
+	"statusChat": string,
 }
 
 export interface BackUserModel

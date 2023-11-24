@@ -826,89 +826,92 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	public	registerFortyThree(data: UserModel)
 	: {res: UserRegisterResponseModel, toDB: UserModel}
-{
-	const	searchUser = this.user.find((user) =>
 	{
-		return (user.id === data.id);
-	});
-	if (searchUser?.registrationProcessEnded === true)
-		throw new BadRequestException("Account already created");
-	if (searchUser !== undefined)
-	{
-		const	index = this.user.findIndex((user) =>
+		const	searchUser = this.user.find((user) =>
 		{
 			return (user.id === data.id);
 		});
-		if (index !== -1)
-			this.user.splice(index, 1);
-	}
-	// const	secretToken = randomBytes(64).toString("hex");
-	const newUser : UserModel= {
-		registrationStarted: true,
-		registrationProcessEnded: false,
-		ftApi: data.ftApi,
-		retStatus: data.retStatus,
-		date: data.date,
-		id: data.id,
-		email: data.email,
-		username: data.username,
-		login: data.login,
-		online: data.online,
-		status: data.status,
-		firstName: data.firstName,
-		lastName: data.lastName,
-		url: data.url,
-		avatar: data.avatar,
-		ftAvatar: data.ftAvatar,
-		location: data.location,
-		revokedConnectionRequest: data.revokedConnectionRequest,
-		authService:
+		if (searchUser?.registrationProcessEnded === true)
+			throw new BadRequestException("Account already created");
+		if (searchUser !== undefined)
 		{
-			token: "Bearer " + jwt.sign(
-				{
-					id: data.id,
-					email: data.email
-				},
-				this.secret,
-				{
-					expiresIn: "1d"
-				}
-			),
-			expAt: Date.now() + (1000 * 60 * 60 * 24),
-			doubleAuth:
+			const	index = this.user.findIndex((user) =>
 			{
-				enable: data.authService.doubleAuth.enable,
-				lastIpClient: data.authService.doubleAuth.lastIpClient,
-				phoneNumber: data.authService.doubleAuth.phoneNumber,
-				phoneRegistered: data.authService.doubleAuth.phoneRegistered,
-				validationCode: data.authService.doubleAuth.validationCode,
-				valid: data.authService.doubleAuth.valid,
-			}
-		},
-		password: data.password,
-		friendsProfileId: [],
-		achievements: []
-	};
-	this.user.push(newUser);
-	const	response: UserRegisterResponseModel = {
-		message: "Your session has been created, you must loggin",
-		token: newUser.authService.token,
-		id: newUser.id,
-		email: newUser.email,
-		statusCode: newUser.retStatus,
-		username: newUser.username,
-		login: newUser.login,
-		firstName: newUser.firstName,
-		lastName: newUser.lastName,
-		avatar: newUser.avatar,
-		ftAvatar: newUser.ftAvatar
-	};
-	return (
-	{
-		res: response,
-		toDB: newUser
-	});
-}
+				return (user.id === data.id);
+			});
+			if (index !== -1)
+				this.user.splice(index, 1);
+		}
+		// const	secretToken = randomBytes(64).toString("hex");
+		const fileCfg = new FileConfig();
+		const newUser : UserModel= {
+			registrationStarted: true,
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			username: data.username,
+			login: data.login,
+			online: data.online,
+			status: data.status,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
+			location: data.location,
+			revokedConnectionRequest: data.revokedConnectionRequest,
+			authService:
+			{
+				token: "Bearer " + jwt.sign(
+					{
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					enable: data.authService.doubleAuth.enable,
+					lastIpClient: data.authService.doubleAuth.lastIpClient,
+					phoneNumber: data.authService.doubleAuth.phoneNumber,
+					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+					validationCode: data.authService.doubleAuth.validationCode,
+					valid: data.authService.doubleAuth.valid,
+				}
+			},
+			password: data.password,
+			friendsProfileId: [],
+			achievements: [],
+			statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+			statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
+		};
+		this.user.push(newUser);
+		const	response: UserRegisterResponseModel = {
+			message: "Your session has been created, you must loggin",
+			token: newUser.authService.token,
+			id: newUser.id,
+			email: newUser.email,
+			statusCode: newUser.retStatus,
+			username: newUser.username,
+			login: newUser.login,
+			firstName: newUser.firstName,
+			lastName: newUser.lastName,
+			avatar: newUser.avatar,
+			ftAvatar: newUser.ftAvatar
+		};
+		return (
+		{
+			res: response,
+			toDB: newUser
+		});
+	}
 
 public	register(data: UserModel)
 : {res: UserRegisterResponseModel, toDB: UserModel}
@@ -926,6 +929,7 @@ public	register(data: UserModel)
 		if (index !== -1)
 			this.user.splice(index, 1);
 	}
+	const fileCfg = new FileConfig();
 	const newUser : UserModel= {
 		registrationStarted: true,
 		registrationProcessEnded: false,
@@ -970,8 +974,10 @@ public	register(data: UserModel)
 		},
 		password: data.password,
 		friendsProfileId: [],
-		achievements: []
+		achievements: [],
 		// tokenSecret: secretToken
+		statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+		statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 	};
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
@@ -1470,7 +1476,9 @@ public	register(data: UserModel)
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
 			achievements: [],
-			revokedConnectionRequest: user.revokedConnectionRequest
+			revokedConnectionRequest: user.revokedConnectionRequest,
+			statusChatIcon: user.statusChatIcon,
+			statusGameIcon: user.statusGameIcon
 		};
 		const	toDB = JSON.stringify(objToDB);
 		return (objToDB);
@@ -1513,7 +1521,9 @@ public	register(data: UserModel)
 			},
 			password: data.password,
 			friendsProfileId: [...data.friendsProfileId],
-			achievements: [...data.achievements]
+			achievements: [...data.achievements],
+			statusChatIcon: data.statusChatIcon,
+			statusGameIcon: data.statusGameIcon
 		};
 		this.user.push(toObj);
 	}

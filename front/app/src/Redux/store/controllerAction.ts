@@ -1523,7 +1523,9 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 			id: user.id,
 			profileId: user.profileId,
 			online: online,
-			status: online ? "online" : "offline"
+			status: online ? "online" : "offline",
+			statusChat: user.statusChat,
+			statusPong: user.statusPong,
 		}
 		if (online)
 		{

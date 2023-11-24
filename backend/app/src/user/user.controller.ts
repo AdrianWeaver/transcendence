@@ -247,6 +247,7 @@ export class UserController
 					}
 					else
 					{
+						const fileCfg = new FileConfig();
 						console.log("ICI  655656?");
 						userObject = {
 							registrationProcessEnded: false,
@@ -283,7 +284,9 @@ export class UserController
 							},
 							password: "undefined",
 							friendsProfileId: [],
-							achievements: []
+							achievements: [],
+							statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+							statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
@@ -340,6 +343,7 @@ export class UserController
 		profileId = Math.floor((Math.random() * 100000) + 1);
 		while (!this.userService.isProfileIDUnique(profileId))
 			profileId = Math.floor((Math.random() * 100000) + 1);
+		const	fileCfg = new FileConfig();
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
 			registrationStarted: true,
@@ -391,7 +395,9 @@ export class UserController
 			},
 			password: "undefined",
 			friendsProfileId: [],
-			achievements: []
+			achievements: [],
+			statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+			statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 		};
 		if (this.userService.getUserById(userObject.id) !== undefined)
 		{
@@ -1035,7 +1041,7 @@ export class UserController
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
 		playing = false;
-		this.chatService.updateStatus(this.gameService);
+		// this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
 		const	chatUsers: any[] = [];
 		console.log("user-playing", req.user.id);
