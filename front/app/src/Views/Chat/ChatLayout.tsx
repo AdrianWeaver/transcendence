@@ -34,7 +34,7 @@ import Myself from "./components/Myself";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
-import nodeCrypto from "crypto";
+// import { v4 as uuidv4 } from "uuid";
 import
 {
 	CSSProperties,

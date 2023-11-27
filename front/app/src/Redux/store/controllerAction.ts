@@ -1321,39 +1321,6 @@ export const	setNewToken = (newToken: string)
 	});
 }
 
-// export const	decodePassword = (username: string, password: string)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return (async (dispatch, getState) =>
-// 	{
-// 		const	prev = getState();
-// 		try
-// 		{
-// 			const	data = await UserServices.decodePassword(
-// 				prev.controller.user.bearerToken,
-// 				password, username,
-// 				prev.server.uri
-// 			);
-// 			const	newUser = {...prev.controller.allFrontUsers[data.index]};
-
-// 			newUser.bearerToken = data.token;
-// 			// newUser.isLoggedIn = true;
-
-// 			const	response: ControllerModel =	{
-// 				...prev.controller,
-// 				user: newUser
-// 			}
-// 			dispatch(controllerActions.setUserData(response));
-// 			// dispatch(controllerActions.setNewToken(response));
-// 		}
-// 		catch (error)
-// 		{
-// 			dispatch(controllerActions.setUserData({...prev.controller}))
-// 			return ;
-// 		}
-// 	});
-// }
-
 export const	addUserAsFriend = (friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -1364,7 +1331,6 @@ export const	addUserAsFriend = (friendId: string)
 			friendId, prev.server.uri)
 		if (data === "ERROR")
 			return ;
-		console.log("DATA ", data);
 		if (data === "success")
 		{
 			const	newFriend = {
@@ -1393,33 +1359,6 @@ export const	addUserAsFriend = (friendId: string)
 	});
 }
 
-// export const	addFrontUser = (user: UserModel)
-// : ThunkAction<void, RootState, unknown, AnyAction> =>
-// {
-// 	return (async (dispatch, getState) =>
-// 	{
-// 		const	prev = getState();
-
-// 		const	array = prev.controller.allFrontUsers.map((elem) =>
-// 		{
-// 			return (Object.assign(elem));
-// 		});
-// 		const	index = array.findIndex((elem) =>
-// 		{
-// 			return (elem.id === user.id);
-// 		});
-// 		if (index === -1)
-// 			array.push(user);
-// 		else
-// 			array[index] = user;
-// 		const	response: ControllerModel = {
-// 			...prev.controller,
-// 			allFrontUsers: array
-// 		}
-// 		dispatch(controllerActions.addFrontUser(response));
-// 	});
-// }
-
 export const	setOnline = (online: boolean, user: UserModel)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
@@ -1437,8 +1376,6 @@ export const	setOnline = (online: boolean, user: UserModel)
 		});
 		if (index === -1)
 			return ;
-		// else
-		// 	array[index].online = online;
 		let nextIndex = index + 1;
 		const newUsers = [
 			// Items before the insertion point:

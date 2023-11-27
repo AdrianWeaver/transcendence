@@ -357,7 +357,6 @@ const	UserServices = {
 			.post("user/add-friend", data, config)
 			.then((_data) =>
 			{
-				console.log("DATA ADD FIEND", _data.data);
 				return (_data.data);
 			})
 			.catch((_error) =>
