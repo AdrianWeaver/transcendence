@@ -34,7 +34,7 @@ import Myself from "./components/Myself";
 import SendIcon from "@mui/icons-material/Send";
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useTheme } from "@emotion/react";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import
 {
 	CSSProperties,
@@ -69,6 +69,9 @@ import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
 import BadgeAvatars from "./components/BadgeAvatars";
 
+// import {randomUUID} from 'node:crypto';
+// window.crypto.randomUUID = randomUUID;
+// console.error = () => { };
 type MessageModel =
 {
 	sender: string,
@@ -245,7 +248,7 @@ const FriendsList = (props: FriendsListProps) =>
 						
 						return (
 							(elem.profileId.toString() !== user.id.toString() && users[index] )
-							?	<div key={crypto.randomUUID()} onClick={() =>
+							?	<div key={uuidv4()} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
@@ -344,7 +347,7 @@ const UsersList = (props: UsersListProps) =>
 						
 						return (
 							(elem.profileId.toString() !== user.id.toString() && users[index] )
-							?	<div key={crypto.randomUUID()} onClick={() =>
+							?	<div key={uuidv4()} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
@@ -399,6 +402,11 @@ const a11yProps = (index: any) =>
 			"aria-controls": `action-tabpanel-${index}`,
 		}
 	);
+};
+
+type	ActionSocket = {
+	type: string,
+	payload?: any
 };
 
 const	ChatLayout = () =>
@@ -954,7 +962,7 @@ const	ChatLayout = () =>
 			}
 		};
 
-		const	channelInfo = (data: any) =>
+		const	channelInfo = (data: ActionSocket) =>
 		{
 			if (data.type === "confirm-is-inside-channel")
 			{
@@ -963,13 +971,13 @@ const	ChatLayout = () =>
 					dispatch(setCurrentChannel(data.payload.chanName));
 					if (data.payload.kind === "channel")
 					{
-						const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
-						{
-							return (!blockedListRef.current.includes(message.sender));
-						});
-						setChanMessages(filteredMessages);
-						goToChannel(data.payload.chanName, "channel", false);
-						// chanMessageTest = data.payload.chanMessage;
+							const	filteredMessages = data.payload.chanMessages.filter((message: MessageModel) =>
+							{
+								return (!blockedListRef.current.includes(message.sender));
+							});
+							setChanMessages(filteredMessages);
+							goToChannel(data.payload.chanName, "channel", false);
+							// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage")
 					{
@@ -1006,8 +1014,11 @@ const	ChatLayout = () =>
 
 			if (data.type === "on-connection")
 			{
-				if (data.payload.blockedList !== "")
-					setBlockedList(data.payload.blockedList);
+				if (data.payload)
+				{
+					const list: string[] = data.payload.blockedList;
+					setBlockedList(list);
+				}
 				refreshListUser();
 			}
 
@@ -1048,20 +1059,20 @@ const	ChatLayout = () =>
 		{
 			if (data.type === "add-friend")
 			{
-				if (data.payload.alreadyFriend !== "")
-				{
-					alert("ALERT" + data.payload.alreadyFriend);
-				}
-				else
-				{
-					setFriendList(data.payload.friendList);
-					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
-					// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
-					dispatch(setCurrentProfile(data.payload.friendProfileId));
-					dispatch(setCurrentProfileIsFriend(true));
-					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-					alert(alertMessage);
-				}
+				// if (data.payload.alreadyFriend !== "")
+				// {
+				// 	alert("ALERT" + data.payload.alreadyFriend);
+				// }
+				// else
+				// {
+				// 	setFriendList(data.payload.friendList);
+				// 	dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
+				// 	// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
+				// 	dispatch(setCurrentProfile(data.payload.friendProfileId));
+				// 	dispatch(setCurrentProfileIsFriend(true));
+				// 	const	alertMessage = data.payload.newFriend + " has been added to Friends.";
+				// 	alert(alertMessage);
+				// }
 			}
 
 			if (data.type === "block-user")

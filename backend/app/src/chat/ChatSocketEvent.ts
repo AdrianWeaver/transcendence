@@ -170,7 +170,6 @@ export class ChatSocketEvents
 						this.chatService.pushUser(newUser, client.id);
 						const	action = {
 							type: "on-connection",
-							payload: "",
 						};
 						this.server.emit("channel-info", action);
 					}
@@ -222,9 +221,8 @@ export class ChatSocketEvents
 						client.emit("channel-info", action);
 					}
 					this.chatService.updateDatabase();
-					const	newAction = {
+					const	newAction: ActionSocket = {
 						type: "on-connection",
-						payload: "",
 					};
 					this.server.emit("channel-info", newAction);
 				}
