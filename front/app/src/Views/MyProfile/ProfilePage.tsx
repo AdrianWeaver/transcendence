@@ -3,13 +3,14 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Grid } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { addUserAsFriend } from "../../Redux/store/controllerAction";
 import { useEffect } from "react";
-import { getAchievements } from "../../Redux/store/controllerAction";
+import { FriendsDataModel } from "../../Redux/models/redux-models";
 
 const	ProfilePage = () =>
 {
@@ -22,29 +23,39 @@ const	ProfilePage = () =>
 	{
 		return (state.controller.user);
 	});
-	const	controller = useAppSelector((state) =>
-	{
-		return (state.controller);
-	});
 	const	currentProfile = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
-	// if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);
 	});
-	useEffect(() =>
+	let		online, status;
+	if (userSelected !== undefined)
 	{
-		if (userSelected)
-			dispatch(getAchievements(userSelected.profileId));
-		console.log("ptofile achivement", controller.achievements );
-	});
-	// if (userSelected === undefined)
-	// 	throw new Error("user profile doesnt exist");
-	const	online = userSelected?.online ? "online 🟢" : "offline 🔴";
-	const	status = userSelected?.status === "playing" ? "playing... 🏓" : online;
+		online = userSelected.online ? "online 🟢" : "offline 🔴";
+		status = userSelected.status === "playing" ? "playing... 🏓" : online;
+	}
+	const	addAsFriend = () =>
+	{
+		if (userSelected && !isFriend)
+			dispatch(addUserAsFriend(userSelected.profileId));
+		console.log("friends", user.chat.friends, "isFriend", isFriend);
+	}
+	let	isFriend: boolean;
+	isFriend = false;
+	if (user.chat.friends)
+	{	const	searchFriend = user.chat.friends.find((elem) =>
+		{
+			return (elem.profileIdFriend.toString() === userSelected?.profileId.toString()
+				&& elem.profileIdOwner.toString() === user.id.toString());
+		})
+		if (searchFriend)
+			isFriend = true;
+		else
+			isFriend = false;
+	}
 	return (
 		<>
 			<MenuBar />
@@ -59,7 +70,7 @@ const	ProfilePage = () =>
 									defaultUrl="https://thispersondoesnotexist.com/"
 									prevPage={prevPage}
 									isMe={false}
-									isFriend={user.chat.currentProfileIsFriend}
+									isFriend={isFriend}
 									profileId={userSelected?.profileId}
 								/>
 						</Grid>
@@ -69,6 +80,11 @@ const	ProfilePage = () =>
 									isMe={false}
 									/>
 						</Grid>
+							{
+								(!isFriend)
+								? <Button onClick={addAsFriend}>ADD AS FRIEND</Button>
+								: <></>
+							}
 					</Grid>
 				</div>
 			}

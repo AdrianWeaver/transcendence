@@ -1302,9 +1302,17 @@ public	register(data: UserModel)
 		if (searchFriendIndex === -1)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
-		this.user[searchUserIndex].friendsProfileId.push(friendId);
+		const	isFriend = this.user[searchUserIndex].friendsProfileId.find((elem) =>
+		{
+			return (elem === friendId);
+		});
+		if (isFriend === undefined)
+			this.user[searchUserIndex].friendsProfileId.push(friendId);
+		else
+			return ("already friends");
 		this.updateUserToDatabase(this.user[searchUserIndex]);
-		return (searchFriend.username + " added as friend");
+	
+		return ("success");
 	}
 
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
@@ -1345,37 +1353,37 @@ public	register(data: UserModel)
 	}
 
 	public	addFriends(myProfileId: any, targetProfileId: any)
-		: string
+	: any
+{
+	const	myUserIndex = this.user.findIndex((user) =>
 	{
-		const	myUserIndex = this.user.findIndex((user) =>
+		return (user.id.toString() === myProfileId.toString());
+	});
+	const	targetUserIndex = this.user.findIndex((user) =>
+	{
+		return (user.id.toString() === targetProfileId.toString());
+	});
+	if (myUserIndex === -1 || targetUserIndex === -1)
+		return ("ERROR");
+	else
+	{
+		const findProfileIndex = this.user[myUserIndex]
+			.friendsProfileId
+			.findIndex((elem) =>
+			{
+				return (elem === targetProfileId.toString());
+			});
+		if (findProfileIndex === -1)
 		{
-			return (user.id.toString() === myProfileId.toString());
-		});
-		const	targetUserIndex = this.user.findIndex((user) =>
-		{
-			return (user.id.toString() === targetProfileId.toString());
-		});
-		if (myUserIndex === -1 || targetUserIndex === -1)
-			return ("ERROR");
+			this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
+		}
 		else
 		{
-			const findProfileIndex = this.user[myUserIndex]
-				.friendsProfileId
-				.findIndex((elem) =>
-				{
-					return (elem === targetProfileId.toString());
-				});
-			if (findProfileIndex === -1)
-			{
-				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
-			}
-			else
-			{
-				return ("ALREADY_FRIENDS");
-			}
+			return ("ALREADY_FRIENDS");
 		}
-		return ("SUCCESS");
 	}
+	return ("SUCCESS");
+}
 
 	public	getFriendsProfileId(myProfileId: any)
 	: Array<string>

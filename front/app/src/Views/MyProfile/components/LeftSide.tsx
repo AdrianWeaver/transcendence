@@ -14,7 +14,7 @@ import { BackUserModel, ChatUserModel } from "../../../Redux/models/redux-models
 
 type	LeftSideProps =
 {
-	status: string,
+	status: string | undefined,
 	pseudo: string | undefined,
 	imageUrl: string | undefined,
 	defaultUrl: string,

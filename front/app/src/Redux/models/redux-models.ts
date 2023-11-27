@@ -44,6 +44,13 @@ export interface BackUserModel
 	location: string;
 	online: boolean;
 	status: string;
+	date: string;
+}
+
+export interface FriendsDataModel
+{
+	"profileIdOwner": string;
+	"profileIdFriend": string;
 }
 
 export interface ChatModel
@@ -64,8 +71,9 @@ export interface ChatModel
 	"numberOfChannels": number,
 	"connectedUsers": ChatUserModel[],
 	"disconnectedUsers": ChatUserModel[],
-	"currentProfile": string;
-	"currentProfileIsFriend": boolean;
+	"currentProfile": string,
+	"currentProfileIsFriend": boolean,
+	"friends": FriendsDataModel[]
 }
 
 export interface	ProfileModel
