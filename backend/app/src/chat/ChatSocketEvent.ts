@@ -607,7 +607,7 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				// this.logger.error("The client send a message", data);
+				// this.logger.error("Client sends a message", data);
 				this.handleInfoSentMessage(client, data);
 			}
 

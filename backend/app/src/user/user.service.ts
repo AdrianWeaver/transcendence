@@ -185,7 +185,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			})
 			.then(() =>
 			{
-				this.logger.error("user succesfully created ");
+				this.logger.verbose("user succesfully created ");
 				return ("SUCCESS");
 			})
 			.catch((error: any) =>
@@ -219,7 +219,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			)
 			.then(() =>
 			{
-				this.logger.error("user succesfully created ");
+				this.logger.verbose("user succesfully created ");
 				return ("SUCCESS");
 			})
 			.catch((error: any) =>
@@ -332,7 +332,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	public	triggerShutDown(stringReason: string)
 	{
-		this.logger.error("Server will shuting down reason: " + stringReason);
+		this.logger.error("Server will be shuting down reason: " + stringReason);
 		this.shutdown$.next(stringReason);
 	}
 
@@ -372,7 +372,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			if (error)
 				this.logger.error("You need to check files and directory permission X and  W");
 			else
-				this.logger.verbose("The path for public storage is okay and accessible");
+				this.logger.verbose("Public storage path is OK and reachable");
 		});
 	}
 
@@ -415,7 +415,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				const requestedCmp = await JSON.parse(actualServerCfg.serialize());
 				if (compareFromDB === requestedCmp)
 				{
-					this.logger.error("Permalink already set but environnement changing");
+					this.logger.error("Permalink already set but environnement is changing");
 					return (false);
 				}
 				this.logger.warn("Permalinks already set, must not change until drop table");
