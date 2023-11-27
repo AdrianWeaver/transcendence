@@ -35,7 +35,6 @@ export class	NodeAnimationFrame
 		{
 			if (this.callbackFunction === null)
 			{
-				console.log("Error: no callback function provided");
 				return ;
 			}
 			if (this.game)
