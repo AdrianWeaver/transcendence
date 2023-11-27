@@ -239,7 +239,7 @@ export class UserController
 					const userTempCheck: UserModel | undefined = this.userService.getUserById(data.id);
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
-						this.logger.error("User Already register");
+						this.logger.error("User Already registered");
 						res.status(200).send("already registered");
 					}
 					else

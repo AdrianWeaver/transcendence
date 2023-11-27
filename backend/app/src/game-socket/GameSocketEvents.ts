@@ -746,7 +746,7 @@ export class GameSocketEvents
 				roomName = await this.dispatchMatchmakingUpsideDown(profileId, client);
 				break ;
 			default:
-				this.logger.error("Oups !!!");
+				this.logger.error("Oops !!!");
 				break;
 		}
 		if (roomName === "The void")
@@ -821,7 +821,7 @@ export class GameSocketEvents
 
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
-			this.logger.error("game instance not fouded for disconnect user");
+			this.logger.error("game instance not found for disconnect user");
 		const	instance = this.gameService.gameInstances[indexInstance];
 		if (instance.playerOne.socketId === client.id)
 		{
