@@ -9,13 +9,15 @@ import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import EditProfile from "./components/EditProfile";
 import UpdateMyProfilePicture from "../../Component/DropZoneImage/UpdateMyProfilePicture";
+import { getAchievements } from "../../Redux/store/controllerAction";
 
 const	MyProfile = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
 	const	prevPage= useAppSelector((state) =>
 	{
 		return (state.controller.previousPage);
@@ -27,8 +29,11 @@ const	MyProfile = () =>
 
 	useEffect(() =>
 	{
+		dispatch(getAchievements("myself"));
 		if (user.profile.editView)
+		{
 			savePrevPage("/me/profile");
+		}
 	});
 
 	return (

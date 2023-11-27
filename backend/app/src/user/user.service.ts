@@ -458,9 +458,24 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		}
 	}
 
-	public getAllUserRaw () : Array<UserModel>
+	public getAllUserRaw () : Array<BackUserModel>
 	{
-		return (this.user);
+		const	newUsers: BackUserModel[] = [];
+		this.user.map((elem) =>
+		{
+			const	user: BackUserModel = {
+				username: elem.username,
+				id: elem.id.toString(),
+				firstName: elem.firstName,
+				lastName: elem.lastName,
+				avatar: elem.avatar,
+				location: elem.location,
+				status: elem.status,
+				online: elem.online
+			}
+			newUsers.push(user);
+		});
+		return (newUsers);
 	}
 
 	public	getUuidInstance(): string
@@ -480,15 +495,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			const	user = {
 				id: elem.id,
-				email: elem.email,
 				username: elem.username,
 				firstName: elem.firstName,
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
-				ipAddress: elem.authService.doubleAuth.lastIpClient,
-				doubleAuth: elem.authService.doubleAuth.enable,
-				token: elem.authService.token
+				online: elem.online,
+				status: elem.status
 			};
 			users.push(user);
 		});
@@ -879,16 +892,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
 			message: "Your session has been created, you must loggin",
-			token: newUser.authService.token,
 			id: newUser.id,
-			email: newUser.email,
-			statusCode: newUser.retStatus,
 			username: newUser.username,
 			login: newUser.login,
 			firstName: newUser.firstName,
 			lastName: newUser.lastName,
 			avatar: newUser.avatar,
-			ftAvatar: newUser.ftAvatar
+			location: newUser.location,
+			date: newUser.date,
+			email: newUser.email,
+			token: newUser.authService.token
 		};
 		return (
 		{
@@ -966,16 +979,16 @@ public	register(data: UserModel)
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
 		message: "Your session has been created, you must loggin",
-		token: newUser.authService.token,
 		id: newUser.id,
-		email: newUser.email,
-		statusCode: newUser.retStatus,
 		username: newUser.username,
 		login: newUser.login,
 		firstName: newUser.firstName,
 		lastName: newUser.lastName,
 		avatar: newUser.avatar,
-		ftAvatar: newUser.ftAvatar
+		date: newUser.date,
+		location: newUser.location,
+		email: newUser.email,
+		token: newUser.authService.token
 	};
 	return (
 	{
@@ -1289,9 +1302,17 @@ public	register(data: UserModel)
 		if (searchFriendIndex === -1)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
-		this.user[searchUserIndex].friendsProfileId.push(friendId);
+		const	isFriend = this.user[searchUserIndex].friendsProfileId.find((elem) =>
+		{
+			return (elem === friendId);
+		});
+		if (isFriend === undefined)
+			this.user[searchUserIndex].friendsProfileId.push(friendId);
+		else
+			return ("already friends");
 		this.updateUserToDatabase(this.user[searchUserIndex]);
-		return (searchFriend.username + " added as friend");
+	
+		return ("success");
 	}
 
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
@@ -1332,37 +1353,37 @@ public	register(data: UserModel)
 	}
 
 	public	addFriends(myProfileId: any, targetProfileId: any)
-		: string
+	: any
+{
+	const	myUserIndex = this.user.findIndex((user) =>
 	{
-		const	myUserIndex = this.user.findIndex((user) =>
+		return (user.id.toString() === myProfileId.toString());
+	});
+	const	targetUserIndex = this.user.findIndex((user) =>
+	{
+		return (user.id.toString() === targetProfileId.toString());
+	});
+	if (myUserIndex === -1 || targetUserIndex === -1)
+		return ("ERROR");
+	else
+	{
+		const findProfileIndex = this.user[myUserIndex]
+			.friendsProfileId
+			.findIndex((elem) =>
+			{
+				return (elem === targetProfileId.toString());
+			});
+		if (findProfileIndex === -1)
 		{
-			return (user.id.toString() === myProfileId.toString());
-		});
-		const	targetUserIndex = this.user.findIndex((user) =>
-		{
-			return (user.id.toString() === targetProfileId.toString());
-		});
-		if (myUserIndex === -1 || targetUserIndex === -1)
-			return ("ERROR");
+			this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
+		}
 		else
 		{
-			const findProfileIndex = this.user[myUserIndex]
-				.friendsProfileId
-				.findIndex((elem) =>
-				{
-					return (elem === targetProfileId.toString());
-				});
-			if (findProfileIndex === -1)
-			{
-				this.user[myUserIndex].friendsProfileId.push(targetProfileId.toString());
-			}
-			else
-			{
-				return ("ALREADY_FRIENDS");
-			}
+			return ("ALREADY_FRIENDS");
 		}
-		return ("SUCCESS");
 	}
+	return ("SUCCESS");
+}
 
 	public	getFriendsProfileId(myProfileId: any)
 	: Array<string>
@@ -1452,7 +1473,7 @@ public	register(data: UserModel)
 			},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
-			achievements: [],
+			achievements: [...user.achievements],
 			revokedConnectionRequest: user.revokedConnectionRequest,
 			statusChatIcon: user.statusChatIcon,
 			statusGameIcon: user.statusGameIcon
@@ -1528,6 +1549,7 @@ public	register(data: UserModel)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
 		this.user[index].registrationStarted = false;
+		this.user[index].achievements.push("You're a part of our transcendence ! [You registered our site]");
 		this.updateUserToDatabase(this.user[index]);
 		return (true);
 	}

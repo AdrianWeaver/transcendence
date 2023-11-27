@@ -15,7 +15,7 @@ export const	initialControllerState: ControllerModel = {
 	themeMode: "light",
 	previousPage: "/",
 	allUsers: [],
-	// allFrontUsers: [],
+	achievements: [],
 	user:
 	{
 		isLoggedIn: false,
@@ -84,7 +84,8 @@ export const	initialControllerState: ControllerModel = {
 			connectedUsers: [],
 			disconnectedUsers: [],
 			currentProfile: "",
-			currentProfileIsFriend: false
+			currentProfileIsFriend: false,
+			friends: []
 		},
 		profile: {
 			editView: false,
@@ -208,6 +209,7 @@ const	controllerSlice = createSlice(
 		setChatUsers(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
+			state.user.chat.friends = action.payload.user.chat.friends;
 		},
 		setActiveConversationId(state, action: PayloadAction<ControllerModel>)
 		{
@@ -430,6 +432,7 @@ const	controllerSlice = createSlice(
 		setAchievements(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.achievements = action.payload.user.achievements;
+			state.achievements = action.payload.achievements;
 		},
 		setUserBackFromDB(state, action: PayloadAction<ControllerModel>)
 		{
@@ -457,7 +460,7 @@ const	controllerSlice = createSlice(
 			state.myStats = action.payload.myStats;
 			state.themeMode = action.payload.themeMode;
 			state.user = action.payload.user;
-		}
+		},
 	}
 });
 

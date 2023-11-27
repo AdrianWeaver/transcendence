@@ -11,6 +11,7 @@ import {
 	useAppSelector } from "../../../Redux/hooks/redux-hooks";
 import {
 	GetValidationCode,
+	getAchievements,
 	receiveValidationCode,
 	registerNumberForDoubleAuth,
 	setAllUsers,
@@ -111,6 +112,7 @@ const	SecondStepFormContent = () =>
 			dispatch(setStatus("online", user));
 			dispatch(setAvatar(user.avatar));
 			dispatch(setAllUsers());
+			dispatch(getAchievements("myself"));
 			navigate("/");
 		}
 	};

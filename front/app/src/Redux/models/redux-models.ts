@@ -42,7 +42,15 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
-	// doubleAuth: boolean;
+	online: boolean;
+	status: string;
+	date: string;
+}
+
+export interface FriendsDataModel
+{
+	"profileIdOwner": string;
+	"profileIdFriend": string;
 }
 
 export interface ChatModel
@@ -63,8 +71,9 @@ export interface ChatModel
 	"numberOfChannels": number,
 	"connectedUsers": ChatUserModel[],
 	"disconnectedUsers": ChatUserModel[],
-	"currentProfile": string;
-	"currentProfileIsFriend": boolean;
+	"currentProfile": string,
+	"currentProfileIsFriend": boolean,
+	"friends": FriendsDataModel[]
 }
 
 export interface	ProfileModel
@@ -180,7 +189,6 @@ export interface	CanvasModel
 export interface	ControllerModel
 {
 	"allUsers": BackUserModel[],
-	// "allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,
@@ -188,7 +196,8 @@ export interface	ControllerModel
 	"registration": RegistrationProcessModel,
 	"canvas": CanvasModel,
 	"myStats": any[],
-	"stats": any[]
+	"stats": any[],
+	"achievements": string[]
 }
 
 export interface	Dimension

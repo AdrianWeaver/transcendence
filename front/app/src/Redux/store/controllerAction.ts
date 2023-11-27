@@ -1007,6 +1007,24 @@ export const	setAvatar = (data: string)
 	return ((dispatch, getState) =>
 	{
 		const	prev = getState();
+		const	index = prev.controller.allUsers.findIndex((elem) =>
+		{
+			return (elem.id.toString() === prev.controller.user.id.toString());
+		})
+		if (index !== -1)
+		{
+			const	user: BackUserModel = {
+				username: prev.controller.allUsers[index].username,
+				firstName: prev.controller.allUsers[index].firstName,
+				lastName: prev.controller.allUsers[index].lastName,
+				location: prev.controller.allUsers[index].username,
+				id: prev.controller.allUsers[index].id,
+				online: prev.controller.allUsers[index].online,
+				status: prev.controller.allUsers[index].status,
+				avatar: prev.controller.allUsers[index].avatar,
+				date: prev.controller.allUsers[index].date
+			}
+		}
 		const	array: BackUserModel[] = prev.controller.allUsers.map((elem) =>
 		{
 			return (Object.assign(elem));
@@ -1337,22 +1355,42 @@ export const	setNewToken = (newToken: string)
 // 	});
 // }
 
-export const	addUserAsFriend = (myId: string, friendId: string)
+export const	addUserAsFriend = (friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.uri, myId)
-		.then((_data) =>
+		const	data = await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
+			friendId, prev.server.uri)
+		if (data === "ERROR")
+			return ;
+		console.log("DATA ", data);
+		if (data === "success")
 		{
-		})
-		.catch((error) =>
-		{
-			console.error(error);
-		});
-		// dispatch update friends that we dont have yet
+			const	newFriend = {
+				profileIdOwner: prev.controller.user.id.toString(),
+				profileIdFriend: friendId.toString()
+			}
+			const	newFriends = prev.controller.user.chat.friends.map((elem) =>
+			{
+				return (elem);
+			});
+			newFriends.push(newFriend);
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					chat:
+					{
+						...prev.controller.user.chat,
+						friends: newFriends
+					}
+				}
+			}
+			dispatch(controllerActions.setChatUsers(response));
+		}
 	});
 }
 
@@ -1766,13 +1804,21 @@ export const	getAchievements = (profileId: string)
 		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	data = await UserServices.getAchievements(token, uri, profileId);
-		if (data.length)
+		console.log("data get achi", data);
+		if (data.length && data !== "no achievements")
 		{
+			const	tmp: string[] = [];
+			data.map((elem: string) =>
+			{
+				tmp.push(elem);
+			})
+			console.log("TMP", tmp);
 			const	response: ControllerModel = {
 				...prev.controller,
+				achievements: [...tmp],
 				user: {
 					...prev.controller.user,
-					achievements: data.achievements
+					achievements: [...tmp]
 				}
 			}
 			dispatch(controllerActions.setAchievements(response));

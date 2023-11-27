@@ -448,7 +448,6 @@ export class UserController
 			res.status(200).send("ok");
 		else
 			res.status(401).send("Not ok");
-		// 
 	}
 
 
@@ -817,19 +816,16 @@ export class UserController
 
 	@Post("add-friend")
 	@UseGuards(UserAuthorizationGuard)
-	AddFriend(
+	async AddFriend(
 		@Body() body: any,
 		@Req()	req: any
 	)
 	{
-		// console
 		this.logger
 			.log("'add-friend' route requested");
-		if (req.user.id !== body.id)
-			throw new ForbiddenException();
-		return (this.userService.addUserAsFriend(body.friendId, body.myId));
+		return (await this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
-
+	
 	@Post("/my-stats")
 	@UseGuards(UserAuthorizationGuard)
 	getMyStats(@Req() req: any)
@@ -1027,9 +1023,15 @@ export class UserController
 	@Post("/get-achievements")
 	@UseGuards(UserAuthorizationGuard)
 	getAchievements(
-		@Body() body: any)
+		@Body() body: any,
+		@Req() req: any)
 	{
-		const	res = this.userService.getAchievements(body.id);
+		let	res;
+		if (body.id === "myself")
+			res = this.userService.getAchievements(req.user.id);
+		else
+			res = this.userService.getAchievements(body.id);
+		console.log("ICI ACHIEVEMENTS", res);
 		return (res);
 	}
 }
