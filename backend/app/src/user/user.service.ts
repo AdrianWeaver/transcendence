@@ -250,7 +250,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				if (data)
 				{
 					const	content = JSON.parse(data.contents);
-					// console.log("content ", content);
 					const	update = this.prepareUserForDB(user.id);
 					this.prismaService.prisma
 						.userJson
@@ -287,9 +286,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						});
 				}
 			})
-			.catch((error) =>
+			.catch((_error) =>
 			{
-				console.log("error create entry", error);
 			});
 	}
 
@@ -311,14 +309,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						// // TEST at home, I need to do this:
 						// const stringObj = JSON.parse(elem.contents);
 						// const	rawObj = JSON.parse(stringObj);
-						// console.log("rawObj user", rawObj);
 						this.databaseToObject(rawObj);
 					});
 				}
 			})
-			.catch((error: any) =>
+			.catch((_error: any) =>
 			{
-				console.log(error);
 			});
 	}
 
@@ -383,7 +379,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private async isHavingPreviousPermalinks(actualServerCfg: ServerConfig): Promise<boolean>
 	{
 		const	permalinkVersion = "prod-v2";
-		// console.log(prisma.permalinks);
 		try
 		{
 			const permalinks = await this.prismaService.prisma.permalinks.findUnique(
@@ -417,9 +412,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			else
 			{
 				const compareFromDB = await JSON.parse(permalinks.contents);
-				// console.log(compareFromDB);
 				const requestedCmp = await JSON.parse(actualServerCfg.serialize());
-				// console.log(requestedCmp);
 				if (compareFromDB === requestedCmp)
 				{
 					this.logger.error("Permalink already set but environnement changing");
@@ -439,10 +432,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	async checkPermalinks()
 	{
 		const test = new ServerConfig();
-		this.logger.verbose("Permalinks verifications from environement:");
-		this.logger.verbose("Location: " + test.location);
-		this.logger.verbose("Protocol: " + test.protocol);
-		this.logger.verbose("Port: " + test.port);
 		if (!test.port || !test.location || !test.protocol)
 		{
 			this.logger.error("Production file must have server config environnement");
@@ -467,7 +456,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			// 		this.logger.error(error);
 			// 	});
 		}
-		this.logger.verbose("Permalinks check ending");
 	}
 
 	public getAllUserRaw () : Array<UserModel>
@@ -689,7 +677,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			const	imagePng = sharp(oldTmpFilePath);
 			const	metadata = await imagePng.metadata();
-			// console.log(metadata);
 			const	outputBuffer = await imagePng.jpeg().toBuffer();
 			fs.writeFileSync(destTmpFilePath, outputBuffer);
 		}
@@ -720,7 +707,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			const	image = sharp(filecfg.getPathTmpConverted());
 
 			const	metadata = await image.metadata();
-			// console.log(metadata);
 			if (metadata.height === metadata.width
 				|| metadata.width === undefined
 				|| metadata.height === undefined)
@@ -785,7 +771,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	: Promise<UserModel>
 	{
 		fileCfg.setPictureConfig(this.getConfig());
-		// console.log(this.getConfig());
 		if (fileCfg.needConvertToJPEG())
 		{
 			try
@@ -794,9 +779,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				await this.deletePicture(fileCfg.fullPath());
 				await this.resizeAllUploadedPictures(fileCfg);
 			}
-			catch (error)
+			catch (_error)
 			{
-				this.logger.error(error);
 			}
 		}
 		else
@@ -1012,9 +996,7 @@ public	register(data: UserModel)
 		else
 		{
 			this.logger.verbose("User found... checkin password");
-			console.log("user ", searchUser);
 			const	valid = await bcrypt.compare(password, searchUser.password);
-			console.log("Value of session validity: ", valid);
 			if (valid === false)
 			{
 				throw new ForbiddenException("Invalid credential");
@@ -1227,18 +1209,15 @@ public	register(data: UserModel)
 
 	async	decodePassword(password: string, username: string)
 	{
-		console.log("usrname ???", username);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (elem.username === username);
 		});
 		if (index === -1)
 			return ("ERROR");
-		console.log(password, " ", this.user[index].password);
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
 		{
-			console.log("email ? ", this.user[index].email);
 			const ret =	{
 				token: "Bearer " + jwt.sign(
 				{
@@ -1254,18 +1233,14 @@ public	register(data: UserModel)
 			};
 			if (ret === undefined)
 				return ("ERROR");
-			console.log("Token ok");
 			this.user[index].authService.token = ret.token;
 			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
-		.catch((err) =>
+		.catch((_err) =>
 		{
-			console.log("ERROR HERE ?");
-			console.log(err);
 			return ("ERROR");
 		});
-		console.log("valid password ?", valid);
 		return (valid);
 	}
 
@@ -1651,6 +1626,5 @@ public	register(data: UserModel)
 					elem.status = "online";
 			}
 		});
-		console.log("UPDATE STATUS WORKED ?", this.user);
 	}
 }

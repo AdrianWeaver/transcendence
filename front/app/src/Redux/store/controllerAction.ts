@@ -1410,7 +1410,6 @@ export const	setOnline = (online: boolean, user: UserModel)
 			// Items after the insertion point:
 			...array.slice(index)
 		];
-		console.log("NEW USERS", newUsers);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
