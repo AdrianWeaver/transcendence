@@ -882,7 +882,6 @@ const	ChatLayout = () =>
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
-			console.log(friendList);
 		};
 
 		const	updateMessages = (data: any) =>
@@ -891,42 +890,12 @@ const	ChatLayout = () =>
 			setKindOfConversation(kind);
 			if (data.payload.kind === "privateMessage")
 			{
-				for (const blocked of blockedListRef.current)
-				{
-					if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
-					{
-						const newMessage: MessageModel = {
-							sender: "server",
-							message: "You have blocked this user and will not see the messages",
-							id: 0,
-							username: uniqueId,
-						};
-						const	messagesArray: MessageModel[] = [];
-						messagesArray.push(newMessage);
-						setPrivMessages(messagesArray);
-						return ;
-					}
-				}
-			}
-			if (data.payload.chanName === currentChannelRef.current)
-			{
-				// we will filter messages from blocked users if any
-				const	tmpMessages = data.payload.messages;
-				// let filteredMessages: MessageModel[] = [];
-				const	filteredMessages = tmpMessages.filter((message: MessageModel) =>
-				{
-					return (!blockedListRef.current.includes(message.sender));
-				});
-				if (data.payload.kind === "channel")
-				{
-					setChanMessages(filteredMessages);
-				}
-				else
+				if (blockedListRef.current)
 				{
 					for (const blocked of blockedListRef.current)
 					{
 						if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
-						{
+						{	
 							const newMessage: MessageModel = {
 								sender: "server",
 								message: "You have blocked this user and will not see the messages",
@@ -936,6 +905,44 @@ const	ChatLayout = () =>
 							const	messagesArray: MessageModel[] = [];
 							messagesArray.push(newMessage);
 							setPrivMessages(messagesArray);
+							return ;
+						}
+					}
+				}
+			}
+			if (data.payload.chanName === currentChannelRef.current)
+			{
+				// we will filter messages from blocked users if any
+				const	tmpMessages = data.payload.messages;
+				let filteredMessages: MessageModel[] = [];
+	
+				if (blockedListRef.current)
+				{
+					filteredMessages = tmpMessages.filter((message: MessageModel) =>
+					{
+						return (!blockedListRef.current.includes(message.sender));
+					});
+				
+					if (data.payload.kind === "channel")
+					{
+						setChanMessages(filteredMessages);
+					}
+					else
+					{
+						for (const blocked of blockedListRef.current)
+						{
+							if (blocked === data.payload.myProfileId || blocked === data.payload.friendProfileId)
+							{
+								const newMessage: MessageModel = {
+									sender: "server",
+									message: "You have blocked this user and will not see the messages",
+									id: 0,
+									username: uniqueId,
+								};
+								const	messagesArray: MessageModel[] = [];
+								messagesArray.push(newMessage);
+								setPrivMessages(messagesArray);
+							}
 						}
 					}
 				}
