@@ -258,14 +258,13 @@ const FriendsList = (props: FriendsListProps) =>
 										{elem.name}
 									</ListItemText>
 									{
-										// (currentProfileIsFriend)
-										// ?
-										// <ListItemText
-										// 		secondary={status}
-										// 		sx={{ align: "right" }}
-										// ></ListItemText>
-
-										// : <></>
+										(currentProfileIsFriend)
+										? 
+											<ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
+										: <></>		// : <></>
 									}
 								</ListItem>
 							</div>
