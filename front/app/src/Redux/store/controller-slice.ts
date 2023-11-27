@@ -65,6 +65,8 @@ export const	initialControllerState: ControllerModel = {
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				profileId: "undefined",
+				statusChat: "undefined",
+				statusPong: "undefined"
 			}
 			],
 			activeConversationId: "undefined",

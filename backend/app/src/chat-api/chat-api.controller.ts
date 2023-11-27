@@ -15,6 +15,7 @@ export class ChatApiController
 	@Get("chat-data")
 	getChatData()
 	{
+		console.log(this.chatApiService.getChatData());
 		return (this.chatApiService.getChatData());
 	}
 

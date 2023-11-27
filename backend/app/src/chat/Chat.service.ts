@@ -162,6 +162,7 @@ export	class ChatService implements OnModuleInit
 			})
 			.catch(() =>
 			{
+				console.log()
 			});
 	}
 
