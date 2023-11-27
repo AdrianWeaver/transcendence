@@ -141,9 +141,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				}
 			}).then((data: any) =>
 			{
-				this.logger.debug("Next line is for database");
-				this.logger.debug(typeof data);
-				this.logger.debug(data);
+				// this.logger.debug("Next line is for database");
+				// this.logger.debug(typeof data);
+				// this.logger.debug(data);
 				if (data === null)
 				{
 					this.logger.log("data is eq to null");

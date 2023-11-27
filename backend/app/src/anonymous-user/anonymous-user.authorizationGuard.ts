@@ -60,7 +60,7 @@ export	class AuthorizationGuard implements CanActivate
 				console.log("User has tryed to use a wrong token signature");
 				throw new UnauthorizedException();
 			}
-			console.log("Error on Anonymous isValidTokenSignature : ", error);
+			// console.log("Error on Anonymous isValidTokenSignature : ", error);
 			return ({validTokenSignature: false});
 		}
 	}

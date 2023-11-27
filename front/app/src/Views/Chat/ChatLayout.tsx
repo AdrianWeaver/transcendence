@@ -221,7 +221,7 @@ const FriendsList = (props: FriendsListProps) =>
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
 
-						console.log("user map :", elem);
+						// console.log("user map :", elem);
 						return (		
 							(elem.profileId !== user.id.toString())
 							?	<div key={Number(elem.profileId)} onClick={() =>

@@ -89,7 +89,7 @@ export class GameApiController
 	{
 		const data = this.gameApiService
 			.getAllInstancesByUserId(req.user.id);
-		this.logger.verbose("User req id :" + req.user.id);
+		// this.logger.verbose("User req id :" + req.user.id);
 		return ({
 			data: data
 		});
