@@ -199,9 +199,6 @@ export class UserController
 		dataAPI.append("client_id", this.env.parsed.FT_UID);
 		dataAPI.append("client_secret", this.env.parsed.FT_SECRET);
 		dataAPI.append("redirect_uri", file.getRedirectURI());
-		console.log("url", file.getRedirectURI());
-		this.logger.error("code", body.code);
-		this.logger.debug("DATA API", dataAPI);
 		const config = {
 			method: "post",
 			maxBodyLength: Infinity,
@@ -248,7 +245,6 @@ export class UserController
 					else
 					{
 						const fileCfg = new FileConfig();
-						console.log("ICI  655656?");
 						userObject = {
 							registrationProcessEnded: false,
 							registrationStarted: true,
@@ -500,7 +496,6 @@ export class UserController
 		@Res() res: Response
 	)
 	{
-		console.log(this.env);
 		if (!this.env)
 		{
 			res.status(400).send("env not found");
@@ -531,7 +526,6 @@ export class UserController
 			channel: "sms" })
 		.then((verification) =>
 		{
-			console.log(verification.status);
 		})
 		.catch((error) =>
 		{
@@ -539,7 +533,6 @@ export class UserController
 		})
 		.finally(() =>
 		{
-			console.log("sms sent");
 		});
 	}
 
@@ -551,7 +544,6 @@ export class UserController
 		@Res() res: Response
 	)
 	{
-		console.log(this.env);
 		if (!this.env)
 		{
 			res.status(400).send("env not found");
@@ -570,7 +562,6 @@ export class UserController
 			return ;
 		}
 		const	number = this.userService.getPhoneNumber(body.profileId);
-		console.log("bYneror", number);
 		if (number === "undefined" || number === undefined)
 		{
 			res.status(400).send("number not found");
@@ -584,7 +575,6 @@ export class UserController
 			channel: "sms" })
 		.then((verification) =>
 		{
-			console.log(verification.status);
 		})
 		.catch((error) =>
 		{
@@ -592,7 +582,6 @@ export class UserController
 		})
 		.finally(() =>
 		{
-			console.log("sms sent");
 		});
 	}
 
@@ -604,11 +593,8 @@ export class UserController
 		@Res() res: Response
 	)
 	{
-		// console.log("body ", body);
-		// console.log("opt-code", body.otpCode);
 		if (body.otpCode === undefined)
 			throw new UnauthorizedException();
-		console.log(this.env);
 		if (!this.env)
 			throw new Error(".env not found");
 		if (!this.env.parsed)
@@ -633,8 +619,6 @@ export class UserController
 				})
 			.then((verificationCheck) =>
 			{
-				console.log("status : ", verificationCheck.status);
-				console.log("VERIF : ", verificationCheck);
 				if (verificationCheck.status === "approved")
 				{
 					res.send(true);
@@ -657,11 +641,8 @@ export class UserController
 		@Res() res: Response
 	)
 	{
-		// console.log("body ", body);
-		// console.log("opt-code", body.otpCode);
 		if (body.otpCode === undefined)
 			throw new UnauthorizedException();
-		console.log(this.env);
 		if (!this.env)
 			throw new Error(".env not found");
 		if (!this.env.parsed)
@@ -707,7 +688,6 @@ export class UserController
 		@Res() res: Response,
 		@Body() body: any)
 	{
-		// console.log(req);
 		this.logger.log("start update photo");
 		try
 		{
@@ -732,24 +712,16 @@ export class UserController
 						bb.on("file", async (name: string, file: internal.Readable, info: busboy.FileInfo) =>
 						{
 							const	{ filename, encoding, mimeType } = info;
-							console.log("Starting visualisation of busboy data");
-							console.log(info);
-							console.log(filename);
-							console.log(encoding);
-							console.log(mimeType);
-							console.log("Ending of busboy data display");
+
 							fileCfg.configMimeType(mimeType);
 							if (!fileCfg.isAccepted())
 								reject(new HttpException("Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
-							// console.log(file);
 							file.on("data", (data) =>
 							{
-								console.log("buffer", typeof data);
 								fileCfg.addToBuffer(data);
 							});
 							file.on("end", () =>
 							{
-								console.log("finish");
 								resolve(fileCfg.fullPath());
 							});
 						});
@@ -761,7 +733,6 @@ export class UserController
 					})
 				);
 			};
-			this.logger.verbose("Start processing");
 			await processBusboy().then((filename) =>
 			{
 				this.logger.verbose(filename);
@@ -778,7 +749,6 @@ export class UserController
 			.catch((error) =>
 			{
 				res.status(418).json({error: true});
-				console.log(error);
 				return ;
 			});
 			await this.userService.uploadPhoto(fileCfg, req.user);
@@ -789,12 +759,9 @@ export class UserController
 			});
 			if (searchedUser)
 				this.userService.updateUserToDatabase(searchedUser);
-			// console.log("buffer", fileCfg.getBuffer());
-			this.logger.log("end update photo");
 		}
 		catch (error)
 		{
-			this.logger.error(error);
 			res.status(418).json({error: true});
 		}
 	}
@@ -820,7 +787,6 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	RevokeToken(@Req() req: any)
 	{
-		console.log("'revoke-token' route requested");
 		this.userService.revokeTokenById(req.user.id);
 		return ("token revoked");
 	}
@@ -866,7 +832,6 @@ export class UserController
 	getMyStats(@Req() req: any)
 	{
 		// return (["toto"]);
-		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
 			return (
@@ -874,12 +839,10 @@ export class UserController
 				|| record.playerTwoProfileId === (req.user.id)
 			);
 		});
-		console.log(myStats);
 		const	array: ResponseRow[] = [];
 
 		myStats.map((stat: MatchHistoryModel, index: number) =>
 		{
-			console.log(stat);
 			const	amIPlayOne = stat.playerOneProfileId === req.user.id;
 			const	frameCount = stat.frameCount as number;
 			const	frameRate = stat.frameRate as number;
@@ -926,8 +889,6 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getStats(@Body() body: any)
 	{
-		console.log("'stats' route requested");
-		console.log("Body", body);
 		const	userStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
 			return (
@@ -985,7 +946,6 @@ export class UserController
 	@UseGuards(UserAuthorizationGuard)
 	getAllStats(@Body() body: any)
 	{
-		console.log("'global-stats' route requested");
 		const	userStats = this.gameService.matchHistory;
 		const	array: ResponseRow[] = [];
 		const	users = this.userService.getAllUserRaw();
@@ -1026,7 +986,6 @@ export class UserController
 		@Res() res: Response,
 		@Req() req: any)
 	{
-		console.log("'get-user-back' route requested");
 		const	data = this.userService.getUserBackFromDB(req.user.id);
 		if (data === "error")
 			res.status(400).send("User not found");
@@ -1044,7 +1003,6 @@ export class UserController
 		// this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
 		const	chatUsers: any[] = [];
-		console.log("user-playing", req.user.id);
 		this.chatService.chat.users.map((elem) =>
 		{
 			if (elem.profileId.toString() !== req.user.id.toString())
@@ -1060,7 +1018,6 @@ export class UserController
 				chatUsers.push(usr);
 			}
 		});
-		console.log("NEW CHAT USERS", chatUsers);
 		return (chatUsers);
 	}
 
@@ -1069,9 +1026,7 @@ export class UserController
 	getAchievements(
 		@Body() body: any)
 	{
-		console.log("'get-achievements' route requested");
 		const	res = this.userService.getAchievements(body.id);
-		console.log("res", res);
 		return (res);
 	}
 }

@@ -106,7 +106,6 @@ export class AnonymousUserService implements OnModuleInit
 			.findMany()
 			.then((data) =>
 			{
-				console.log(data);
 			})
 			.catch((error: any ) =>
 			{
@@ -251,7 +250,6 @@ export class AnonymousUserService implements OnModuleInit
 		user.lastConnection = Date.now();
 		user.token = "no token";
 		user.revokeConnectionRequest = false;
-		console.log("Anonymous user revoke session uuid : " + user.uuid);
 		return (false);
 	}
 

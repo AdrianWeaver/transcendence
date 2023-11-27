@@ -109,7 +109,6 @@ class FileConfig
 		};
 		this.getPathLarge = () =>
 		{
-			console.log("returning path Large");
 
 			return (
 				this.pictureConfiguration.path.large
@@ -118,8 +117,6 @@ class FileConfig
 		};
 		this.getPathMedium = () =>
 		{
-			console.log("returning path mediumm");
-
 			return (
 				this.pictureConfiguration.path.medium
 					+ "/" + this.filename + ".jpeg"
@@ -127,8 +124,6 @@ class FileConfig
 		};
 		this.getPathMicro = () =>
 		{
-			console.log("returning path micro");
-
 			return (
 				this.pictureConfiguration.path.micro
 					+ "/" + this.filename + ".jpeg"
@@ -136,8 +131,6 @@ class FileConfig
 		};
 		this.getPathSmall = () =>
 		{
-			console.log("returning path smmall");
-
 			return (
 				this.pictureConfiguration.path.small
 					+ "/" + this.filename + ".jpeg"
@@ -145,7 +138,6 @@ class FileConfig
 		};
 		this.getPathNormal = () =>
 		{
-			console.log("returning path normal");
 			return (
 				this.pictureConfiguration.path.normal
 					+ "/" + this.filename + ".jpeg"

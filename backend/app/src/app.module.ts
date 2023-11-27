@@ -61,8 +61,6 @@ const	assetsFolder = join(__dirname, "..", "/public/assets");
 			.forRoot({
 				cleanup: async (app : any) =>
 				{
-					// releasing ressources
-					console.log("Releasing ressources");
 				},
 				gracefulShutdownTimeout:
 					Number(process.env.GRACEFULL_SHUTDOWN_TIMEOUT ?? 10000),

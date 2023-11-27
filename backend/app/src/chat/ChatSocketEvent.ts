@@ -476,14 +476,12 @@ export class ChatSocketEvents
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			const	copyUsers: ChatUserModel[] = [];
 
-			// console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
 			this.chatService.chat.users.forEach((user) =>
 			{
 				const	userIndex = this.userService.user.findIndex((userServe) =>
 				{
 					return (userServe.id.toString() === user.profileId.toString());
 				});
-				// this.logger.verbose("result player " + status);
 				const newUser: ChatUserModel = {
 					avatar: user.avatar,
 					id: user.id,
@@ -496,7 +494,6 @@ export class ChatSocketEvents
 				};
 				copyUsers.push(newUser);
 			});
-			// console.log(copyUsers);
 			const	me = this.chatService.getUserBySocketId(client.id);
 			if (me === undefined)
 				return ;
