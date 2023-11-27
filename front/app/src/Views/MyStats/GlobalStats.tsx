@@ -12,9 +12,9 @@ import {
 import MenuBar from "../../Component/MenuBar/MenuBar";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
 import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { getAllStats } from "../../Redux/store/controllerAction";
 import { useEffect } from "react";
-import { getAllStats, getStats } from "../../Redux/store/controllerAction";
 
 const	columns: GridColDef[] = [
 	{
@@ -123,6 +123,7 @@ const	Header = () =>
 	{
 		dispatch(getAllStats());
 	};
+
 	return (
 		<>
 			<Box
@@ -173,7 +174,9 @@ const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 
-	savePrevPage("/global-stats");
+	useEffect(() => {
+		savePrevPage("/global-stats");
+	  }, []);
 	return (
 		<>
 			<MenuBar />

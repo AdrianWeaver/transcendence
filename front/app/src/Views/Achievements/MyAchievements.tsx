@@ -158,9 +158,9 @@ const	MyAchievements = () =>
 
 	useEffect(() =>
 	{
-		dispatch(getMyStats());
+		savePrevPage("/my-achievements");
 	}, [dispatch]);
-	savePrevPage("/my-achievements");
+	
 	return (
 		<>
 			<MenuBar />
