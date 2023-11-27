@@ -23,7 +23,7 @@ type AddNewChannelModalProps = {
 };
 
 const AddNewChannelModal = (props: AddNewChannelModalProps) =>
-{ 
+{
 	return (
 		<>
 			<Button
