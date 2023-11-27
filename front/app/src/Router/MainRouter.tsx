@@ -30,10 +30,14 @@ const	MainRouter: React.FC = () =>
 		{
 			if (controller.registration.startedRegister === true
 				&& !controller.registration.abortRequested)
-					setRouterSwitch(<RegistrationRouter />);
+				setRouterSwitch(<RegistrationRouter />);
 			else
 				setRouterSwitch(<VisitorRouter />);
 		}
+		return (() =>
+		{
+			setRouterSwitch(<></>);
+		});
 	}, [
 		controller.user.isLoggedIn,
 		controller.registration.startedRegister,

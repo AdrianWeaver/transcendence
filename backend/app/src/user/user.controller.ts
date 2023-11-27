@@ -239,7 +239,7 @@ export class UserController
 					const userTempCheck: UserModel | undefined = this.userService.getUserById(data.id);
 					if (userTempCheck && userTempCheck.registrationProcessEnded === true)
 					{
-						this.logger.error("User Already register");
+						this.logger.error("User Already registered");
 						res.status(200).send("already registered");
 					}
 					else
@@ -525,6 +525,7 @@ export class UserController
 			channel: "sms" })
 		.then((verification) =>
 		{
+			console.log("verified");
 		})
 		.catch((error) =>
 		{
@@ -532,6 +533,7 @@ export class UserController
 		})
 		.finally(() =>
 		{
+			console.log("Verified end");
 		});
 	}
 
@@ -574,6 +576,7 @@ export class UserController
 			channel: "sms" })
 		.then((verification) =>
 		{
+			console.log("verified");
 		})
 		.catch((error) =>
 		{
@@ -581,6 +584,7 @@ export class UserController
 		})
 		.finally(() =>
 		{
+			console.log("End of verification");
 		});
 	}
 
@@ -754,7 +758,7 @@ export class UserController
 			res.status(200).json({message: "Success"});
 			const searchedUser = this.userService.user.find((elem) =>
 			{
-				return (elem.id.toString() == req.user.id.toString());
+				return (elem.id.toString() === req.user.id.toString());
 			});
 			if (searchedUser)
 				this.userService.updateUserToDatabase(searchedUser);
@@ -774,7 +778,6 @@ export class UserController
 	{
 		this.logger
 			.log("'change-infos' user route request");
-			//// check chat update
 		const	chatUsers = this.chatService.changeInfos(data, req.user.id);
 		const	users = this.userService.changeInfos(data, req.user.id);
 		if (chatUsers === "user doesnt exist" || users === "user doesnt exist")
@@ -994,8 +997,8 @@ export class UserController
 	async GetPlayingStatus(@Req() req: any)
 	{
 		this.logger.log("'user-playing' route requested");
-		let	playing: boolean;
-		playing = false;
+		// let	playing: boolean;
+		const playing = false;
 		// this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
 		const	chatUsers: any[] = [];
@@ -1010,7 +1013,7 @@ export class UserController
 					status: elem.status,
 					avatar: elem.avatar,
 					id: elem.id,
-				}
+				};
 				chatUsers.push(usr);
 			}
 		});

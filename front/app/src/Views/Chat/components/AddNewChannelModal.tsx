@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import {
 	Button,
 	Dialog,
@@ -22,7 +23,7 @@ type AddNewChannelModalProps = {
 };
 
 const AddNewChannelModal = (props: AddNewChannelModalProps) =>
-{ 
+{
 	return (
 		<>
 			<Button
@@ -116,6 +117,6 @@ const AddNewChannelModal = (props: AddNewChannelModalProps) =>
 			</Dialog>
 		</>
 	);
-}
+};
 
 export default AddNewChannelModal;

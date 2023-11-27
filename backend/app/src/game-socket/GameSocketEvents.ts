@@ -25,10 +25,11 @@ import { UserService } from "../user/user.service";
 import { NodeAnimationFrame } from "./NodeAnimationFrame";
 import e from "express";
 import { ContentAndApprovalsPage } from "twilio/lib/rest/content/v1/contentAndApprovals";
-import { disconnect } from "process";
+import { constrainedMemory, disconnect } from "process";
 import { profileEnd } from "console";
 import	* as roomNameArray from "./assets/roomName.json";
 import FileConfig from "src/user/Object/FileConfig";
+import { UserModel } from "../user/user.interface";
 
 type	ActionSocket = {
 	type: string,
@@ -746,7 +747,7 @@ export class GameSocketEvents
 				roomName = await this.dispatchMatchmakingUpsideDown(profileId, client);
 				break ;
 			default:
-				this.logger.error("Oups !!!");
+				this.logger.error("Oops !!!");
 				break;
 		}
 		if (roomName === "The void")
@@ -818,10 +819,18 @@ export class GameSocketEvents
 		const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId;
 		if (profileId === undefined)
 			this.logger.error("Profile id not found");
-
+		const	userIndexState = this.userService.user.findIndex((elem: UserModel) =>
+		{
+			return (elem.id.toString() === profileId?.toString());
+		});
+		if (userIndexState !== -1)
+		{
+			const fileCfg = new FileConfig();
+			this.userService.user[userIndexState].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline;
+		}
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
-			this.logger.error("game instance not fouded for disconnect user");
+			this.logger.error("game instance not found for disconnect user");
 		const	instance = this.gameService.gameInstances[indexInstance];
 		if (instance.playerOne.socketId === client.id)
 		{
@@ -892,12 +901,8 @@ export class GameSocketEvents
 				}
 			}
 		}
+
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
-		if (userIndex !== -1)
-		{
-			const fileCfg = new FileConfig();
-			this.userService.user[userIndex].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline; 
-		}
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
 		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);

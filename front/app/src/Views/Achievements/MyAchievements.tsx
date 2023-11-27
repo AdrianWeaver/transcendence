@@ -158,7 +158,6 @@ const	MyAchievements = () =>
 	})
 	useEffect(() =>
 	{
-		console.log("ACHEIV", controller.achievements)
 		savePrevPage("/my-achievements");
 		dispatch(getAchievements("myself"));
 	}, []);

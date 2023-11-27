@@ -66,6 +66,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
+import BadgeAvatars from "./components/BadgeAvatars";
 
 type MessageModel =
 {
@@ -79,7 +80,9 @@ type	FriendListModel =
 {
 	name: string,
 	avatar: string,
-	status: string
+	status: string,
+	statusChat: string,
+	statusGame: string
 }
 
 type MembersModel =
@@ -162,8 +165,8 @@ const TabPanel = (props: TabPanelProps) =>
 
 type FriendsListProps = {
 	arrayListUsers: string[],
-	socketRef: React.MutableRefObject<Socket> | null
-	friends: FriendListModel[]
+	socketRef: React.MutableRefObject<Socket> | null,
+	// friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
@@ -213,38 +216,57 @@ const FriendsList = (props: FriendsListProps) =>
 			}
 			<Divider />
 				{
-					users.map((elem, index) =>
+					users.filter((elem, index) =>
+					{
+						return (users.indexOf(elem) === index);
+					}).map((elem, index) =>
 					{
 						let status;
 
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						return (		
-							(elem.profileId !== user.id.toString())
-							?	<div key={Number(elem.profileId)} onClick={() =>
+						
+						return (
+							(elem.profileId.toString() !== user.id.toString() && users[index] )
+							?	<div key={crypto.randomUUID()} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={Number(elem.profileId)} >
+									<ListItem  >
 									<ListItemIcon>
-										<Avatar
+										<BadgeAvatars
+											elem={elem}
+										/>
+										{/* ici */}
+										{/* <Avatar
 											alt={elem.name}
 											src={elem.avatar}
 										/>
+											<img
+												src={elem.statusChat}
+												width="33%"
+												style={{margin: "20px"}}
+											/>
+											<img
+												src={elem.statusPong}
+												width="33%"
+												style={{margin: "20px"}}
+											/> */}
+										{/* jusqu'ici */}
 									</ListItemIcon>
 									<ListItemText primary={elem.name}>
 										{elem.name}
 									</ListItemText>
 									{
-										// (currentProfileIsFriend)
-										// ?
-										<ListItemText
-												secondary={status}
-												sx={{ align: "right" }}
-										></ListItemText>
-										// : <></>
+										(currentProfileIsFriend)
+										? 
+											<ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
+										: <></>		// : <></>
 									}
 								</ListItem>
 							</div>
@@ -747,6 +769,7 @@ const	ChatLayout = () =>
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
+			console.log(friendList);
 		};
 
 		const	updateMessages = (data: any) =>
@@ -861,7 +884,7 @@ const	ChatLayout = () =>
 				setIsFriend(data.payload.isFriend);
 			}
 
-			if (data.type === "on-connect")
+			if (data.type === "on-connection")
 			{
 				if (data.payload.blockedList !== "")
 					setBlockedList(data.payload.blockedList);
@@ -1071,7 +1094,7 @@ const	ChatLayout = () =>
 			const	timeout = setTimeout(() =>
 			{
 				refreshListUser();
-			}, 10000);
+			}, 100);
 			return (() =>
 			{
 				clearTimeout(timeout);
@@ -1131,7 +1154,7 @@ const	ChatLayout = () =>
 		{
 			return (elem.profileId === uniqueId);
 		});
-		let substrings: string[] = chanName.split("&");
+		const substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>
 		{
@@ -1509,7 +1532,7 @@ const	ChatLayout = () =>
 					>
 						<div>
 							<AddNewChannelModal
-								handleClickOpen={handleClickOpen} 
+								handleClickOpen={handleClickOpen}
 								handleClose={handleClose}
 								handleSave={handleSave}
 								open={open}
