@@ -42,7 +42,6 @@ const	RightSide = (props: RightSideProps) =>
 	{
 		if (userSelected && !props.isFriend)
 			dispatch(addUserAsFriend(userSelected.profileId));
-		console.log("friends", user.chat.friends, "isFriend", props.isFriend);
 	}
 
 	return (

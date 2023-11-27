@@ -61,6 +61,7 @@ const	MyProfile = () =>
 								<RightSide
 									profileId={user.id.toString()}
 									isMe={true}
+									isFriend={true}
 									/>
 						</Grid>
 					</Grid>

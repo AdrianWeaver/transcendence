@@ -106,78 +106,50 @@ const	LeftSide = (props: LeftSideProps) =>
 								♡♡♡
 							</Typography>
 						</>
-						: <Typography>
-							{
-								(!props.isFriend)
-								? <>
-											
-									<Typography style={{color: "green"}}>
-										_______________
-									</Typography>
-										{props.pseudo}
-									<Typography style={{color: "green"}}>
-										___________________
-										___________________
-										___________________
-										___________________
-									</Typography>
-								</>
-								: (userSelected === undefined)
-									? <></>
-									: <>
-										<Grid item xs={12}>
-											<Typography>
-												{userSelected.firstName}  {userSelected.lastName}
-											</Typography>
-										</Grid>
-										<Typography style={{color: "green"}}>
-											___________________
-											___________________
+						: (!props.isFriend)
+							? <>
+										
+								<Typography style={{color: "green"}}>
+									_______________
+								</Typography>
+									{props.pseudo}
+								<Typography style={{color: "green"}}>
+									___________________
+									___________________
+									___________________
+									___________________
+								</Typography>
+							</>
+							: (userSelected === undefined)
+								? <></>
+								: <>
+									<Grid item xs={12}>
+										<Typography>
+											{userSelected.firstName}  {userSelected.lastName}
 										</Typography>
-										<Grid item xs={12}>
-											<Typography>
-												{props.pseudo} is {props.status}
-											</Typography>
-										</Grid>
-										<Grid item xs={12}>
-											<Typography>
-												{userSelected.location}
-											</Typography>
-										</Grid>
-									</>
+									</Grid>
+									<Typography style={{color: "green"}}>
+										___________________
+										___________________
+									</Typography>
+									<Grid item xs={12}>
+										<Typography>
+											{props.pseudo} is {props.status}
+										</Typography>
+									</Grid>
+									<Grid item xs={12}>
+										<Typography>
+											{userSelected.location}
+										</Typography>
+									</Grid>
+								</>
 							}
-						</Typography>
-					}
 					{
 						(props.isMe)
 						? <Button onClick={editRequest}>
 							EDIT PROFILE
 						</Button>
 						: <></>
-						// : (!userMe.chat.currentProfileIsFriend)
-						// 	? <Grid item xs={12}>
-						// 		<Typography>
-						// 			________________
-						// 			__________________
-						// 			___________________
-						// 		</Typography>
-						// 	</Grid>
-						// 	: (userSelected !== undefined)
-						// 		? (userSelected?.firstName !== "undefined" && userSelected.lastName !== "undefined")
-						// 			? <> 
-						// 				<Grid item xs={12}>
-						// 					<Typography>
-						// 						{userSelected?.firstName} {userSelected?.lastName}
-						// 					</Typography>
-						// 				</Grid>
-						// 				<Grid item xs={12}>
-						// 					<Typography>
-						// 						{userSelected.location}
-						// 					</Typography>
-						// 				</Grid>
-						// 		 	 </>
-						// 			: <></>
-						// 		: <></>
 					}
 				</Grid>
 					<button className="leaveProfile__btn"

@@ -3,14 +3,11 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-statements */
 import MenuBar from "../../Component/MenuBar/MenuBar";
-import { Button, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { addUserAsFriend } from "../../Redux/store/controllerAction";
-import { useEffect } from "react";
-import { FriendsDataModel } from "../../Redux/models/redux-models";
 
 const	ProfilePage = () =>
 {
@@ -36,12 +33,6 @@ const	ProfilePage = () =>
 	{
 		online = userSelected.online ? "online 🟢" : "offline 🔴";
 		status = userSelected.status === "playing" ? "playing... 🏓" : online;
-	}
-	const	addAsFriend = () =>
-	{
-		if (userSelected && !isFriend)
-			dispatch(addUserAsFriend(userSelected.profileId));
-		console.log("friends", user.chat.friends, "isFriend", isFriend);
 	}
 	let	isFriend: boolean;
 	isFriend = false;
@@ -78,13 +69,9 @@ const	ProfilePage = () =>
 								<RightSide
 									profileId={userSelected?.profileId}
 									isMe={false}
+									isFriend={isFriend}
 									/>
 						</Grid>
-							{
-								(!isFriend)
-								? <Button onClick={addAsFriend}>ADD AS FRIEND</Button>
-								: <></>
-							}
 					</Grid>
 				</div>
 			}
