@@ -165,13 +165,127 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 type FriendsListProps = {
-	arrayListUsers: string[],
+	// arrayListUsers: string[],
 	socketRef: React.MutableRefObject<Socket> | null,
 	// friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
 const FriendsList = (props: FriendsListProps) =>
+{
+	const	dispatch = useAppDispatch();
+
+	const	currentProfileIsFriend = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfileIsFriend);
+	});
+	const	users = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.users);
+	});
+	const	user = useAppSelector((state) =>
+	{
+		return (state.controller.user);
+	});
+
+	const	friendList = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.friends);
+	});
+
+	const	numberOfChannels = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.numberOfChannels);
+	});
+
+	const	createNewConv = (activeId: string) =>
+	{
+		const action = {
+			type: "create-channel",
+			payload: {
+				chanName: "undefined",
+				chanMode: "private",
+				chanPassword: "undefined",
+				chanId: numberOfChannels + 1,
+				activeId: activeId
+			}
+		};
+		props.socketRef?.current.emit("channel-info", action);
+	};
+
+	return (
+		<>
+			{
+				(user.ft)
+				? <Myself />
+				: <></>
+			}
+			<Divider />
+				{
+					users.filter((elem, index) =>
+					{
+						return (users.indexOf(elem) === index);
+					}).filter((elem) =>
+					{
+						let	isFriend = false;
+
+						friendList.forEach(element =>
+						{
+							if (elem.profileId.toString() === element.profileIdFriend.toString())
+								isFriend = true;
+						});
+						return (isFriend);
+					}).map((elem, index) =>
+					{
+						let status;
+
+						status = elem.online ? "💚" : "🔴";
+						if (elem.status === "playing" && elem.online)
+							status = "🏓";
+						
+						return (
+							(elem.profileId.toString() !== user.id.toString() && users[index] )
+							?	<div key={crypto.randomUUID()} onClick={() =>
+									{
+										dispatch(setActiveConversationId(elem.id));
+										createNewConv(elem.id);
+									}}>
+									<ListItem  >
+									<ListItemIcon>
+										<BadgeAvatars
+											elem={elem}
+										/>
+									</ListItemIcon>
+									<ListItemText primary={elem.name}>
+										{elem.name}
+									</ListItemText>
+									{
+										(currentProfileIsFriend)
+										? 
+											<ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
+										: <></>		// : <></>
+									}
+								</ListItem>
+							</div>
+							: <></>
+						);
+					})
+				}
+		</>
+	);
+};
+
+type UsersListProps = {
+	// arrayListUsers: string[],
+	socketRef: React.MutableRefObject<Socket> | null,
+	// friends: FriendListModel[]
+	tabMode: "user" | "friend",
+};
+
+const UsersList = (props: UsersListProps) =>
 {
 	const	dispatch = useAppDispatch();
 
@@ -237,15 +351,14 @@ const FriendsList = (props: FriendsListProps) =>
 									}}>
 									<ListItem  >
 									<ListItemIcon>
-										<BadgeAvatars
+										{/* <BadgeAvatars
 											elem={elem}
-										/>
-										{/* ici */}
-										{/* <Avatar
+										/> */}
+										<Avatar
 											alt={elem.name}
 											src={elem.avatar}
 										/>
-											<img
+											{/* <img
 												src={elem.statusChat}
 												width="33%"
 												style={{margin: "20px"}}
@@ -255,7 +368,6 @@ const FriendsList = (props: FriendsListProps) =>
 												width="33%"
 												style={{margin: "20px"}}
 											/> */}
-										{/* jusqu'ici */}
 									</ListItemIcon>
 									<ListItemText primary={elem.name}>
 										{elem.name}
@@ -1816,12 +1928,12 @@ const	ChatLayout = () =>
 																					(member.name !== uniqueId) &&
 																					(
 																						<>
-																							<Button onClick={() =>
+																							{/* <Button onClick={() =>
 																							{
 																								addUserToFriends(member.name);
 																							}}>
 																								Add friend
-																							</Button>
+																							</Button> */}
 																							<Button onClick={() =>
 																							{
 																								addUserToBlocked(member.name, "");
@@ -1907,10 +2019,9 @@ const	ChatLayout = () =>
 						dir={style.direction}
 						style={style}
 					>
-							<FriendsList socketRef={socketRef}
-										arrayListUsers={arrayListUser}
-										friends={friendList}
-										tabMode="user"
+							<UsersList
+								socketRef={socketRef}
+								tabMode="user"
 							/>
 							<List>
 								{
@@ -1979,28 +2090,11 @@ const	ChatLayout = () =>
 					>
 						<List>
 							{
-								friendList.map((friend: any, index: number) =>
-								{
-									return (
-										<ListItem style={listItemStyle} key={index}>
-											<ListItemIcon>
-												<Avatar
-													key={index}
-													alt={friend.name}
-													src={friend.avatar}
-												/>
-											</ListItemIcon>
-											<ListItemText
-												style={listItemTextStyle}
-												primary={friend.name}
-											/>
-											<ListItemText
-												secondary={friend.status}
-												sx={{ align: "right" }}
-										></ListItemText>
-										</ListItem>
-									);
-								})
+								<FriendsList socketRef={socketRef}
+									
+									// friends={friendList}
+									tabMode="user"
+								/>
 							}
 						</List>
 					</TabPanel>
