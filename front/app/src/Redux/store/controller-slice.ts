@@ -15,7 +15,6 @@ export const	initialControllerState: ControllerModel = {
 	themeMode: "light",
 	previousPage: "/",
 	allUsers: [],
-	// allFrontUsers: [],
 	user:
 	{
 		isLoggedIn: false,

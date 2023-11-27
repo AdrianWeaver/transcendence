@@ -458,9 +458,24 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		}
 	}
 
-	public getAllUserRaw () : Array<UserModel>
+	public getAllUserRaw () : Array<BackUserModel>
 	{
-		return (this.user);
+		const	newUsers: BackUserModel[] = [];
+		this.user.map((elem) =>
+		{
+			const	user: BackUserModel = {
+				username: elem.username,
+				id: elem.id.toString(),
+				firstName: elem.firstName,
+				lastName: elem.lastName,
+				avatar: elem.avatar,
+				location: elem.location,
+				status: elem.status,
+				online: elem.online
+			}
+			newUsers.push(user);
+		});
+		return (newUsers);
 	}
 
 	public	getUuidInstance(): string
@@ -480,15 +495,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			const	user = {
 				id: elem.id,
-				email: elem.email,
 				username: elem.username,
 				firstName: elem.firstName,
 				lastName: elem.lastName,
 				avatar: elem.avatar,
 				location: elem.location,
-				ipAddress: elem.authService.doubleAuth.lastIpClient,
-				doubleAuth: elem.authService.doubleAuth.enable,
-				token: elem.authService.token
+				online: elem.online,
+				status: elem.status
 			};
 			users.push(user);
 		});

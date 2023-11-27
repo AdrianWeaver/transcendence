@@ -48,15 +48,13 @@ export	interface ChatUserModel
 export interface BackUserModel
 {
 	id: number | string;
-	email: string;
 	username: string;
 	firstName: string;
 	lastName: string;
 	avatar: string;
 	location: string;
-	ipAddress: string;
-	doubleAuth: boolean;
-	token: string;
+	status: string;
+	online: boolean;
 }
 
 export interface UserDBFrontModel

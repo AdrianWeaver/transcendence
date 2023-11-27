@@ -42,7 +42,6 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
-	// doubleAuth: boolean;
 }
 
 export interface ChatModel
@@ -180,7 +179,6 @@ export interface	CanvasModel
 export interface	ControllerModel
 {
 	"allUsers": BackUserModel[],
-	// "allFrontUsers": UserModel[],
 	"activeView": string,
 	"previousPage": string,
 	"themeMode": string,

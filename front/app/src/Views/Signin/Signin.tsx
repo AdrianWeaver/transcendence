@@ -9,7 +9,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { userSignIn } from "../../Redux/store/controllerAction";
+import { setAllUsers, userSignIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 const	Signin = () =>
@@ -92,6 +92,7 @@ const	Signin = () =>
 			if (filtered.length === 0)
 			{
 				dispatch(userSignIn(userLogIn.username, userLogIn.password));
+				dispatch(setAllUsers());
 			}
 	};
 
