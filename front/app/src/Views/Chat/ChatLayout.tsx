@@ -237,15 +237,14 @@ const FriendsList = (props: FriendsListProps) =>
 									}}>
 									<ListItem  >
 									<ListItemIcon>
-										<BadgeAvatars
+										{/* <BadgeAvatars
 											elem={elem}
-										/>
-										{/* ici */}
-										{/* <Avatar
+										/> */}
+										<Avatar
 											alt={elem.name}
 											src={elem.avatar}
 										/>
-											<img
+											{/* <img
 												src={elem.statusChat}
 												width="33%"
 												style={{margin: "20px"}}
@@ -255,7 +254,6 @@ const FriendsList = (props: FriendsListProps) =>
 												width="33%"
 												style={{margin: "20px"}}
 											/> */}
-										{/* jusqu'ici */}
 									</ListItemIcon>
 									<ListItemText primary={elem.name}>
 										{elem.name}
