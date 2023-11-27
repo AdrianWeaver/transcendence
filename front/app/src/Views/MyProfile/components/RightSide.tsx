@@ -4,13 +4,14 @@
 /* eslint-disable max-len */
 import { Button, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { getAchievements } from "../../../Redux/store/controllerAction";
-import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
+import { addUserAsFriend, getAchievements } from "../../../Redux/store/controllerAction";
+import { useAppDispatch, useAppSelector } from "../../../Redux/hooks/redux-hooks";
 
 type	RightSideProps =
 {
 	profileId: string | undefined;
 	isMe: boolean;
+	isFriend: boolean;
 }
 
 const	RightSide = (props: RightSideProps) =>
@@ -24,21 +25,25 @@ const	RightSide = (props: RightSideProps) =>
 		else
 			navigate("/stats");
 	};
-
-	const	displayAchievements = () =>
+	const	user = useAppSelector((state) =>
 	{
-		if (props.isMe)
-		{
-			dispatch(getAchievements("myself"))
-			navigate("/my-achievements");
-		}
-		else
-		{
-			if (props.profileId)
-				dispatch(getAchievements(props.profileId));
-			navigate("/achievements");
-		}
-	};
+		return (state.controller.user);
+	});
+	const	currentProfile = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfile);
+	});
+	const	userSelected = user.chat.users.find((elem) =>
+	{
+		return (elem.profileId === currentProfile);
+	});
+
+	const	addAsFriend = () =>
+	{
+		if (userSelected && !props.isFriend)
+			dispatch(addUserAsFriend(userSelected.profileId));
+		console.log("friends", user.chat.friends, "isFriend", props.isFriend);
+	}
 
 	return (
 		<>
@@ -63,14 +68,11 @@ const	RightSide = (props: RightSideProps) =>
 						___________________
 					</Typography>
 				</Grid>
-				{/* <Grid item xs={12}>
-					<Typography variant="h5">
-						ACHIEVEMENTS
-					</Typography>
-					<Button onClick={displayAchievements}>
-						click to see the achievements
-					</Button>
-				</Grid> */}
+				{
+					(!props.isFriend)
+					? <Button onClick={addAsFriend}>ADD AS FRIEND</Button>
+					: <></>
+				}
 				<Grid item xs={12}>
 					<Typography>
 						_________________
