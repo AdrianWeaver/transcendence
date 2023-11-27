@@ -165,8 +165,8 @@ const TabPanel = (props: TabPanelProps) =>
 
 type FriendsListProps = {
 	arrayListUsers: string[],
-	socketRef: React.MutableRefObject<Socket> | null
-	friends: FriendListModel[]
+	socketRef: React.MutableRefObject<Socket> | null,
+	// friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
@@ -216,23 +216,25 @@ const FriendsList = (props: FriendsListProps) =>
 			}
 			<Divider />
 				{
-					users.map((elem, index) =>
+					users.filter((elem, index) =>
+					{
+						return (users.indexOf(elem) === index);
+					}).map((elem, index) =>
 					{
 						let status;
 
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-
-						console.log("user map :", elem);
+						
 						return (
-							(elem.profileId !== user.id.toString())
-							?	<div key={Number(elem.profileId)} onClick={() =>
+							(elem.profileId.toString() !== user.id.toString() && users[index] )
+							?	<div key={crypto.randomUUID()} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={Number(elem.profileId)} >
+									<ListItem  >
 									<ListItemIcon>
 										<BadgeAvatars
 											elem={elem}
@@ -258,14 +260,13 @@ const FriendsList = (props: FriendsListProps) =>
 										{elem.name}
 									</ListItemText>
 									{
-										// (currentProfileIsFriend)
-										// ?
-										// <ListItemText
-										// 		secondary={status}
-										// 		sx={{ align: "right" }}
-										// ></ListItemText>
-
-										// : <></>
+										(currentProfileIsFriend)
+										? 
+											<ListItemText
+													secondary={status}
+													sx={{ align: "right" }}
+											></ListItemText>
+										: <></>		// : <></>
 									}
 								</ListItem>
 							</div>
@@ -883,7 +884,7 @@ const	ChatLayout = () =>
 				setIsFriend(data.payload.isFriend);
 			}
 
-			if (data.type === "on-connect")
+			if (data.type === "on-connection")
 			{
 				if (data.payload.blockedList !== "")
 					setBlockedList(data.payload.blockedList);
@@ -1093,7 +1094,7 @@ const	ChatLayout = () =>
 			const	timeout = setTimeout(() =>
 			{
 				refreshListUser();
-			}, 10000);
+			}, 100);
 			return (() =>
 			{
 				clearTimeout(timeout);

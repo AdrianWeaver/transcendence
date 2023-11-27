@@ -177,7 +177,9 @@ const	Stats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 
-	savePrevPage("/stats");
+	useEffect(() => {
+		savePrevPage("/stats");
+	  }, []);
 	return (
 		<>
 			<MenuBar />

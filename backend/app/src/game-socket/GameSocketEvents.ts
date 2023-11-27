@@ -819,7 +819,6 @@ export class GameSocketEvents
 		const	profileId = this.gameService.findProfileIdFromSocketId(client.id)?.profileId;
 		if (profileId === undefined)
 			this.logger.error("Profile id not found");
-
 		const	userIndexState = this.userService.user.findIndex((elem: UserModel) =>
 		{
 			return (elem.id.toString() === profileId?.toString());
@@ -902,6 +901,7 @@ export class GameSocketEvents
 				}
 			}
 		}
+
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
