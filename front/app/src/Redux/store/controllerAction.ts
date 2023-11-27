@@ -11,7 +11,7 @@
 import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, FriendsDataModel, UserModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
 import UserServices from "../service/ft-api-service";
 import ServerService from "../service/server-service";
 import ConnectionState from "../../Component/ConnectionState";
@@ -431,6 +431,7 @@ export const setChatConnected = (connected: boolean)
 				}
 			}
 		};
+		console.log("set Chat user ", users);
 		dispatch(controllerActions.setChatUsers(response));
 	});
 };
@@ -1336,41 +1337,22 @@ export const	setNewToken = (newToken: string)
 // 	});
 // }
 
-export const	addUserAsFriend = (friendId: string)
+export const	addUserAsFriend = (myId: string, friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		const	data = await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.uri)
-		if (data === "ERROR")
-			return ;
-		if (data === "success")
+		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
+			friendId, prev.server.uri, myId)
+		.then((_data) =>
 		{
-			const	newFriend = {
-				profileIdOwner: prev.controller.user.id.toString(),
-				profileIdFriend: friendId.toString()
-			}
-			const	newFriends = prev.controller.user.chat.friends.map((elem) =>
-			{
-				return (elem);
-			});
-			newFriends.push(newFriend);
-			const	response: ControllerModel = {
-				...prev.controller,
-				user:
-				{
-					...prev.controller.user,
-					chat:
-					{
-						...prev.controller.user.chat,
-						friends: newFriends
-					}
-				}
-			}
-			dispatch(controllerActions.setChatUsers(response));
-		}
+		})
+		.catch((error) =>
+		{
+			console.error(error);
+		});
+		// dispatch update friends that we dont have yet
 	});
 }
 
@@ -1429,7 +1411,6 @@ export const	setOnline = (online: boolean, user: UserModel)
 			// Items after the insertion point:
 			...array.slice(index)
 		];
-		console.log("NEW USERS", newUsers);
 		const	response: ControllerModel = {
 			...prev.controller,
 			user:
@@ -1543,6 +1524,8 @@ export const	connectChatUser = (user: ChatUserModel, online: boolean)
 			profileId: user.profileId,
 			online: online,
 			status: online ? "online" : "offline",
+			statusChat: user.statusChat,
+			statusPong: user.statusPong,
 		}
 		if (online)
 		{
@@ -1904,4 +1887,3 @@ export const	resetController = ()
 		dispatch(controllerActions.resetController(initialControllerState));
 	});
 }
-

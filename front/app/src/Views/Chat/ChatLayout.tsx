@@ -66,6 +66,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
+import BadgeAvatars from "./components/BadgeAvatars";
 
 type MessageModel =
 {
@@ -79,7 +80,9 @@ type	FriendListModel =
 {
 	name: string,
 	avatar: string,
-	status: string
+	status: string,
+	statusChat: string,
+	statusGame: string
 }
 
 type MembersModel =
@@ -216,23 +219,40 @@ const FriendsList = (props: FriendsListProps) =>
 					users.map((elem, index) =>
 					{
 						let status;
+
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						let keyIndex = crypto.randomUUID();
-						return (		
+
+						console.log("user map :", elem);
+						return (
 							(elem.profileId !== user.id.toString())
-							?	<div key={keyIndex} onClick={() =>
+							?	<div key={Number(elem.profileId)} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem key={keyIndex} >
+									<ListItem key={Number(elem.profileId)} >
 									<ListItemIcon>
-										<Avatar
+										<BadgeAvatars
+											elem={elem}
+										/>
+										{/* ici */}
+										{/* <Avatar
 											alt={elem.name}
 											src={elem.avatar}
 										/>
+											<img
+												src={elem.statusChat}
+												width="33%"
+												style={{margin: "20px"}}
+											/>
+											<img
+												src={elem.statusPong}
+												width="33%"
+												style={{margin: "20px"}}
+											/> */}
+										{/* jusqu'ici */}
 									</ListItemIcon>
 									<ListItemText primary={elem.name}>
 										{elem.name}
@@ -244,7 +264,7 @@ const FriendsList = (props: FriendsListProps) =>
 													secondary={status}
 													sx={{ align: "right" }}
 											></ListItemText>
-										: <></>
+										: <></>		// : <></>
 									}
 								</ListItem>
 							</div>
@@ -747,6 +767,7 @@ const	ChatLayout = () =>
 			dispatch(setChatUsers(data.payload.arrayListUsers));
 			setFriendList(data.payload.friendsList);
 			setArrayListUser(data.payload.arrayListUsers);
+			console.log(friendList);
 		};
 
 		const	updateMessages = (data: any) =>
@@ -912,7 +933,8 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					dispatch(addUserAsFriend(data.payload.friendProfileId));
+					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
+					// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
@@ -1126,11 +1148,15 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (chanName: string) =>
 	{
-		let substrings: string[] = chanName.split("&");
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
+		const substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>
 		{
-			if (elem !== user?.username)
+			if (elem !== userMe?.name)
 				username = elem;
 		});
 		dispatch(setPreviousPage("/the-chat"));
@@ -1155,7 +1181,6 @@ const	ChatLayout = () =>
 		}
 		setTalkingUserProfileId(searchUser.profileId);
 		navigate("/profile/");
-		setClickedChannel("");
 	};
 
 	const	leaveChannel = (chanName: string) =>
@@ -1505,7 +1530,7 @@ const	ChatLayout = () =>
 					>
 						<div>
 							<AddNewChannelModal
-								handleClickOpen={handleClickOpen} 
+								handleClickOpen={handleClickOpen}
 								handleClose={handleClose}
 								handleSave={handleSave}
 								open={open}
@@ -1924,6 +1949,7 @@ const	ChatLayout = () =>
 													<Button onClick={() =>
 													{
 														goToProfilePage(clickedChannel);
+														setClickedChannel("");
 													}}>
 														see profile page
 													</Button>

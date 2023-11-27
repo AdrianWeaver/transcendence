@@ -19,6 +19,13 @@ type CDNConfig = {
 	}
 };
 
+type AssetConfig = {
+	statusGameOnline: string;
+	statusGameOffline: string;
+	statusChatOnline: string;
+	statusChatOffline: string;
+};
+
 class FileConfig
 {
 	private	acceptedType: boolean;
@@ -45,6 +52,8 @@ class FileConfig
 	public	getPathNormal: () => string;
 	public	getPathTmpConverted: () => string;
 	public	getCDNConfig: () => CDNConfig;
+	public	getAssetsConfig: () => AssetConfig;
+
 	constructor()
 	{
 		this.serverConfig = new ServerConfig();
@@ -100,7 +109,6 @@ class FileConfig
 		};
 		this.getPathLarge = () =>
 		{
-			console.log("returning path Large");
 
 			return (
 				this.pictureConfiguration.path.large
@@ -109,8 +117,6 @@ class FileConfig
 		};
 		this.getPathMedium = () =>
 		{
-			console.log("returning path mediumm");
-
 			return (
 				this.pictureConfiguration.path.medium
 					+ "/" + this.filename + ".jpeg"
@@ -118,8 +124,6 @@ class FileConfig
 		};
 		this.getPathMicro = () =>
 		{
-			console.log("returning path micro");
-
 			return (
 				this.pictureConfiguration.path.micro
 					+ "/" + this.filename + ".jpeg"
@@ -127,8 +131,6 @@ class FileConfig
 		};
 		this.getPathSmall = () =>
 		{
-			console.log("returning path smmall");
-
 			return (
 				this.pictureConfiguration.path.small
 					+ "/" + this.filename + ".jpeg"
@@ -136,7 +138,6 @@ class FileConfig
 		};
 		this.getPathNormal = () =>
 		{
-			console.log("returning path normal");
 			return (
 				this.pictureConfiguration.path.normal
 					+ "/" + this.filename + ".jpeg"
@@ -168,6 +169,19 @@ class FileConfig
 					}
 				}
 			});
+		};
+		this.getAssetsConfig = () =>
+		{
+			const	baseUrl = this.serverConfig.protocol
+			+ "://" + this.serverConfig.location
+			+ ":" + this.serverConfig.port + "/cdn/image/assets/";
+			const	returnValue: AssetConfig = {
+				statusGameOffline: baseUrl + "pong-offline.png",
+				statusGameOnline: baseUrl + "pong-online.png",
+				statusChatOffline: baseUrl + "user-offline.png",
+				statusChatOnline: baseUrl + "user-online.png",
+			}
+			return (returnValue);
 		};
 	}
 }

@@ -12,6 +12,7 @@ import Channel from "./Objects/Channel";
 import { Socket, Server } from "socket.io";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
+import FileConfig from "src/user/Object/FileConfig";
 
 export interface MessageRoomModel
 {
@@ -28,7 +29,9 @@ export	interface ChatUserModel
 	"status": string,
 	"id": string,
 	"avatar": string,
-	"profileId": string
+	"profileId": string,
+	"statusPong": string,
+	"statusChat": string
 }
 
 type MessageModel =
@@ -61,6 +64,7 @@ type MemberSocketIdModel ={
 
 import { v4 as uuidv4 } from "uuid";
 import { GameService } from "src/game-socket/Game.service";
+import { UserService } from "src/user/user.service";
 
 @Injectable()
 export	class ChatService implements OnModuleInit
@@ -72,6 +76,7 @@ export	class ChatService implements OnModuleInit
 
 	constructor(
 		private	readonly prismaService: PrismaService,
+		private readonly userService: UserService,
 	)
 	{
 		this.log.verbose("Chat Service is constructed with id: " + this.uuid);
@@ -80,6 +85,7 @@ export	class ChatService implements OnModuleInit
 
 	private onTableCreate()
 	{
+		return ;
 		this.log.verbose("Creating a new version inside database");
 		const	dbString = this.parseForDatabase();
 		this.prismaService
@@ -127,6 +133,7 @@ export	class ChatService implements OnModuleInit
 
 	private	loadTableToMemory()
 	{
+		return ;
 		this.prismaService
 			.prisma
 			.chatJson
@@ -155,7 +162,7 @@ export	class ChatService implements OnModuleInit
 			})
 			.catch(() =>
 			{
-				console.log("load table skipped");
+				console.log()
 			});
 	}
 
@@ -167,6 +174,7 @@ export	class ChatService implements OnModuleInit
 
 	public	updateDatabase()
 	{
+		return ;
 		const dbString = this.parseForDatabase();
 		this.prismaService.prisma.chatJson
 		.update(
@@ -336,13 +344,19 @@ export	class ChatService implements OnModuleInit
 
 		this.chat.users.map((element) =>
 		{
-			const user = {
+			const indexUser = this.userService.user.findIndex((user) =>
+			{
+				return (user.id.toString() === element.profileId.toString());
+			});
+			const user: ChatUserModel = {
 				name: element.name,
 				id: element.id,
 				online: element.online,
 				status: element.status,
 				avatar: element.avatar,
-				profileId: element.profileId
+				profileId: element.profileId,
+				statusPong: this.userService.user[indexUser].statusGameIcon,
+				statusChat: this.userService.user[indexUser].statusChatIcon,
 			};
 			users.push(user);
 		});
@@ -543,6 +557,12 @@ export	class ChatService implements OnModuleInit
 		return (ret.name);
 	}
 
+	/**
+	 * @deprecated
+	 * 
+	 * @param clientId 
+	 * @returns 
+	 */
 	public	disconnectUserWithClientId(clientId: string)
 	{
 		return ;
@@ -604,29 +624,5 @@ export	class ChatService implements OnModuleInit
 		if (hashed)
 			this.chat.channels[index].password = hashed;
 		return (hashed);
-	}
-
-	/**
-	 * @deprecated
-	 * @param gameService 
-	 * @returns 
-	 */
-	public	updateStatus(gameService: GameService)
-	{
-		this.chat.users.forEach((elem) =>
-		{
-			if (!elem.online)
-				elem.status = "offline";
-			else
-			{
-				const	 playing = gameService.getStatusConnectedToGameFromProfileId(elem.id.toString());
-				if (playing)
-					elem.status = "playing";
-				else
-					elem.status = "online";
-			}
-		});
-		console.log("UPDATE STATUS WORKED ?", this.chat.users);
-		return (this.chat.users);
 	}
 }

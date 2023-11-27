@@ -123,6 +123,8 @@ export interface UserModel
 	password: string,
 	friendsProfileId: Array<string>;
 	achievements: Array<string>;
+	statusGameIcon: string;
+	statusChatIcon: string;
 }
 
 export interface AdminResponseModel

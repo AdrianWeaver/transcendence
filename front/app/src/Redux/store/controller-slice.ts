@@ -65,6 +65,8 @@ export const	initialControllerState: ControllerModel = {
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				profileId: "undefined",
+				statusChat: "undefined",
+				statusPong: "undefined"
 			}
 			],
 			activeConversationId: "undefined",
@@ -82,8 +84,7 @@ export const	initialControllerState: ControllerModel = {
 			connectedUsers: [],
 			disconnectedUsers: [],
 			currentProfile: "",
-			currentProfileIsFriend: false,
-			friends: []
+			currentProfileIsFriend: false
 		},
 		profile: {
 			editView: false,
@@ -207,7 +208,6 @@ const	controllerSlice = createSlice(
 		setChatUsers(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.chat.users = action.payload.user.chat.users;
-			state.user.chat.friends = action.payload.user.chat.friends;
 		},
 		setActiveConversationId(state, action: PayloadAction<ControllerModel>)
 		{

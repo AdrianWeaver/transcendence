@@ -235,6 +235,7 @@ class Chat
 		};
 		this.databaseToObject = (rawObj: Chat) =>
 		{
+			return ;
 			const	rawChannels = rawObj.channels;
 			const	rawPrivateMessages = rawObj.privateMessage;
 			const	rawUsers = rawObj.users;

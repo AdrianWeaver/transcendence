@@ -25,9 +25,8 @@ const	sendImage = (files: FileObject[], token: string, uri: string) =>
 		data: formData
 	};
 	axios(config)
-	.then((response) =>
+	.then((_response) =>
 	{
-		// console.log(response);
 	})
 	.catch((error) =>
 	{

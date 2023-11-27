@@ -46,7 +46,7 @@ export class	GameService implements OnModuleInit
 
 	public constructor()
 	{
-		this.logger.error("Service constructed with ID: " + this.instanceId);
+		this.logger.verbose("Service constructed with ID: " + this.instanceId);
 		this.roomCount = 0;
 		this.users = 0;
 		this.totalUsers = 0;
@@ -629,7 +629,6 @@ export class	GameService implements OnModuleInit
 			});
 		const	socketConvertedAsActive
 			= this.getCopyWithActiveSocketSetAsActive(deepCopy);
-		console.log(socketConvertedAsActive);
 		const	activeConnection
 			= this.filterGameArrayBySocketState(
 					profileId,

@@ -17,12 +17,8 @@ async function bootstrap()
 
 	if ( await configTest.isValidConfiguration() === false)
 	{
-		console.log("The configuration for the project "
-			+ "is not okay -- goto help folder and $> npm run"
-			+ " (to see command and configure project)");
 		return ;
 	}
-	console.log("The configuration of the project is okay program will start");
 	const	app = await NestFactory.create<NestExpressApplication>(AppModule);
 	app.enableCors({
 		origin: "*",

@@ -22,6 +22,7 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService, ChatUserModel } from "./Chat.service";
+import FileConfig from "src/user/Object/FileConfig";
 import { Logger } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
@@ -38,7 +39,7 @@ type	ActionSocket = {
 type FriendListModel = {
 	name: string,
 	status: string,
-	online: boolean
+	online: boolean,
 }
 
 type MessageModel =
@@ -65,7 +66,9 @@ export type	FriendsModel =
 	name: string,
 	profileId: string,
 	avatar: string,
-	status: string
+	status: string,
+	statusChat: string,
+	statusGame: string
 }
 
 
@@ -141,6 +144,16 @@ export class ChatSocketEvents
 						client.disconnect();
 						return ;
 					}
+					const indexUser = this.userService.user.findIndex((user) =>
+					{
+						return (user.id.toString() === profileId.toString());
+					});
+					if (indexUser !== -1)
+					{
+						const fileCfg = new FileConfig();
+						this.userService.user[indexUser]
+							.statusChatIcon = fileCfg.getAssetsConfig().statusChatOnline;
+					}
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
@@ -199,7 +212,7 @@ export class ChatSocketEvents
 						userToUpdate?.blocked.forEach((blocked) =>
 						{
 							blockedArray.push(blocked.profileId);
-						})
+						});
 						const	action = {
 							type: "on-connection",
 							payload: {
@@ -235,14 +248,16 @@ export class ChatSocketEvents
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				const	friendsArr: FriendsModel[] = [];
 
-				userMe.friends.forEach((friend) =>
+				userMe.friends.forEach((friend: FriendsModel) =>
 				{
 					const	fr: FriendsModel = {
 						name: friend.name,
 						id: friend.id,
 						profileId: friend.profileId,
 						avatar: friend.avatar,
-						status: friend.status
+						status: friend.status,
+						statusChat: friend.statusChat,
+						statusGame: friend.statusGame
 					}
 					friendsArr.push(fr);
 				});
@@ -266,13 +281,11 @@ export class ChatSocketEvents
 			const index = this.chatService.searchUserIndex(sockId);
 			if (index === -1)
 			{
-				this.logger.error("The user that is started to remove dont exist ???");
 				return ;
 			}
 			const	profileId = this.chatService.getProfileIdFromSocketId(sockId);
 			if (profileId === "undefined")
 			{
-				this.logger.error("The user that is started to remove dont exist ???");
 				return ;
 			}
 			this.chatService.updateMemberSocketId("disconnected", profileId);
@@ -287,15 +300,25 @@ export class ChatSocketEvents
 			const indexOfUsers = this.chatService.chat.users.findIndex((user) =>
 			{
 				return (user.profileId === profileId);
-			})
+			});
 			if (indexOfUsers === -1)
 			{
-				this.logger.error("must not be in this conditions ");
 				return ;
 			}
 			// can check if the user is playing with the function of gameService
 			this.chatService.chat.users[indexOfUsers].status = "offline";
 			this.chatService.chat.users[indexOfUsers].online = false;
+			
+			const indexUser = this.userService.user.findIndex((user) =>
+			{
+				return (user.id.toString() === profileId.toString());
+			});
+			if (indexUser !== -1)
+			{
+				const fileCfg = new FileConfig();
+				this.userService.user[indexUser]
+					.statusChatIcon = fileCfg.getAssetsConfig().statusChatOffline;
+			}
 		}
 
 		@SubscribeMessage("sending-message")
@@ -352,7 +375,6 @@ export class ChatSocketEvents
 				if (searchPlayerOne === undefined || searchPlayerTwo === undefined)
 				{
 					// TEST
-					console.error("user not found");
 					return ("error");
 				}
 				this.gameService.increaseRoomCount();
@@ -458,31 +480,24 @@ export class ChatSocketEvents
 			const	profileId = this.chatService.getProfileIdFromSocketId(client.id);
 			const	copyUsers: ChatUserModel[] = [];
 
-			console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
 			this.chatService.chat.users.forEach((user) =>
 			{
-				let status;
-
-				if (!user.online)
-					status = "offline";
-				else
+				const	userIndex = this.userService.user.findIndex((userServe) =>
 				{
-					if (this.gameService.getStatusConnectedToGameFromProfileId(profileId))
-						status = "playing";
-					else
-						status = "online";
-				}
+					return (userServe.id.toString() === user.profileId.toString());
+				});
 				const newUser: ChatUserModel = {
 					avatar: user.avatar,
 					id: user.id,
 					name: user.name,
 					online: user.online,
 					profileId: user.profileId,
-					status: status,
+					status: "unimplemented",
+					statusChat: this.userService.user[userIndex].statusChatIcon,
+					statusPong: this.userService.user[userIndex].statusGameIcon
 				};
 				copyUsers.push(newUser);
 			});
-
 			const	me = this.chatService.getUserBySocketId(client.id);
 			if (me === undefined)
 				return ;
@@ -497,14 +512,16 @@ export class ChatSocketEvents
 				copyUsers.splice(searchUser, 1);
 			const	newArray= [...regularUsers];
 			const	friendsList: FriendsModel[] = [];
-			me.friends.map((elem) =>
+			me.friends.map((elem : FriendsModel) =>
 			{
 				const	friend: FriendsModel = {
 					name: elem.name,
 					id: elem.id,
 					profileId: elem.profileId,
 					avatar: elem.avatar,
-					status: elem.status
+					status: elem.status,
+					statusChat: elem.statusChat,
+					statusGame: elem.statusGame
 				}
 				friendsList.push(friend);
 			});
@@ -537,6 +554,7 @@ export class ChatSocketEvents
 		{
 			const	searchChatUser = this.chatService.getUserBySocketId(client.id);
 
+			// this.logger.verbose("handle info", data);
 			let newChatUser: ChatUserModel;
 			if (searchChatUser === undefined)
 			{
@@ -546,7 +564,9 @@ export class ChatSocketEvents
 					id: client.id,
 					online: data.payload.online,
 					status: data.payload.status,
-					profileId: data.payload.user.id
+					profileId: data.payload.user.id,
+					statusChat: "undefined",
+					statusPong: "undefined"
 				};
 				this.chatService.addNewChatUser(newChatUser, client);
 			}
@@ -558,7 +578,9 @@ export class ChatSocketEvents
 					id: searchChatUser.id,
 					online: searchChatUser.online,
 					status: searchChatUser.status,
-					profileId: searchChatUser.profileId
+					profileId: searchChatUser.profileId,
+					statusChat: "undefined",
+					statusPong: "undefined"
 				};
 			}
 			const	action = {
@@ -585,7 +607,7 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				this.logger.error("The client send a message", data);
+				// this.logger.error("Client sends a message", data);
 				this.handleInfoSentMessage(client, data);
 			}
 

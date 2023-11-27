@@ -120,7 +120,6 @@ class Configuration
 	private generateFull()
 		: string
 	{
-		console.log("generate url for  auth");
 		const	paramsArray: Array<TokenModel> = [];
 		let		strUrl: string;
 		const	params: TokenModel = {

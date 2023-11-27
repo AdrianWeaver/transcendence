@@ -18,7 +18,6 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
-	ChatUserModel,
 	HistoryModel,
 	UserDBFrontModel,
 	UserLoginResponseModel,
@@ -142,9 +141,9 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				}
 			}).then((data: any) =>
 			{
-				this.logger.debug("Next line is for database");
-				this.logger.debug(typeof data);
-				this.logger.debug(data);
+				// this.logger.debug("Next line is for database");
+				// this.logger.debug(typeof data);
+				// this.logger.debug(data);
 				if (data === null)
 				{
 					this.logger.log("data is eq to null");
@@ -154,7 +153,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				{
 					this.logger.log("data is provided");
 					this.secret = data?.value;
-					this.logger.error("Secret : " + this.secret);
+					this.logger.verbose("Secret : " + this.secret);
 				}
 			})
 			.catch((error: any) =>
@@ -186,7 +185,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			})
 			.then(() =>
 			{
-				this.logger.error("user succesfully created ");
+				this.logger.verbose("user succesfully created ");
 				return ("SUCCESS");
 			})
 			.catch((error: any) =>
@@ -220,7 +219,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			)
 			.then(() =>
 			{
-				this.logger.error("user succesfully created ");
+				this.logger.verbose("user succesfully created ");
 				return ("SUCCESS");
 			})
 			.catch((error: any) =>
@@ -251,7 +250,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				if (data)
 				{
 					const	content = JSON.parse(data.contents);
-					// console.log("content ", content);
 					const	update = this.prepareUserForDB(user.id);
 					this.prismaService.prisma
 						.userJson
@@ -288,9 +286,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						});
 				}
 			})
-			.catch((error) =>
+			.catch((_error) =>
 			{
-				console.log("error create entry", error);
 			});
 	}
 
@@ -312,14 +309,12 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 						// // TEST at home, I need to do this:
 						// const stringObj = JSON.parse(elem.contents);
 						// const	rawObj = JSON.parse(stringObj);
-						// console.log("rawObj user", rawObj);
 						this.databaseToObject(rawObj);
 					});
 				}
 			})
-			.catch((error: any) =>
+			.catch((_error: any) =>
 			{
-				console.log(error);
 			});
 	}
 
@@ -337,7 +332,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	public	triggerShutDown(stringReason: string)
 	{
-		this.logger.error("Server will shuting down reason: " + stringReason);
+		this.logger.error("Server will be shuting down reason: " + stringReason);
 		this.shutdown$.next(stringReason);
 	}
 
@@ -377,14 +372,13 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			if (error)
 				this.logger.error("You need to check files and directory permission X and  W");
 			else
-				this.logger.verbose("The path for public storage is okay and accessible");
+				this.logger.verbose("Public storage path is OK and reachable");
 		});
 	}
 
 	private async isHavingPreviousPermalinks(actualServerCfg: ServerConfig): Promise<boolean>
 	{
 		const	permalinkVersion = "prod-v2";
-		// console.log(prisma.permalinks);
 		try
 		{
 			const permalinks = await this.prismaService.prisma.permalinks.findUnique(
@@ -418,12 +412,10 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			else
 			{
 				const compareFromDB = await JSON.parse(permalinks.contents);
-				// console.log(compareFromDB);
 				const requestedCmp = await JSON.parse(actualServerCfg.serialize());
-				// console.log(requestedCmp);
 				if (compareFromDB === requestedCmp)
 				{
-					this.logger.error("Permalink already set but environnement changing");
+					this.logger.error("Permalink already set but environnement is changing");
 					return (false);
 				}
 				this.logger.warn("Permalinks already set, must not change until drop table");
@@ -440,10 +432,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	private	async checkPermalinks()
 	{
 		const test = new ServerConfig();
-		this.logger.verbose("Permalinks verifications from environement:");
-		this.logger.verbose("Location: " + test.location);
-		this.logger.verbose("Protocol: " + test.protocol);
-		this.logger.verbose("Port: " + test.port);
 		if (!test.port || !test.location || !test.protocol)
 		{
 			this.logger.error("Production file must have server config environnement");
@@ -468,7 +456,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			// 		this.logger.error(error);
 			// 	});
 		}
-		this.logger.verbose("Permalinks check ending");
 	}
 
 	public getAllUserRaw () : Array<UserModel>
@@ -690,7 +677,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		{
 			const	imagePng = sharp(oldTmpFilePath);
 			const	metadata = await imagePng.metadata();
-			// console.log(metadata);
 			const	outputBuffer = await imagePng.jpeg().toBuffer();
 			fs.writeFileSync(destTmpFilePath, outputBuffer);
 		}
@@ -721,7 +707,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 			const	image = sharp(filecfg.getPathTmpConverted());
 
 			const	metadata = await image.metadata();
-			// console.log(metadata);
 			if (metadata.height === metadata.width
 				|| metadata.width === undefined
 				|| metadata.height === undefined)
@@ -786,7 +771,6 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 	: Promise<UserModel>
 	{
 		fileCfg.setPictureConfig(this.getConfig());
-		// console.log(this.getConfig());
 		if (fileCfg.needConvertToJPEG())
 		{
 			try
@@ -795,9 +779,8 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				await this.deletePicture(fileCfg.fullPath());
 				await this.resizeAllUploadedPictures(fileCfg);
 			}
-			catch (error)
+			catch (_error)
 			{
-				this.logger.error(error);
 			}
 		}
 		else
@@ -827,89 +810,92 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 
 	public	registerFortyThree(data: UserModel)
 	: {res: UserRegisterResponseModel, toDB: UserModel}
-{
-	const	searchUser = this.user.find((user) =>
 	{
-		return (user.id === data.id);
-	});
-	if (searchUser?.registrationProcessEnded === true)
-		throw new BadRequestException("Account already created");
-	if (searchUser !== undefined)
-	{
-		const	index = this.user.findIndex((user) =>
+		const	searchUser = this.user.find((user) =>
 		{
 			return (user.id === data.id);
 		});
-		if (index !== -1)
-			this.user.splice(index, 1);
-	}
-	// const	secretToken = randomBytes(64).toString("hex");
-	const newUser : UserModel= {
-		registrationStarted: true,
-		registrationProcessEnded: false,
-		ftApi: data.ftApi,
-		retStatus: data.retStatus,
-		date: data.date,
-		id: data.id,
-		email: data.email,
-		username: data.username,
-		login: data.login,
-		online: data.online,
-		status: data.status,
-		firstName: data.firstName,
-		lastName: data.lastName,
-		url: data.url,
-		avatar: data.avatar,
-		ftAvatar: data.ftAvatar,
-		location: data.location,
-		revokedConnectionRequest: data.revokedConnectionRequest,
-		authService:
+		if (searchUser?.registrationProcessEnded === true)
+			throw new BadRequestException("Account already created");
+		if (searchUser !== undefined)
 		{
-			token: "Bearer " + jwt.sign(
-				{
-					id: data.id,
-					email: data.email
-				},
-				this.secret,
-				{
-					expiresIn: "1d"
-				}
-			),
-			expAt: Date.now() + (1000 * 60 * 60 * 24),
-			doubleAuth:
+			const	index = this.user.findIndex((user) =>
 			{
-				enable: data.authService.doubleAuth.enable,
-				lastIpClient: data.authService.doubleAuth.lastIpClient,
-				phoneNumber: data.authService.doubleAuth.phoneNumber,
-				phoneRegistered: data.authService.doubleAuth.phoneRegistered,
-				validationCode: data.authService.doubleAuth.validationCode,
-				valid: data.authService.doubleAuth.valid,
-			}
-		},
-		password: data.password,
-		friendsProfileId: [],
-		achievements: []
-	};
-	this.user.push(newUser);
-	const	response: UserRegisterResponseModel = {
-		message: "Your session has been created, you must loggin",
-		token: newUser.authService.token,
-		id: newUser.id,
-		email: newUser.email,
-		statusCode: newUser.retStatus,
-		username: newUser.username,
-		login: newUser.login,
-		firstName: newUser.firstName,
-		lastName: newUser.lastName,
-		avatar: newUser.avatar,
-		ftAvatar: newUser.ftAvatar
-	};
-	return (
-	{
-		res: response,
-		toDB: newUser
-	});
-}
+				return (user.id === data.id);
+			});
+			if (index !== -1)
+				this.user.splice(index, 1);
+		}
+		// const	secretToken = randomBytes(64).toString("hex");
+		const fileCfg = new FileConfig();
+		const newUser : UserModel= {
+			registrationStarted: true,
+			registrationProcessEnded: false,
+			ftApi: data.ftApi,
+			retStatus: data.retStatus,
+			date: data.date,
+			id: data.id,
+			email: data.email,
+			username: data.username,
+			login: data.login,
+			online: data.online,
+			status: data.status,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			url: data.url,
+			avatar: data.avatar,
+			ftAvatar: data.ftAvatar,
+			location: data.location,
+			revokedConnectionRequest: data.revokedConnectionRequest,
+			authService:
+			{
+				token: "Bearer " + jwt.sign(
+					{
+						id: data.id,
+						email: data.email
+					},
+					this.secret,
+					{
+						expiresIn: "1d"
+					}
+				),
+				expAt: Date.now() + (1000 * 60 * 60 * 24),
+				doubleAuth:
+				{
+					enable: data.authService.doubleAuth.enable,
+					lastIpClient: data.authService.doubleAuth.lastIpClient,
+					phoneNumber: data.authService.doubleAuth.phoneNumber,
+					phoneRegistered: data.authService.doubleAuth.phoneRegistered,
+					validationCode: data.authService.doubleAuth.validationCode,
+					valid: data.authService.doubleAuth.valid,
+				}
+			},
+			password: data.password,
+			friendsProfileId: [],
+			achievements: [],
+			statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+			statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
+		};
+		this.user.push(newUser);
+		const	response: UserRegisterResponseModel = {
+			message: "Your session has been created, you must loggin",
+			token: newUser.authService.token,
+			id: newUser.id,
+			email: newUser.email,
+			statusCode: newUser.retStatus,
+			username: newUser.username,
+			login: newUser.login,
+			firstName: newUser.firstName,
+			lastName: newUser.lastName,
+			avatar: newUser.avatar,
+			ftAvatar: newUser.ftAvatar
+		};
+		return (
+		{
+			res: response,
+			toDB: newUser
+		});
+	}
 
 public	register(data: UserModel)
 : {res: UserRegisterResponseModel, toDB: UserModel}
@@ -927,6 +913,7 @@ public	register(data: UserModel)
 		if (index !== -1)
 			this.user.splice(index, 1);
 	}
+	const fileCfg = new FileConfig();
 	const newUser : UserModel= {
 		registrationStarted: true,
 		registrationProcessEnded: false,
@@ -971,8 +958,10 @@ public	register(data: UserModel)
 		},
 		password: data.password,
 		friendsProfileId: [],
-		achievements: []
+		achievements: [],
 		// tokenSecret: secretToken
+		statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+		statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 	};
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
@@ -1007,9 +996,7 @@ public	register(data: UserModel)
 		else
 		{
 			this.logger.verbose("User found... checkin password");
-			console.log("user ", searchUser);
 			const	valid = await bcrypt.compare(password, searchUser.password);
-			console.log("Value of session validity: ", valid);
 			if (valid === false)
 			{
 				throw new ForbiddenException("Invalid credential");
@@ -1173,7 +1160,7 @@ public	register(data: UserModel)
 		{
 			return (element.id === profileId);
 		});
-		console.error(searchUser);
+		// console.error(searchUser);
 		return (searchUser?.username);
 	}
 
@@ -1222,18 +1209,15 @@ public	register(data: UserModel)
 
 	async	decodePassword(password: string, username: string)
 	{
-		console.log("usrname ???", username);
 		const	index = this.user.findIndex((elem) =>
 		{
 			return (elem.username === username);
 		});
 		if (index === -1)
 			return ("ERROR");
-		console.log(password, " ", this.user[index].password);
 		const	valid = await bcrypt.compare(password, this.user[index].password)
 		.then(() =>
 		{
-			console.log("email ? ", this.user[index].email);
 			const ret =	{
 				token: "Bearer " + jwt.sign(
 				{
@@ -1249,12 +1233,11 @@ public	register(data: UserModel)
 			};
 			if (ret === undefined)
 				return ("ERROR");
-			console.log("Token ok");
 			this.user[index].authService.token = ret.token;
 			this.user[index].authService.expAt = ret.expAt;
 			return (ret);
 		})
-		.catch((err) =>
+		.catch((_err) =>
 		{
 			return ("ERROR");
 		});
@@ -1306,17 +1289,9 @@ public	register(data: UserModel)
 		if (searchFriendIndex === -1)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
-		const	isFriend = this.user[searchUserIndex].friendsProfileId.find((elem) =>
-		{
-			return (elem === friendId);
-		});
-		if (isFriend === undefined)
-			this.user[searchUserIndex].friendsProfileId.push(friendId);
-		else
-			return ("already friends");
+		this.user[searchUserIndex].friendsProfileId.push(friendId);
 		this.updateUserToDatabase(this.user[searchUserIndex]);
-	
-		return ("success");
+		return (searchFriend.username + " added as friend");
 	}
 
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
@@ -1357,7 +1332,7 @@ public	register(data: UserModel)
 	}
 
 	public	addFriends(myProfileId: any, targetProfileId: any)
-		: any
+		: string
 	{
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
@@ -1387,22 +1362,6 @@ public	register(data: UserModel)
 			}
 		}
 		return ("SUCCESS");
-		// const	copy = this.getAllUserRaw();
-		// const	newUsers: any[] = [];
-		// copy.map((elem) =>
-		// {
-		// 	const	toSend = {
-		// 		name: elem.username,
-		// 		avatar: elem.avatar,
-		// 		id: elem.id,
-		// 		status: elem.status,
-		// 		online: elem.online,
-		// 		location: elem.location,
-		// 		friends: elem.friendsProfileId
-		// 	}
-		// 	newUsers.push(toSend);
-		// })
-		// return (newUsers);
 	}
 
 	public	getFriendsProfileId(myProfileId: any)
@@ -1432,7 +1391,9 @@ public	register(data: UserModel)
 			name: this.user[myUserIndex].username,
 			profileId: this.user[myUserIndex].id,
 			avatar: this.user[myUserIndex].avatar,
-			status: this.user[myUserIndex].status
+			status: this.user[myUserIndex].status,
+			statusChat: this.user[myUserIndex].statusChatIcon,
+			statusGame: this.user[myUserIndex].statusGameIcon
 		};
 		return (friend);
 	}
@@ -1492,7 +1453,9 @@ public	register(data: UserModel)
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
 			achievements: [],
-			revokedConnectionRequest: user.revokedConnectionRequest
+			revokedConnectionRequest: user.revokedConnectionRequest,
+			statusChatIcon: user.statusChatIcon,
+			statusGameIcon: user.statusGameIcon
 		};
 		const	toDB = JSON.stringify(objToDB);
 		return (objToDB);
@@ -1535,7 +1498,9 @@ public	register(data: UserModel)
 			},
 			password: data.password,
 			friendsProfileId: [...data.friendsProfileId],
-			achievements: [...data.achievements]
+			achievements: [...data.achievements],
+			statusChatIcon: data.statusChatIcon,
+			statusGameIcon: data.statusGameIcon
 		};
 		this.user.push(toObj);
 	}
@@ -1663,6 +1628,5 @@ public	register(data: UserModel)
 					elem.status = "online";
 			}
 		});
-		console.log("UPDATE STATUS WORKED ?", this.user);
 	}
 }

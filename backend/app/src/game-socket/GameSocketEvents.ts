@@ -28,6 +28,7 @@ import { ContentAndApprovalsPage } from "twilio/lib/rest/content/v1/contentAndAp
 import { disconnect } from "process";
 import { profileEnd } from "console";
 import	* as roomNameArray from "./assets/roomName.json";
+import FileConfig from "src/user/Object/FileConfig";
 
 type	ActionSocket = {
 	type: string,
@@ -79,6 +80,7 @@ export class GameSocketEvents
 		private readonly userService: UserService
 	)
 	{
+		this.logger.verbose("Started instance of game socket event with id : " + this.userService.getUuidInstance());
 		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
@@ -127,8 +129,6 @@ export class GameSocketEvents
 		{
 			if (instance.revoked === true)
 			{
-				// this.gameService.recordMatchHistory(instance);
-				// this.logger.debug(frame);
 				instance.revoked = false;
 				this.logger.debug("instance not killed");
 				if (frame === 0)
@@ -139,9 +139,6 @@ export class GameSocketEvents
 				{
 					this.server.to(instance.roomName).emit("matchmaking-state", {type: "abandon"});
 				}
-				// this.logger.error("error in revoked", instance);
-				// this.gameService.recordMatchHistory(instance);
-				// console.log(instance);
 				return ;
 			}
 			if (instance.loop && instance.loop.gameActive === false)
@@ -311,7 +308,6 @@ export class GameSocketEvents
 		const token = this.isTokenValid(client.handshake.auth.token);
 		if (token.isValid === false)
 		{
-			console.log(token);
 			client.disconnect();
 			return ({error: true});
 		}
@@ -435,8 +431,6 @@ export class GameSocketEvents
 		const	classicalArray = this.gameService.filterGameArrayBySocketState(profileId, classicalGameMode);
 		let		roomName: string;
 
-		console.log("classical filtered", classicalArray);
-		this.logger.debug("Checking socket state for state of classical games");
 		if (classicalArray.filtered.disconnected.length === 0)
 		{
 			this.logger.verbose("\tThe user has no pending games");
@@ -581,7 +575,6 @@ export class GameSocketEvents
 		const	upsideDownArray = this.gameService.filterGameArrayBySocketState(profileId, upsideDownGameMode);
 		let		roomName: string;
 
-		console.log("upside-down filtered", upsideDownArray);
 		this.logger.debug("Checking socket state for state of upsideDown games");
 		if (upsideDownArray.filtered.disconnected.length === 0)
 		{
@@ -753,11 +746,21 @@ export class GameSocketEvents
 				roomName = await this.dispatchMatchmakingUpsideDown(profileId, client);
 				break ;
 			default:
-				this.logger.error("Oups !!!");
+				this.logger.error("Oops !!!");
 				break;
 		}
 		if (roomName === "The void")
 			return ;
+		const indexUser = this.userService.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileId.toString());
+		});
+		if (indexUser !== -1)
+		{
+			const fileCfg = new FileConfig();
+			this.userService.user[indexUser]
+				.statusGameIcon = fileCfg.getAssetsConfig().statusGameOnline;
+		}
 		const	roomInfo = this.server.sockets.adapter.rooms.get(roomName);
 		if (roomInfo)
 		{
@@ -818,7 +821,7 @@ export class GameSocketEvents
 
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
-			this.logger.error("game instance not fouded for disconnect user");
+			this.logger.error("game instance not found for disconnect user");
 		const	instance = this.gameService.gameInstances[indexInstance];
 		if (instance.playerOne.socketId === client.id)
 		{
@@ -873,8 +876,6 @@ export class GameSocketEvents
 		}
 		if (instance.revoked)
 		{
-			this.logger.verbose("The game will be destroyed");
-			// console.log(instance);
 			// before data is erased 
 			if (instance.userConnected === 0)
 			{
@@ -890,9 +891,13 @@ export class GameSocketEvents
 					this.gameService.roomCount = 0;
 				}
 			}
-			// console.log(instance);
 		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
+		if (userIndex !== -1)
+		{
+			const fileCfg = new FileConfig();
+			this.userService.user[userIndex].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline; 
+		}
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
 		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);
@@ -960,13 +965,11 @@ export class GameSocketEvents
 		});
 		if (!userRoom)
 		{
-			console.log("An error occured with socket.io");
 			return ;
 		}
 		const roomInfo = this.server.sockets.adapter.rooms.get(userRoom);
 		if (!roomInfo)
 		{
-			console.log("An error occured with socket.io");
 			return ;
 		}
 		const socketIdsInRoom = Array.from(roomInfo.keys());

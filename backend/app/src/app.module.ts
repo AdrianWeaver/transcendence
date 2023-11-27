@@ -27,6 +27,7 @@ import { GameApiService } from "./game-api/game-api.service";
 import { PrismaModule } from "./prisma/prisma.module";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
+const	assetsFolder = join(__dirname, "..", "/public/assets");
 
 @Module(
 {
@@ -47,12 +48,19 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 					index: false
 				}
 			}),
+		ServeStaticModule
+			.forRoot({
+				serveRoot: "/cdn/image/assets",
+				rootPath: assetsFolder,
+				serveStaticOptions:
+				{
+					index: false
+				}
+			}),
 		GracefulShutdownModule
 			.forRoot({
 				cleanup: async (app : any) =>
 				{
-					// releasing ressources
-					console.log("Releasing ressources");
 				},
 				gracefulShutdownTimeout:
 					Number(process.env.GRACEFULL_SHUTDOWN_TIMEOUT ?? 10000),
