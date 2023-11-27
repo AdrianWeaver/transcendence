@@ -170,7 +170,7 @@ type FriendsListProps = {
 const FriendsList = (props: FriendsListProps) =>
 {
 	const	dispatch = useAppDispatch();
-	const	alreadyHere: string[] = [];
+
 	const	currentProfileIsFriend = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfileIsFriend);
@@ -216,30 +216,21 @@ const FriendsList = (props: FriendsListProps) =>
 					users.map((elem, index) =>
 					{
 						let status;
-						let	ind: number;
-						ind = -1;
+
 						status = elem.online ? "💚" : "🔴";
 						if (elem.status === "playing" && elem.online)
 							status = "🏓";
-						// let keyIndex = crypto.randomUUID();
-						const	found = alreadyHere.find((el) =>
-						{
-							return (elem.profileId.toString() === el.toString())
-						});
-						if (found === undefined)
-						{
-							ind = Number(elem.profileId);
-							alreadyHere.push(elem.profileId);
-						}
+
+						console.log("user map :", elem);
 						return (		
-							(elem.profileId !== user.id.toString() && ind !== -1)
-							?	<div key={ind} onClick={() =>
+							(elem.profileId !== user.id.toString())
+							?	<div key={Number(elem.profileId)} onClick={() =>
 									{
 										dispatch(setActiveConversationId(elem.id));
 										createNewConv(elem.id);
 									}}>
-									<ListItem >
-									<ListItemIcon >
+									<ListItem key={Number(elem.profileId)} >
+									<ListItemIcon>
 										<Avatar
 											alt={elem.name}
 											src={elem.avatar}
@@ -249,15 +240,15 @@ const FriendsList = (props: FriendsListProps) =>
 										{elem.name}
 									</ListItemText>
 									{
-										(currentProfileIsFriend)
-										? 
-											<ListItemText
-													secondary={status}
-													sx={{ align: "right" }}
-											></ListItemText>
-										: <></>
+										// (currentProfileIsFriend)
+										// ?
+										<ListItemText
+												secondary={status}
+												sx={{ align: "right" }}
+										></ListItemText>
+										// : <></>
 									}
-                </ListItem>
+								</ListItem>
 							</div>
 							: <></>
 						);
@@ -923,7 +914,8 @@ const	ChatLayout = () =>
 				else
 				{
 					setFriendList(data.payload.friendList);
-					dispatch(addUserAsFriend(data.payload.friendProfileId));
+					dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
+					// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
 					dispatch(setCurrentProfile(data.payload.friendProfileId));
 					dispatch(setCurrentProfileIsFriend(true));
 					const	alertMessage = data.payload.newFriend + " has been added to Friends.";
@@ -1137,11 +1129,15 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (chanName: string) =>
 	{
+		const	userMe = chatUsers.find((elem) =>
+		{
+			return (elem.profileId === uniqueId);
+		});
 		let substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>
 		{
-			if (elem !== user?.username)
+			if (elem !== userMe?.name)
 				username = elem;
 		});
 		dispatch(setPreviousPage("/the-chat"));
@@ -1166,7 +1162,6 @@ const	ChatLayout = () =>
 		}
 		setTalkingUserProfileId(searchUser.profileId);
 		navigate("/profile/");
-		setClickedChannel("");
 	};
 
 	const	leaveChannel = (chanName: string) =>
@@ -1932,12 +1927,13 @@ const	ChatLayout = () =>
 														Choose an Action
 													</DialogTitle>
 													<DialogContent>
-														<Button onClick={() =>
-														{
-															goToProfilePage(clickedChannel);
-														}}>
-															see profile page
-														</Button>
+													<Button onClick={() =>
+													{
+														goToProfilePage(clickedChannel);
+														setClickedChannel("");
+													}}>
+														see profile page
+													</Button>
 													</DialogContent>
 														<DialogActions>
 															<Button onClick={handleDialogClose} color="primary">

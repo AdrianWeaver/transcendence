@@ -247,6 +247,8 @@ export class UserController
 					}
 					else
 					{
+						const fileCfg = new FileConfig();
+						console.log("ICI  655656?");
 						userObject = {
 							registrationProcessEnded: false,
 							registrationStarted: true,
@@ -282,7 +284,9 @@ export class UserController
 							},
 							password: "undefined",
 							friendsProfileId: [],
-							achievements: []
+							achievements: [],
+							statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+							statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 						};
 						this.logger.log("Starting processing image");
 						const newUserObj = await this.userService.downloadAvatar(userObject);
@@ -339,6 +343,7 @@ export class UserController
 		profileId = Math.floor((Math.random() * 100000) + 1);
 		while (!this.userService.isProfileIDUnique(profileId))
 			profileId = Math.floor((Math.random() * 100000) + 1);
+		const	fileCfg = new FileConfig();
 		const	userObject:UserModel = {
 			registrationProcessEnded: false,
 			registrationStarted: true,
@@ -390,7 +395,9 @@ export class UserController
 			},
 			password: "undefined",
 			friendsProfileId: [],
-			achievements: []
+			achievements: [],
+			statusChatIcon: fileCfg.getAssetsConfig().statusChatOffline,
+			statusGameIcon: fileCfg.getAssetsConfig().statusGameOffline,
 		};
 		if (this.userService.getUserById(userObject.id) !== undefined)
 		{
@@ -563,6 +570,7 @@ export class UserController
 			return ;
 		}
 		const	number = this.userService.getPhoneNumber(body.profileId);
+		console.log("bYneror", number);
 		if (number === "undefined" || number === undefined)
 		{
 			res.status(400).send("number not found");
@@ -624,7 +632,9 @@ export class UserController
 					code: body.otpCode
 				})
 			.then((verificationCheck) =>
-			{;
+			{
+				console.log("status : ", verificationCheck.status);
+				console.log("VERIF : ", verificationCheck);
 				if (verificationCheck.status === "approved")
 				{
 					res.send(true);
@@ -843,15 +853,19 @@ export class UserController
 		@Req()	req: any
 	)
 	{
+		// console
 		this.logger
 			.log("'add-friend' route requested");
-		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
+		if (req.user.id !== body.id)
+			throw new ForbiddenException();
+		return (this.userService.addUserAsFriend(body.friendId, body.myId));
 	}
 
 	@Post("/my-stats")
 	@UseGuards(UserAuthorizationGuard)
 	getMyStats(@Req() req: any)
 	{
+		// return (["toto"]);
 		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
@@ -1027,7 +1041,7 @@ export class UserController
 		this.logger.log("'user-playing' route requested");
 		let	playing: boolean;
 		playing = false;
-		this.chatService.updateStatus(this.gameService);
+		// this.chatService.updateStatus(this.gameService);
 		this.userService.updateStatus(this.gameService);
 		const	chatUsers: any[] = [];
 		console.log("user-playing", req.user.id);
@@ -1046,6 +1060,7 @@ export class UserController
 				chatUsers.push(usr);
 			}
 		});
+		console.log("NEW CHAT USERS", chatUsers);
 		return (chatUsers);
 	}
 

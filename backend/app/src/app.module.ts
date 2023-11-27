@@ -27,6 +27,7 @@ import { GameApiService } from "./game-api/game-api.service";
 import { PrismaModule } from "./prisma/prisma.module";
 // may change on prod (folder dist)
 const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
+const	assetsFolder = join(__dirname, "..", "/public/assets");
 
 @Module(
 {
@@ -42,6 +43,15 @@ const	pictureFolder = join(__dirname, "..", "/public/profilePictures");
 			.forRoot({
 				serveRoot: "/cdn/image/profile",
 				rootPath: pictureFolder,
+				serveStaticOptions:
+				{
+					index: false
+				}
+			}),
+		ServeStaticModule
+			.forRoot({
+				serveRoot: "/cdn/image/assets",
+				rootPath: assetsFolder,
 				serveStaticOptions:
 				{
 					index: false

@@ -77,6 +77,7 @@ export class GameApiController
 	// @UseGuards(UserAuthorizationGuard)
 	inviteFriend(@Param("invited") friend: string)
 	{
+		console.log(friend);
 		return ("hello");
 	}
 
@@ -100,6 +101,8 @@ export class GameApiController
 		@Req() req: any,
 		@Body() body: RevokeTokenDto): string
 	{
+		console.log(req.user.id);
+		console.log(body);
 		const indexGameInstance = this.gameApiService
 			.findIndexGameInstanceUserProfileAndGameUuid(
 				req.user.id, body.uuid

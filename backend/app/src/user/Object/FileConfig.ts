@@ -19,6 +19,13 @@ type CDNConfig = {
 	}
 };
 
+type AssetConfig = {
+	statusGameOnline: string;
+	statusGameOffline: string;
+	statusChatOnline: string;
+	statusChatOffline: string;
+};
+
 class FileConfig
 {
 	private	acceptedType: boolean;
@@ -45,6 +52,8 @@ class FileConfig
 	public	getPathNormal: () => string;
 	public	getPathTmpConverted: () => string;
 	public	getCDNConfig: () => CDNConfig;
+	public	getAssetsConfig: () => AssetConfig;
+
 	constructor()
 	{
 		this.serverConfig = new ServerConfig();
@@ -168,6 +177,19 @@ class FileConfig
 					}
 				}
 			});
+		};
+		this.getAssetsConfig = () =>
+		{
+			const	baseUrl = this.serverConfig.protocol
+			+ "://" + this.serverConfig.location
+			+ ":" + this.serverConfig.port + "/cdn/image/assets/";
+			const	returnValue: AssetConfig = {
+				statusGameOffline: baseUrl + "pong-offline.png",
+				statusGameOnline: baseUrl + "pong-online.png",
+				statusChatOffline: baseUrl + "user-offline.png",
+				statusChatOnline: baseUrl + "user-online.png",
+			}
+			return (returnValue);
 		};
 	}
 }

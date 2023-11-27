@@ -160,7 +160,7 @@ const	Header = () =>
 						<Button
 							variant="contained"
 							onClick={handleRefresh}>
-							Refresh
+							Rafraichir
 						</Button>
 						{/* 
 							<Button variant="outlined">Secondary 
@@ -176,11 +176,7 @@ const	MyStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 
-	useEffect(() =>
-	{
-		savePrevPage("/my-stats");
-	})
-	
+	savePrevPage("/my-stats");
 	return (
 		<>
 			<MenuBar />
