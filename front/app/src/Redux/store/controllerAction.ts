@@ -11,7 +11,7 @@
 import controllerSlice, { initialControllerState } from "./controller-slice";
 import { AnyAction, ThunkAction } from "@reduxjs/toolkit";
 import { RootState } from "./index";
-import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, UserModel } from "../models/redux-models";
+import { BackUserModel, CanvasModel, ChatUserModel, ControllerModel, FriendsDataModel, UserModel } from "../models/redux-models";
 import UserServices from "../service/ft-api-service";
 import ServerService from "../service/server-service";
 import ConnectionState from "../../Component/ConnectionState";
@@ -1336,22 +1336,41 @@ export const	setNewToken = (newToken: string)
 // 	});
 // }
 
-export const	addUserAsFriend = (myId: string, friendId: string)
+export const	addUserAsFriend = (friendId: string)
 : ThunkAction<void, RootState, unknown, AnyAction> =>
 {
 	return (async (dispatch, getState) =>
 	{
 		const	prev = getState();
-		await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
-			friendId, prev.server.uri, myId)
-		.then((_data) =>
+		const	data = await UserServices.addUserAsFriend(prev.controller.user.bearerToken,
+			friendId, prev.server.uri)
+		if (data === "ERROR")
+			return ;
+		if (data === "success")
 		{
-		})
-		.catch((error) =>
-		{
-			console.error(error);
-		});
-		// dispatch update friends that we dont have yet
+			const	newFriend = {
+				profileIdOwner: prev.controller.user.id.toString(),
+				profileIdFriend: friendId.toString()
+			}
+			const	newFriends = prev.controller.user.chat.friends.map((elem) =>
+			{
+				return (elem);
+			});
+			newFriends.push(newFriend);
+			const	response: ControllerModel = {
+				...prev.controller,
+				user:
+				{
+					...prev.controller.user,
+					chat:
+					{
+						...prev.controller.user.chat,
+						friends: newFriends
+					}
+				}
+			}
+			dispatch(controllerActions.setChatUsers(response));
+		}
 	});
 }
 
@@ -1887,3 +1906,4 @@ export const	resetController = ()
 		dispatch(controllerActions.resetController(initialControllerState));
 	});
 }
+

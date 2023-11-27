@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 type	RightSideProps =
 {
-	profileId: string;
+	profileId: string | undefined;
 	isMe: boolean;
 }
 

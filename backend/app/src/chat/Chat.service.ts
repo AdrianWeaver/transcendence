@@ -86,23 +86,23 @@ export	class ChatService implements OnModuleInit
 	private onTableCreate()
 	{
 		return ;
-		this.log.verbose("Creating a new version inside database");
-		const	dbString = this.parseForDatabase();
-		this.prismaService
-			.prisma
-			.chatJson
-			.create(
-			{
-				data:
-				{
-					chatJsonID: this.chatID,
-					contents: dbString
-				}
-			})
-			.catch((_error: any) =>
-			{
-				// this.log.error(error);
-			});
+		// this.log.verbose("Creating a new version inside database");
+		// const	dbString = this.parseForDatabase();
+		// this.prismaService
+		// 	.prisma
+		// 	.chatJson
+		// 	.create(
+		// 	{
+		// 		data:
+		// 		{
+		// 			chatJsonID: this.chatID,
+		// 			contents: dbString
+		// 		}
+		// 	})
+		// 	.catch((_error: any) =>
+		// 	{
+		// 		// this.log.error(error);
+		// 	});
 	}
 
 	public getChatData()
@@ -125,8 +125,9 @@ export	class ChatService implements OnModuleInit
 		this.chat.updateChannelOwner(newSocketId, profileId);
 	}
 
-	public parseForDatabase() : string
+	public parseForDatabase()
 	{
+		return ;
 		const toDBObject = this.chat.parseForDatabase();
 		return (JSON.stringify(toDBObject));
 	}
@@ -614,7 +615,6 @@ export	class ChatService implements OnModuleInit
 	async	hashPassword(password: string, chanName: string)
 	{
 		const	saltRounds = 10;
-		console.log("CHANNAME ", chanName);
 		const	index = this.chat.channels.findIndex((elem) =>
 		{
 			return (elem.name === chanName);

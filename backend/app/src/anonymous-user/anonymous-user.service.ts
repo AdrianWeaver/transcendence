@@ -25,7 +25,7 @@ import { PrismaService } from "../prisma/prisma.service";
 export class AnonymousUserService implements OnModuleInit
 {
 	private	anonymousUser: Array<AnonymousUserModel> = [];
-	private	secret: string = "test";
+	private	secret: string = "42";
 	private	uuidInstance: string;
 	private	logger = new Logger("anymous-user-service itself");
 	private	readonly secretId = "anonymous-user-service-secret";

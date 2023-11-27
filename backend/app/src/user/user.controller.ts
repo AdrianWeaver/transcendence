@@ -570,7 +570,6 @@ export class UserController
 			return ;
 		}
 		const	number = this.userService.getPhoneNumber(body.profileId);
-		console.log("bYneror", number);
 		if (number === "undefined" || number === undefined)
 		{
 			res.status(400).send("number not found");
@@ -632,9 +631,7 @@ export class UserController
 					code: body.otpCode
 				})
 			.then((verificationCheck) =>
-			{
-				console.log("status : ", verificationCheck.status);
-				console.log("VERIF : ", verificationCheck);
+			{;
 				if (verificationCheck.status === "approved")
 				{
 					res.send(true);
@@ -853,19 +850,15 @@ export class UserController
 		@Req()	req: any
 	)
 	{
-		// console
 		this.logger
 			.log("'add-friend' route requested");
-		if (req.user.id !== body.id)
-			throw new ForbiddenException();
-		return (this.userService.addUserAsFriend(body.friendId, body.myId));
+		return (this.userService.addUserAsFriend(body.friendId, req.user.id));
 	}
 
 	@Post("/my-stats")
 	@UseGuards(UserAuthorizationGuard)
 	getMyStats(@Req() req: any)
 	{
-		// return (["toto"]);
 		console.log("'my-stats' route requested");
 		const	myStats = this.gameService.matchHistory.filter((record: MatchHistoryModel) =>
 		{
@@ -1060,7 +1053,6 @@ export class UserController
 				chatUsers.push(usr);
 			}
 		});
-		console.log("NEW CHAT USERS", chatUsers);
 		return (chatUsers);
 	}
 

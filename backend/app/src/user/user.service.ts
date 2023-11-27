@@ -18,6 +18,7 @@ import
 {
 	AdminResponseModel,
 	BackUserModel,
+	ChatUserModel,
 	HistoryModel,
 	UserDBFrontModel,
 	UserLoginResponseModel,
@@ -1261,11 +1262,8 @@ public	register(data: UserModel)
 		})
 		.catch((err) =>
 		{
-			console.log("ERROR HERE ?");
-			console.log(err);
 			return ("ERROR");
 		});
-		console.log("valid password ?", valid);
 		return (valid);
 	}
 
@@ -1314,9 +1312,17 @@ public	register(data: UserModel)
 		if (searchFriendIndex === -1)
 			return ("Friend doesnt exist");
 		// this.user[searchUserIndex].friends.push(searchFriend);
-		this.user[searchUserIndex].friendsProfileId.push(friendId);
+		const	isFriend = this.user[searchUserIndex].friendsProfileId.find((elem) =>
+		{
+			return (elem === friendId);
+		});
+		if (isFriend === undefined)
+			this.user[searchUserIndex].friendsProfileId.push(friendId);
+		else
+			return ("already friends");
 		this.updateUserToDatabase(this.user[searchUserIndex]);
-		return (searchFriend.username + " added as friend");
+	
+		return ("success");
 	}
 
 	public getNumberOfUserWithUsername(username : string, user: UserModel)
@@ -1357,7 +1363,7 @@ public	register(data: UserModel)
 	}
 
 	public	addFriends(myProfileId: any, targetProfileId: any)
-		: string
+		: any
 	{
 		const	myUserIndex = this.user.findIndex((user) =>
 		{
@@ -1387,6 +1393,22 @@ public	register(data: UserModel)
 			}
 		}
 		return ("SUCCESS");
+		// const	copy = this.getAllUserRaw();
+		// const	newUsers: any[] = [];
+		// copy.map((elem) =>
+		// {
+		// 	const	toSend = {
+		// 		name: elem.username,
+		// 		avatar: elem.avatar,
+		// 		id: elem.id,
+		// 		status: elem.status,
+		// 		online: elem.online,
+		// 		location: elem.location,
+		// 		friends: elem.friendsProfileId
+		// 	}
+		// 	newUsers.push(toSend);
+		// })
+		// return (newUsers);
 	}
 
 	public	getFriendsProfileId(myProfileId: any)
