@@ -22,6 +22,10 @@ const	ProfilePage = () =>
 	{
 		return (state.controller.user);
 	});
+	const	controller = useAppSelector((state) =>
+	{
+		return (state.controller);
+	});
 	const	currentProfile = useAppSelector((state) =>
 	{
 		return (state.controller.user.chat.currentProfile);
@@ -30,6 +34,12 @@ const	ProfilePage = () =>
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);
+	});
+	useEffect(() =>
+	{
+		if (userSelected)
+			dispatch(getAchievements(userSelected.profileId));
+		console.log("ptofile achivement", controller.achievements );
 	});
 	// if (userSelected === undefined)
 	// 	throw new Error("user profile doesnt exist");

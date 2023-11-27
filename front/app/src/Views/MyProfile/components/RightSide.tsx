@@ -63,14 +63,14 @@ const	RightSide = (props: RightSideProps) =>
 						___________________
 					</Typography>
 				</Grid>
-				<Grid item xs={12}>
+				{/* <Grid item xs={12}>
 					<Typography variant="h5">
 						ACHIEVEMENTS
-					</Typography>
+					</Typography> */}
 					<Button onClick={displayAchievements}>
 						click to see the achievements
 					</Button>
-				</Grid>
+				{/* </Grid> */}
 				<Grid item xs={12}>
 					<Typography>
 						_________________

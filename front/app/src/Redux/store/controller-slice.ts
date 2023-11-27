@@ -15,6 +15,7 @@ export const	initialControllerState: ControllerModel = {
 	themeMode: "light",
 	previousPage: "/",
 	allUsers: [],
+	achievements: [],
 	user:
 	{
 		isLoggedIn: false,
@@ -429,6 +430,7 @@ const	controllerSlice = createSlice(
 		setAchievements(state, action: PayloadAction<ControllerModel>)
 		{
 			state.user.achievements = action.payload.user.achievements;
+			state.achievements = action.payload.achievements;
 		},
 		setUserBackFromDB(state, action: PayloadAction<ControllerModel>)
 		{

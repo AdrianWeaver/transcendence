@@ -39,8 +39,8 @@ const	columns: GridColDef[] = [
 		{
 			return (
 				<Avatar
-					alt={params.row.adversaireAvatar}
-					src={params.row.adversaireAvatar}/>
+					alt={params.row.avatar}
+					src={params.row.avatar}/>
 				);
 		}
 	},
@@ -56,7 +56,7 @@ const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
 	{
-		return (state.controller.stats);
+		return (state.controller.achievements);
 	});
 	if (rowStats.length === 0)
 	{

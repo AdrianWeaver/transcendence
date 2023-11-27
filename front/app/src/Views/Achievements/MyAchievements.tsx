@@ -15,6 +15,7 @@ import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { getAchievements, getMyStats } from "../../Redux/store/controllerAction";
+import Achievements from "./Achievements";
 
 const	columns: GridColDef[] = [
 	{
@@ -39,8 +40,8 @@ const	columns: GridColDef[] = [
 		{
 			return (
 				<Avatar
-					alt={params.row.adversaireAvatar}
-					src={params.row.adversaireAvatar}/>
+					alt={params.row.avatar}
+					src={params.row.avatar}/>
 				);
 		}
 	},
@@ -55,7 +56,7 @@ const	HistoryTable = () =>
 {
 	const	rowStats = useAppSelector((state) =>
 	{
-		return (state.controller.myStats);
+		return (state.controller.achievements);
 	});
 	if (rowStats.length === 0)
 	{
@@ -95,13 +96,9 @@ const	HistoryTable = () =>
 const	Header = () =>
 {
 	const	dispatch = useAppDispatch();
-	const	user = useAppSelector((state) =>
-	{
-		return (state.controller.user);
-	});
 	const	handleRefresh = () =>
 	{
-		dispatch(getAchievements(user.id.toString()));
+		dispatch(getAchievements("myself"));
 	}
 	return (
 		<>
@@ -155,9 +152,13 @@ const	MyAchievements = () =>
 {
 	const	savePrevPage = useSavePrevPage();
 	const	dispatch = useAppDispatch();
-
+	const	controller = useAppSelector((state)=>
+	{
+		return (state.controller);
+	})
 	useEffect(() =>
 	{
+		console.log("ACHEIV", controller.achievements)
 		savePrevPage("/my-achievements");
 		dispatch(getAchievements("myself"));
 	}, []);
