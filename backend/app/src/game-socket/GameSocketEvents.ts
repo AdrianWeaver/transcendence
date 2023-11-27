@@ -819,6 +819,16 @@ export class GameSocketEvents
 		if (profileId === undefined)
 			this.logger.error("Profile id not found");
 
+		const userIndex = this.userService.user.findIndex((elem) =>
+		{
+			return (elem.id.toString() === profileId?.toString());
+		});
+		if (userIndex !== -1)
+		{
+
+			const fileCfg = new FileConfig();
+			this.userService.user[userIndex].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline;
+		}
 		const	indexInstance = this.gameService.findIndexGameInstanceWithClientId(client.id);
 		if (indexInstance === -1)
 			this.logger.error("game instance not fouded for disconnect user");
@@ -892,12 +902,7 @@ export class GameSocketEvents
 				}
 			}
 		}
-		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
-		if (userIndex !== -1)
-		{
-			const fileCfg = new FileConfig();
-			this.userService.user[userIndex].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline; 
-		}
+		
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
 		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);
