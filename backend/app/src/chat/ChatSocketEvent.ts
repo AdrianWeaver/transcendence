@@ -39,7 +39,7 @@ type	ActionSocket = {
 type FriendListModel = {
 	name: string,
 	status: string,
-	online: boolean
+	online: boolean,
 }
 
 type MessageModel =
@@ -66,7 +66,9 @@ export type	FriendsModel =
 	name: string,
 	profileId: string,
 	avatar: string,
-	status: string
+	status: string,
+	statusChat: string,
+	statusGame: string
 }
 
 
@@ -246,14 +248,16 @@ export class ChatSocketEvents
 				const	profId = this.chatService.getProfileIdFromSocketId(client.id);
 				const	friendsArr: FriendsModel[] = [];
 
-				userMe.friends.forEach((friend) =>
+				userMe.friends.forEach((friend: FriendsModel) =>
 				{
 					const	fr: FriendsModel = {
 						name: friend.name,
 						id: friend.id,
 						profileId: friend.profileId,
 						avatar: friend.avatar,
-						status: friend.status
+						status: friend.status,
+						statusChat: friend.statusChat,
+						statusGame: friend.statusGame
 					}
 					friendsArr.push(fr);
 				});
@@ -508,14 +512,16 @@ export class ChatSocketEvents
 				copyUsers.splice(searchUser, 1);
 			const	newArray= [...regularUsers];
 			const	friendsList: FriendsModel[] = [];
-			me.friends.map((elem) =>
+			me.friends.map((elem : FriendsModel) =>
 			{
 				const	friend: FriendsModel = {
 					name: elem.name,
 					id: elem.id,
 					profileId: elem.profileId,
 					avatar: elem.avatar,
-					status: elem.status
+					status: elem.status,
+					statusChat: elem.statusChat,
+					statusGame: elem.statusGame
 				}
 				friendsList.push(friend);
 			});
@@ -601,7 +607,7 @@ export class ChatSocketEvents
 
 			if (data.type === "sent-message")
 			{
-				this.logger.error("The client send a message", data);
+				// this.logger.error("The client send a message", data);
 				this.handleInfoSentMessage(client, data);
 			}
 

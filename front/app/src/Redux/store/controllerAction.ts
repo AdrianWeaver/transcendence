@@ -431,6 +431,7 @@ export const setChatConnected = (connected: boolean)
 				}
 			}
 		};
+		console.log("set Chat user ", users);
 		dispatch(controllerActions.setChatUsers(response));
 	});
 };

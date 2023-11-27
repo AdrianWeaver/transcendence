@@ -1160,7 +1160,7 @@ public	register(data: UserModel)
 		{
 			return (element.id === profileId);
 		});
-		console.error(searchUser);
+		// console.error(searchUser);
 		return (searchUser?.username);
 	}
 
@@ -1391,7 +1391,9 @@ public	register(data: UserModel)
 			name: this.user[myUserIndex].username,
 			profileId: this.user[myUserIndex].id,
 			avatar: this.user[myUserIndex].avatar,
-			status: this.user[myUserIndex].status
+			status: this.user[myUserIndex].status,
+			statusChat: this.user[myUserIndex].statusChatIcon,
+			statusGame: this.user[myUserIndex].statusGameIcon
 		};
 		return (friend);
 	}

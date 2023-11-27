@@ -202,7 +202,6 @@ class Chat
 		};
 		this.parseForDatabase = () =>
 		{
-			return ;
 			const	channels: any = [];
 			const	privateMessage: any = [];
 			const	users: any= [];
