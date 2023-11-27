@@ -629,7 +629,7 @@ export class	GameService implements OnModuleInit
 			});
 		const	socketConvertedAsActive
 			= this.getCopyWithActiveSocketSetAsActive(deepCopy);
-		console.log(socketConvertedAsActive);
+		// console.log(socketConvertedAsActive);
 		const	activeConnection
 			= this.filterGameArrayBySocketState(
 					profileId,

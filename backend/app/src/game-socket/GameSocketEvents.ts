@@ -28,6 +28,7 @@ import { ContentAndApprovalsPage } from "twilio/lib/rest/content/v1/contentAndAp
 import { disconnect } from "process";
 import { profileEnd } from "console";
 import	* as roomNameArray from "./assets/roomName.json";
+import FileConfig from "src/user/Object/FileConfig";
 
 type	ActionSocket = {
 	type: string,
@@ -79,6 +80,7 @@ export class GameSocketEvents
 		private readonly userService: UserService
 	)
 	{
+		this.logger.verbose("Started instance of game socket event with id : " + this.userService.getUuidInstance());
 		this.gameService.setUserReadyNumber(0);
 		this.update = (instance: GameServe) =>
 		{
@@ -758,6 +760,16 @@ export class GameSocketEvents
 		}
 		if (roomName === "The void")
 			return ;
+		const indexUser = this.userService.user.findIndex((user) =>
+		{
+			return (user.id.toString() === profileId.toString());
+		});
+		if (indexUser !== -1)
+		{
+			const fileCfg = new FileConfig();
+			this.userService.user[indexUser]
+				.statusGameIcon = fileCfg.getAssetsConfig().statusGameOnline;
+		}
 		const	roomInfo = this.server.sockets.adapter.rooms.get(roomName);
 		if (roomInfo)
 		{
@@ -893,6 +905,11 @@ export class GameSocketEvents
 			// console.log(instance);
 		}
 		const userIndex = this.gameService.findIndexSocketIdUserByClientId(client.id);
+		if (userIndex !== -1)
+		{
+			const fileCfg = new FileConfig();
+			this.userService.user[userIndex].statusGameIcon = fileCfg.getAssetsConfig().statusGameOffline; 
+		}
 		this.gameService.removeOneSocketIdUserWithIndex(userIndex);
 		const	idSocketReady = this.gameService.findIndexSocketIdReadyWithSocketId(client.id);
 		this.gameService.removeOneSocketIdReadyWithIndex(idSocketReady);

@@ -202,6 +202,7 @@ class Chat
 		};
 		this.parseForDatabase = () =>
 		{
+			return ;
 			const	channels: any = [];
 			const	privateMessage: any = [];
 			const	users: any= [];
@@ -235,6 +236,7 @@ class Chat
 		};
 		this.databaseToObject = (rawObj: Chat) =>
 		{
+			return ;
 			const	rawChannels = rawObj.channels;
 			const	rawPrivateMessages = rawObj.privateMessage;
 			const	rawUsers = rawObj.users;

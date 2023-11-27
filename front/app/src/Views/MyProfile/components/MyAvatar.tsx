@@ -9,9 +9,9 @@ import { useState } from "react";
 
 type	MyAvatarProps =
 {
-	imageUrl: string | undefined;
+	imageUrl: string;
 	defaultUrl: string;
-	pseudo: string | undefined;
+	pseudo: string;
 }
 
 const	MyAvatar = (props: MyAvatarProps) =>

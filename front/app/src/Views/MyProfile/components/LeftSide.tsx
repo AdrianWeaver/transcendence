@@ -14,14 +14,14 @@ import { BackUserModel, ChatUserModel } from "../../../Redux/models/redux-models
 
 type	LeftSideProps =
 {
-	status: string | undefined,
-	pseudo: string | undefined,
-	imageUrl: string | undefined,
+	status: string,
+	pseudo: string,
+	imageUrl: string,
 	defaultUrl: string,
 	prevPage: string;
 	isMe: boolean;
 	isFriend: boolean;
-	profileId: string | undefined;
+	profileId: string;
 };
 
 
@@ -52,14 +52,14 @@ const	LeftSide = (props: LeftSideProps) =>
 
 		userSelected = users.find((elem) =>
 		{
-			return (props.profileId?.toString() === elem.id.toString());
+			return (props.profileId.toString() === elem.id.toString());
 		});
 		if (userSelected === undefined)
 		{
 			dispatch(setAllUsers());
 			userSelected = users.find((elem) =>
 			{
-				return (props.profileId?.toString() === elem.id.toString());
+				return (props.profileId.toString() === elem.id.toString());
 			});
 		}
 	}
@@ -106,44 +106,47 @@ const	LeftSide = (props: LeftSideProps) =>
 								♡♡♡
 							</Typography>
 						</>
-						: 
-							(!props.isFriend)
-							? <>
-										
-								<Typography style={{color: "green"}}>
-									_______________
-								</Typography>
-									{props.pseudo}
-								<Typography style={{color: "green"}}>
-									___________________
-									___________________
-									___________________
-									___________________
-								</Typography>
-							</>
-							: (userSelected === undefined)
-								? <></>
-								: <>
-									<Grid item xs={12}>
-										<Typography>
-											{userSelected.firstName}  {userSelected.lastName}
-										</Typography>
-									</Grid>
+						: <Typography>
+							{
+								(!props.isFriend)
+								? <>
+											
+									<Typography style={{color: "green"}}>
+										_______________
+									</Typography>
+										{props.pseudo}
 									<Typography style={{color: "green"}}>
 										___________________
 										___________________
+										___________________
+										___________________
 									</Typography>
-									<Grid item xs={12}>
-										<Typography>
-											{props.pseudo} is {props.status}
-										</Typography>
-									</Grid>
-									<Grid item xs={12}>
-										<Typography>
-											{userSelected.location}
-										</Typography>
-									</Grid>
 								</>
+								: (userSelected === undefined)
+									? <></>
+									: <>
+										<Grid item xs={12}>
+											<Typography>
+												{userSelected.firstName}  {userSelected.lastName}
+											</Typography>
+										</Grid>
+										<Typography style={{color: "green"}}>
+											___________________
+											___________________
+										</Typography>
+										<Grid item xs={12}>
+											<Typography>
+												{props.pseudo} is {props.status}
+											</Typography>
+										</Grid>
+										<Grid item xs={12}>
+											<Typography>
+												{userSelected.location}
+											</Typography>
+										</Grid>
+									</>
+							}
+						</Typography>
 					}
 					{
 						(props.isMe)

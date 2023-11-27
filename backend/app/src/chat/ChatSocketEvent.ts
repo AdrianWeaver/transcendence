@@ -22,6 +22,7 @@ import
 	WebSocketServer
 }	from "@nestjs/websockets";
 import { ChatService, ChatUserModel } from "./Chat.service";
+import FileConfig from "src/user/Object/FileConfig";
 import { Logger } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import	* as jwt from "jsonwebtoken";
@@ -141,6 +142,16 @@ export class ChatSocketEvents
 						client.disconnect();
 						return ;
 					}
+					const indexUser = this.userService.user.findIndex((user) =>
+					{
+						return (user.id.toString() === profileId.toString());
+					});
+					if (indexUser !== -1)
+					{
+						const fileCfg = new FileConfig();
+						this.userService.user[indexUser]
+							.statusChatIcon = fileCfg.getAssetsConfig().statusChatOnline;
+					}
 					const index = this.chatService.getIndexUserWithProfileId(profileId);
 					if (index === -1)
 					{
@@ -199,7 +210,7 @@ export class ChatSocketEvents
 						userToUpdate?.blocked.forEach((blocked) =>
 						{
 							blockedArray.push(blocked.profileId);
-						})
+						});
 						const	action = {
 							type: "on-connection",
 							payload: {
@@ -266,13 +277,11 @@ export class ChatSocketEvents
 			const index = this.chatService.searchUserIndex(sockId);
 			if (index === -1)
 			{
-				this.logger.error("The user that is started to remove dont exist ???");
 				return ;
 			}
 			const	profileId = this.chatService.getProfileIdFromSocketId(sockId);
 			if (profileId === "undefined")
 			{
-				this.logger.error("The user that is started to remove dont exist ???");
 				return ;
 			}
 			this.chatService.updateMemberSocketId("disconnected", profileId);
@@ -287,15 +296,25 @@ export class ChatSocketEvents
 			const indexOfUsers = this.chatService.chat.users.findIndex((user) =>
 			{
 				return (user.profileId === profileId);
-			})
+			});
 			if (indexOfUsers === -1)
 			{
-				this.logger.error("must not be in this conditions ");
 				return ;
 			}
 			// can check if the user is playing with the function of gameService
 			this.chatService.chat.users[indexOfUsers].status = "offline";
 			this.chatService.chat.users[indexOfUsers].online = false;
+			
+			const indexUser = this.userService.user.findIndex((user) =>
+			{
+				return (user.id.toString() === profileId.toString());
+			});
+			if (indexUser !== -1)
+			{
+				const fileCfg = new FileConfig();
+				this.userService.user[indexUser]
+					.statusChatIcon = fileCfg.getAssetsConfig().statusChatOffline;
+			}
 		}
 
 		@SubscribeMessage("sending-message")
@@ -352,7 +371,6 @@ export class ChatSocketEvents
 				if (searchPlayerOne === undefined || searchPlayerTwo === undefined)
 				{
 					// TEST
-					console.error("user not found");
 					return ("error");
 				}
 				this.gameService.increaseRoomCount();
@@ -461,28 +479,24 @@ export class ChatSocketEvents
 			// console.log("Am I playing: ", this.gameService.getStatusConnectedToGameFromProfileId(profileId));
 			this.chatService.chat.users.forEach((user) =>
 			{
-				let status;
-
-				if (!user.online)
-					status = "offline";
-				else
+				const	userIndex = this.userService.user.findIndex((userServe) =>
 				{
-					if (this.gameService.getStatusConnectedToGameFromProfileId(profileId))
-						status = "playing";
-					else
-						status = "online";
-				}
+					return (userServe.id.toString() === user.profileId.toString());
+				});
+				// this.logger.verbose("result player " + status);
 				const newUser: ChatUserModel = {
 					avatar: user.avatar,
 					id: user.id,
 					name: user.name,
 					online: user.online,
 					profileId: user.profileId,
-					status: status,
+					status: "unimplemented",
+					statusChat: this.userService.user[userIndex].statusChatIcon,
+					statusPong: this.userService.user[userIndex].statusGameIcon
 				};
 				copyUsers.push(newUser);
 			});
-
+			// console.log(copyUsers);
 			const	me = this.chatService.getUserBySocketId(client.id);
 			if (me === undefined)
 				return ;
@@ -546,7 +560,10 @@ export class ChatSocketEvents
 					id: client.id,
 					online: data.payload.online,
 					status: data.payload.status,
-					profileId: data.payload.user.id
+					profileId: data.payload.user.id,
+					//please fix me 
+					statusChat: "undefined",
+					statusPong: "undefined"
 				};
 				this.chatService.addNewChatUser(newChatUser, client);
 			}
@@ -558,7 +575,10 @@ export class ChatSocketEvents
 					id: searchChatUser.id,
 					online: searchChatUser.online,
 					status: searchChatUser.status,
-					profileId: searchChatUser.profileId
+					profileId: searchChatUser.profileId,
+					//please fix me 
+					statusChat: "undefined",
+					statusPong: "undefined"
 				};
 			}
 			const	action = {
