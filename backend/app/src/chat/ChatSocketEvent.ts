@@ -222,6 +222,11 @@ export class ChatSocketEvents
 						client.emit("channel-info", action);
 					}
 					this.chatService.updateDatabase();
+					const	newAction = {
+						type: "on-connection",
+						payload: "",
+					};
+					this.server.emit("channel-info", newAction);
 				}
 				catch (error)
 				{
@@ -547,6 +552,7 @@ export class ChatSocketEvents
 					kind: "privateMessage"
 				}
 			};
+
 			client.emit("info", action);
 		}
 
