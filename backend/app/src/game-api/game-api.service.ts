@@ -91,7 +91,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me player one");
+					// this.logger.error("please fill a good picture for me player one");
 					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerOne.username = "wanted";
 				}
@@ -102,7 +102,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me ");
+					// this.logger.error("please fill a good picture for me ");
 					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerTwo.username = "wanted";
 				}
@@ -126,7 +126,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me player one");
+					// this.logger.error("please fill a good picture for me player one");
 					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerOne.username = "wanted";
 				}
@@ -137,7 +137,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me ");
+					// this.logger.error("please fill a good picture for me ");
 					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerTwo.username = "wanted";
 				}
@@ -161,7 +161,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me player one");
+					// this.logger.error("please fill a good picture for me player one");
 					instance.playerOne.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerOne.username = "wanted";
 				}
@@ -172,7 +172,7 @@ export class GameApiService
 				}
 				else
 				{
-					this.logger.error("please fill a good picture for me ");
+					// this.logger.error("please fill a good picture for me ");
 					instance.playerTwo.avatar = "https://source.unsplash.com/random?wallpapers";
 					instance.playerTwo.username = "wanted";
 				}
