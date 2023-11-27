@@ -151,28 +151,29 @@ const	StepZero = () =>
 		displayRedirect,
 		setDiplayRedirect
 	] = useState(<></>);
-	let	responseQuery: any;
+	
+	// let	responseQuery: any;
 
-	responseQuery = "";
+	// responseQuery = "";
 	const	openSameTab = () =>
 	{
 		window.open(ftUrl, "_self");
-		let	start: boolean;
-		responseQuery = checkQueryParams(query);
-		start = false;
-		if (responseQuery.code && (!start))
-		{
-			dispatch(registerClientWithCode(responseQuery.code));
-			start = true;
-		}
-		// eslint-disable-next-line eqeqeq
-		if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
-		{
-			dispatch(verifyToken());
-			dispatch(userRegistrationStepTwo());
-		}
+		// let	start: boolean;
+		// responseQuery = checkQueryParams(query);
+		// start = false;
+		// if (responseQuery.code && (!start))
+		// {
+		// 	dispatch(registerClientWithCode(responseQuery.code));
+		// 	start = true;
+		// }
+		// // eslint-disable-next-line eqeqeq
+		// if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
+		// {
+		// 	dispatch(verifyToken());
+		// 	dispatch(userRegistrationStepTwo());
+		// }
 	};
-	const	alertInfo = AlertComponent(responseQuery);
+	// const	alertInfo = AlertComponent(responseQuery);
 
 	useEffect(() =>
 	{
@@ -185,21 +186,25 @@ const	StepZero = () =>
 			clearTimeout(timer);
 		});
 	});
-	// let	start: boolean;
-	// const	responseQuery = checkQueryParams(query);
-	// const	alertInfo = AlertComponent(responseQuery);
-	// start = false;
-	// if (responseQuery.code && (!start))
-	// {
-	// 	dispatch(registerClientWithCode(responseQuery.code));
-	// 	start = true;
-	// }
-	// // eslint-disable-next-line eqeqeq
-	// if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
-	// {
-	// 	dispatch(verifyToken());
-	// 	dispatch(userRegistrationStepTwo());
-	// }
+	let	start: boolean;
+	const	responseQuery = checkQueryParams(query);
+	const	alertInfo = AlertComponent(responseQuery);
+	start = false;
+	useEffect(() =>
+	{
+		if (responseQuery.code && (!start))
+		{
+			dispatch(registerClientWithCode(responseQuery.code));
+			start = true;
+		}
+		// eslint-disable-next-line eqeqeq
+		if (user.bearerToken !== "undefined" && user.bearerToken !== undefined && !user.alreadyExists)
+		{
+			dispatch(verifyToken());
+			dispatch(userRegistrationStepTwo());
+		}
+	}, [])
+
 
 	useEffect(() =>
 	{
