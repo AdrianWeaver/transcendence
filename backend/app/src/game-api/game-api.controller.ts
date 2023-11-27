@@ -40,7 +40,7 @@ export class GameApiController
 		private readonly prismaService: PrismaService,
 	)
 	{
-		this.logger.error("instanciate controller for the Game api"
+		this.logger.verbose("instanciate controller for the Game api"
 			+ "id: " + this.gameApiService.getInstanceId());
 		this.logger.verbose("Using the userService with id : "
 			+ this.userService.getUuidInstance());

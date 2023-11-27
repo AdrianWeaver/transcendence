@@ -20,7 +20,7 @@ export class GameApiService
 		private readonly	userService: UserService
 	)
 	{
-		this.logger.error("I am using game service with id:"
+		this.logger.verbose("I am using game service with id:"
 			+ this.gameService.getInstanceId());
 	}
 

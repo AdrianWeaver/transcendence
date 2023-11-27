@@ -153,7 +153,7 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 				{
 					this.logger.log("data is provided");
 					this.secret = data?.value;
-					this.logger.error("Secret : " + this.secret);
+					this.logger.verbose("Secret : " + this.secret);
 				}
 			})
 			.catch((error: any) =>
