@@ -548,6 +548,7 @@ export class ChatSocketEvents
 		{
 			const	searchChatUser = this.chatService.getUserBySocketId(client.id);
 
+			// this.logger.verbose("handle info", data);
 			let newChatUser: ChatUserModel;
 			if (searchChatUser === undefined)
 			{
@@ -558,7 +559,6 @@ export class ChatSocketEvents
 					online: data.payload.online,
 					status: data.payload.status,
 					profileId: data.payload.user.id,
-					//please fix me 
 					statusChat: "undefined",
 					statusPong: "undefined"
 				};
@@ -573,7 +573,6 @@ export class ChatSocketEvents
 					online: searchChatUser.online,
 					status: searchChatUser.status,
 					profileId: searchChatUser.profileId,
-					//please fix me 
 					statusChat: "undefined",
 					statusPong: "undefined"
 				};
