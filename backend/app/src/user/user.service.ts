@@ -892,16 +892,16 @@ export class UserService implements OnModuleInit, OnModuleDestroy
 		this.user.push(newUser);
 		const	response: UserRegisterResponseModel = {
 			message: "Your session has been created, you must loggin",
-			token: newUser.authService.token,
 			id: newUser.id,
-			email: newUser.email,
-			statusCode: newUser.retStatus,
 			username: newUser.username,
 			login: newUser.login,
 			firstName: newUser.firstName,
 			lastName: newUser.lastName,
 			avatar: newUser.avatar,
-			ftAvatar: newUser.ftAvatar
+			location: newUser.location,
+			date: newUser.date,
+			email: newUser.email,
+			token: newUser.authService.token
 		};
 		return (
 		{
@@ -979,16 +979,16 @@ public	register(data: UserModel)
 	this.user.push(newUser);
 	const	response: UserRegisterResponseModel = {
 		message: "Your session has been created, you must loggin",
-		token: newUser.authService.token,
 		id: newUser.id,
-		email: newUser.email,
-		statusCode: newUser.retStatus,
 		username: newUser.username,
 		login: newUser.login,
 		firstName: newUser.firstName,
 		lastName: newUser.lastName,
 		avatar: newUser.avatar,
-		ftAvatar: newUser.ftAvatar
+		date: newUser.date,
+		location: newUser.location,
+		email: newUser.email,
+		token: newUser.authService.token
 	};
 	return (
 	{
@@ -1463,7 +1463,7 @@ public	register(data: UserModel)
 			},
 			password: user.password,
 			friendsProfileId: [...user.friendsProfileId],
-			achievements: [],
+			achievements: [...user.achievements],
 			revokedConnectionRequest: user.revokedConnectionRequest,
 			statusChatIcon: user.statusChatIcon,
 			statusGameIcon: user.statusGameIcon
@@ -1539,6 +1539,7 @@ public	register(data: UserModel)
 			return (false);
 		this.user[index].registrationProcessEnded = true;
 		this.user[index].registrationStarted = false;
+		this.user[index].achievements.push("You're a part of our transcendence ! [You registered our site]");
 		this.updateUserToDatabase(this.user[index]);
 		return (true);
 	}

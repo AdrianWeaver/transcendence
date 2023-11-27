@@ -9,7 +9,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { setAllUsers, userSignIn } from "../../Redux/store/controllerAction";
+import { getAchievements, setAllUsers, userSignIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 const	Signin = () =>
@@ -21,11 +21,6 @@ const	Signin = () =>
 	const	user = useAppSelector((state) =>
 	{
 		return (state.controller.user);
-	});
-
-	const	allUsers = useAppSelector((state) =>
-	{
-		return (state.controller.allUsers);
 	});
 
 	useEffect(() =>

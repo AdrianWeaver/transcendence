@@ -7,12 +7,13 @@ import { Grid } from "@mui/material";
 import "./assets/index.css";
 import LeftSide from "./components/LeftSide";
 import RightSide from "./components/RightSide";
-import { useAppSelector } from "../../Redux/hooks/redux-hooks";
-// import EditProfile from "./components/EditProfile";
-// import { addUserAsFriend, setProfileEditView } from "../../Redux/store/controllerAction";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
+import { useEffect } from "react";
+import { getAchievements } from "../../Redux/store/controllerAction";
 
 const	ProfilePage = () =>
 {
+	const	dispatch = useAppDispatch();
 	const	prevPage= useAppSelector((state) =>
 	{
 		return (state.controller.previousPage);
@@ -25,16 +26,15 @@ const	ProfilePage = () =>
 	{
 		return (state.controller.user.chat.currentProfile);
 	});
-	if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
-		throw new Error("currentProfile undefined");
+	// if (currentProfile === "undefined" || currentProfile === undefined || currentProfile === "")
 	const	userSelected = user.chat.users.find((elem) =>
 	{
 		return (elem.profileId === currentProfile);
 	});
-	if (userSelected === undefined)
-		throw new Error("user profile doesnt exist");
-	const	online = userSelected.online ? "online 🟢" : "offline 🔴";
-	const	status = userSelected.status === "playing" ? "playing... 🏓" : online;
+	// if (userSelected === undefined)
+	// 	throw new Error("user profile doesnt exist");
+	const	online = userSelected?.online ? "online 🟢" : "offline 🔴";
+	const	status = userSelected?.status === "playing" ? "playing... 🏓" : online;
 	return (
 		<>
 			<MenuBar />
@@ -44,18 +44,18 @@ const	ProfilePage = () =>
 						<Grid item xs={12} sm={6}>
 								<LeftSide
 									status={status}
-									pseudo={userSelected.name}
-									imageUrl={userSelected.avatar}
+									pseudo={userSelected?.name}
+									imageUrl={userSelected?.avatar}
 									defaultUrl="https://thispersondoesnotexist.com/"
 									prevPage={prevPage}
 									isMe={false}
 									isFriend={user.chat.currentProfileIsFriend}
-									profileId={userSelected.profileId}
+									profileId={userSelected?.profileId}
 								/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
 								<RightSide
-									profileId={userSelected.profileId}
+									profileId={userSelected?.profileId}
 									isMe={false}
 									/>
 						</Grid>

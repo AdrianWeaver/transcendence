@@ -131,15 +131,15 @@ export interface AdminResponseModel
 	array : Array<UserModel>
 }
 
-export interface UserRegisterResponseModel
-{
-	message: string;
-	token: string;
-	// uuid: string;
-	// password: string;
-	// creationDate: string;
-	statusCode: number;
-}
+// export interface UserRegisterResponseModel
+// {
+// 	message: string;
+// 	token: string;
+// 	// uuid: string;
+// 	// password: string;
+// 	// creationDate: string;
+// 	statusCode: number;
+// }
 export interface UserLoginResponseModel
 {
 	message: string;
@@ -178,20 +178,22 @@ export interface UserRegisterResponseModel
 	email: string;
 	// creationDate: string;
 	token: string;
-	statusCode: number;
+	// statusCode: number;
 	username: string;
 	login: string;
 	firstName: string;
 	lastName: string;
 	avatar: string;
-	ftAvatar:
-	{
-		link: string,
-		version: {
-			large: string,
-			medium: string,
-			small: string,
-			mini: string
-		}
-	};
+	// ftAvatar:
+	// {
+	// 	link: string,
+	// 	version: {
+	// 		large: string,
+	// 		medium: string,
+	// 		small: string,
+	// 		mini: string
+	// 	}
+	// };
+	date: string;
+	location: string;
 }

@@ -64,6 +64,8 @@ export const	initialControllerState: ControllerModel = {
 				status: "offline",
 				avatar: "https://thispersondoesnotexist.com/",
 				profileId: "undefined",
+				statusChat: "undefined",
+				statusPong: "undefined"
 			}
 			],
 			activeConversationId: "undefined",
@@ -454,7 +456,7 @@ const	controllerSlice = createSlice(
 			state.myStats = action.payload.myStats;
 			state.themeMode = action.payload.themeMode;
 			state.user = action.payload.user;
-		}
+		},
 	}
 });
 

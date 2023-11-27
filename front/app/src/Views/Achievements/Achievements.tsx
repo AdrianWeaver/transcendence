@@ -154,8 +154,17 @@ const	Header = () =>
 const	Achievements = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-
-	savePrevPage("/achievements");
+	const	dispatch = useAppDispatch();
+	const	currentProfile = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfile);
+	});
+	useEffect(() =>
+	{
+		savePrevPage("/achievements");
+		dispatch(getAchievements(currentProfile));
+	}, [])
+	
 	return (
 		<>
 			<MenuBar />

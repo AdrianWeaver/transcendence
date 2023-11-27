@@ -15,6 +15,7 @@ import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { getAllStats, getStats } from "../../Redux/store/controllerAction";
+import { constants } from "buffer";
 
 const	columns: GridColDef[] = [
 	{
@@ -172,8 +173,14 @@ const	Header = () =>
 const	GlobalStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
 
-	savePrevPage("/global-stats");
+	useEffect(() =>
+	{
+		savePrevPage("/global-stats");
+		dispatch(getAllStats());
+	}, []);
+	
 	return (
 		<>
 			<MenuBar />

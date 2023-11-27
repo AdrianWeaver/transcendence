@@ -4,17 +4,19 @@
 /* eslint-disable max-len */
 import { Button, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { getAchievements } from "../../../Redux/store/controllerAction";
+import { useAppDispatch } from "../../../Redux/hooks/redux-hooks";
 
 type	RightSideProps =
 {
-	profileId: string;
+	profileId: string | undefined;
 	isMe: boolean;
 }
 
 const	RightSide = (props: RightSideProps) =>
 {
 	const	navigate = useNavigate();
-
+	const	dispatch = useAppDispatch();
 	const	displayStats = () =>
 	{
 		if (props.isMe)
@@ -26,9 +28,16 @@ const	RightSide = (props: RightSideProps) =>
 	const	displayAchievements = () =>
 	{
 		if (props.isMe)
+		{
+			dispatch(getAchievements("myself"))
 			navigate("/my-achievements");
+		}
 		else
+		{
+			if (props.profileId)
+				dispatch(getAchievements(props.profileId));
 			navigate("/achievements");
+		}
 	};
 
 	return (

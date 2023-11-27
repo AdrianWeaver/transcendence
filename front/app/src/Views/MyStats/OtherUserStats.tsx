@@ -15,6 +15,7 @@ import { useSavePrevPage } from "../../Router/Hooks/useSavePrevPage";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { getStats } from "../../Redux/store/controllerAction";
+import { type } from "os";
 
 const	columns: GridColDef[] = [
 	{
@@ -176,8 +177,17 @@ const	Header = () =>
 const	Stats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
-
-	savePrevPage("/stats");
+	const	dispatch = useAppDispatch();
+	const	currentProfile = useAppSelector((state) =>
+	{
+		return (state.controller.user.chat.currentProfile);
+	});
+	
+	useEffect(() =>
+	{
+		savePrevPage("/stats");
+		dispatch(getStats(currentProfile));
+	})
 	return (
 		<>
 			<MenuBar />

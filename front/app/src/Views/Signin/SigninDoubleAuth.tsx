@@ -11,7 +11,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 import UserLoginChecker from "../../Object/UserLoginChecker";
 import UserLogin from "../../Object/UserLogin";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks/redux-hooks";
-import { GetCode, receiveCode, receiveValidationCode, setUserLoggedIn, userSignIn } from "../../Redux/store/controllerAction";
+import { GetCode, getAchievements, receiveCode, receiveValidationCode, setUserLoggedIn, userSignIn } from "../../Redux/store/controllerAction";
 import { useNavigate } from "react-router-dom";
 
 const	SigninDoubleAuth = () =>
@@ -23,11 +23,6 @@ const	SigninDoubleAuth = () =>
 	const	user = useAppSelector((state) =>
 	{
 		return (state.controller.user);
-	});
-
-	const	allUsers = useAppSelector((state) =>
-	{
-		return (state.controller.allUsers);
 	});
 
 	useEffect(() =>
@@ -119,6 +114,7 @@ const	SigninDoubleAuth = () =>
 			if (filtered.length === 0)
 			{
 				dispatch(userSignIn(userLogIn.username, userLogIn.password));
+				dispatch(getAchievements("myself"));
 			}
 	};
 

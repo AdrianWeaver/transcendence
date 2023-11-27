@@ -448,7 +448,6 @@ export class UserController
 			res.status(200).send("ok");
 		else
 			res.status(401).send("Not ok");
-		// 
 	}
 
 
@@ -1024,9 +1023,15 @@ export class UserController
 	@Post("/get-achievements")
 	@UseGuards(UserAuthorizationGuard)
 	getAchievements(
-		@Body() body: any)
+		@Body() body: any,
+		@Req() req: any)
 	{
-		const	res = this.userService.getAchievements(body.id);
+		let	res;
+		if (body.id === "myself")
+			res = this.userService.getAchievements(req.user.id);
+		else
+			res = this.userService.getAchievements(body.id);
+		console.log("ICI ACHIEVEMENTS", res);
 		return (res);
 	}
 }

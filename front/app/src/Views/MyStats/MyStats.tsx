@@ -175,8 +175,14 @@ const	Header = () =>
 const	MyStats = () =>
 {
 	const	savePrevPage = useSavePrevPage();
+	const	dispatch = useAppDispatch();
 
-	savePrevPage("/my-stats");
+	useEffect(() =>
+	{
+		savePrevPage("/my-stats");
+		dispatch(getMyStats());
+	}, [])
+	
 	return (
 		<>
 			<MenuBar />

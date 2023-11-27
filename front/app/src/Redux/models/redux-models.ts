@@ -42,6 +42,8 @@ export interface BackUserModel
 	lastName: string;
 	avatar: string;
 	location: string;
+	online: boolean;
+	status: string;
 }
 
 export interface ChatModel

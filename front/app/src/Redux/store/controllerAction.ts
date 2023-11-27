@@ -1765,7 +1765,8 @@ export const	getAchievements = (profileId: string)
 		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	data = await UserServices.getAchievements(token, uri, profileId);
-		if (data.length)
+		console.log("data get achi", data);
+		if (data.length && data === "no achievements")
 		{
 			const	response: ControllerModel = {
 				...prev.controller,
