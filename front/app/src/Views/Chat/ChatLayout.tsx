@@ -1270,15 +1270,12 @@ const	ChatLayout = () =>
 
 	const	goToProfilePage = (chanName: string) =>
 	{
-		const	userMe = chatUsers.find((elem) =>
-		{
-			return (elem.profileId === uniqueId);
-		});
+		const	userMe = user.username;
 		const substrings: string[] = chanName.split("&");
 		let	username: string;
 		substrings.forEach((elem) =>
 		{
-			if (elem !== userMe?.name)
+			if (elem !== userMe)
 				username = elem;
 		});
 		dispatch(setPreviousPage("/the-chat"));
