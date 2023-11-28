@@ -761,7 +761,13 @@ export class UserController
 				return (elem.id.toString() === req.user.id.toString());
 			});
 			if (searchedUser)
+			{
+				searchedUser.avatar = fileCfg.getCDNConfig().avatar;
+				searchedUser.ftAvatar = fileCfg.getCDNConfig().ftAvatar;
+				this.logger.verbose(searchedUser.avatar);
 				this.userService.updateUserToDatabase(searchedUser);
+				
+			}
 		}
 		catch (error)
 		{
