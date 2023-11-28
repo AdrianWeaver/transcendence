@@ -1740,7 +1740,6 @@ export const	getAchievements = (profileId: string)
 		const	token = prev.controller.user.bearerToken;
 		const	uri = prev.server.uri;
 		const	data = await UserServices.getAchievements(token, uri, profileId);
-		console.log("data get achi", data);
 		if (data.length && data !== "no achievements")
 		{
 			const	tmp: string[] = [];
@@ -1748,7 +1747,6 @@ export const	getAchievements = (profileId: string)
 			{
 				tmp.push(elem);
 			})
-			console.log("TMP", tmp);
 			const	response: ControllerModel = {
 				...prev.controller,
 				achievements: [...tmp],

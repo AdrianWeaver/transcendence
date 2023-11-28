@@ -56,7 +56,6 @@ import {
 	setNumberOfChannels,
 	connectChatUser,
 	addChatUser,
-	addUserAsFriend,
 	setCurrentProfile,
 	setCurrentProfileIsFriend,
 	setProfileFriendView,
@@ -69,9 +68,6 @@ import AddNewChannelModal from "./components/AddNewChannelModal";
 import { Socket } from "socket.io-client/debug";
 import BadgeAvatars from "./components/BadgeAvatars";
 
-// import {randomUUID} from 'node:crypto';
-// window.crypto.randomUUID = randomUUID;
-// console.error = () => { };
 type MessageModel =
 {
 	sender: string,
@@ -168,9 +164,7 @@ const TabPanel = (props: TabPanelProps) =>
 };
 
 type FriendsListProps = {
-	// arrayListUsers: string[],
 	socketRef: React.MutableRefObject<Socket> | null,
-	// friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
@@ -218,11 +212,7 @@ const FriendsList = (props: FriendsListProps) =>
 
 	return (
 		<>
-			{
-				(user.ft)
-				? <Myself />
-				: <></>
-			}
+			MY FRIENDS
 			<Divider />
 				{
 					users.filter((elem, index) =>
@@ -269,7 +259,7 @@ const FriendsList = (props: FriendsListProps) =>
 													secondary={status}
 													sx={{ align: "right" }}
 											></ListItemText>
-										: <></>		// : <></>
+										: <></>
 									}
 								</ListItem>
 							</div>
@@ -282,9 +272,7 @@ const FriendsList = (props: FriendsListProps) =>
 };
 
 type UsersListProps = {
-	// arrayListUsers: string[],
 	socketRef: React.MutableRefObject<Socket> | null,
-	// friends: FriendListModel[]
 	tabMode: "user" | "friend",
 };
 
@@ -354,23 +342,10 @@ const UsersList = (props: UsersListProps) =>
 									}}>
 									<ListItem  >
 									<ListItemIcon>
-										{/* <BadgeAvatars
-											elem={elem}
-										/> */}
 										<Avatar
 											alt={elem.name}
 											src={elem.avatar}
 										/>
-											{/* <img
-												src={elem.statusChat}
-												width="33%"
-												style={{margin: "20px"}}
-											/>
-											<img
-												src={elem.statusPong}
-												width="33%"
-												style={{margin: "20px"}}
-											/> */}
 									</ListItemIcon>
 									<ListItemText primary={elem.name}>
 										{elem.name}
@@ -382,7 +357,7 @@ const UsersList = (props: UsersListProps) =>
 													secondary={status}
 													sx={{ align: "right" }}
 											></ListItemText>
-										: <></>		// : <></>
+										: <></>
 									}
 								</ListItem>
 							</div>
@@ -772,7 +747,6 @@ const	ChatLayout = () =>
 		const disconnect = () =>
 		{
 			setConnected(false);
-			// setStatus("🔴");
 			const	searchChatUser = user.chat.users.find((elem) =>
 			{
 				return (elem.name === user.username);
@@ -956,10 +930,6 @@ const	ChatLayout = () =>
 				}
 			}
 			goToChannel(data.payload.chanName, data.payload.kind, true);
-			if (data.playPong === true)
-			{
-				// inviteToPlayPong(data.payload.chanName, data.payload.MyProfileId, data.payload.friendProfileId);
-			}
 		};
 
 		const	channelInfo = (data: ActionSocket) =>
@@ -977,14 +947,12 @@ const	ChatLayout = () =>
 							});
 							setChanMessages(filteredMessages);
 							goToChannel(data.payload.chanName, "channel", false);
-							// chanMessageTest = data.payload.chanMessage;
 					}
 					if (data.payload.kind === "privateMessage")
 					{
 						setCurrentChannel(data.payload.chanName);
 						setPrivMessages(data.payload.chanMessages);
 						goToChannel(data.payload.chanName, "privateMessage", false);
-						// goToChannel(data.payload.chanName, data.payload.kind, true);
 					}
 				}
 				else
@@ -1057,24 +1025,6 @@ const	ChatLayout = () =>
 
 		const	userInfo = (data: any) =>
 		{
-			if (data.type === "add-friend")
-			{
-				// if (data.payload.alreadyFriend !== "")
-				// {
-				// 	alert("ALERT" + data.payload.alreadyFriend);
-				// }
-				// else
-				// {
-				// 	setFriendList(data.payload.friendList);
-				// 	dispatch(addUserAsFriend(user.id.toString(), data.payload.friendProfileId));
-				// 	// dispatch(addUserAsFriend(data.payload.friendProfileId, user.id.toString()));
-				// 	dispatch(setCurrentProfile(data.payload.friendProfileId));
-				// 	dispatch(setCurrentProfileIsFriend(true));
-				// 	const	alertMessage = data.payload.newFriend + " has been added to Friends.";
-				// 	alert(alertMessage);
-				// }
-			}
-
 			if (data.type === "block-user")
 			{
 				let	alertMessage: string;
@@ -1310,6 +1260,7 @@ const	ChatLayout = () =>
 			dispatch(setProfilePublicView());
 		}
 		setTalkingUserProfileId(searchUser.profileId);
+		
 		navigate("/profile/");
 	};
 
@@ -1435,20 +1386,6 @@ const	ChatLayout = () =>
 			socketRef.current.emit("channel-info", action);
 	};
 
-	const	addUserToFriends = (userName: string) =>
-	{
-		const	action = {
-			type: "add-friend",
-			payload: {
-				friendName: userName,
-				friendProfileId: friendProfileId,
-			}
-		};
-
-		if (socketRef.current !== null)
-			socketRef.current.emit("user-info", action);
-	};
-
 	const	addUserToBlocked = (userName: string, chanName: string) =>
 	{
 		let	blockedName: string;
@@ -1470,7 +1407,6 @@ const	ChatLayout = () =>
 			type: "block-user",
 			payload: {
 				blockedName: blockedName,
-				// friendProfileId: friendProfileId,
 			}
 		};
 
@@ -1503,7 +1439,6 @@ const	ChatLayout = () =>
 		});
 		if (searchUser !== undefined)
 			return (searchUser.profileId);
-			// setUserToInvite(searchUser.profileId);
 		else
 			return ("undefined");
 	};
@@ -1943,12 +1878,6 @@ const	ChatLayout = () =>
 																					(member.name !== uniqueId) &&
 																					(
 																						<>
-																							{/* <Button onClick={() =>
-																							{
-																								addUserToFriends(member.name);
-																							}}>
-																								Add friend
-																							</Button> */}
 																							<Button onClick={() =>
 																							{
 																								addUserToBlocked(member.name, "");
@@ -2192,7 +2121,6 @@ const	ChatLayout = () =>
 
 					<Grid
 						container
-						// style={{padding: '20px'}}
 						sx={{ padding: "20px" }}
 					>
 						<Grid item xs={11}>
