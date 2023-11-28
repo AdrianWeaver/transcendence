@@ -1031,7 +1031,8 @@ export class ChatSocketEvents
 					{
 						return (admin.profileId === target.profileId);
 					})
-					channel.admins.splice(indexToRemove, 1);
+					if (indexToRemove !== -1)
+						channel.admins.splice(indexToRemove, 1);
 					targetClient.emit("left-message", action);
 				}
 				else
